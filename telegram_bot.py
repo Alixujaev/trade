@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import logging
+import time
 
 import requests
 
+from backtest_main import WHITELIST_PATH, format_metrics_table, run_all_backtests
 from core.config import AppConfig
+from live_main import build_live_engine, format_signals
+from screening.sharia import ShariaFilter
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -80,3 +84,86 @@ def send_reply(cfg: AppConfig, chat_id: int | str, text: str) -> None:
         response.raise_for_status()
     except requests.exceptions.RequestException:
         logger.warning("failed to send telegram reply", exc_info=True)
+
+
+def _load_symbols() -> list[str]:
+    whitelist = ShariaFilter.from_file(WHITELIST_PATH)
+    return whitelist.filter(sorted(whitelist.whitelist))
+
+
+def handle_run(cfg: AppConfig) -> str:
+    engine = build_live_engine(cfg)
+    signals = engine.run_once(_load_symbols())
+    return format_signals(signals)
+
+
+def handle_backtest(cfg: AppConfig) -> str:
+    return format_metrics_table(run_all_backtests(cfg))
+
+
+def handle_status(cfg: AppConfig) -> str:
+    symbols = _load_symbols()
+    if not symbols:
+        return "Whitelist bo'sh."
+    engine = build_live_engine(cfg)
+    lines = [
+        f"{symbol}: {'long' if engine.state.get(symbol, 0) == 1 else 'flat'}"
+        for symbol in symbols
+    ]
+    return "\n".join(lines)
+
+
+_HANDLERS = {
+    "/run": handle_run,
+    "/backtest": handle_backtest,
+    "/status": handle_status,
+}
+
+
+def dispatch(update: dict, cfg: AppConfig) -> None:
+    if not _is_authorized(update, cfg):
+        return
+
+    command = _command_text(update)
+    if command is None:
+        return
+
+    chat_id = update["message"]["chat"]["id"]
+
+    if command == "/help":
+        send_reply(cfg, chat_id, handle_help())
+        return
+
+    handler = _HANDLERS.get(command)
+    if handler is None:
+        send_reply(cfg, chat_id, "Noma'lum buyruq. /help")
+        return
+
+    try:
+        reply = handler(cfg)
+    except Exception as exc:
+        logger.exception("command %s failed", command)
+        send_reply(cfg, chat_id, f"Xatolik yuz berdi: {exc}")
+        return
+
+    send_reply(cfg, chat_id, reply)
+
+
+def run_forever(cfg: AppConfig) -> None:
+    register_commands(cfg)
+    offset = 0
+    while True:
+        try:
+            updates = fetch_updates(cfg, offset)
+        except requests.exceptions.RequestException:
+            logger.warning("failed to fetch telegram updates; retrying", exc_info=True)
+            time.sleep(5)
+            continue
+
+        for update in updates:
+            dispatch(update, cfg)
+        offset = next_offset(updates, offset)
+
+
+if __name__ == "__main__":
+    run_forever(AppConfig.from_env())

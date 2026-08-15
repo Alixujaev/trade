@@ -1020,6 +1020,144 @@ def test_telegram_bot_api_wrappers() -> None:
     print("[ok] telegram_bot_api_wrappers")
 
 
+def test_telegram_bot_dispatch_and_handlers() -> None:
+    import requests
+
+    import telegram_bot
+    from core.config import AppConfig
+    from core.models import Action, Signal
+
+    cfg = AppConfig(telegram_bot_token="TOK", telegram_chat_id="123")
+
+    class _FakeEngine:
+        def __init__(self):
+            self.state = {"AAPL": 1, "MSFT": 0}
+
+        def run_once(self, symbols):
+            return [
+                Signal(
+                    symbol="AAPL",
+                    timestamp="t",
+                    target_position=1,
+                    action=Action.BUY,
+                    reason="x",
+                    price=1.0,
+                )
+            ]
+
+    def fake_backtest_rows(cfg):
+        return [
+            (
+                "AAPL",
+                {
+                    "total_return_pct": 1.0,
+                    "cagr_pct": 1.0,
+                    "sharpe": 1.0,
+                    "max_drawdown_pct": -1.0,
+                    "num_trades": 1,
+                    "win_rate_pct": 100.0,
+                    "avg_win": 1.0,
+                    "avg_loss": 0.0,
+                    "expectancy_per_trade": 1.0,
+                },
+            )
+        ]
+
+    orig_build_engine = telegram_bot.build_live_engine
+    orig_run_backtests = telegram_bot.run_all_backtests
+    orig_load_symbols = telegram_bot._load_symbols
+    telegram_bot.build_live_engine = lambda cfg: _FakeEngine()
+    telegram_bot._load_symbols = lambda: ["AAPL", "MSFT"]
+    telegram_bot.run_all_backtests = fake_backtest_rows
+    try:
+        assert telegram_bot.handle_run(cfg) == "Tekshirildi: 1 ta signal (AAPL BUY)."
+
+        status = telegram_bot.handle_status(cfg)
+        assert "AAPL: long" in status
+        assert "MSFT: flat" in status
+
+        backtest_text = telegram_bot.handle_backtest(cfg)
+        assert "AAPL" in backtest_text
+
+        # ---- dispatch: authorization, routing, error isolation ----
+        sent = []
+
+        def fake_post(url, json=None, timeout=None):
+            sent.append(json)
+
+            class _R:
+                def raise_for_status(self):
+                    pass
+
+            return _R()
+
+        orig_post = requests.post
+        requests.post = fake_post
+        try:
+            # unauthorized sender: dropped silently, no reply
+            telegram_bot.dispatch(
+                {"message": {"chat": {"id": 999}, "text": "/status"}}, cfg
+            )
+            assert sent == []
+
+            # authorized /status
+            telegram_bot.dispatch(
+                {"message": {"chat": {"id": 123}, "text": "/status"}}, cfg
+            )
+            assert len(sent) == 1
+            assert "AAPL: long" in sent[0]["text"]
+
+            # authorized /run
+            telegram_bot.dispatch(
+                {"message": {"chat": {"id": 123}, "text": "/run"}}, cfg
+            )
+            assert len(sent) == 2
+            assert sent[1]["text"] == "Tekshirildi: 1 ta signal (AAPL BUY)."
+
+            # authorized /backtest (still the working fake at this point)
+            telegram_bot.dispatch(
+                {"message": {"chat": {"id": 123}, "text": "/backtest"}}, cfg
+            )
+            assert len(sent) == 3
+            assert "AAPL" in sent[2]["text"]
+
+            # unknown command
+            telegram_bot.dispatch(
+                {"message": {"chat": {"id": 123}, "text": "/bogus"}}, cfg
+            )
+            assert sent[3]["text"] == "Noma'lum buyruq. /help"
+
+            # /help
+            telegram_bot.dispatch(
+                {"message": {"chat": {"id": 123}, "text": "/help"}}, cfg
+            )
+            assert "/run" in sent[4]["text"]
+
+            # non-message update types are ignored (no reply)
+            telegram_bot.dispatch(
+                {"edited_message": {"chat": {"id": 123}, "text": "/status"}}, cfg
+            )
+            assert len(sent) == 5
+
+            # handler error is caught, reported to the chat, dispatch doesn't raise
+            def broken_backtests(cfg):
+                raise RuntimeError("boom")
+
+            telegram_bot.run_all_backtests = broken_backtests
+            telegram_bot.dispatch(
+                {"message": {"chat": {"id": 123}, "text": "/backtest"}}, cfg
+            )
+            assert "Xatolik yuz berdi" in sent[5]["text"]
+        finally:
+            requests.post = orig_post
+    finally:
+        telegram_bot.build_live_engine = orig_build_engine
+        telegram_bot.run_all_backtests = orig_run_backtests
+        telegram_bot._load_symbols = orig_load_symbols
+
+    print("[ok] telegram_bot_dispatch_and_handlers")
+
+
 def main() -> int:
     tests = [
         test_models,
@@ -1039,6 +1177,7 @@ def main() -> int:
         test_live_main_helpers,
         test_telegram_bot_auth_and_parsing,
         test_telegram_bot_api_wrappers,
+        test_telegram_bot_dispatch_and_handlers,
     ]
     for t in tests:
         t()
