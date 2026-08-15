@@ -992,6 +992,34 @@ def test_telegram_bot_api_wrappers() -> None:
     finally:
         requests.post = orig_post
 
+    # send_reply: text over Telegram's 4096-char limit is chunked into
+    # multiple sendMessage calls, none of which exceed the safety margin
+    long_calls = []
+
+    def fake_post_long(url, json=None, timeout=None):
+        long_calls.append(json)
+        return _FakeResp({"ok": True})
+
+    long_text = "line\n" * 1000  # 5000 chars, well over the limit
+    requests.post = fake_post_long
+    try:
+        telegram_bot.send_reply(cfg, 123, long_text)
+    finally:
+        requests.post = orig_post
+    assert len(long_calls) > 1
+    assert all(len(call["text"]) <= telegram_bot.MAX_MESSAGE_LENGTH for call in long_calls)
+    assert all(call["chat_id"] == 123 for call in long_calls)
+    assert "".join(call["text"] for call in long_calls).count("line") == 1000
+
+    # _chunk_text: a single line longer than the limit is hard-split, and
+    # short text is passed through untouched
+    assert telegram_bot._chunk_text("short") == ["short"]
+    huge_line = "x" * 9000
+    huge_chunks = telegram_bot._chunk_text(huge_line)
+    assert len(huge_chunks) == 3
+    assert all(len(c) <= telegram_bot.MAX_MESSAGE_LENGTH for c in huge_chunks)
+    assert "".join(huge_chunks) == huge_line
+
     # register_commands: posts setMyCommands with all four commands
     reg_calls = []
 
@@ -1100,44 +1128,54 @@ def test_telegram_bot_dispatch_and_handlers() -> None:
             )
             assert sent == []
 
-            # authorized /status
+            # authorized /status (fast command: no "working..." ack)
             telegram_bot.dispatch(
                 {"message": {"chat": {"id": 123}, "text": "/status"}}, cfg
             )
             assert len(sent) == 1
             assert "AAPL: long" in sent[0]["text"]
 
-            # authorized /run
+            # authorized /run (slow command: "working..." ack, then the real reply)
             telegram_bot.dispatch(
                 {"message": {"chat": {"id": 123}, "text": "/run"}}, cfg
             )
-            assert len(sent) == 2
-            assert sent[1]["text"] == "Tekshirildi: 1 ta signal (AAPL BUY)."
+            assert len(sent) == 3
+            assert sent[1]["text"] == "Ishlayapti..."
+            assert sent[2]["text"] == "Tekshirildi: 1 ta signal (AAPL BUY)."
 
             # authorized /backtest (still the working fake at this point)
             telegram_bot.dispatch(
                 {"message": {"chat": {"id": 123}, "text": "/backtest"}}, cfg
             )
-            assert len(sent) == 3
-            assert "AAPL" in sent[2]["text"]
+            assert len(sent) == 5
+            assert sent[3]["text"] == "Ishlayapti..."
+            assert "AAPL" in sent[4]["text"]
 
             # unknown command
             telegram_bot.dispatch(
                 {"message": {"chat": {"id": 123}, "text": "/bogus"}}, cfg
             )
-            assert sent[3]["text"] == "Noma'lum buyruq. /help"
+            assert sent[5]["text"] == "Noma'lum buyruq. /help"
 
             # /help
             telegram_bot.dispatch(
                 {"message": {"chat": {"id": 123}, "text": "/help"}}, cfg
             )
-            assert "/run" in sent[4]["text"]
+            assert "/run" in sent[6]["text"]
 
             # non-message update types are ignored (no reply)
             telegram_bot.dispatch(
                 {"edited_message": {"chat": {"id": 123}, "text": "/status"}}, cfg
             )
-            assert len(sent) == 5
+            assert len(sent) == 7
+
+            # whitespace-only text (e.g. a lone non-breaking space): _command_text
+            # returns None, dispatch's early-return kicks in, no reply, no raise.
+            # This is the end-to-end regression check for the whitespace-only crash.
+            telegram_bot.dispatch(
+                {"message": {"chat": {"id": 123}, "text": "\xa0"}}, cfg
+            )
+            assert len(sent) == 7
 
             # handler error is caught, reported to the chat, dispatch doesn't raise
             def broken_backtests(cfg):
@@ -1147,7 +1185,8 @@ def test_telegram_bot_dispatch_and_handlers() -> None:
             telegram_bot.dispatch(
                 {"message": {"chat": {"id": 123}, "text": "/backtest"}}, cfg
             )
-            assert "Xatolik yuz berdi" in sent[5]["text"]
+            assert sent[7]["text"] == "Ishlayapti..."
+            assert "Xatolik yuz berdi" in sent[8]["text"]
         finally:
             requests.post = orig_post
     finally:
@@ -1156,6 +1195,38 @@ def test_telegram_bot_dispatch_and_handlers() -> None:
         telegram_bot._load_symbols = orig_load_symbols
 
     print("[ok] telegram_bot_dispatch_and_handlers")
+
+
+def test_telegram_bot_load_symbols_real() -> None:
+    import os
+    import tempfile
+
+    import telegram_bot
+
+    fd, path = tempfile.mkstemp(suffix=".txt")
+    try:
+        with os.fdopen(fd, "w") as f:
+            f.write("# comment line\n")
+            f.write("MSFT\n")
+            f.write("AAPL\n")
+            f.write("\n")
+            f.write("  NVDA  \n")
+            f.write("# another comment\n")
+
+        orig_whitelist_path = telegram_bot.WHITELIST_PATH
+        telegram_bot.WHITELIST_PATH = path
+        try:
+            # exercises the real ShariaFilter.from_file(...).filter(...) path,
+            # not a monkeypatched stand-in
+            symbols = telegram_bot._load_symbols()
+        finally:
+            telegram_bot.WHITELIST_PATH = orig_whitelist_path
+
+        assert symbols == ["AAPL", "MSFT", "NVDA"]
+    finally:
+        os.remove(path)
+
+    print("[ok] telegram_bot_load_symbols_real")
 
 
 def main() -> int:
@@ -1178,6 +1249,7 @@ def main() -> int:
         test_telegram_bot_auth_and_parsing,
         test_telegram_bot_api_wrappers,
         test_telegram_bot_dispatch_and_handlers,
+        test_telegram_bot_load_symbols_real,
     ]
     for t in tests:
         t()

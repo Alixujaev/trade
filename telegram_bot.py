@@ -35,7 +35,10 @@ def _command_text(update: dict) -> str | None:
     text = message.get("text")
     if not text:
         return None
-    return text.split()[0].split("@")[0]
+    parts = text.split()
+    if not parts:
+        return None
+    return parts[0].split("@")[0]
 
 
 def handle_help() -> str:
@@ -74,16 +77,45 @@ def next_offset(updates: list[dict], current_offset: int) -> int:
     return max(u["update_id"] for u in updates) + 1
 
 
+MAX_MESSAGE_LENGTH = 3900
+
+
+def _chunk_text(text: str, limit: int = MAX_MESSAGE_LENGTH) -> list[str]:
+    """Split text into pieces <= limit chars, preferring to split on newlines."""
+    if len(text) <= limit:
+        return [text]
+
+    chunks: list[str] = []
+    current = ""
+    for line in text.split("\n"):
+        candidate = f"{current}\n{line}" if current else line
+        if len(candidate) <= limit:
+            current = candidate
+            continue
+        if current:
+            chunks.append(current)
+            current = ""
+        # a single line longer than the limit must be hard-split
+        while len(line) > limit:
+            chunks.append(line[:limit])
+            line = line[limit:]
+        current = line
+    if current:
+        chunks.append(current)
+    return chunks
+
+
 def send_reply(cfg: AppConfig, chat_id: int | str, text: str) -> None:
-    try:
-        response = requests.post(
-            _api_url(cfg, "sendMessage"),
-            json={"chat_id": chat_id, "text": text},
-            timeout=10,
-        )
-        response.raise_for_status()
-    except requests.exceptions.RequestException:
-        logger.warning("failed to send telegram reply", exc_info=True)
+    for chunk in _chunk_text(text):
+        try:
+            response = requests.post(
+                _api_url(cfg, "sendMessage"),
+                json={"chat_id": chat_id, "text": chunk},
+                timeout=10,
+            )
+            response.raise_for_status()
+        except requests.exceptions.RequestException:
+            logger.warning("failed to send telegram reply", exc_info=True)
 
 
 def _load_symbols() -> list[str]:
@@ -119,6 +151,10 @@ _HANDLERS = {
     "/status": handle_status,
 }
 
+# Commands that can take a long time (network calls per symbol) get an
+# immediate acknowledgment so the user isn't left wondering / resending.
+_SLOW_COMMANDS = {"/run", "/backtest"}
+
 
 def dispatch(update: dict, cfg: AppConfig) -> None:
     if not _is_authorized(update, cfg):
@@ -139,6 +175,9 @@ def dispatch(update: dict, cfg: AppConfig) -> None:
         send_reply(cfg, chat_id, "Noma'lum buyruq. /help")
         return
 
+    if command in _SLOW_COMMANDS:
+        send_reply(cfg, chat_id, "Ishlayapti...")
+
     try:
         reply = handler(cfg)
     except Exception as exc:
@@ -152,6 +191,15 @@ def dispatch(update: dict, cfg: AppConfig) -> None:
 def run_forever(cfg: AppConfig) -> None:
     register_commands(cfg)
     offset = 0
+    try:
+        # Throwaway fetch to discover any already-pending updates without
+        # processing them, so a restart doesn't replay the whole backlog
+        # (up to 24h of unconfirmed updates, e.g. several /backtest runs).
+        pending = fetch_updates(cfg, offset=-1, timeout=0)
+        offset = next_offset(pending, offset)
+    except requests.exceptions.RequestException:
+        logger.warning("failed to drain pending telegram updates on startup", exc_info=True)
+
     while True:
         try:
             updates = fetch_updates(cfg, offset)
@@ -161,7 +209,10 @@ def run_forever(cfg: AppConfig) -> None:
             continue
 
         for update in updates:
-            dispatch(update, cfg)
+            try:
+                dispatch(update, cfg)
+            except Exception:
+                logger.exception("failed dispatching update")
         offset = next_offset(updates, offset)
 
 
