@@ -863,6 +863,38 @@ def test_backtest_main_helpers() -> None:
     print("[ok] backtest_main_helpers")
 
 
+def test_live_main_helpers() -> None:
+    import live_main
+    from core.models import Action, Signal
+
+    assert live_main.format_signals([]) == "Tekshirildi, o'zgarish yo'q."
+
+    sigs = [
+        Signal(
+            symbol="MSFT",
+            timestamp="2024-01-02",
+            target_position=1,
+            action=Action.BUY,
+            reason="x",
+            price=1.0,
+        ),
+        Signal(
+            symbol="NVDA",
+            timestamp="2024-01-02",
+            target_position=0,
+            action=Action.SELL,
+            reason="y",
+            price=2.0,
+        ),
+    ]
+    text = live_main.format_signals(sigs)
+    assert text == "Tekshirildi: 2 ta signal (MSFT BUY, NVDA SELL)."
+
+    assert callable(live_main.build_live_engine)
+
+    print("[ok] live_main_helpers")
+
+
 def main() -> int:
     tests = [
         test_models,
@@ -879,6 +911,7 @@ def main() -> int:
         test_live_engine,
         test_entry_points_import_and_share_strategy,
         test_backtest_main_helpers,
+        test_live_main_helpers,
     ]
     for t in tests:
         t()
