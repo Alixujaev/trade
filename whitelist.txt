@@ -1,0 +1,27 @@
+# Sharia-compliant universe whitelist.
+#
+# PLACEHOLDER LIST — NOT A RELIGIOUS RULING.
+# These tickers are examples only, for wiring up the pipeline. Before trading,
+# replace this file with a universe you have sourced from a recognized
+# standard (e.g. S&P Shariah / Dow Jones Islamic Market constituents) or a
+# screening service (Zoya, Musaffa) and/or reviewed with a qualified scholar.
+# This software does not compute or assert sharia compliance for any ticker
+# (see SPEC.md §14) and provides no financial or religious advice.
+#
+# One symbol per line. Blank lines and lines starting with # are ignored.
+#
+# Sourced by the user from a sharia screening service (Zoya/Musaffa-style),
+# 2026-08-15. More may be appended later. Note: MPE.L (M.P. Evans Group PLC)
+# is London Stock Exchange listed, not a US equity — SPEC.md scopes this bot
+# to US spot equities only, so yfinance may fetch it but it is outside the
+# system's intended universe; kept here at the user's explicit request.
+MPE.L
+CF
+EXEL
+HMY
+AU
+ODC
+SIMO
+DLO
+INCY
+DAVE
