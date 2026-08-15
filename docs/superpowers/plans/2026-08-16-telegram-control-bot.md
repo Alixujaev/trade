@@ -995,8 +995,8 @@ Design rationale and testing approach:
 - [ ] **Step 2: Run the full test suite one more time**
 
 Run: `py -m tests.smoke_test`
-Expected: every test's `[ok]` line prints (12 from Phase 1 plus the 5 added in
-Tasks 1-5), process exits 0.
+Expected: every test's `[ok]` line prints (13 from Phase 1 plus the 5 added in
+Tasks 1-5, 18 total), process exits 0.
 
 - [ ] **Step 3: Byte-compile every module**
 
