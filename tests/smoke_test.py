@@ -929,6 +929,97 @@ def test_telegram_bot_auth_and_parsing() -> None:
     print("[ok] telegram_bot_auth_and_parsing")
 
 
+def test_telegram_bot_api_wrappers() -> None:
+    import requests
+
+    import telegram_bot
+    from core.config import AppConfig
+
+    cfg = AppConfig(telegram_bot_token="TOK", telegram_chat_id="123")
+
+    class _FakeResp:
+        def __init__(self, payload):
+            self._payload = payload
+
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return self._payload
+
+    # fetch_updates: parses the "result" list, passes offset/timeout through
+    get_calls = []
+
+    def fake_get(url, params=None, timeout=None):
+        get_calls.append((url, params, timeout))
+        return _FakeResp({"ok": True, "result": [{"update_id": 5}, {"update_id": 6}]})
+
+    orig_get = requests.get
+    requests.get = fake_get
+    try:
+        updates = telegram_bot.fetch_updates(cfg, offset=5, timeout=30)
+    finally:
+        requests.get = orig_get
+    assert updates == [{"update_id": 5}, {"update_id": 6}]
+    assert "TOK" in get_calls[0][0]
+    assert get_calls[0][1] == {"offset": 5, "timeout": 30}
+
+    # next_offset: advances past the highest update_id seen; unchanged when empty
+    assert telegram_bot.next_offset([], 5) == 5
+    assert telegram_bot.next_offset([{"update_id": 5}, {"update_id": 7}], 5) == 8
+
+    # send_reply: posts to sendMessage; failures are swallowed, never raised
+    post_calls = []
+
+    def fake_post_ok(url, json=None, timeout=None):
+        post_calls.append((url, json, timeout))
+        return _FakeResp({"ok": True})
+
+    orig_post = requests.post
+    requests.post = fake_post_ok
+    try:
+        telegram_bot.send_reply(cfg, 123, "salom")
+    finally:
+        requests.post = orig_post
+    assert post_calls[0][1] == {"chat_id": 123, "text": "salom"}
+
+    def fake_post_fail(url, json=None, timeout=None):
+        raise requests.exceptions.ConnectionError("boom")
+
+    requests.post = fake_post_fail
+    try:
+        telegram_bot.send_reply(cfg, 123, "salom")  # must not raise
+    finally:
+        requests.post = orig_post
+
+    # register_commands: posts setMyCommands with all four commands
+    reg_calls = []
+
+    def fake_post_register(url, json=None, timeout=None):
+        reg_calls.append((url, json, timeout))
+        return _FakeResp({"ok": True})
+
+    requests.post = fake_post_register
+    try:
+        telegram_bot.register_commands(cfg)
+    finally:
+        requests.post = orig_post
+    assert "setMyCommands" in reg_calls[0][0]
+    assert {
+        "command": "run",
+        "description": "Bugungi signalni tekshirish",
+    } in reg_calls[0][1]["commands"]
+
+    # register_commands: failures swallowed too
+    requests.post = fake_post_fail
+    try:
+        telegram_bot.register_commands(cfg)  # must not raise
+    finally:
+        requests.post = orig_post
+
+    print("[ok] telegram_bot_api_wrappers")
+
+
 def main() -> int:
     tests = [
         test_models,
@@ -947,6 +1038,7 @@ def main() -> int:
         test_backtest_main_helpers,
         test_live_main_helpers,
         test_telegram_bot_auth_and_parsing,
+        test_telegram_bot_api_wrappers,
     ]
     for t in tests:
         t()
