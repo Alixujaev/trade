@@ -895,6 +895,40 @@ def test_live_main_helpers() -> None:
     print("[ok] live_main_helpers")
 
 
+def test_telegram_bot_auth_and_parsing() -> None:
+    import telegram_bot
+    from core.config import AppConfig
+
+    cfg = AppConfig(telegram_bot_token="TOK", telegram_chat_id="881912596")
+
+    owner_update = {"message": {"chat": {"id": 881912596}, "text": "/status"}}
+    stranger_update = {"message": {"chat": {"id": 111}, "text": "/status"}}
+    assert telegram_bot._is_authorized(owner_update, cfg)
+    assert not telegram_bot._is_authorized(stranger_update, cfg)
+    # chat id as string still matches (Telegram sends ints; cfg stores str from env)
+    assert telegram_bot._is_authorized(
+        {"message": {"chat": {"id": "881912596"}, "text": "hi"}}, cfg
+    )
+    assert not telegram_bot._is_authorized({"edited_message": {}}, cfg)
+
+    assert telegram_bot._command_text({"message": {"text": "/run"}}) == "/run"
+    assert telegram_bot._command_text({"message": {"text": "/run@MyBot"}}) == "/run"
+    assert (
+        telegram_bot._command_text({"message": {"text": "/backtest now please"}})
+        == "/backtest"
+    )
+    assert telegram_bot._command_text({"message": {}}) is None
+    assert telegram_bot._command_text({"edited_message": {"text": "/run"}}) is None
+
+    help_text = telegram_bot.handle_help()
+    assert "/run" in help_text
+    assert "/backtest" in help_text
+    assert "/status" in help_text
+    assert "/help" in help_text
+
+    print("[ok] telegram_bot_auth_and_parsing")
+
+
 def main() -> int:
     tests = [
         test_models,
@@ -912,6 +946,7 @@ def main() -> int:
         test_entry_points_import_and_share_strategy,
         test_backtest_main_helpers,
         test_live_main_helpers,
+        test_telegram_bot_auth_and_parsing,
     ]
     for t in tests:
         t()
