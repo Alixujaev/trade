@@ -33,23 +33,7 @@ def build_strategy(cfg: AppConfig) -> Strategy:
     )
 
 
-def _print_metrics_table(rows: list[tuple[str, dict]]) -> None:
-    if not rows:
-        print("No results.")
-        return
-
-    header = "symbol\t" + "\t".join(_METRIC_COLUMNS)
-    print(header)
-    for symbol, metrics in rows:
-        values = [symbol]
-        for col in _METRIC_COLUMNS:
-            v = metrics[col]
-            values.append(str(v) if col == "num_trades" else f"{v:.2f}")
-        print("\t".join(values))
-
-
-def main() -> None:
-    cfg = AppConfig.from_env()
+def run_all_backtests(cfg: AppConfig) -> list[tuple[str, dict]]:
     whitelist = ShariaFilter.from_file(WHITELIST_PATH)
     symbols = whitelist.filter(sorted(whitelist.whitelist))
 
@@ -65,7 +49,26 @@ def main() -> None:
         except Exception:
             logger.exception("backtest failed for %s", symbol)
 
-    _print_metrics_table(rows)
+    return rows
+
+
+def format_metrics_table(rows: list[tuple[str, dict]]) -> str:
+    if not rows:
+        return "No results."
+
+    lines = ["symbol\t" + "\t".join(_METRIC_COLUMNS)]
+    for symbol, metrics in rows:
+        values = [symbol]
+        for col in _METRIC_COLUMNS:
+            v = metrics[col]
+            values.append(str(v) if col == "num_trades" else f"{v:.2f}")
+        lines.append("\t".join(values))
+    return "\n".join(lines)
+
+
+def main() -> None:
+    cfg = AppConfig.from_env()
+    print(format_metrics_table(run_all_backtests(cfg)))
 
 
 if __name__ == "__main__":

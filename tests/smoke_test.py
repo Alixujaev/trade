@@ -833,6 +833,36 @@ def test_entry_points_import_and_share_strategy() -> None:
     print("[ok] entry_points_import_and_share_strategy")
 
 
+def test_backtest_main_helpers() -> None:
+    import backtest_main
+
+    rows = [
+        (
+            "AAPL",
+            {
+                "total_return_pct": 12.3,
+                "cagr_pct": 6.7,
+                "sharpe": 1.2,
+                "max_drawdown_pct": -5.5,
+                "num_trades": 3,
+                "win_rate_pct": 66.7,
+                "avg_win": 10.0,
+                "avg_loss": -4.0,
+                "expectancy_per_trade": 42.0,
+            },
+        ),
+    ]
+    table = backtest_main.format_metrics_table(rows)
+    assert table.startswith("symbol\ttotal_return_pct\t")
+    assert "AAPL\t12.30\t6.70\t1.20\t-5.50\t3\t66.70\t42.00" in table
+
+    assert backtest_main.format_metrics_table([]) == "No results."
+
+    assert callable(backtest_main.run_all_backtests)
+
+    print("[ok] backtest_main_helpers")
+
+
 def main() -> int:
     tests = [
         test_models,
@@ -848,6 +878,7 @@ def main() -> int:
         test_backtest_engine,
         test_live_engine,
         test_entry_points_import_and_share_strategy,
+        test_backtest_main_helpers,
     ]
     for t in tests:
         t()
