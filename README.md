@@ -29,6 +29,31 @@ python live_main.py          # one-shot: fetch latest data, alert on any signal 
 `live_main.py` is meant to run once per day after the US close, via cron — see
 `SPEC.md` §12. It is not a long-running process.
 
+## Telegram control bot (optional)
+
+Instead of running `backtest_main.py`/`live_main.py` from a terminal, you can run a
+long-lived process that listens for Telegram commands and replies in the chat:
+
+```bash
+python telegram_bot.py
+```
+
+This is an always-on process — a deliberate exception to this project's usual "no
+always-on process" design (see `SPEC.md` §12) — leave the terminal open, or run it
+under a process manager, while you want to use it. It only responds to the
+`TELEGRAM_CHAT_ID` configured in `.env`; every other sender is silently ignored.
+
+Commands (also shown via Telegram's native "/" menu once the bot has started once):
+
+- `/run` — run one live signal check now, same as `python live_main.py`.
+- `/backtest` — run a backtest over the whitelist, same as `python backtest_main.py`.
+- `/status` — show each whitelist symbol's current stored position, instantly, with
+  no network call.
+- `/help` — list the commands.
+
+Design rationale and testing approach:
+`docs/superpowers/specs/2026-08-16-telegram-control-bot-design.md`.
+
 ## Architecture
 
 ```
