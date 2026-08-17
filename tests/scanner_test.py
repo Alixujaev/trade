@@ -78,12 +78,69 @@ def test_bullish_pin() -> None:
     print("[ok] bullish_pin")
 
 
+def test_uptrend() -> None:
+    from core.config import IndicatorConfig
+    from signals.detectors import uptrend
+
+    cfg = IndicatorConfig(ema_fast=3, ema_slow=5)
+
+    rising = _mk_bars([[c, c + 1, c - 1, c] for c in [100, 102, 104, 106, 108, 110]])
+    assert uptrend(rising, cfg) is True
+
+    falling = _mk_bars([[c, c + 1, c - 1, c] for c in [110, 108, 106, 104, 102, 100]])
+    assert uptrend(falling, cfg) is False
+
+    # insufficient data for the slow EMA to warm up -> not an uptrend
+    short = _mk_bars([[100, 101, 99, 100]] * 3)
+    assert uptrend(short, cfg) is False
+
+    print("[ok] uptrend")
+
+
+def test_near_round_number() -> None:
+    from signals.detectors import near_round_number
+
+    on_round = _mk_bars([[99.6, 100.4, 99.4, 100.0]])  # close exactly 100
+    assert near_round_number(on_round, tol_frac=0.01) is True
+
+    off_round = _mk_bars([[102.5, 103.5, 102.0, 103.0]])  # nearest 5-multiple is 105
+    assert near_round_number(off_round, tol_frac=0.01) is False
+
+    print("[ok] near_round_number")
+
+
+def test_near_fvg() -> None:
+    from signals.detectors import near_fvg
+
+    filler = [[99.0, 101.0, 98.0, 99.5]] * 14  # ATR warmup (period=14)
+    fvg_bars = [
+        [97, 100, 96, 99],  # bar i-2: high=100 -> gap floor
+        [100, 103, 99, 102],  # middle bar
+        [104, 108, 106, 107],  # bar i: low=106 -> gap ceiling; gap=[100,106]
+    ]
+    pullback_bars = [
+        [106, 107, 103, 104],
+        [104, 105, 102, 103],
+        [103, 104, 101, 102.5],  # last close=102.5 sits back inside [100,106]
+    ]
+    df = _mk_bars(filler + fvg_bars + pullback_bars)
+    assert near_fvg(df, atr_frac=0.3, lookback=10) is True
+
+    flat = _mk_bars(filler + filler[:6])  # no gap ever forms
+    assert near_fvg(flat, atr_frac=0.3, lookback=10) is False
+
+    print("[ok] near_fvg")
+
+
 def main() -> int:
     tests = [
         test_atr,
         test_bullish_sweep,
         test_bullish_engulfing,
         test_bullish_pin,
+        test_uptrend,
+        test_near_round_number,
+        test_near_fvg,
     ]
     for t in tests:
         t()
