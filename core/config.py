@@ -25,6 +25,16 @@ class BacktestConfig:
 
 
 @dataclass
+class ScannerConfig:
+    sweep_lookback: int = 20
+    sweep_reclaim_frac: float = 0.5
+    pin_wick_frac: float = 0.6
+    fvg_atr_frac: float = 0.3
+    fvg_lookback: int = 10
+    round_number_tol_frac: float = 0.01
+
+
+@dataclass
 class AppConfig:
     interval: str = "1d"
     lookback_days: int = 400
@@ -33,6 +43,7 @@ class AppConfig:
     telegram_chat_id: str | None = None
     indicators: IndicatorConfig = field(default_factory=IndicatorConfig)
     backtest: BacktestConfig = field(default_factory=BacktestConfig)
+    scanner: ScannerConfig = field(default_factory=ScannerConfig)
 
     @classmethod
     def from_env(cls) -> AppConfig:

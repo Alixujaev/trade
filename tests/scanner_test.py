@@ -132,6 +132,95 @@ def test_near_fvg() -> None:
     print("[ok] near_fvg")
 
 
+def test_scanner_config_defaults() -> None:
+    from core.config import AppConfig, ScannerConfig
+
+    cfg = ScannerConfig()
+    assert cfg.sweep_lookback == 20
+    assert cfg.sweep_reclaim_frac == 0.5
+    assert cfg.pin_wick_frac == 0.6
+    assert cfg.fvg_atr_frac == 0.3
+    assert cfg.fvg_lookback == 10
+    assert cfg.round_number_tol_frac == 0.01
+
+    app = AppConfig()
+    assert isinstance(app.scanner, ScannerConfig)
+
+    print("[ok] scanner_config_defaults")
+
+
+def test_enricher_alone_not_actionable() -> None:
+    from core.config import AppConfig
+    from signals.detectors import near_round_number, scan_symbol
+
+    filler = [[99.0, 101.0, 98.0, 99.5]] * 2
+    last_bar = [100.2, 100.6, 99.7, 100.0]  # small body, short lower wick, on 100
+    df = _mk_bars(filler + [last_bar])
+
+    assert near_round_number(df, tol_frac=0.01) is True  # enricher alone is true...
+
+    result = scan_symbol(df, "TEST", AppConfig(), require_uptrend=False)
+    assert result is None  # ...but no trigger fired, so no actionable setup
+
+    print("[ok] enricher_alone_not_actionable")
+
+
+def test_scan_symbol_no_lookahead() -> None:
+    from core.config import AppConfig, ScannerConfig
+    from signals.detectors import scan_symbol
+
+    prior = [[100, 101, 95, 100]] * 5
+    sweep_bar = [97, 99, 90, 98]
+    df_base = _mk_bars(prior + [sweep_bar])  # 6 bars
+
+    cfg = AppConfig(scanner=ScannerConfig(sweep_lookback=5, sweep_reclaim_frac=0.5))
+
+    result_base = scan_symbol(df_base, "TEST", cfg, require_uptrend=False)
+    assert result_base is not None
+    assert "liquidity_sweep" in result_base.triggers
+
+    future_rows = [[98, 99, 97, 98.5]] * 4
+    df_extended = _mk_bars(prior + [sweep_bar] + future_rows)
+
+    # same bar position, more data appended after it -> identical result
+    result_same_slice = scan_symbol(df_extended.iloc[:6], "TEST", cfg, require_uptrend=False)
+    assert result_same_slice is not None
+    assert result_same_slice.triggers == result_base.triggers
+    assert result_same_slice.context == result_base.context
+    assert result_same_slice.price == result_base.price
+
+    # evaluating the full extended df looks at a genuinely different last bar
+    result_full = scan_symbol(df_extended, "TEST", cfg, require_uptrend=False)
+    assert result_full is None
+
+    print("[ok] scan_symbol_no_lookahead")
+
+
+def test_scan_symbol_uptrend_gate() -> None:
+    from core.config import AppConfig, IndicatorConfig, ScannerConfig
+    from signals.detectors import scan_symbol
+
+    closes = [140, 135, 130, 125, 120, 115, 110]
+    rows = [[c + 1, c + 2, c - 2, c] for c in closes]
+    sweep_bar = [97, 114, 100, 112]  # dips to 100, reclaims, closes 112
+    df = _mk_bars(rows + [sweep_bar])
+
+    cfg = AppConfig(
+        indicators=IndicatorConfig(ema_fast=3, ema_slow=5),
+        scanner=ScannerConfig(sweep_lookback=5, sweep_reclaim_frac=0.5),
+    )
+
+    gated = scan_symbol(df, "TEST", cfg, require_uptrend=True)
+    assert gated is None
+
+    ungated = scan_symbol(df, "TEST", cfg, require_uptrend=False)
+    assert ungated is not None
+    assert "liquidity_sweep" in ungated.triggers
+    assert "uptrend" not in ungated.context
+
+    print("[ok] scan_symbol_uptrend_gate")
+
+
 def main() -> int:
     tests = [
         test_atr,
@@ -141,6 +230,10 @@ def main() -> int:
         test_uptrend,
         test_near_round_number,
         test_near_fvg,
+        test_scanner_config_defaults,
+        test_enricher_alone_not_actionable,
+        test_scan_symbol_no_lookahead,
+        test_scan_symbol_uptrend_gate,
     ]
     for t in tests:
         t()

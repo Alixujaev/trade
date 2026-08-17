@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import pandas as pd
 
-from core.config import IndicatorConfig
+from core.config import AppConfig, IndicatorConfig
 from indicators.indicators import atr, ema
 
 
@@ -112,3 +114,58 @@ def near_round_number(df: pd.DataFrame, tol_frac: float = 0.01) -> bool:
     nearest = round(price / _ROUND_NUMBER_UNIT) * _ROUND_NUMBER_UNIT
     tol = tol_frac * price
     return bool(abs(price - nearest) <= tol)
+
+
+@dataclass
+class Setup:
+    symbol: str
+    triggers: list[str]
+    context: list[str]
+    price: float
+    confluence: int
+
+    @property
+    def is_actionable(self) -> bool:
+        return len(self.triggers) > 0
+
+
+def scan_symbol(
+    df: pd.DataFrame, symbol: str, cfg: AppConfig, require_uptrend: bool = True
+) -> Setup | None:
+    if df.empty:
+        return None
+
+    scanner_cfg = cfg.scanner
+    triggers: list[str] = []
+    if bullish_sweep(
+        df, lookback=scanner_cfg.sweep_lookback, reclaim_frac=scanner_cfg.sweep_reclaim_frac
+    ):
+        triggers.append("liquidity_sweep")
+    if bullish_engulfing(df):
+        triggers.append("bullish_engulfing")
+    if bullish_pin(df, wick_frac=scanner_cfg.pin_wick_frac):
+        triggers.append("bullish_pin")
+
+    if not triggers:
+        return None
+
+    is_uptrend = uptrend(df, cfg.indicators)
+    if require_uptrend and not is_uptrend:
+        return None
+
+    context: list[str] = []
+    if is_uptrend:
+        context.append("uptrend")
+    if near_fvg(df, atr_frac=scanner_cfg.fvg_atr_frac, lookback=scanner_cfg.fvg_lookback):
+        context.append("near_fvg")
+    if near_round_number(df, tol_frac=scanner_cfg.round_number_tol_frac):
+        context.append("near_round_number")
+
+    price = float(df["close"].iloc[-1])
+    return Setup(
+        symbol=symbol,
+        triggers=triggers,
+        context=context,
+        price=price,
+        confluence=len(triggers) + len(context),
+    )
