@@ -33,9 +33,57 @@ def test_atr() -> None:
     print("[ok] atr")
 
 
+def test_bullish_sweep() -> None:
+    from signals.detectors import bullish_sweep
+
+    prior = [[100, 101, 95, 100]] * 5  # 5 flat prior bars, low=95 each
+    sweep_bar = [97, 99, 90, 98]  # dips below 95, reclaims, closes at 98
+    df = _mk_bars(prior + [sweep_bar])
+    assert bullish_sweep(df, lookback=5, reclaim_frac=0.5) is True
+
+    plain_down_bar = [98, 99, 96, 97]  # never dips below the prior window low of 95
+    df2 = _mk_bars(prior + [plain_down_bar])
+    assert bullish_sweep(df2, lookback=5, reclaim_frac=0.5) is False
+
+    print("[ok] bullish_sweep")
+
+
+def test_bullish_engulfing() -> None:
+    from signals.detectors import bullish_engulfing
+
+    prior_bearish = [105, 106, 99, 100]  # bearish: close(100) < open(105)
+    last_engulf = [99, 107, 98, 106]  # bullish: body [99,106] engulfs [100,105]
+    df = _mk_bars([prior_bearish, last_engulf])
+    assert bullish_engulfing(df) is True
+
+    prior_bullish = [100, 106, 99, 105]  # prior is bullish -> no engulfing setup
+    last_bar = [99, 107, 98, 106]
+    df2 = _mk_bars([prior_bullish, last_bar])
+    assert bullish_engulfing(df2) is False
+
+    print("[ok] bullish_engulfing")
+
+
+def test_bullish_pin() -> None:
+    from signals.detectors import bullish_pin
+
+    pin_bar = [100.2, 100.6, 92.0, 100.1]  # long lower wick, small body
+    df = _mk_bars([pin_bar])
+    assert bullish_pin(df, wick_frac=0.6) is True
+
+    no_pin_bar = [100.0, 101.0, 99.5, 100.8]  # normal bullish bar, no long lower wick
+    df2 = _mk_bars([no_pin_bar])
+    assert bullish_pin(df2, wick_frac=0.6) is False
+
+    print("[ok] bullish_pin")
+
+
 def main() -> int:
     tests = [
         test_atr,
+        test_bullish_sweep,
+        test_bullish_engulfing,
+        test_bullish_pin,
     ]
     for t in tests:
         t()
