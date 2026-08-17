@@ -44,3 +44,12 @@ def crossover(a: pd.Series, b: pd.Series) -> pd.Series:
 def crossunder(a: pd.Series, b: pd.Series) -> pd.Series:
     result = (a < b) & (a.shift(1) >= b.shift(1))
     return result.fillna(False).astype(bool)
+
+
+def atr(df: pd.DataFrame, period: int = 14) -> pd.Series:
+    high, low, close = df["high"], df["low"], df["close"]
+    prev_close = close.shift(1)
+    true_range = pd.concat(
+        [high - low, (high - prev_close).abs(), (low - prev_close).abs()], axis=1
+    ).max(axis=1)
+    return true_range.ewm(alpha=1 / period, adjust=False, min_periods=period).mean()
