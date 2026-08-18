@@ -106,6 +106,13 @@ def test_near_round_number() -> None:
     off_round = _mk_bars([[102.5, 103.5, 102.0, 103.0]])  # nearest 5-multiple is 105
     assert near_round_number(off_round, tol_frac=0.01) is False
 
+    # High price: under the old unbounded formula tol = tol_frac * price = 5.03,
+    # which would wrongly call this "near" a round number (distance 2.0 <= 5.03).
+    # The capped formula limits tol to _ROUND_NUMBER_UNIT * 0.1 = 0.5, so
+    # distance 2.0 > 0.5 correctly reports False.
+    high_price_false_positive = _mk_bars([[502.0, 504.5, 501.5, 503.0]])  # nearest 5-multiple is 505
+    assert near_round_number(high_price_false_positive, tol_frac=0.01) is False
+
     print("[ok] near_round_number")
 
 

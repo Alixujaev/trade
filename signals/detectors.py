@@ -112,7 +112,12 @@ def near_round_number(df: pd.DataFrame, tol_frac: float = 0.01) -> bool:
 
     price = float(df["close"].iloc[-1])
     nearest = round(price / _ROUND_NUMBER_UNIT) * _ROUND_NUMBER_UNIT
-    tol = tol_frac * price
+    # Cap the tolerance relative to the fixed unit spacing rather than letting
+    # it scale unboundedly with price: tol_frac * price alone would make this
+    # predicate trivially True for every bar once price >= UNIT / (2 * tol_frac)
+    # (e.g. $250 at the default tol_frac=0.01), silently corrupting the
+    # journal's confluence/context data for higher-priced symbols.
+    tol = min(tol_frac * price, _ROUND_NUMBER_UNIT * 0.1)
     return bool(abs(price - nearest) <= tol)
 
 
