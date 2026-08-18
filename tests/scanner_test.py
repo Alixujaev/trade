@@ -221,6 +221,222 @@ def test_scan_symbol_uptrend_gate() -> None:
     print("[ok] scan_symbol_uptrend_gate")
 
 
+def _tmp_path(suffix: str) -> str:
+    import os
+    import tempfile
+
+    fd, path = tempfile.mkstemp(suffix=suffix)
+    os.close(fd)
+    os.remove(path)  # want a nonexistent path -> "no prior state/journal" scenario
+    return path
+
+
+class _FakeSource:
+    def __init__(self, frame):
+        self._frame = frame
+
+    def get_history(self, symbol, lookback_days, interval="1d"):
+        return self._frame.copy()
+
+
+class _FakeAlert:
+    def __init__(self):
+        self.sent = []
+
+    def send(self, signal):
+        self.sent.append(signal)
+
+
+def test_scanner_drop_forming_bar() -> None:
+    import os
+
+    from core.config import AppConfig
+    from engine.scanner import Scanner
+
+    idx = pd.date_range("2024-01-01", periods=3, freq="B")
+    df = pd.DataFrame(
+        {
+            "open": [100.0, 105.0, 99.0],
+            "high": [101.0, 106.0, 107.0],
+            "low": [99.0, 99.0, 98.0],
+            "close": [100.0, 100.0, 106.0],
+            "volume": [1_000_000] * 3,
+        },
+        index=idx,
+    )
+
+    # drop_forming_bar=True: the engulfing pattern lives on the dropped bar -> no setup
+    state_a, journal_a = _tmp_path(".json"), _tmp_path(".csv")
+    try:
+        cfg = AppConfig(state_file=state_a)
+        scanner = Scanner(
+            _FakeSource(df),
+            _FakeAlert(),
+            cfg,
+            require_uptrend=False,
+            journal_path=journal_a,
+            state_path=state_a,
+            drop_forming_bar=True,
+        )
+        setup = scanner.process_symbol("AAPL")
+        assert setup is None
+        assert not os.path.isfile(journal_a)
+    finally:
+        for p in (state_a, journal_a):
+            if os.path.isfile(p):
+                os.remove(p)
+
+    # drop_forming_bar=False: the same engulfing pattern is now the last bar -> fires
+    state_b, journal_b = _tmp_path(".json"), _tmp_path(".csv")
+    try:
+        cfg = AppConfig(state_file=state_b)
+        alert = _FakeAlert()
+        scanner = Scanner(
+            _FakeSource(df),
+            alert,
+            cfg,
+            require_uptrend=False,
+            journal_path=journal_b,
+            state_path=state_b,
+            drop_forming_bar=False,
+        )
+        setup = scanner.process_symbol("AAPL")
+        assert setup is not None
+        assert "bullish_engulfing" in setup.triggers
+        assert len(alert.sent) == 1
+        assert alert.sent[0].action.value == "BUY"
+        assert os.path.isfile(journal_b)
+        with open(journal_b, encoding="utf-8") as f:
+            content = f.read()
+        assert "bullish_engulfing" in content
+        assert "AAPL" in content
+        assert content.startswith(
+            "scanned_at,bar_date,symbol,price,triggers,context,confluence,decision,outcome,notes"
+        )
+    finally:
+        for p in (state_b, journal_b):
+            if os.path.isfile(p):
+                os.remove(p)
+
+    print("[ok] scanner_drop_forming_bar")
+
+
+def test_scanner_alert_on_change_and_state() -> None:
+    import json
+    import os
+
+    from core.config import AppConfig
+    from engine.scanner import Scanner
+
+    idx = pd.date_range("2024-01-01", periods=2, freq="B")
+    df = pd.DataFrame(
+        {
+            "open": [105.0, 99.0],
+            "high": [106.0, 107.0],
+            "low": [99.0, 98.0],
+            "close": [100.0, 106.0],
+            "volume": [1_000_000] * 2,
+        },
+        index=idx,
+    )  # bar0 bearish, bar1 bullish engulf -> fires with drop_forming_bar=False
+
+    state_path, journal_path = _tmp_path(".json"), _tmp_path(".csv")
+    try:
+        cfg = AppConfig(state_file=state_path)
+        alert = _FakeAlert()
+        scanner = Scanner(
+            _FakeSource(df),
+            alert,
+            cfg,
+            require_uptrend=False,
+            journal_path=journal_path,
+            state_path=state_path,
+            drop_forming_bar=False,
+        )
+
+        setups = scanner.run_once(["AAPL"])
+        assert len(setups) == 1
+        assert len(alert.sent) == 1
+        with open(journal_path, encoding="utf-8") as f:
+            rows_after_first = f.read().count("\n")
+
+        # same bar again -> already alerted, no re-alert, no new journal row
+        setups2 = scanner.run_once(["AAPL"])
+        assert setups2 == []
+        assert len(alert.sent) == 1
+        with open(journal_path, encoding="utf-8") as f:
+            rows_after_second = f.read().count("\n")
+        assert rows_after_second == rows_after_first
+
+        assert os.path.isfile(state_path)
+        with open(state_path, encoding="utf-8") as f:
+            saved = json.load(f)
+        assert "AAPL" in saved
+    finally:
+        for p in (state_path, journal_path):
+            if os.path.isfile(p):
+                os.remove(p)
+
+    print("[ok] scanner_alert_on_change_and_state")
+
+
+def test_scanner_corrupt_state_and_isolation() -> None:
+    import os
+    import tempfile
+
+    from core.config import AppConfig
+    from engine.scanner import Scanner
+
+    idx = pd.date_range("2024-01-01", periods=2, freq="B")
+    good_df = pd.DataFrame(
+        {
+            "open": [105.0, 99.0],
+            "high": [106.0, 107.0],
+            "low": [99.0, 98.0],
+            "close": [100.0, 106.0],
+            "volume": [1_000_000] * 2,
+        },
+        index=idx,
+    )
+
+    class _FlakySource:
+        def __init__(self, good):
+            self._good = good
+
+        def get_history(self, symbol, lookback_days, interval="1d"):
+            if symbol == "BAD":
+                raise RuntimeError("network down")
+            return self._good.copy()
+
+    fd, corrupt_state = tempfile.mkstemp(suffix=".json")
+    with os.fdopen(fd, "w") as f:
+        f.write("{not valid json")
+    journal_path = _tmp_path(".csv")
+
+    try:
+        cfg = AppConfig(state_file=corrupt_state)
+        scanner = Scanner(
+            _FlakySource(good_df),
+            _FakeAlert(),
+            cfg,
+            require_uptrend=False,
+            journal_path=journal_path,
+            state_path=corrupt_state,
+            drop_forming_bar=False,
+        )
+        assert scanner.state == {}
+
+        setups = scanner.run_once(["BAD", "AAPL"])
+        assert len(setups) == 1
+        assert setups[0].symbol == "AAPL"
+    finally:
+        for p in (corrupt_state, journal_path):
+            if os.path.isfile(p):
+                os.remove(p)
+
+    print("[ok] scanner_corrupt_state_and_isolation")
+
+
 def main() -> int:
     tests = [
         test_atr,
@@ -234,6 +450,9 @@ def main() -> int:
         test_enricher_alone_not_actionable,
         test_scan_symbol_no_lookahead,
         test_scan_symbol_uptrend_gate,
+        test_scanner_drop_forming_bar,
+        test_scanner_alert_on_change_and_state,
+        test_scanner_corrupt_state_and_isolation,
     ]
     for t in tests:
         t()
