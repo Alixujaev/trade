@@ -1,4 +1,6 @@
 .env
 state.json
+scanner_state.json
+journal.csv
 __pycache__/
 *.pyc

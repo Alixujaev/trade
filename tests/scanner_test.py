@@ -437,6 +437,22 @@ def test_scanner_corrupt_state_and_isolation() -> None:
     print("[ok] scanner_corrupt_state_and_isolation")
 
 
+def test_scan_main_imports_and_builds() -> None:
+    import importlib
+
+    from core.config import AppConfig
+    from engine.scanner import Scanner
+
+    scan_main = importlib.import_module("scan_main")
+
+    assert callable(scan_main.build_scanner)
+    scanner = scan_main.build_scanner(AppConfig())
+    assert isinstance(scanner, Scanner)
+    assert scan_main.WHITELIST_PATH == "whitelist.txt"
+
+    print("[ok] scan_main_imports_and_builds")
+
+
 def main() -> int:
     tests = [
         test_atr,
@@ -453,6 +469,7 @@ def main() -> int:
         test_scanner_drop_forming_bar,
         test_scanner_alert_on_change_and_state,
         test_scanner_corrupt_state_and_isolation,
+        test_scan_main_imports_and_builds,
     ]
     for t in tests:
         t()
