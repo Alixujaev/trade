@@ -89,6 +89,7 @@ class Scanner:
 
     def _to_signal(self, setup: Setup, timestamp) -> Signal:
         reason = (
+            "SCANNER: setup formed, go look — not a trade signal. "
             f"triggers={','.join(setup.triggers)} "
             f"context={','.join(setup.context)} "
             f"confluence={setup.confluence}"

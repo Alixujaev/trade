@@ -357,6 +357,7 @@ def test_scanner_alert_on_change_and_state() -> None:
         setups = scanner.run_once(["AAPL"])
         assert len(setups) == 1
         assert len(alert.sent) == 1
+        assert "SCANNER: setup formed, go look — not a trade signal." in alert.sent[0].reason
         with open(journal_path, encoding="utf-8") as f:
             rows_after_first = f.read().count("\n")
 
