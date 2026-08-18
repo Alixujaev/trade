@@ -134,6 +134,53 @@ class Setup:
         return len(self.triggers) > 0
 
 
+_TRIGGER_LABELS: dict[str, str] = {
+    "liquidity_sweep": "liquidity sweep",
+    "bullish_engulfing": "bullish engulfing",
+    "bullish_pin": "bullish pin",
+}
+
+_CONTEXT_LABELS: dict[str, str] = {
+    "uptrend": "uptrend",
+    "near_fvg": "near FVG",
+}
+
+
+def format_setup_alert_text(setup: Setup, bar_date: str) -> str:
+    """Build the Telegram-visible alert body for a fired Setup.
+
+    This is the single place that translates internal trigger/context keys
+    (e.g. "liquidity_sweep") into reader-facing labels. The CSV journal
+    (engine/scanner.py's _append_journal) deliberately keeps the raw keys —
+    they're better for later filtering/grouping — so only the alert text
+    goes through this mapping.
+    """
+    trigger_text = " + ".join(
+        _TRIGGER_LABELS.get(t, t.replace("_", " ")) for t in setup.triggers
+    )
+
+    context_labels: list[str] = []
+    for c in setup.context:
+        if c == "near_round_number":
+            nearest = round(setup.price / _ROUND_NUMBER_UNIT) * _ROUND_NUMBER_UNIT
+            context_labels.append(f"near ${nearest:,.0f}")
+        else:
+            context_labels.append(_CONTEXT_LABELS.get(c, c.replace("_", " ")))
+
+    lines = [
+        f"\U0001f50d <b>{setup.symbol}</b> — setup formed, go look",
+        f"<b>Trigger:</b> {trigger_text}",
+    ]
+    if context_labels:
+        lines.append(f"<b>Context:</b> {', '.join(context_labels)}")
+    lines.append(f"<b>Price:</b> ${setup.price:,.2f}")
+    lines.append(f"<b>Bar:</b> {bar_date}")
+    lines.append("")
+    lines.append("<i>Not a trade signal — open the chart and decide yourself.</i>")
+
+    return "\n".join(lines)
+
+
 def scan_symbol(
     df: pd.DataFrame, symbol: str, cfg: AppConfig, require_uptrend: bool = True
 ) -> Setup | None:

@@ -116,6 +116,88 @@ def test_near_round_number() -> None:
     print("[ok] near_round_number")
 
 
+def test_format_setup_alert_text() -> None:
+    from signals.detectors import Setup, format_setup_alert_text
+
+    setup = Setup(
+        symbol="AAPL",
+        triggers=["liquidity_sweep", "bullish_engulfing"],
+        context=["uptrend", "near_round_number"],
+        price=226.30,
+        confluence=4,
+    )
+    text = format_setup_alert_text(setup, "2026-08-18")
+
+    assert text == (
+        "\U0001f50d <b>AAPL</b> — setup formed, go look\n"
+        "<b>Trigger:</b> liquidity sweep + bullish engulfing\n"
+        "<b>Context:</b> uptrend, near $225\n"
+        "<b>Price:</b> $226.30\n"
+        "<b>Bar:</b> 2026-08-18\n"
+        "\n"
+        "<i>Not a trade signal — open the chart and decide yourself.</i>"
+    )
+
+    print("[ok] format_setup_alert_text")
+
+
+def test_format_setup_alert_text_no_context() -> None:
+    from signals.detectors import Setup, format_setup_alert_text
+
+    setup = Setup(
+        symbol="MSFT",
+        triggers=["bullish_pin"],
+        context=[],
+        price=99.99,
+        confluence=1,
+    )
+    text = format_setup_alert_text(setup, "2026-08-18")
+
+    assert "Context:" not in text
+    assert text == (
+        "\U0001f50d <b>MSFT</b> — setup formed, go look\n"
+        "<b>Trigger:</b> bullish pin\n"
+        "<b>Price:</b> $99.99\n"
+        "<b>Bar:</b> 2026-08-18\n"
+        "\n"
+        "<i>Not a trade signal — open the chart and decide yourself.</i>"
+    )
+
+    print("[ok] format_setup_alert_text_no_context")
+
+
+def test_format_setup_alert_text_emoji_and_no_separators() -> None:
+    import re
+    import unicodedata
+
+    from signals.detectors import Setup, format_setup_alert_text
+
+    setup = Setup(
+        symbol="NVDA",
+        triggers=["liquidity_sweep", "bullish_engulfing", "bullish_pin"],
+        context=["uptrend", "near_fvg", "near_round_number"],
+        price=101.20,
+        confluence=6,
+    )
+    text = format_setup_alert_text(setup, "2026-08-18")
+
+    # Exactly one emoji-category ("So" = Symbol, other) character anywhere in
+    # the text, and it must be the single header magnifying-glass -- proves
+    # "exactly one emoji, no other emoji anywhere".
+    symbol_chars = [ch for ch in text if unicodedata.category(ch) == "So"]
+    assert symbol_chars == ["\U0001f50d"]
+
+    # No box-drawing characters (U+2500-U+257F) anywhere.
+    assert not any("─" <= ch <= "╿" for ch in text)
+
+    # No run of 3+ separator-ish characters (---, ===, ___, repeated dashes) --
+    # the two single em-dashes the template itself uses are fine, a *run* of
+    # 3+ is what breaks on narrow mobile screens.
+    assert re.search(r"[-=_—–]{3,}", text) is None
+
+    print("[ok] format_setup_alert_text_emoji_and_no_separators")
+
+
 def test_near_fvg() -> None:
     from signals.detectors import near_fvg
 
@@ -539,6 +621,9 @@ def main() -> int:
         test_bullish_pin,
         test_uptrend,
         test_near_round_number,
+        test_format_setup_alert_text,
+        test_format_setup_alert_text_no_context,
+        test_format_setup_alert_text_emoji_and_no_separators,
         test_near_fvg,
         test_scanner_config_defaults,
         test_enricher_alone_not_actionable,
