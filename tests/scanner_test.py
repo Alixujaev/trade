@@ -381,6 +381,76 @@ def test_scanner_alert_on_change_and_state() -> None:
     print("[ok] scanner_alert_on_change_and_state")
 
 
+def test_scanner_journal_failure_preserves_state() -> None:
+    import os
+    import shutil
+    import tempfile
+
+    from core.config import AppConfig
+    from engine.scanner import Scanner
+
+    idx = pd.date_range("2024-01-01", periods=2, freq="B")
+    df = pd.DataFrame(
+        {
+            "open": [105.0, 99.0],
+            "high": [106.0, 107.0],
+            "low": [99.0, 98.0],
+            "close": [100.0, 106.0],
+            "volume": [1_000_000] * 2,
+        },
+        index=idx,
+    )  # bar0 bearish, bar1 bullish engulf -> fires with drop_forming_bar=False
+
+    state_path = _tmp_path(".json")
+    # A directory in place of the journal file: opening it for append raises
+    # OSError, simulating a journal write failure (e.g. disk full).
+    bad_journal_dir = tempfile.mkdtemp()
+    good_journal_path = _tmp_path(".csv")
+
+    try:
+        cfg = AppConfig(state_file=state_path)
+        alert = _FakeAlert()
+        scanner = Scanner(
+            _FakeSource(df),
+            alert,
+            cfg,
+            require_uptrend=False,
+            journal_path=bad_journal_dir,
+            state_path=state_path,
+            drop_forming_bar=False,
+        )
+
+        raised = False
+        try:
+            scanner.process_symbol("AAPL")
+        except OSError:
+            raised = True
+        assert raised
+        # The journal write failed, so the bar must NOT be marked as alerted
+        # -- otherwise the setup would be silently and permanently lost.
+        assert scanner.state.get("AAPL") is None
+        assert len(alert.sent) == 0
+
+        # Point at a writable journal path and retry the same bar: it must
+        # still fire, proving the failed attempt didn't consume the setup.
+        scanner.journal_path = good_journal_path
+        setup = scanner.process_symbol("AAPL")
+        assert setup is not None
+        assert scanner.state.get("AAPL") is not None
+        assert len(alert.sent) == 1
+        assert os.path.isfile(good_journal_path)
+        with open(good_journal_path, encoding="utf-8") as f:
+            content = f.read()
+        assert "AAPL" in content
+    finally:
+        shutil.rmtree(bad_journal_dir, ignore_errors=True)
+        for p in (state_path, good_journal_path):
+            if os.path.isfile(p):
+                os.remove(p)
+
+    print("[ok] scanner_journal_failure_preserves_state")
+
+
 def test_scanner_corrupt_state_and_isolation() -> None:
     import os
     import tempfile
@@ -469,6 +539,7 @@ def main() -> int:
         test_scan_symbol_uptrend_gate,
         test_scanner_drop_forming_bar,
         test_scanner_alert_on_change_and_state,
+        test_scanner_journal_failure_preserves_state,
         test_scanner_corrupt_state_and_isolation,
         test_scan_main_imports_and_builds,
     ]

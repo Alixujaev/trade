@@ -118,12 +118,17 @@ class Scanner:
         if self.state.get(symbol) == ts_key:
             return None  # already alerted this bar
 
-        self.state[symbol] = ts_key
-
         scanned_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
         self._append_journal(setup, ts_key, scanned_at)
 
         self.alert.send(self._to_signal(setup, latest_ts))
+
+        # Only mark this bar "alerted" once the journal write and alert both
+        # succeeded — otherwise a transient failure (e.g. disk full) would
+        # permanently drop the setup, since run_once still saves state for
+        # every symbol it processed, even ones whose per-symbol exception it
+        # caught and logged.
+        self.state[symbol] = ts_key
         return setup
 
     def run_once(self, symbols: list[str]) -> list[Setup]:
