@@ -24,10 +24,17 @@ sharia-compliant universe (see "Sharia screening" below — this is not done for
 python -m tests.smoke_test   # offline correctness checks, must be green before anything else
 python backtest_main.py      # backtest the whitelist universe, print a metrics table
 python live_main.py          # one-shot: fetch latest data, alert on any signal change
+python scan_main.py          # one-shot: scan the whitelist for price-action setups, journal + alert
 ```
 
 `live_main.py` is meant to run once per day after the US close, via cron — see
 `SPEC.md` §12. It is not a long-running process.
+
+`scan_main.py` is the price-action Scanner's cron entry point — like `live_main.py`,
+it's meant for once-a-day cron use, not an always-on process (swing trading needs
+no such thing). **A Scanner alert means "go look" — it is NOT a trade signal.** It
+flags that a price-action setup has formed and appends a row to `journal.csv`; it
+never asserts an edge and is not connected to the strategies backtested/traded above.
 
 ## Telegram control bot (optional)
 
@@ -59,13 +66,21 @@ Design rationale and testing approach:
 ```
 core/       shared dataclasses (Signal, Trade, BacktestResult) + config
 data/       DataSource interface + yfinance implementation
-indicators/ sma, ema, rsi (Wilder), macd, crossover/crossunder — the one place indicator math lives
-signals/    Strategy interface + RsiStrategy, MacdStrategy, EmaCrossStrategy, CombinedStrategy
+indicators/ sma, ema, rsi (Wilder), macd, atr, crossover/crossunder — the one place indicator math lives
+signals/    Strategy interface + RsiStrategy, MacdStrategy, EmaCrossStrategy, CombinedStrategy;
+            detectors.py — pure-function price-action trigger/enricher detectors + scan_symbol
 screening/  ShariaFilter — whitelist-based universe gate
 alerts/     AlertSink interface + Telegram implementation
 broker/     ExecutionAdapter interface — no implementation in v1.0, deliberately
-engine/     backtest.py (run_backtest, compute_metrics) and live.py (LiveEngine)
+engine/     backtest.py (run_backtest, compute_metrics), live.py (LiveEngine),
+            and scanner.py (Scanner — journal, state, alert-on-change for price-action setups)
 ```
+
+`journal.csv` (written by `Scanner`) is a user-maintained decision log, not an
+automated record: each row is a detected setup plus empty `decision`/`outcome`
+columns you fill in yourself. That's the point of the tool — it turns "eyeballing
+a chart" into a measurable question you can review later, instead of asserting an
+edge on your behalf.
 
 Three seams keep the system broker/provider-agnostic (`DataSource`, `AlertSink`,
 `ExecutionAdapter`): strategy and engine code depend only on these interfaces, never
