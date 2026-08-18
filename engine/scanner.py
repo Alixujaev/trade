@@ -10,7 +10,7 @@ from alerts.base import AlertSink
 from core.config import AppConfig
 from core.models import Action, Signal
 from data.base import DataSource
-from signals.detectors import Setup, scan_symbol
+from signals.detectors import Setup, format_setup_alert_text, scan_symbol
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +94,7 @@ class Scanner:
             f"context={','.join(setup.context)} "
             f"confluence={setup.confluence}"
         )
+        bar_date = timestamp.strftime("%Y-%m-%d")
         return Signal(
             symbol=setup.symbol,
             timestamp=timestamp,
@@ -101,6 +102,7 @@ class Scanner:
             action=Action.BUY,
             reason=reason,
             price=setup.price,
+            formatted_text=format_setup_alert_text(setup, bar_date),
         )
 
     def process_symbol(self, symbol: str) -> Setup | None:

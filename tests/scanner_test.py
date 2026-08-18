@@ -470,6 +470,62 @@ def test_scanner_alert_on_change_and_state() -> None:
     print("[ok] scanner_alert_on_change_and_state")
 
 
+def test_scanner_alert_formatted_text() -> None:
+    import os
+
+    from core.config import AppConfig
+    from engine.scanner import Scanner
+
+    idx = pd.date_range("2024-01-01", periods=2, freq="B")
+    df = pd.DataFrame(
+        {
+            "open": [105.0, 99.0],
+            "high": [106.0, 107.0],
+            "low": [99.0, 98.0],
+            "close": [100.0, 106.0],
+            "volume": [1_000_000] * 2,
+        },
+        index=idx,
+    )  # bar0 bearish, bar1 bullish engulf -> fires with drop_forming_bar=False;
+    # only 2 bars -> EMA/ATR warmups never complete, so context is empty here.
+
+    state_path, journal_path = _tmp_path(".json"), _tmp_path(".csv")
+    try:
+        cfg = AppConfig(state_file=state_path)
+        alert = _FakeAlert()
+        scanner = Scanner(
+            _FakeSource(df),
+            alert,
+            cfg,
+            require_uptrend=False,
+            journal_path=journal_path,
+            state_path=state_path,
+            drop_forming_bar=False,
+        )
+
+        setups = scanner.run_once(["AAPL"])
+        assert len(setups) == 1
+        assert len(alert.sent) == 1
+
+        signal = alert.sent[0]
+        text = signal.formatted_text
+        assert text is not None
+        assert text.startswith("\U0001f50d <b>AAPL</b>")
+        assert "bullish engulfing" in text
+        assert "Context:" not in text
+        assert "Not a trade signal — open the chart and decide yourself." in text
+
+        # The pre-existing `reason` framing (asserted by
+        # test_scanner_alert_on_change_and_state) must be untouched.
+        assert "SCANNER: setup formed, go look — not a trade signal." in signal.reason
+    finally:
+        for p in (state_path, journal_path):
+            if os.path.isfile(p):
+                os.remove(p)
+
+    print("[ok] scanner_alert_formatted_text")
+
+
 def test_scanner_journal_failure_preserves_state() -> None:
     import os
     import shutil
@@ -631,6 +687,7 @@ def main() -> int:
         test_scan_symbol_uptrend_gate,
         test_scanner_drop_forming_bar,
         test_scanner_alert_on_change_and_state,
+        test_scanner_alert_formatted_text,
         test_scanner_journal_failure_preserves_state,
         test_scanner_corrupt_state_and_isolation,
         test_scan_main_imports_and_builds,
