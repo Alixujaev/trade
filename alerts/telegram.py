@@ -24,14 +24,19 @@ class TelegramAlertSink(AlertSink):
         self.chat_id = chat_id
 
     def send(self, signal: Signal) -> None:
-        emoji = _ACTION_EMOJI.get(signal.action, "")
-        text = (
-            f"{emoji} <b>{signal.action.value}</b> {signal.symbol}\n"
-            f"Price: {signal.price}\n"
-            f"Date: {signal.timestamp}\n"
-            f"Reason: {signal.reason}\n\n"
-            f"<i>Signal only — no order placed.</i>"
-        )
+        if signal.formatted_text is not None:
+            # Pre-built by the caller (e.g. the scanner) -- send verbatim
+            # rather than wrapping it in the generic strategy-alert template.
+            text = signal.formatted_text
+        else:
+            emoji = _ACTION_EMOJI.get(signal.action, "")
+            text = (
+                f"{emoji} <b>{signal.action.value}</b> {signal.symbol}\n"
+                f"Price: {signal.price}\n"
+                f"Date: {signal.timestamp}\n"
+                f"Reason: {signal.reason}\n\n"
+                f"<i>Signal only — no order placed.</i>"
+            )
         url = self.API_URL.format(token=self.token)
         try:
             response = requests.post(

@@ -495,6 +495,55 @@ def test_telegram_alert_sink() -> None:
     print("[ok] telegram_alert_sink")
 
 
+def test_telegram_alert_sink_formatted_text_override() -> None:
+    import requests
+
+    from alerts.telegram import TelegramAlertSink
+    from core.models import Action, Signal
+
+    sig = Signal(
+        symbol="AAPL",
+        timestamp="2024-01-02",
+        target_position=1,
+        action=Action.BUY,
+        reason="unused when formatted_text is set",
+        price=123.45,
+        formatted_text=(
+            "\U0001f50d <b>AAPL</b> — setup formed, go look\n"
+            "<i>Not a trade signal — open the chart and decide yourself.</i>"
+        ),
+    )
+
+    calls = []
+
+    class _FakeResponse:
+        def raise_for_status(self):
+            pass
+
+    def fake_post_ok(url, json=None, timeout=None):
+        calls.append((url, json, timeout))
+        return _FakeResponse()
+
+    sink = TelegramAlertSink(token="TOK", chat_id="CHAT")
+    orig_post = requests.post
+    requests.post = fake_post_ok
+    try:
+        sink.send(sig)
+    finally:
+        requests.post = orig_post
+
+    assert len(calls) == 1
+    _, payload, _ = calls[0]
+    assert payload["text"] == sig.formatted_text
+    assert payload["parse_mode"] == "HTML"
+    # the generic strategy-alert template must NOT leak through when
+    # formatted_text is set
+    assert "Reason:" not in payload["text"]
+    assert "Signal only" not in payload["text"]
+
+    print("[ok] telegram_alert_sink_formatted_text_override")
+
+
 def test_execution_adapter_is_seam_only() -> None:
     import os
 
@@ -1240,6 +1289,7 @@ def main() -> int:
         test_strategies,
         test_sharia_filter,
         test_telegram_alert_sink,
+        test_telegram_alert_sink_formatted_text_override,
         test_execution_adapter_is_seam_only,
         test_backtest_engine,
         test_live_engine,

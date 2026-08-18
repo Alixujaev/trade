@@ -22,6 +22,7 @@ class Signal:
     action: Action
     reason: str
     price: float | None
+    formatted_text: str | None = None
 
 
 @dataclass
