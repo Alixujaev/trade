@@ -442,6 +442,85 @@ def test_sharia_filter() -> None:
     print("[ok] sharia_filter")
 
 
+def test_add_to_whitelist() -> None:
+    import os
+    import tempfile
+
+    from screening.sharia import add_to_whitelist
+
+    fd, path = tempfile.mkstemp(suffix=".txt")
+    try:
+        with os.fdopen(fd, "w") as f:
+            f.write("# header comment\n")
+            f.write("AAPL\n")
+
+        # new symbol -> appended, lower/mixed case normalized to upper
+        assert add_to_whitelist(path, "tsla") is True
+        with open(path, encoding="utf-8") as f:
+            content = f.read()
+        assert content.endswith("TSLA\n")
+        assert "AAPL" in content  # existing lines/header untouched
+
+        # already present (case-insensitive) -> not re-added
+        assert add_to_whitelist(path, "AAPL") is False
+        assert add_to_whitelist(path, "TSLA") is False
+        with open(path, encoding="utf-8") as f:
+            assert f.read().count("TSLA") == 1
+
+        # invalid ticker text -> raises, file untouched
+        before = open(path, encoding="utf-8").read()
+        try:
+            add_to_whitelist(path, "not a ticker!")
+            raise AssertionError("expected ValueError on invalid ticker")
+        except ValueError:
+            pass
+        with open(path, encoding="utf-8") as f:
+            assert f.read() == before
+    finally:
+        os.remove(path)
+
+    print("[ok] add_to_whitelist")
+
+
+def test_remove_from_whitelist() -> None:
+    import os
+    import tempfile
+
+    from screening.sharia import remove_from_whitelist
+
+    fd, path = tempfile.mkstemp(suffix=".txt")
+    try:
+        with os.fdopen(fd, "w") as f:
+            f.write("# header comment\n")
+            f.write("AAPL\n")
+            f.write("TSLA\n")
+            f.write("MSFT\n")
+
+        # present (case-insensitive) -> removed, other lines/comment untouched
+        assert remove_from_whitelist(path, "tsla") is True
+        with open(path, encoding="utf-8") as f:
+            content = f.read()
+        assert "TSLA" not in content
+        assert "# header comment" in content
+        assert "AAPL" in content
+        assert "MSFT" in content
+
+        # already gone -> False, file unchanged
+        before = content
+        assert remove_from_whitelist(path, "TSLA") is False
+        with open(path, encoding="utf-8") as f:
+            assert f.read() == before
+
+        # never present -> False, file unchanged
+        assert remove_from_whitelist(path, "NVDA") is False
+        with open(path, encoding="utf-8") as f:
+            assert f.read() == before
+    finally:
+        os.remove(path)
+
+    print("[ok] remove_from_whitelist")
+
+
 def test_telegram_alert_sink() -> None:
     import requests
 
@@ -1462,6 +1541,144 @@ def test_telegram_bot_scan_command() -> None:
     print("[ok] telegram_bot_scan_command")
 
 
+def test_telegram_bot_add_command() -> None:
+    import os
+    import tempfile
+
+    import requests
+
+    import telegram_bot
+    from core.config import AppConfig
+
+    cfg = AppConfig(telegram_bot_token="TOK", telegram_chat_id="123")
+
+    fd, whitelist_path = tempfile.mkstemp(suffix=".txt")
+    with os.fdopen(fd, "w") as f:
+        f.write("AAPL\n")
+
+    orig_whitelist_path = telegram_bot.WHITELIST_PATH
+    telegram_bot.WHITELIST_PATH = whitelist_path
+
+    sent = []
+
+    def fake_post(url, json=None, timeout=None):
+        sent.append(json)
+
+        class _R:
+            def raise_for_status(self):
+                pass
+
+        return _R()
+
+    orig_post = requests.post
+    requests.post = fake_post
+    try:
+        telegram_bot.dispatch(
+            {"message": {"chat": {"id": 123}, "text": "/add tsla"}}, cfg
+        )
+        assert len(sent) == 1
+        assert "TSLA" in sent[0]["text"]
+        assert "qo'shildi" in sent[0]["text"]
+        assert "shariat" in sent[0]["text"].lower()
+        with open(whitelist_path, encoding="utf-8") as f:
+            assert "TSLA" in f.read()
+
+        # already present -> no duplicate, informative reply
+        telegram_bot.dispatch(
+            {"message": {"chat": {"id": 123}, "text": "/add AAPL"}}, cfg
+        )
+        assert len(sent) == 2
+        assert "allaqachon" in sent[1]["text"]
+
+        # no argument -> usage hint, nothing written
+        telegram_bot.dispatch({"message": {"chat": {"id": 123}, "text": "/add"}}, cfg)
+        assert len(sent) == 3
+        assert "/add" in sent[2]["text"]
+
+        # invalid ticker -> error reply, file untouched
+        with open(whitelist_path, encoding="utf-8") as f:
+            before = f.read()
+        telegram_bot.dispatch(
+            {"message": {"chat": {"id": 123}, "text": "/add not a ticker!"}}, cfg
+        )
+        assert len(sent) == 4
+        with open(whitelist_path, encoding="utf-8") as f:
+            assert f.read() == before
+
+        help_text = telegram_bot.handle_help()
+        assert "/add" in help_text
+    finally:
+        requests.post = orig_post
+        telegram_bot.WHITELIST_PATH = orig_whitelist_path
+        os.remove(whitelist_path)
+
+    print("[ok] telegram_bot_add_command")
+
+
+def test_telegram_bot_remove_command() -> None:
+    import os
+    import tempfile
+
+    import requests
+
+    import telegram_bot
+    from core.config import AppConfig
+
+    cfg = AppConfig(telegram_bot_token="TOK", telegram_chat_id="123")
+
+    fd, whitelist_path = tempfile.mkstemp(suffix=".txt")
+    with os.fdopen(fd, "w") as f:
+        f.write("AAPL\n")
+        f.write("TSLA\n")
+
+    orig_whitelist_path = telegram_bot.WHITELIST_PATH
+    telegram_bot.WHITELIST_PATH = whitelist_path
+
+    sent = []
+
+    def fake_post(url, json=None, timeout=None):
+        sent.append(json)
+
+        class _R:
+            def raise_for_status(self):
+                pass
+
+        return _R()
+
+    orig_post = requests.post
+    requests.post = fake_post
+    try:
+        telegram_bot.dispatch(
+            {"message": {"chat": {"id": 123}, "text": "/remove tsla"}}, cfg
+        )
+        assert len(sent) == 1
+        assert "TSLA" in sent[0]["text"]
+        assert "o'chirildi" in sent[0]["text"]
+        with open(whitelist_path, encoding="utf-8") as f:
+            assert "TSLA" not in f.read()
+
+        # not on the list -> informative reply, no crash
+        telegram_bot.dispatch(
+            {"message": {"chat": {"id": 123}, "text": "/remove NVDA"}}, cfg
+        )
+        assert len(sent) == 2
+        assert "topilmadi" in sent[1]["text"]
+
+        # no argument -> usage hint
+        telegram_bot.dispatch({"message": {"chat": {"id": 123}, "text": "/remove"}}, cfg)
+        assert len(sent) == 3
+        assert "/remove" in sent[2]["text"]
+
+        help_text = telegram_bot.handle_help()
+        assert "/remove" in help_text
+    finally:
+        requests.post = orig_post
+        telegram_bot.WHITELIST_PATH = orig_whitelist_path
+        os.remove(whitelist_path)
+
+    print("[ok] telegram_bot_remove_command")
+
+
 def test_telegram_bot_load_symbols_real() -> None:
     import os
     import tempfile
@@ -1504,6 +1721,8 @@ def main() -> int:
         test_strategy_base,
         test_strategies,
         test_sharia_filter,
+        test_add_to_whitelist,
+        test_remove_from_whitelist,
         test_telegram_alert_sink,
         test_telegram_alert_sink_formatted_text_override,
         test_execution_adapter_is_seam_only,
@@ -1518,6 +1737,8 @@ def main() -> int:
         test_telegram_bot_api_wrappers,
         test_telegram_bot_dispatch_and_handlers,
         test_telegram_bot_scan_command,
+        test_telegram_bot_add_command,
+        test_telegram_bot_remove_command,
         test_telegram_bot_load_symbols_real,
     ]
     for t in tests:

@@ -9,7 +9,7 @@ from backtest_main import WHITELIST_PATH, format_metrics_for_telegram, run_all_b
 from core.config import AppConfig
 from live_main import build_live_engine, format_signals
 from scan_main import build_scanner, format_setups
-from screening.sharia import ShariaFilter
+from screening.sharia import ShariaFilter, add_to_whitelist, remove_from_whitelist
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -20,6 +20,8 @@ COMMANDS = [
     ("run", "Bugungi signalni tekshirish"),
     ("backtest", "Whitelist bo'yicha backtest ishga tushirish"),
     ("scan", "Price-action setuplarni skanerlash"),
+    ("add", "Whitelistga yangi ticker qo'shish, masalan: /add TSLA"),
+    ("remove", "Whitelistdan ticker o'chirish, masalan: /remove TSLA"),
     ("status", "Joriy pozitsiyalarni ko'rish"),
     ("help", "Yordam"),
 ]
@@ -64,6 +66,14 @@ def _command_text(update: dict) -> str | None:
     if not parts:
         return None
     return parts[0].split("@")[0]
+
+
+def _command_arg(update: dict) -> str:
+    """Everything after the command word, e.g. "/add tsla" -> "tsla"."""
+    message = update.get("message") or {}
+    text = (message.get("text") or "").strip()
+    parts = text.split(maxsplit=1)
+    return parts[1].strip() if len(parts) > 1 else ""
 
 
 def handle_help() -> str:
@@ -181,6 +191,35 @@ def handle_status(cfg: AppConfig) -> str:
     return "\n".join(lines)
 
 
+def handle_add(cfg: AppConfig, symbol: str) -> str:
+    if not symbol:
+        return "Belgi kiritilmadi. Masalan: /add TSLA"
+
+    try:
+        added = add_to_whitelist(WHITELIST_PATH, symbol)
+    except ValueError:
+        return f"Noto'g'ri ticker: {symbol}"
+
+    ticker = symbol.strip().upper()
+    if not added:
+        return f"{ticker} allaqachon whitelistda bor."
+    return (
+        f"✅ {ticker} whitelistga qo'shildi.\n"
+        "⚠️ Eslatma: shariat muvofiqligini o'zingiz tekshirib ko'rgan bo'lishingiz "
+        "kerak — bu bot hech qanday skrining qilmaydi."
+    )
+
+
+def handle_remove(cfg: AppConfig, symbol: str) -> str:
+    if not symbol:
+        return "Belgi kiritilmadi. Masalan: /remove TSLA"
+
+    ticker = symbol.strip().upper()
+    if not remove_from_whitelist(WHITELIST_PATH, symbol):
+        return f"{ticker} whitelistda topilmadi."
+    return f"🗑 {ticker} whitelistdan o'chirildi."
+
+
 _HANDLERS = {
     "/run": handle_run,
     "/backtest": handle_backtest,
@@ -205,6 +244,26 @@ def dispatch(update: dict, cfg: AppConfig) -> None:
 
     if command == "/help":
         send_reply(cfg, chat_id, handle_help())
+        return
+
+    if command == "/add":
+        try:
+            reply = handle_add(cfg, _command_arg(update))
+        except Exception as exc:
+            logger.exception("command /add failed")
+            send_reply(cfg, chat_id, f"Xatolik yuz berdi: {exc}")
+            return
+        send_reply(cfg, chat_id, reply)
+        return
+
+    if command == "/remove":
+        try:
+            reply = handle_remove(cfg, _command_arg(update))
+        except Exception as exc:
+            logger.exception("command /remove failed")
+            send_reply(cfg, chat_id, f"Xatolik yuz berdi: {exc}")
+            return
+        send_reply(cfg, chat_id, reply)
         return
 
     handler = _HANDLERS.get(command)
