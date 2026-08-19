@@ -10,7 +10,7 @@ from alerts.base import AlertSink
 from core.config import AppConfig
 from core.models import Action, Signal
 from data.base import DataSource
-from signals.detectors import Setup, format_setup_alert_text, scan_symbol
+from signals.detectors import Setup, build_setup_keyboard, format_setup_alert_text, scan_symbol
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +26,38 @@ _JOURNAL_HEADER = [
     "outcome",
     "notes",
 ]
+
+
+def update_journal_decision(journal_path: str, symbol: str, bar_date: str, decision: str) -> bool:
+    """Record a user's decision (from a Telegram inline-button tap) against
+    the journal row for this setup.
+
+    Rows are matched by (symbol, bar_date) -- unique because the Scanner only
+    ever alerts once per bar per symbol (see Scanner.process_symbol's state
+    check). Returns False, leaving the file untouched, if no matching row
+    exists (including when the journal doesn't exist yet).
+    """
+    if not os.path.isfile(journal_path):
+        return False
+
+    with open(journal_path, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+
+    updated = False
+    for row in rows:
+        if row.get("symbol") == symbol and row.get("bar_date") == bar_date:
+            row["decision"] = decision
+            updated = True
+
+    if not updated:
+        return False
+
+    with open(journal_path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=_JOURNAL_HEADER)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return True
 
 
 class Scanner:
@@ -103,6 +135,7 @@ class Scanner:
             reason=reason,
             price=setup.price,
             formatted_text=format_setup_alert_text(setup, bar_date),
+            reply_markup=build_setup_keyboard(setup.symbol, bar_date),
         )
 
     def process_symbol(self, symbol: str) -> Setup | None:

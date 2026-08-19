@@ -129,13 +129,14 @@ def test_format_setup_alert_text() -> None:
     text = format_setup_alert_text(setup, "2026-08-18")
 
     assert text == (
-        "\U0001f50d <b>AAPL</b> — setup formed, go look\n"
-        "<b>Trigger:</b> liquidity sweep + bullish engulfing\n"
-        "<b>Context:</b> uptrend, near $225\n"
-        "<b>Price:</b> $226.30\n"
-        "<b>Bar:</b> 2026-08-18\n"
+        "\U0001f50d <b>AAPL</b> — setup shakllandi, ko'rib chiq\n"
+        "<b>Belgi:</b> liquidity sweep + bullish engulfing\n"
+        "<b>Kontekst:</b> uptrend, $225 atrofida\n"
+        "<b>Narx:</b> $226.30\n"
+        "<b>Sana:</b> 2026-08-18\n"
+        "<b>Kuchi:</b> 4 ta belgi\n"
         "\n"
-        "<i>Not a trade signal — open the chart and decide yourself.</i>"
+        "<i>Savdo signali emas — chartni oching va o'zingiz qaror qiling.</i>"
     )
 
     print("[ok] format_setup_alert_text")
@@ -153,14 +154,15 @@ def test_format_setup_alert_text_no_context() -> None:
     )
     text = format_setup_alert_text(setup, "2026-08-18")
 
-    assert "Context:" not in text
+    assert "Kontekst:" not in text
     assert text == (
-        "\U0001f50d <b>MSFT</b> — setup formed, go look\n"
-        "<b>Trigger:</b> bullish pin\n"
-        "<b>Price:</b> $99.99\n"
-        "<b>Bar:</b> 2026-08-18\n"
+        "\U0001f50d <b>MSFT</b> — setup shakllandi, ko'rib chiq\n"
+        "<b>Belgi:</b> bullish pin\n"
+        "<b>Narx:</b> $99.99\n"
+        "<b>Sana:</b> 2026-08-18\n"
+        "<b>Kuchi:</b> 1 ta belgi\n"
         "\n"
-        "<i>Not a trade signal — open the chart and decide yourself.</i>"
+        "<i>Savdo signali emas — chartni oching va o'zingiz qaror qiling.</i>"
     )
 
     print("[ok] format_setup_alert_text_no_context")
@@ -512,8 +514,16 @@ def test_scanner_alert_formatted_text() -> None:
         assert text is not None
         assert text.startswith("\U0001f50d <b>AAPL</b>")
         assert "bullish engulfing" in text
-        assert "Context:" not in text
-        assert "Not a trade signal — open the chart and decide yourself." in text
+        assert "Kontekst:" not in text
+        assert "Savdo signali emas — chartni oching va o'zingiz qaror qiling." in text
+
+        assert signal.reply_markup is not None
+        keyboard = signal.reply_markup["inline_keyboard"]
+        assert keyboard[0][0]["text"] == "\U0001f4c8 Chart"
+        assert "AAPL" in keyboard[0][0]["url"]
+        assert "callback_data" not in keyboard[0][0]  # chart button is a plain link
+        assert keyboard[1][0]["callback_data"] == "j:T:AAPL:2024-01-02"
+        assert keyboard[1][1]["callback_data"] == "j:S:AAPL:2024-01-02"
 
         # The pre-existing `reason` framing (asserted by
         # test_scanner_alert_on_change_and_state) must be untouched.
@@ -653,6 +663,44 @@ def test_scanner_corrupt_state_and_isolation() -> None:
     print("[ok] scanner_corrupt_state_and_isolation")
 
 
+def test_update_journal_decision() -> None:
+    import csv
+    import os
+
+    from engine.scanner import update_journal_decision
+
+    journal_path = _tmp_path(".csv")
+    try:
+        # no journal file yet -> nothing to update
+        assert update_journal_decision(journal_path, "AAPL", "2026-08-18", "taken") is False
+
+        with open(journal_path, "w", encoding="utf-8", newline="") as f:
+            f.write(
+                "scanned_at,bar_date,symbol,price,triggers,context,confluence,"
+                "decision,outcome,notes\n"
+                "2026-08-18T21:00:00+00:00,2026-08-18,AAPL,226.3,liquidity_sweep,"
+                "uptrend,2,,,\n"
+                "2026-08-18T21:00:00+00:00,2026-08-18,MSFT,410.0,bullish_pin,,1,,,\n"
+            )
+
+        assert update_journal_decision(journal_path, "AAPL", "2026-08-18", "taken") is True
+
+        with open(journal_path, encoding="utf-8", newline="") as f:
+            rows = list(csv.DictReader(f))
+        assert rows[0]["symbol"] == "AAPL"
+        assert rows[0]["decision"] == "taken"
+        assert rows[1]["symbol"] == "MSFT"
+        assert rows[1]["decision"] == ""  # untouched
+
+        # no row matches this symbol/bar_date -> False, file left as-is
+        assert update_journal_decision(journal_path, "NVDA", "2026-08-18", "skipped") is False
+    finally:
+        if os.path.isfile(journal_path):
+            os.remove(journal_path)
+
+    print("[ok] update_journal_decision")
+
+
 def test_scan_main_imports_and_builds() -> None:
     import importlib
 
@@ -690,6 +738,7 @@ def main() -> int:
         test_scanner_alert_formatted_text,
         test_scanner_journal_failure_preserves_state,
         test_scanner_corrupt_state_and_isolation,
+        test_update_journal_decision,
         test_scan_main_imports_and_builds,
     ]
     for t in tests:

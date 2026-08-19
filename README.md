@@ -50,7 +50,8 @@ always-on process" design (see `SPEC.md` §12) — leave the terminal open, or r
 under a process manager, while you want to use it. It only responds to the
 `TELEGRAM_CHAT_ID` configured in `.env`; every other sender is silently ignored.
 
-Commands (also shown via Telegram's native "/" menu once the bot has started once):
+Commands (also shown via Telegram's native "/" menu, and as a persistent
+reply-keyboard row under the chat input, once the bot has started once):
 
 - `/run` — run one live signal check now, same as `python live_main.py`.
 - `/backtest` — run a backtest over the whitelist, same as `python backtest_main.py`.
@@ -58,8 +59,16 @@ Commands (also shown via Telegram's native "/" menu once the bot has started onc
   no network call.
 - `/help` — list the commands.
 
+Each Scanner alert (from `scan_main.py`/`Scanner`) carries inline buttons: a
+"📈 Chart" link (TradingView) and "✅ Oldim" / "⏭ O'tkazib yubordim" — tapping
+the latter records your decision straight into that setup's `journal.csv` row
+(via `engine.scanner.update_journal_decision`), so `python telegram_bot.py`
+must be running for these buttons to work.
+
 Design rationale and testing approach:
-`docs/superpowers/specs/2026-08-16-telegram-control-bot-design.md`.
+`docs/superpowers/specs/2026-08-16-telegram-control-bot-design.md` (note: its
+"No inline-button UI" non-goal was superseded — see git history for the
+inline-button/keyboard addition).
 
 ## Architecture
 

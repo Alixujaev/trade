@@ -23,6 +23,7 @@ class Signal:
     reason: str
     price: float | None
     formatted_text: str | None = None
+    reply_markup: dict | None = None
 
 
 @dataclass

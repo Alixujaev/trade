@@ -32,16 +32,19 @@ class TelegramAlertSink(AlertSink):
             emoji = _ACTION_EMOJI.get(signal.action, "")
             text = (
                 f"{emoji} <b>{signal.action.value}</b> {signal.symbol}\n"
-                f"Price: {signal.price}\n"
-                f"Date: {signal.timestamp}\n"
-                f"Reason: {signal.reason}\n\n"
-                f"<i>Signal only — no order placed.</i>"
+                f"Narx: {signal.price}\n"
+                f"Sana: {signal.timestamp}\n"
+                f"Sabab: {signal.reason}\n\n"
+                f"<i>Faqat signal — order joylashtirilmagan.</i>"
             )
         url = self.API_URL.format(token=self.token)
+        payload = {"chat_id": self.chat_id, "text": text, "parse_mode": "HTML"}
+        if signal.reply_markup is not None:
+            payload["reply_markup"] = signal.reply_markup
         try:
             response = requests.post(
                 url,
-                json={"chat_id": self.chat_id, "text": text, "parse_mode": "HTML"},
+                json=payload,
                 timeout=10,
             )
             response.raise_for_status()

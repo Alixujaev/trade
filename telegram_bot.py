@@ -7,6 +7,7 @@ import requests
 
 from backtest_main import WHITELIST_PATH, format_metrics_table, run_all_backtests
 from core.config import AppConfig
+from engine.scanner import update_journal_decision
 from live_main import build_live_engine, format_signals
 from screening.sharia import ShariaFilter
 
@@ -15,12 +16,37 @@ logger = logging.getLogger(__name__)
 
 API_URL = "https://api.telegram.org/bot{token}/{method}"
 
+JOURNAL_PATH = "journal.csv"
+
 COMMANDS = [
     ("run", "Bugungi signalni tekshirish"),
     ("backtest", "Whitelist bo'yicha backtest ishga tushirish"),
     ("status", "Joriy pozitsiyalarni ko'rish"),
     ("help", "Yordam"),
 ]
+
+# Persistent reply keyboard shown under the chat input, mirroring COMMANDS
+# one-to-one -- tapping a button sends its label as plain text, which
+# _command_text maps back to the matching "/command" below.
+MAIN_KEYBOARD = {
+    "keyboard": [
+        ["▶️ Run", "\U0001f4ca Backtest"],
+        ["\U0001f4cc Status", "❓ Yordam"],
+    ],
+    "resize_keyboard": True,
+}
+
+_BUTTON_LABELS: dict[str, str] = {
+    "▶️ Run": "/run",
+    "\U0001f4ca Backtest": "/backtest",
+    "\U0001f4cc Status": "/status",
+    "❓ Yordam": "/help",
+}
+
+# Scanner-alert inline-button decisions (see signals.detectors.build_setup_keyboard):
+# callback_data is "j:<code>:<symbol>:<bar_date>".
+_DECISION_CODES: dict[str, str] = {"T": "taken", "S": "skipped"}
+_DECISION_LABELS: dict[str, str] = {"taken": "✅ Oldim", "skipped": "⏭ O'tkazib yubordim"}
 
 
 def _is_authorized(update: dict, cfg: AppConfig) -> bool:
@@ -35,6 +61,9 @@ def _command_text(update: dict) -> str | None:
     text = message.get("text")
     if not text:
         return None
+    button_command = _BUTTON_LABELS.get(text.strip())
+    if button_command is not None:
+        return button_command
     parts = text.split()
     if not parts:
         return None
@@ -110,12 +139,38 @@ def send_reply(cfg: AppConfig, chat_id: int | str, text: str) -> None:
         try:
             response = requests.post(
                 _api_url(cfg, "sendMessage"),
-                json={"chat_id": chat_id, "text": chunk},
+                json={"chat_id": chat_id, "text": chunk, "reply_markup": MAIN_KEYBOARD},
                 timeout=10,
             )
             response.raise_for_status()
         except requests.exceptions.RequestException:
             logger.warning("failed to send telegram reply", exc_info=True)
+
+
+def answer_callback_query(cfg: AppConfig, callback_query_id: str, text: str = "") -> None:
+    try:
+        response = requests.post(
+            _api_url(cfg, "answerCallbackQuery"),
+            json={"callback_query_id": callback_query_id, "text": text},
+            timeout=10,
+        )
+        response.raise_for_status()
+    except requests.exceptions.RequestException:
+        logger.warning("failed to answer telegram callback query", exc_info=True)
+
+
+def edit_message_reply_markup(
+    cfg: AppConfig, chat_id: int | str, message_id: int, reply_markup: dict | None
+) -> None:
+    try:
+        response = requests.post(
+            _api_url(cfg, "editMessageReplyMarkup"),
+            json={"chat_id": chat_id, "message_id": message_id, "reply_markup": reply_markup},
+            timeout=10,
+        )
+        response.raise_for_status()
+    except requests.exceptions.RequestException:
+        logger.warning("failed to edit telegram message reply markup", exc_info=True)
 
 
 def _load_symbols() -> list[str]:
@@ -156,7 +211,44 @@ _HANDLERS = {
 _SLOW_COMMANDS = {"/run", "/backtest"}
 
 
+def _dispatch_callback(callback_query: dict, cfg: AppConfig) -> None:
+    message = callback_query.get("message") or {}
+    if not _is_authorized({"message": message}, cfg):
+        return
+
+    callback_id = callback_query.get("id")
+    chat_id = message["chat"]["id"]
+    message_id = message.get("message_id")
+    data = callback_query.get("data") or ""
+    parts = data.split(":")
+
+    if len(parts) != 4 or parts[0] != "j" or parts[1] not in _DECISION_CODES:
+        answer_callback_query(cfg, callback_id, "Noma'lum amal.")
+        return
+
+    _, code, symbol, bar_date = parts
+    decision = _DECISION_CODES[code]
+
+    if not update_journal_decision(JOURNAL_PATH, symbol, bar_date, decision):
+        answer_callback_query(cfg, callback_id, "Yozuv topilmadi.")
+        return
+
+    answer_callback_query(cfg, callback_id, "Saqlandi.")
+    if message_id is not None:
+        confirmed = {
+            "inline_keyboard": [
+                [{"text": f"Belgilandi: {_DECISION_LABELS[decision]}", "callback_data": "noop"}]
+            ]
+        }
+        edit_message_reply_markup(cfg, chat_id, message_id, confirmed)
+
+
 def dispatch(update: dict, cfg: AppConfig) -> None:
+    callback_query = update.get("callback_query")
+    if callback_query is not None:
+        _dispatch_callback(callback_query, cfg)
+        return
+
     if not _is_authorized(update, cfg):
         return
 

@@ -26,11 +26,24 @@ def test_models() -> None:
     )
     assert sig.symbol == "AAPL"
     assert sig.target_position == 1
+    assert sig.reply_markup is None
     try:
         sig.symbol = "MSFT"  # type: ignore[misc]
         raise AssertionError("Signal must be frozen")
     except AttributeError:
         pass
+
+    kb = {"inline_keyboard": [[{"text": "x", "url": "https://example.com"}]]}
+    sig_with_kb = Signal(
+        symbol="AAPL",
+        timestamp="2024-01-02",
+        target_position=1,
+        action=Action.BUY,
+        reason="test",
+        price=100.0,
+        reply_markup=kb,
+    )
+    assert sig_with_kb.reply_markup == kb
 
     trade = Trade(
         symbol="AAPL",
@@ -479,8 +492,9 @@ def test_telegram_alert_sink() -> None:
     assert "2024-01-02" in text
     assert "rsi crossed up out of oversold" in text
     assert "BUY" in text
-    assert "signal only" in text.lower()
-    assert "no order" in text.lower()
+    assert "faqat signal" in text.lower()
+    assert "order joylashtirilmagan" in text.lower()
+    assert "reply_markup" not in payload  # no keyboard when Signal has none
 
     # send failures must be swallowed, never raised
     def fake_post_fail(url, json=None, timeout=None):
@@ -501,6 +515,7 @@ def test_telegram_alert_sink_formatted_text_override() -> None:
     from alerts.telegram import TelegramAlertSink
     from core.models import Action, Signal
 
+    kb = {"inline_keyboard": [[{"text": "\U0001f4c8 Chart", "url": "https://example.com"}]]}
     sig = Signal(
         symbol="AAPL",
         timestamp="2024-01-02",
@@ -512,6 +527,7 @@ def test_telegram_alert_sink_formatted_text_override() -> None:
             "\U0001f50d <b>AAPL</b> — setup formed, go look\n"
             "<i>Not a trade signal — open the chart and decide yourself.</i>"
         ),
+        reply_markup=kb,
     )
 
     calls = []
@@ -536,6 +552,7 @@ def test_telegram_alert_sink_formatted_text_override() -> None:
     _, payload, _ = calls[0]
     assert payload["text"] == sig.formatted_text
     assert payload["parse_mode"] == "HTML"
+    assert payload["reply_markup"] == kb
     # the generic strategy-alert template must NOT leak through when
     # formatted_text is set
     assert "Reason:" not in payload["text"]
@@ -969,6 +986,14 @@ def test_telegram_bot_auth_and_parsing() -> None:
     assert telegram_bot._command_text({"message": {}}) is None
     assert telegram_bot._command_text({"edited_message": {"text": "/run"}}) is None
 
+    # persistent reply-keyboard button labels map to the same commands
+    assert telegram_bot._command_text({"message": {"text": "\U0001f4cc Status"}}) == "/status"
+    assert telegram_bot._command_text({"message": {"text": "▶️ Run"}}) == "/run"
+    assert (
+        telegram_bot._command_text({"message": {"text": "\U0001f4ca Backtest"}}) == "/backtest"
+    )
+    assert telegram_bot._command_text({"message": {"text": "❓ Yordam"}}) == "/help"
+
     help_text = telegram_bot.handle_help()
     assert "/run" in help_text
     assert "/backtest" in help_text
@@ -1030,7 +1055,11 @@ def test_telegram_bot_api_wrappers() -> None:
         telegram_bot.send_reply(cfg, 123, "salom")
     finally:
         requests.post = orig_post
-    assert post_calls[0][1] == {"chat_id": 123, "text": "salom"}
+    assert post_calls[0][1] == {
+        "chat_id": 123,
+        "text": "salom",
+        "reply_markup": telegram_bot.MAIN_KEYBOARD,
+    }
 
     def fake_post_fail(url, json=None, timeout=None):
         raise requests.exceptions.ConnectionError("boom")
@@ -1058,6 +1087,7 @@ def test_telegram_bot_api_wrappers() -> None:
     assert len(long_calls) > 1
     assert all(len(call["text"]) <= telegram_bot.MAX_MESSAGE_LENGTH for call in long_calls)
     assert all(call["chat_id"] == 123 for call in long_calls)
+    assert all(call["reply_markup"] == telegram_bot.MAIN_KEYBOARD for call in long_calls)
     assert "".join(call["text"] for call in long_calls).count("line") == 1000
 
     # _chunk_text: a single line longer than the limit is hard-split, and
@@ -1246,6 +1276,117 @@ def test_telegram_bot_dispatch_and_handlers() -> None:
     print("[ok] telegram_bot_dispatch_and_handlers")
 
 
+def test_telegram_bot_callback_dispatch() -> None:
+    import csv
+    import os
+    import tempfile
+
+    import requests
+
+    import telegram_bot
+    from core.config import AppConfig
+
+    cfg = AppConfig(telegram_bot_token="TOK", telegram_chat_id="881912596")
+
+    fd, journal_path = tempfile.mkstemp(suffix=".csv")
+    os.close(fd)
+    with open(journal_path, "w", encoding="utf-8", newline="") as f:
+        f.write(
+            "scanned_at,bar_date,symbol,price,triggers,context,confluence,"
+            "decision,outcome,notes\n"
+            "2026-08-18T21:00:00+00:00,2026-08-18,AAPL,226.3,liquidity_sweep,"
+            "uptrend,2,,,\n"
+        )
+
+    orig_journal_path = telegram_bot.JOURNAL_PATH
+    telegram_bot.JOURNAL_PATH = journal_path
+
+    sent = []
+
+    def fake_post(url, json=None, timeout=None):
+        sent.append((url, json))
+
+        class _R:
+            def raise_for_status(self):
+                pass
+
+        return _R()
+
+    orig_post = requests.post
+    requests.post = fake_post
+    try:
+        # unauthorized chat -> dropped silently, no API calls at all
+        telegram_bot.dispatch(
+            {
+                "callback_query": {
+                    "id": "cbq1",
+                    "message": {"message_id": 10, "chat": {"id": 999}},
+                    "data": "j:T:AAPL:2026-08-18",
+                }
+            },
+            cfg,
+        )
+        assert sent == []
+
+        # authorized "taken" tap -> journal updated, toast answered, keyboard edited
+        telegram_bot.dispatch(
+            {
+                "callback_query": {
+                    "id": "cbq2",
+                    "message": {"message_id": 10, "chat": {"id": 881912596}},
+                    "data": "j:T:AAPL:2026-08-18",
+                }
+            },
+            cfg,
+        )
+        assert len(sent) == 2
+        answer_url, answer_payload = sent[0]
+        assert "answerCallbackQuery" in answer_url
+        assert answer_payload["callback_query_id"] == "cbq2"
+        edit_url, edit_payload = sent[1]
+        assert "editMessageReplyMarkup" in edit_url
+        assert edit_payload["chat_id"] == 881912596
+        assert edit_payload["message_id"] == 10
+
+        with open(journal_path, encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        assert rows[0]["decision"] == "taken"
+
+        # no matching journal row -> answered with a "not found" toast, no edit
+        telegram_bot.dispatch(
+            {
+                "callback_query": {
+                    "id": "cbq3",
+                    "message": {"message_id": 11, "chat": {"id": 881912596}},
+                    "data": "j:S:NVDA:2026-08-18",
+                }
+            },
+            cfg,
+        )
+        assert len(sent) == 3
+        assert "answerCallbackQuery" in sent[2][0]
+
+        # malformed callback_data -> answered, nothing else attempted
+        telegram_bot.dispatch(
+            {
+                "callback_query": {
+                    "id": "cbq4",
+                    "message": {"message_id": 12, "chat": {"id": 881912596}},
+                    "data": "noop",
+                }
+            },
+            cfg,
+        )
+        assert len(sent) == 4
+        assert "answerCallbackQuery" in sent[3][0]
+    finally:
+        requests.post = orig_post
+        telegram_bot.JOURNAL_PATH = orig_journal_path
+        os.remove(journal_path)
+
+    print("[ok] telegram_bot_callback_dispatch")
+
+
 def test_telegram_bot_load_symbols_real() -> None:
     import os
     import tempfile
@@ -1299,6 +1440,7 @@ def main() -> int:
         test_telegram_bot_auth_and_parsing,
         test_telegram_bot_api_wrappers,
         test_telegram_bot_dispatch_and_handlers,
+        test_telegram_bot_callback_dispatch,
         test_telegram_bot_load_symbols_real,
     ]
     for t in tests:

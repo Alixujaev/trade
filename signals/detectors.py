@@ -142,8 +142,10 @@ _TRIGGER_LABELS: dict[str, str] = {
 
 _CONTEXT_LABELS: dict[str, str] = {
     "uptrend": "uptrend",
-    "near_fvg": "near FVG",
+    "near_fvg": "FVG yaqinida",
 }
+
+_CHART_URL = "https://www.tradingview.com/chart/?symbol={symbol}"
 
 
 def format_setup_alert_text(setup: Setup, bar_date: str) -> str:
@@ -153,7 +155,10 @@ def format_setup_alert_text(setup: Setup, bar_date: str) -> str:
     (e.g. "liquidity_sweep") into reader-facing labels. The CSV journal
     (engine/scanner.py's _append_journal) deliberately keeps the raw keys —
     they're better for later filtering/grouping — so only the alert text
-    goes through this mapping.
+    goes through this mapping. Scaffold words are in Uzbek (matching the
+    rest of the bot's user-facing text); trigger/context jargon (liquidity
+    sweep, FVG, engulfing, ...) stays in English as that's the terms traders
+    already use.
     """
     trigger_text = " + ".join(
         _TRIGGER_LABELS.get(t, t.replace("_", " ")) for t in setup.triggers
@@ -163,22 +168,43 @@ def format_setup_alert_text(setup: Setup, bar_date: str) -> str:
     for c in setup.context:
         if c == "near_round_number":
             nearest = round(setup.price / _ROUND_NUMBER_UNIT) * _ROUND_NUMBER_UNIT
-            context_labels.append(f"near ${nearest:,.0f}")
+            context_labels.append(f"${nearest:,.0f} atrofida")
         else:
             context_labels.append(_CONTEXT_LABELS.get(c, c.replace("_", " ")))
 
     lines = [
-        f"\U0001f50d <b>{setup.symbol}</b> — setup formed, go look",
-        f"<b>Trigger:</b> {trigger_text}",
+        f"\U0001f50d <b>{setup.symbol}</b> — setup shakllandi, ko'rib chiq",
+        f"<b>Belgi:</b> {trigger_text}",
     ]
     if context_labels:
-        lines.append(f"<b>Context:</b> {', '.join(context_labels)}")
-    lines.append(f"<b>Price:</b> ${setup.price:,.2f}")
-    lines.append(f"<b>Bar:</b> {bar_date}")
+        lines.append(f"<b>Kontekst:</b> {', '.join(context_labels)}")
+    lines.append(f"<b>Narx:</b> ${setup.price:,.2f}")
+    lines.append(f"<b>Sana:</b> {bar_date}")
+    lines.append(f"<b>Kuchi:</b> {setup.confluence} ta belgi")
     lines.append("")
-    lines.append("<i>Not a trade signal — open the chart and decide yourself.</i>")
+    lines.append("<i>Savdo signali emas — chartni oching va o'zingiz qaror qiling.</i>")
 
     return "\n".join(lines)
+
+
+def build_setup_keyboard(symbol: str, bar_date: str) -> dict:
+    """Inline keyboard attached to a scanner alert: a chart link plus two
+    quick-decision buttons that record the user's call in journal.csv
+    (via telegram_bot._dispatch_callback -> engine.scanner.update_journal_decision).
+    """
+    chart_url = _CHART_URL.format(symbol=symbol)
+    return {
+        "inline_keyboard": [
+            [{"text": "\U0001f4c8 Chart", "url": chart_url}],
+            [
+                {"text": "✅ Oldim", "callback_data": f"j:T:{symbol}:{bar_date}"},
+                {
+                    "text": "⏭ O'tkazib yubordim",
+                    "callback_data": f"j:S:{symbol}:{bar_date}",
+                },
+            ],
+        ]
+    }
 
 
 def scan_symbol(
