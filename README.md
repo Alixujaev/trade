@@ -24,7 +24,7 @@ sharia-compliant universe (see "Sharia screening" below — this is not done for
 python -m tests.smoke_test   # offline correctness checks, must be green before anything else
 python backtest_main.py      # backtest the whitelist universe, print a metrics table
 python live_main.py          # one-shot: fetch latest data, alert on any signal change
-python scan_main.py          # one-shot: scan the whitelist for price-action setups, journal + alert
+python scan_main.py          # one-shot: scan the whitelist for price-action setups, alert
 ```
 
 `live_main.py` is meant to run once per day after the US close, via cron — see
@@ -33,8 +33,10 @@ python scan_main.py          # one-shot: scan the whitelist for price-action set
 `scan_main.py` is the price-action Scanner's cron entry point — like `live_main.py`,
 it's meant for once-a-day cron use, not an always-on process (swing trading needs
 no such thing). **A Scanner alert means "go look" — it is NOT a trade signal.** It
-flags that a price-action setup has formed and appends a row to `journal.csv`; it
-never asserts an edge and is not connected to the strategies backtested/traded above.
+flags that a price-action setup has formed; it never asserts an edge and is not
+connected to the strategies backtested/traded above. Each alert links to your own
+Google Sheet journal (see "Telegram control bot" below) where you log your own
+decision and outcome — nothing is written or tracked by this repo.
 
 ## Telegram control bot (optional)
 
@@ -61,10 +63,9 @@ reply-keyboard row under the chat input, once the bot has started once):
 - `/help` — list the commands.
 
 Each Scanner alert (from `scan_main.py`/`Scanner`) carries inline buttons: a
-"📈 Chart" link (TradingView) and "✅ Oldim" / "⏭ O'tkazib yubordim" — tapping
-the latter records your decision straight into that setup's `journal.csv` row
-(via `engine.scanner.update_journal_decision`), so `python telegram_bot.py`
-must be running for these buttons to work.
+"📈 Chart" link (TradingView) and a "📝 Journalga yozish" link to your own Google
+Sheet, where you log the decision and outcome by hand (see
+`signals/detectors.py`'s `build_setup_keyboard` to point this at your own sheet).
 
 Design rationale and testing approach:
 `docs/superpowers/specs/2026-08-16-telegram-control-bot-design.md` (note: its
@@ -83,14 +84,14 @@ screening/  ShariaFilter — whitelist-based universe gate
 alerts/     AlertSink interface + Telegram implementation
 broker/     ExecutionAdapter interface — no implementation in v1.0, deliberately
 engine/     backtest.py (run_backtest, compute_metrics), live.py (LiveEngine),
-            and scanner.py (Scanner — journal, state, alert-on-change for price-action setups)
+            and scanner.py (Scanner — state, alert-on-change for price-action setups)
 ```
 
-`journal.csv` (written by `Scanner`) is a user-maintained decision log, not an
-automated record: each row is a detected setup plus empty `decision`/`outcome`
-columns you fill in yourself. That's the point of the tool — it turns "eyeballing
-a chart" into a measurable question you can review later, instead of asserting an
-edge on your behalf.
+The Scanner itself keeps no decision log — each alert links to your own Google
+Sheet (see "Telegram control bot" above) where you record your own decision and
+outcome. That's the point of the tool — it turns "eyeballing a chart" into a
+measurable question you can review later, instead of asserting an edge on your
+behalf.
 
 Three seams keep the system broker/provider-agnostic (`DataSource`, `AlertSink`,
 `ExecutionAdapter`): strategy and engine code depend only on these interfaces, never

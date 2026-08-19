@@ -6,9 +6,9 @@ sharia whitelist. An alert means "a setup formed, go look" — it is NOT a trade
 signal and makes no claim of predictive edge. All entry/exit/sizing decisions
 remain fully discretionary (Smart Money Concepts price-action reading is not
 mechanizable and is intentionally not automated here). This module places no
-orders, paper or live, and never will (INV-D) — it only sends a Telegram alert
-and appends a row to journal.csv for the user to later fill in with their
-decision and outcome.
+orders, paper or live, and never will (INV-D) — it only sends a Telegram alert,
+linking to the user's own Google Sheet journal for them to log their decision
+and outcome by hand (see signals/detectors.py's build_setup_keyboard).
 
 Swing needs no always-on process. Intended to run once per trading day after
 the US close via cron, exactly like live_main.py, e.g. (Asia/Tashkent):

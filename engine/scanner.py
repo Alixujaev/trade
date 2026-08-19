@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import csv
-import datetime
 import json
 import logging
 import os
@@ -14,51 +12,6 @@ from signals.detectors import Setup, build_setup_keyboard, format_setup_alert_te
 
 logger = logging.getLogger(__name__)
 
-_JOURNAL_HEADER = [
-    "scanned_at",
-    "bar_date",
-    "symbol",
-    "price",
-    "triggers",
-    "context",
-    "confluence",
-    "decision",
-    "outcome",
-    "notes",
-]
-
-
-def update_journal_decision(journal_path: str, symbol: str, bar_date: str, decision: str) -> bool:
-    """Record a user's decision (from a Telegram inline-button tap) against
-    the journal row for this setup.
-
-    Rows are matched by (symbol, bar_date) -- unique because the Scanner only
-    ever alerts once per bar per symbol (see Scanner.process_symbol's state
-    check). Returns False, leaving the file untouched, if no matching row
-    exists (including when the journal doesn't exist yet).
-    """
-    if not os.path.isfile(journal_path):
-        return False
-
-    with open(journal_path, encoding="utf-8", newline="") as f:
-        rows = list(csv.DictReader(f))
-
-    updated = False
-    for row in rows:
-        if row.get("symbol") == symbol and row.get("bar_date") == bar_date:
-            row["decision"] = decision
-            updated = True
-
-    if not updated:
-        return False
-
-    with open(journal_path, "w", encoding="utf-8", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=_JOURNAL_HEADER)
-        writer.writeheader()
-        writer.writerows(rows)
-
-    return True
-
 
 class Scanner:
     def __init__(
@@ -67,7 +20,6 @@ class Scanner:
         alert: AlertSink,
         cfg: AppConfig,
         require_uptrend: bool = True,
-        journal_path: str = "journal.csv",
         state_path: str = "scanner_state.json",
         drop_forming_bar: bool = True,
     ) -> None:
@@ -75,7 +27,6 @@ class Scanner:
         self.alert = alert
         self.cfg = cfg
         self.require_uptrend = require_uptrend
-        self.journal_path = journal_path
         self.state_path = state_path
         self.drop_forming_bar = drop_forming_bar
         self.state: dict = self._load_state()
@@ -98,27 +49,6 @@ class Scanner:
         with open(self.state_path, "w", encoding="utf-8") as f:
             json.dump(self.state, f)
 
-    def _append_journal(self, setup: Setup, bar_date: str, scanned_at: str) -> None:
-        is_new = not os.path.isfile(self.journal_path)
-        with open(self.journal_path, "a", encoding="utf-8", newline="") as f:
-            writer = csv.writer(f)
-            if is_new:
-                writer.writerow(_JOURNAL_HEADER)
-            writer.writerow(
-                [
-                    scanned_at,
-                    bar_date,
-                    setup.symbol,
-                    setup.price,
-                    "|".join(setup.triggers),
-                    "|".join(setup.context),
-                    setup.confluence,
-                    "",
-                    "",
-                    "",
-                ]
-            )
-
     def _to_signal(self, setup: Setup, timestamp) -> Signal:
         reason = (
             "SCANNER: setup formed, go look — not a trade signal. "
@@ -135,7 +65,7 @@ class Scanner:
             reason=reason,
             price=setup.price,
             formatted_text=format_setup_alert_text(setup, bar_date),
-            reply_markup=build_setup_keyboard(setup.symbol, bar_date),
+            reply_markup=build_setup_keyboard(setup.symbol),
         )
 
     def process_symbol(self, symbol: str) -> Setup | None:
@@ -153,16 +83,12 @@ class Scanner:
         if self.state.get(symbol) == ts_key:
             return None  # already alerted this bar
 
-        scanned_at = datetime.datetime.now(datetime.timezone.utc).isoformat()
-        self._append_journal(setup, ts_key, scanned_at)
-
         self.alert.send(self._to_signal(setup, latest_ts))
 
-        # Only mark this bar "alerted" once the journal write and alert both
-        # succeeded — otherwise a transient failure (e.g. disk full) would
-        # permanently drop the setup, since run_once still saves state for
-        # every symbol it processed, even ones whose per-symbol exception it
-        # caught and logged.
+        # Only mark this bar "alerted" once the alert itself succeeded --
+        # otherwise a transient failure would permanently drop the setup,
+        # since run_once still saves state for every symbol it processed,
+        # even ones whose per-symbol exception it caught and logged.
         self.state[symbol] = ts_key
         return setup
 

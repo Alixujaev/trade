@@ -1399,117 +1399,6 @@ def test_telegram_bot_dispatch_and_handlers() -> None:
     print("[ok] telegram_bot_dispatch_and_handlers")
 
 
-def test_telegram_bot_callback_dispatch() -> None:
-    import csv
-    import os
-    import tempfile
-
-    import requests
-
-    import telegram_bot
-    from core.config import AppConfig
-
-    cfg = AppConfig(telegram_bot_token="TOK", telegram_chat_id="881912596")
-
-    fd, journal_path = tempfile.mkstemp(suffix=".csv")
-    os.close(fd)
-    with open(journal_path, "w", encoding="utf-8", newline="") as f:
-        f.write(
-            "scanned_at,bar_date,symbol,price,triggers,context,confluence,"
-            "decision,outcome,notes\n"
-            "2026-08-18T21:00:00+00:00,2026-08-18,AAPL,226.3,liquidity_sweep,"
-            "uptrend,2,,,\n"
-        )
-
-    orig_journal_path = telegram_bot.JOURNAL_PATH
-    telegram_bot.JOURNAL_PATH = journal_path
-
-    sent = []
-
-    def fake_post(url, json=None, timeout=None):
-        sent.append((url, json))
-
-        class _R:
-            def raise_for_status(self):
-                pass
-
-        return _R()
-
-    orig_post = requests.post
-    requests.post = fake_post
-    try:
-        # unauthorized chat -> dropped silently, no API calls at all
-        telegram_bot.dispatch(
-            {
-                "callback_query": {
-                    "id": "cbq1",
-                    "message": {"message_id": 10, "chat": {"id": 999}},
-                    "data": "j:T:AAPL:2026-08-18",
-                }
-            },
-            cfg,
-        )
-        assert sent == []
-
-        # authorized "taken" tap -> journal updated, toast answered, keyboard edited
-        telegram_bot.dispatch(
-            {
-                "callback_query": {
-                    "id": "cbq2",
-                    "message": {"message_id": 10, "chat": {"id": 881912596}},
-                    "data": "j:T:AAPL:2026-08-18",
-                }
-            },
-            cfg,
-        )
-        assert len(sent) == 2
-        answer_url, answer_payload = sent[0]
-        assert "answerCallbackQuery" in answer_url
-        assert answer_payload["callback_query_id"] == "cbq2"
-        edit_url, edit_payload = sent[1]
-        assert "editMessageReplyMarkup" in edit_url
-        assert edit_payload["chat_id"] == 881912596
-        assert edit_payload["message_id"] == 10
-
-        with open(journal_path, encoding="utf-8") as f:
-            rows = list(csv.DictReader(f))
-        assert rows[0]["decision"] == "taken"
-
-        # no matching journal row -> answered with a "not found" toast, no edit
-        telegram_bot.dispatch(
-            {
-                "callback_query": {
-                    "id": "cbq3",
-                    "message": {"message_id": 11, "chat": {"id": 881912596}},
-                    "data": "j:S:NVDA:2026-08-18",
-                }
-            },
-            cfg,
-        )
-        assert len(sent) == 3
-        assert "answerCallbackQuery" in sent[2][0]
-
-        # malformed callback_data -> answered, nothing else attempted
-        telegram_bot.dispatch(
-            {
-                "callback_query": {
-                    "id": "cbq4",
-                    "message": {"message_id": 12, "chat": {"id": 881912596}},
-                    "data": "noop",
-                }
-            },
-            cfg,
-        )
-        assert len(sent) == 4
-        assert "answerCallbackQuery" in sent[3][0]
-    finally:
-        requests.post = orig_post
-        telegram_bot.JOURNAL_PATH = orig_journal_path
-        os.remove(journal_path)
-
-    print("[ok] telegram_bot_callback_dispatch")
-
-
 def test_telegram_bot_scan_command() -> None:
     import requests
 
@@ -1628,7 +1517,6 @@ def main() -> int:
         test_telegram_bot_auth_and_parsing,
         test_telegram_bot_api_wrappers,
         test_telegram_bot_dispatch_and_handlers,
-        test_telegram_bot_callback_dispatch,
         test_telegram_bot_scan_command,
         test_telegram_bot_load_symbols_real,
     ]

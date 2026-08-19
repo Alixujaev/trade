@@ -152,13 +152,10 @@ def format_setup_alert_text(setup: Setup, bar_date: str) -> str:
     """Build the Telegram-visible alert body for a fired Setup.
 
     This is the single place that translates internal trigger/context keys
-    (e.g. "liquidity_sweep") into reader-facing labels. The CSV journal
-    (engine/scanner.py's _append_journal) deliberately keeps the raw keys —
-    they're better for later filtering/grouping — so only the alert text
-    goes through this mapping. Scaffold words are in Uzbek (matching the
-    rest of the bot's user-facing text); trigger/context jargon (liquidity
-    sweep, FVG, engulfing, ...) stays in English as that's the terms traders
-    already use.
+    (e.g. "liquidity_sweep") into reader-facing labels. Scaffold words are in
+    Uzbek (matching the rest of the bot's user-facing text); trigger/context
+    jargon (liquidity sweep, FVG, engulfing, ...) stays in English as that's
+    the terms traders already use.
     """
     trigger_text = " + ".join(
         _TRIGGER_LABELS.get(t, t.replace("_", " ")) for t in setup.triggers
@@ -187,22 +184,22 @@ def format_setup_alert_text(setup: Setup, bar_date: str) -> str:
     return "\n".join(lines)
 
 
-def build_setup_keyboard(symbol: str, bar_date: str) -> dict:
-    """Inline keyboard attached to a scanner alert: a chart link plus two
-    quick-decision buttons that record the user's call in journal.csv
-    (via telegram_bot._dispatch_callback -> engine.scanner.update_journal_decision).
+_JOURNAL_SHEET_URL = (
+    "https://docs.google.com/spreadsheets/d/174WmNxdCmv_9DDGCRIIy952MCwxSyF5sEA0BbIOpVCE"
+    "/edit?pli=1&gid=2119535500#gid=2119535500"
+)
+
+
+def build_setup_keyboard(symbol: str) -> dict:
+    """Inline keyboard attached to a scanner alert: a chart link plus a link
+    to the user's own Google Sheet journal, where they log their decision
+    and outcome by hand -- nothing is written or tracked locally.
     """
     chart_url = _CHART_URL.format(symbol=symbol)
     return {
         "inline_keyboard": [
             [{"text": "\U0001f4c8 Chart", "url": chart_url}],
-            [
-                {"text": "✅ Oldim", "callback_data": f"j:T:{symbol}:{bar_date}"},
-                {
-                    "text": "⏭ O'tkazib yubordim",
-                    "callback_data": f"j:S:{symbol}:{bar_date}",
-                },
-            ],
+            [{"text": "\U0001f4dd Journalga yozish", "url": _JOURNAL_SHEET_URL}],
         ]
     }
 

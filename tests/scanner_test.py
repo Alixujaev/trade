@@ -357,7 +357,7 @@ def test_scanner_drop_forming_bar() -> None:
     )
 
     # drop_forming_bar=True: the engulfing pattern lives on the dropped bar -> no setup
-    state_a, journal_a = _tmp_path(".json"), _tmp_path(".csv")
+    state_a = _tmp_path(".json")
     try:
         cfg = AppConfig(state_file=state_a)
         scanner = Scanner(
@@ -365,20 +365,17 @@ def test_scanner_drop_forming_bar() -> None:
             _FakeAlert(),
             cfg,
             require_uptrend=False,
-            journal_path=journal_a,
             state_path=state_a,
             drop_forming_bar=True,
         )
         setup = scanner.process_symbol("AAPL")
         assert setup is None
-        assert not os.path.isfile(journal_a)
     finally:
-        for p in (state_a, journal_a):
-            if os.path.isfile(p):
-                os.remove(p)
+        if os.path.isfile(state_a):
+            os.remove(state_a)
 
     # drop_forming_bar=False: the same engulfing pattern is now the last bar -> fires
-    state_b, journal_b = _tmp_path(".json"), _tmp_path(".csv")
+    state_b = _tmp_path(".json")
     try:
         cfg = AppConfig(state_file=state_b)
         alert = _FakeAlert()
@@ -387,7 +384,6 @@ def test_scanner_drop_forming_bar() -> None:
             alert,
             cfg,
             require_uptrend=False,
-            journal_path=journal_b,
             state_path=state_b,
             drop_forming_bar=False,
         )
@@ -396,18 +392,9 @@ def test_scanner_drop_forming_bar() -> None:
         assert "bullish_engulfing" in setup.triggers
         assert len(alert.sent) == 1
         assert alert.sent[0].action.value == "BUY"
-        assert os.path.isfile(journal_b)
-        with open(journal_b, encoding="utf-8") as f:
-            content = f.read()
-        assert "bullish_engulfing" in content
-        assert "AAPL" in content
-        assert content.startswith(
-            "scanned_at,bar_date,symbol,price,triggers,context,confluence,decision,outcome,notes"
-        )
     finally:
-        for p in (state_b, journal_b):
-            if os.path.isfile(p):
-                os.remove(p)
+        if os.path.isfile(state_b):
+            os.remove(state_b)
 
     print("[ok] scanner_drop_forming_bar")
 
@@ -431,7 +418,7 @@ def test_scanner_alert_on_change_and_state() -> None:
         index=idx,
     )  # bar0 bearish, bar1 bullish engulf -> fires with drop_forming_bar=False
 
-    state_path, journal_path = _tmp_path(".json"), _tmp_path(".csv")
+    state_path = _tmp_path(".json")
     try:
         cfg = AppConfig(state_file=state_path)
         alert = _FakeAlert()
@@ -440,7 +427,6 @@ def test_scanner_alert_on_change_and_state() -> None:
             alert,
             cfg,
             require_uptrend=False,
-            journal_path=journal_path,
             state_path=state_path,
             drop_forming_bar=False,
         )
@@ -449,25 +435,19 @@ def test_scanner_alert_on_change_and_state() -> None:
         assert len(setups) == 1
         assert len(alert.sent) == 1
         assert "SCANNER: setup formed, go look — not a trade signal." in alert.sent[0].reason
-        with open(journal_path, encoding="utf-8") as f:
-            rows_after_first = f.read().count("\n")
 
-        # same bar again -> already alerted, no re-alert, no new journal row
+        # same bar again -> already alerted, no re-alert
         setups2 = scanner.run_once(["AAPL"])
         assert setups2 == []
         assert len(alert.sent) == 1
-        with open(journal_path, encoding="utf-8") as f:
-            rows_after_second = f.read().count("\n")
-        assert rows_after_second == rows_after_first
 
         assert os.path.isfile(state_path)
         with open(state_path, encoding="utf-8") as f:
             saved = json.load(f)
         assert "AAPL" in saved
     finally:
-        for p in (state_path, journal_path):
-            if os.path.isfile(p):
-                os.remove(p)
+        if os.path.isfile(state_path):
+            os.remove(state_path)
 
     print("[ok] scanner_alert_on_change_and_state")
 
@@ -491,7 +471,7 @@ def test_scanner_alert_formatted_text() -> None:
     )  # bar0 bearish, bar1 bullish engulf -> fires with drop_forming_bar=False;
     # only 2 bars -> EMA/ATR warmups never complete, so context is empty here.
 
-    state_path, journal_path = _tmp_path(".json"), _tmp_path(".csv")
+    state_path = _tmp_path(".json")
     try:
         cfg = AppConfig(state_file=state_path)
         alert = _FakeAlert()
@@ -500,7 +480,6 @@ def test_scanner_alert_formatted_text() -> None:
             alert,
             cfg,
             require_uptrend=False,
-            journal_path=journal_path,
             state_path=state_path,
             drop_forming_bar=False,
         )
@@ -522,24 +501,22 @@ def test_scanner_alert_formatted_text() -> None:
         assert keyboard[0][0]["text"] == "\U0001f4c8 Chart"
         assert "AAPL" in keyboard[0][0]["url"]
         assert "callback_data" not in keyboard[0][0]  # chart button is a plain link
-        assert keyboard[1][0]["callback_data"] == "j:T:AAPL:2024-01-02"
-        assert keyboard[1][1]["callback_data"] == "j:S:AAPL:2024-01-02"
+        assert keyboard[1][0]["text"] == "\U0001f4dd Journalga yozish"
+        assert "docs.google.com/spreadsheets" in keyboard[1][0]["url"]
+        assert "callback_data" not in keyboard[1][0]  # journal button is a plain link too
 
         # The pre-existing `reason` framing (asserted by
         # test_scanner_alert_on_change_and_state) must be untouched.
         assert "SCANNER: setup formed, go look — not a trade signal." in signal.reason
     finally:
-        for p in (state_path, journal_path):
-            if os.path.isfile(p):
-                os.remove(p)
+        if os.path.isfile(state_path):
+            os.remove(state_path)
 
     print("[ok] scanner_alert_formatted_text")
 
 
-def test_scanner_journal_failure_preserves_state() -> None:
+def test_scanner_alert_failure_preserves_state() -> None:
     import os
-    import shutil
-    import tempfile
 
     from core.config import AppConfig
     from engine.scanner import Scanner
@@ -556,21 +533,26 @@ def test_scanner_journal_failure_preserves_state() -> None:
         index=idx,
     )  # bar0 bearish, bar1 bullish engulf -> fires with drop_forming_bar=False
 
-    state_path = _tmp_path(".json")
-    # A directory in place of the journal file: opening it for append raises
-    # OSError, simulating a journal write failure (e.g. disk full).
-    bad_journal_dir = tempfile.mkdtemp()
-    good_journal_path = _tmp_path(".csv")
+    class _FlakyAlert:
+        def __init__(self):
+            self.sent = []
+            self.calls = 0
 
+        def send(self, signal):
+            self.calls += 1
+            if self.calls == 1:
+                raise RuntimeError("telegram down")
+            self.sent.append(signal)
+
+    state_path = _tmp_path(".json")
     try:
         cfg = AppConfig(state_file=state_path)
-        alert = _FakeAlert()
+        alert = _FlakyAlert()
         scanner = Scanner(
             _FakeSource(df),
             alert,
             cfg,
             require_uptrend=False,
-            journal_path=bad_journal_dir,
             state_path=state_path,
             drop_forming_bar=False,
         )
@@ -578,32 +560,25 @@ def test_scanner_journal_failure_preserves_state() -> None:
         raised = False
         try:
             scanner.process_symbol("AAPL")
-        except OSError:
+        except RuntimeError:
             raised = True
         assert raised
-        # The journal write failed, so the bar must NOT be marked as alerted
-        # -- otherwise the setup would be silently and permanently lost.
+        # The alert send failed, so the bar must NOT be marked as alerted --
+        # otherwise the setup would be silently and permanently lost.
         assert scanner.state.get("AAPL") is None
         assert len(alert.sent) == 0
 
-        # Point at a writable journal path and retry the same bar: it must
-        # still fire, proving the failed attempt didn't consume the setup.
-        scanner.journal_path = good_journal_path
+        # Retry the same bar: it must still fire, proving the failed attempt
+        # didn't consume the setup.
         setup = scanner.process_symbol("AAPL")
         assert setup is not None
         assert scanner.state.get("AAPL") is not None
         assert len(alert.sent) == 1
-        assert os.path.isfile(good_journal_path)
-        with open(good_journal_path, encoding="utf-8") as f:
-            content = f.read()
-        assert "AAPL" in content
     finally:
-        shutil.rmtree(bad_journal_dir, ignore_errors=True)
-        for p in (state_path, good_journal_path):
-            if os.path.isfile(p):
-                os.remove(p)
+        if os.path.isfile(state_path):
+            os.remove(state_path)
 
-    print("[ok] scanner_journal_failure_preserves_state")
+    print("[ok] scanner_alert_failure_preserves_state")
 
 
 def test_scanner_corrupt_state_and_isolation() -> None:
@@ -637,7 +612,6 @@ def test_scanner_corrupt_state_and_isolation() -> None:
     fd, corrupt_state = tempfile.mkstemp(suffix=".json")
     with os.fdopen(fd, "w") as f:
         f.write("{not valid json")
-    journal_path = _tmp_path(".csv")
 
     try:
         cfg = AppConfig(state_file=corrupt_state)
@@ -646,7 +620,6 @@ def test_scanner_corrupt_state_and_isolation() -> None:
             _FakeAlert(),
             cfg,
             require_uptrend=False,
-            journal_path=journal_path,
             state_path=corrupt_state,
             drop_forming_bar=False,
         )
@@ -656,49 +629,27 @@ def test_scanner_corrupt_state_and_isolation() -> None:
         assert len(setups) == 1
         assert setups[0].symbol == "AAPL"
     finally:
-        for p in (corrupt_state, journal_path):
-            if os.path.isfile(p):
-                os.remove(p)
+        if os.path.isfile(corrupt_state):
+            os.remove(corrupt_state)
 
     print("[ok] scanner_corrupt_state_and_isolation")
 
 
-def test_update_journal_decision() -> None:
-    import csv
-    import os
+def test_build_setup_keyboard() -> None:
+    from signals.detectors import build_setup_keyboard
 
-    from engine.scanner import update_journal_decision
+    kb = build_setup_keyboard("AAPL")
+    keyboard = kb["inline_keyboard"]
 
-    journal_path = _tmp_path(".csv")
-    try:
-        # no journal file yet -> nothing to update
-        assert update_journal_decision(journal_path, "AAPL", "2026-08-18", "taken") is False
+    assert keyboard[0][0]["text"] == "\U0001f4c8 Chart"
+    assert "AAPL" in keyboard[0][0]["url"]
+    assert "callback_data" not in keyboard[0][0]
 
-        with open(journal_path, "w", encoding="utf-8", newline="") as f:
-            f.write(
-                "scanned_at,bar_date,symbol,price,triggers,context,confluence,"
-                "decision,outcome,notes\n"
-                "2026-08-18T21:00:00+00:00,2026-08-18,AAPL,226.3,liquidity_sweep,"
-                "uptrend,2,,,\n"
-                "2026-08-18T21:00:00+00:00,2026-08-18,MSFT,410.0,bullish_pin,,1,,,\n"
-            )
+    assert keyboard[1][0]["text"] == "\U0001f4dd Journalga yozish"
+    assert keyboard[1][0]["url"].startswith("https://docs.google.com/spreadsheets/")
+    assert "callback_data" not in keyboard[1][0]
 
-        assert update_journal_decision(journal_path, "AAPL", "2026-08-18", "taken") is True
-
-        with open(journal_path, encoding="utf-8", newline="") as f:
-            rows = list(csv.DictReader(f))
-        assert rows[0]["symbol"] == "AAPL"
-        assert rows[0]["decision"] == "taken"
-        assert rows[1]["symbol"] == "MSFT"
-        assert rows[1]["decision"] == ""  # untouched
-
-        # no row matches this symbol/bar_date -> False, file left as-is
-        assert update_journal_decision(journal_path, "NVDA", "2026-08-18", "skipped") is False
-    finally:
-        if os.path.isfile(journal_path):
-            os.remove(journal_path)
-
-    print("[ok] update_journal_decision")
+    print("[ok] build_setup_keyboard")
 
 
 def test_format_setups() -> None:
@@ -751,9 +702,9 @@ def main() -> int:
         test_scanner_drop_forming_bar,
         test_scanner_alert_on_change_and_state,
         test_scanner_alert_formatted_text,
-        test_scanner_journal_failure_preserves_state,
+        test_scanner_alert_failure_preserves_state,
         test_scanner_corrupt_state_and_isolation,
-        test_update_journal_decision,
+        test_build_setup_keyboard,
         test_format_setups,
         test_scan_main_imports_and_builds,
     ]
