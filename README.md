@@ -55,6 +55,7 @@ reply-keyboard row under the chat input, once the bot has started once):
 
 - `/run` — run one live signal check now, same as `python live_main.py`.
 - `/backtest` — run a backtest over the whitelist, same as `python backtest_main.py`.
+- `/scan` — run the price-action Scanner now, same as `python scan_main.py`.
 - `/status` — show each whitelist symbol's current stored position, instantly, with
   no network call.
 - `/help` — list the commands.

@@ -929,6 +929,128 @@ def test_backtest_main_helpers() -> None:
     print("[ok] backtest_main_helpers")
 
 
+def test_run_all_backtests_drops_forming_bar() -> None:
+    import math
+    import os
+    import tempfile
+
+    import pandas as pd
+
+    import backtest_main
+    from core.config import AppConfig
+
+    # 209 well-formed bars, then a trailing "forming" bar with NaN OHLC --
+    # mirrors the real yfinance quirk where the most recent daily bar comes
+    # back with empty prices (see the SIMO 2026-08-18 row that motivated
+    # this fix). Without dropping it, the last equity value -- and so
+    # total_return_pct -- comes out NaN even though 209 good bars exist.
+    idx = pd.date_range("2024-01-01", periods=210, freq="B")
+    df = pd.DataFrame(
+        {
+            "open": [100.0 + i * 0.1 for i in range(209)] + [float("nan")],
+            "high": [101.0 + i * 0.1 for i in range(209)] + [float("nan")],
+            "low": [99.0 + i * 0.1 for i in range(209)] + [float("nan")],
+            "close": [100.0 + i * 0.1 for i in range(209)] + [float("nan")],
+            "volume": [1_000_000] * 209 + [123],
+        },
+        index=idx,
+    )
+
+    class _FakeSource:
+        def get_history(self, symbol, lookback_days, interval="1d"):
+            return df.copy()
+
+    fd, whitelist_path = tempfile.mkstemp(suffix=".txt")
+    with os.fdopen(fd, "w") as f:
+        f.write("TEST\n")
+
+    orig_source_cls = backtest_main.YFinanceSource
+    orig_whitelist_path = backtest_main.WHITELIST_PATH
+    backtest_main.YFinanceSource = _FakeSource
+    backtest_main.WHITELIST_PATH = whitelist_path
+    try:
+        rows = backtest_main.run_all_backtests(AppConfig())
+    finally:
+        backtest_main.YFinanceSource = orig_source_cls
+        backtest_main.WHITELIST_PATH = orig_whitelist_path
+        os.remove(whitelist_path)
+
+    assert len(rows) == 1
+    symbol, metrics = rows[0]
+    assert symbol == "TEST"
+    assert not math.isnan(metrics["total_return_pct"])
+
+    print("[ok] run_all_backtests_drops_forming_bar")
+
+
+def test_format_metrics_for_telegram() -> None:
+    import backtest_main
+
+    rows = [
+        (
+            "AU",
+            {
+                "total_return_pct": -23.32,
+                "cagr_pct": -15.40,
+                "sharpe": -0.41,
+                "max_drawdown_pct": -53.67,
+                "num_trades": 11,
+                "win_rate_pct": 27.27,
+                "avg_win": 1.0,
+                "avg_loss": -1.0,
+                "expectancy_per_trade": -347.51,
+            },
+        ),
+        (
+            "SIMO",
+            {
+                "total_return_pct": 84.95,
+                "cagr_pct": 47.31,
+                "sharpe": 1.05,
+                "max_drawdown_pct": -27.10,
+                "num_trades": 7,
+                "win_rate_pct": 42.86,
+                "avg_win": 1.0,
+                "avg_loss": -1.0,
+                "expectancy_per_trade": 1399.64,
+            },
+        ),
+        (
+            "EXEL",
+            {
+                "total_return_pct": float("nan"),
+                "cagr_pct": 0.0,
+                "sharpe": 0.05,
+                "max_drawdown_pct": -18.92,
+                "num_trades": 8,
+                "win_rate_pct": 50.0,
+                "avg_win": 1.0,
+                "avg_loss": -1.0,
+                "expectancy_per_trade": float("nan"),
+            },
+        ),
+    ]
+
+    text = backtest_main.format_metrics_for_telegram(rows)
+
+    assert text.startswith("\U0001f4ca <b>Backtest natijalari</b> (3 ta belgi)")
+
+    # sorted by expectancy_per_trade descending: best first, nan sorts last
+    simo_pos = text.index("SIMO")
+    au_pos = text.index("AU")
+    exel_pos = text.index("EXEL")
+    assert simo_pos < au_pos < exel_pos
+
+    assert "\U0001f7e2 <b>SIMO</b> — +1399.64$/savdo" in text
+    assert "\U0001f534 <b>AU</b> — -347.51$/savdo" in text
+    assert "⚪ <b>EXEL</b> — ma'lumot yetarli emas" in text
+    assert "kelajakdagi natija kafolati emas" in text
+
+    assert backtest_main.format_metrics_for_telegram([]) == "Natija yo'q."
+
+    print("[ok] format_metrics_for_telegram")
+
+
 def test_live_main_helpers() -> None:
     import live_main
     from core.models import Action, Signal
@@ -1058,6 +1180,7 @@ def test_telegram_bot_api_wrappers() -> None:
     assert post_calls[0][1] == {
         "chat_id": 123,
         "text": "salom",
+        "parse_mode": "HTML",
         "reply_markup": telegram_bot.MAIN_KEYBOARD,
     }
 
@@ -1387,6 +1510,69 @@ def test_telegram_bot_callback_dispatch() -> None:
     print("[ok] telegram_bot_callback_dispatch")
 
 
+def test_telegram_bot_scan_command() -> None:
+    import requests
+
+    import telegram_bot
+    from core.config import AppConfig
+    from signals.detectors import Setup
+
+    cfg = AppConfig(telegram_bot_token="TOK", telegram_chat_id="123")
+
+    class _FakeScanner:
+        def run_once(self, symbols):
+            return [
+                Setup(
+                    symbol="AAPL",
+                    triggers=["liquidity_sweep"],
+                    context=[],
+                    price=100.0,
+                    confluence=1,
+                )
+            ]
+
+    orig_build_scanner = telegram_bot.build_scanner
+    orig_load_symbols = telegram_bot._load_symbols
+    telegram_bot.build_scanner = lambda cfg: _FakeScanner()
+    telegram_bot._load_symbols = lambda: ["AAPL"]
+    try:
+        assert telegram_bot.handle_scan(cfg) == "Skanerlandi: 1 ta setup topildi (AAPL)."
+
+        sent = []
+
+        def fake_post(url, json=None, timeout=None):
+            sent.append(json)
+
+            class _R:
+                def raise_for_status(self):
+                    pass
+
+            return _R()
+
+        orig_post = requests.post
+        requests.post = fake_post
+        try:
+            telegram_bot.dispatch({"message": {"chat": {"id": 123}, "text": "/scan"}}, cfg)
+        finally:
+            requests.post = orig_post
+
+        # slow command: "working..." ack, then the real reply
+        assert len(sent) == 2
+        assert sent[0]["text"] == "Ishlayapti..."
+        assert sent[1]["text"] == "Skanerlandi: 1 ta setup topildi (AAPL)."
+
+        # reply-keyboard button label maps to the same command
+        assert telegram_bot._command_text({"message": {"text": "\U0001f50d Scan"}}) == "/scan"
+
+        help_text = telegram_bot.handle_help()
+        assert "/scan" in help_text
+    finally:
+        telegram_bot.build_scanner = orig_build_scanner
+        telegram_bot._load_symbols = orig_load_symbols
+
+    print("[ok] telegram_bot_scan_command")
+
+
 def test_telegram_bot_load_symbols_real() -> None:
     import os
     import tempfile
@@ -1436,11 +1622,14 @@ def main() -> int:
         test_live_engine,
         test_entry_points_import_and_share_strategy,
         test_backtest_main_helpers,
+        test_run_all_backtests_drops_forming_bar,
+        test_format_metrics_for_telegram,
         test_live_main_helpers,
         test_telegram_bot_auth_and_parsing,
         test_telegram_bot_api_wrappers,
         test_telegram_bot_dispatch_and_handlers,
         test_telegram_bot_callback_dispatch,
+        test_telegram_bot_scan_command,
         test_telegram_bot_load_symbols_real,
     ]
     for t in tests:

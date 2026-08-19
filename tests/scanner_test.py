@@ -701,6 +701,21 @@ def test_update_journal_decision() -> None:
     print("[ok] update_journal_decision")
 
 
+def test_format_setups() -> None:
+    from scan_main import format_setups
+    from signals.detectors import Setup
+
+    assert format_setups([]) == "Skanerlandi, yangi setup yo'q."
+
+    setups = [
+        Setup(symbol="AAPL", triggers=["liquidity_sweep"], context=[], price=100.0, confluence=1),
+        Setup(symbol="MSFT", triggers=["bullish_pin"], context=[], price=200.0, confluence=1),
+    ]
+    assert format_setups(setups) == "Skanerlandi: 2 ta setup topildi (AAPL, MSFT)."
+
+    print("[ok] format_setups")
+
+
 def test_scan_main_imports_and_builds() -> None:
     import importlib
 
@@ -739,6 +754,7 @@ def main() -> int:
         test_scanner_journal_failure_preserves_state,
         test_scanner_corrupt_state_and_isolation,
         test_update_journal_decision,
+        test_format_setups,
         test_scan_main_imports_and_builds,
     ]
     for t in tests:

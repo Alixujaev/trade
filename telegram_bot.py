@@ -5,10 +5,11 @@ import time
 
 import requests
 
-from backtest_main import WHITELIST_PATH, format_metrics_table, run_all_backtests
+from backtest_main import WHITELIST_PATH, format_metrics_for_telegram, run_all_backtests
 from core.config import AppConfig
 from engine.scanner import update_journal_decision
 from live_main import build_live_engine, format_signals
+from scan_main import build_scanner, format_setups
 from screening.sharia import ShariaFilter
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
@@ -21,6 +22,7 @@ JOURNAL_PATH = "journal.csv"
 COMMANDS = [
     ("run", "Bugungi signalni tekshirish"),
     ("backtest", "Whitelist bo'yicha backtest ishga tushirish"),
+    ("scan", "Price-action setuplarni skanerlash"),
     ("status", "Joriy pozitsiyalarni ko'rish"),
     ("help", "Yordam"),
 ]
@@ -31,7 +33,8 @@ COMMANDS = [
 MAIN_KEYBOARD = {
     "keyboard": [
         ["▶️ Run", "\U0001f4ca Backtest"],
-        ["\U0001f4cc Status", "❓ Yordam"],
+        ["\U0001f50d Scan", "\U0001f4cc Status"],
+        ["❓ Yordam"],
     ],
     "resize_keyboard": True,
 }
@@ -39,6 +42,7 @@ MAIN_KEYBOARD = {
 _BUTTON_LABELS: dict[str, str] = {
     "▶️ Run": "/run",
     "\U0001f4ca Backtest": "/backtest",
+    "\U0001f50d Scan": "/scan",
     "\U0001f4cc Status": "/status",
     "❓ Yordam": "/help",
 }
@@ -139,7 +143,12 @@ def send_reply(cfg: AppConfig, chat_id: int | str, text: str) -> None:
         try:
             response = requests.post(
                 _api_url(cfg, "sendMessage"),
-                json={"chat_id": chat_id, "text": chunk, "reply_markup": MAIN_KEYBOARD},
+                json={
+                    "chat_id": chat_id,
+                    "text": chunk,
+                    "parse_mode": "HTML",
+                    "reply_markup": MAIN_KEYBOARD,
+                },
                 timeout=10,
             )
             response.raise_for_status()
@@ -185,7 +194,13 @@ def handle_run(cfg: AppConfig) -> str:
 
 
 def handle_backtest(cfg: AppConfig) -> str:
-    return format_metrics_table(run_all_backtests(cfg))
+    return format_metrics_for_telegram(run_all_backtests(cfg))
+
+
+def handle_scan(cfg: AppConfig) -> str:
+    scanner = build_scanner(cfg)
+    setups = scanner.run_once(_load_symbols())
+    return format_setups(setups)
 
 
 def handle_status(cfg: AppConfig) -> str:
@@ -203,12 +218,13 @@ def handle_status(cfg: AppConfig) -> str:
 _HANDLERS = {
     "/run": handle_run,
     "/backtest": handle_backtest,
+    "/scan": handle_scan,
     "/status": handle_status,
 }
 
 # Commands that can take a long time (network calls per symbol) get an
 # immediate acknowledgment so the user isn't left wondering / resending.
-_SLOW_COMMANDS = {"/run", "/backtest"}
+_SLOW_COMMANDS = {"/run", "/backtest", "/scan"}
 
 
 def _dispatch_callback(callback_query: dict, cfg: AppConfig) -> None:

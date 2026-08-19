@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import math
 
 from core.config import AppConfig
 from data.yfinance_source import YFinanceSource
@@ -44,6 +45,12 @@ def run_all_backtests(cfg: AppConfig) -> list[tuple[str, dict]]:
     for symbol in symbols:
         try:
             df = source.get_history(symbol, cfg.lookback_days, cfg.interval)
+            # yfinance occasionally returns the most recent daily bar with
+            # empty OHLC (not yet fully settled/back-filled); left in, its
+            # NaN close poisons the last equity value and so total_return_pct.
+            # LiveEngine/Scanner already guard against this (drop_forming_bar);
+            # backtests need the same guard.
+            df = df.iloc[:-1]
             result = run_backtest(df, strategy, cfg.backtest, symbol)
             rows.append((symbol, compute_metrics(result)))
         except Exception:
@@ -63,6 +70,44 @@ def format_metrics_table(rows: list[tuple[str, dict]]) -> str:
             v = metrics[col]
             values.append(str(v) if col == "num_trades" else f"{v:.2f}")
         lines.append("\t".join(values))
+    return "\n".join(lines)
+
+
+def format_metrics_for_telegram(rows: list[tuple[str, dict]]) -> str:
+    """Telegram-friendly backtest summary: one line per symbol, sorted by the
+    headline metric (expectancy_per_trade, per README's "Metrics that matter")
+    so the most/least promising results are immediately visible on a narrow
+    screen, instead of format_metrics_table's wide tab-table which wraps
+    unreadably on mobile. The CLI (main(), below) keeps using
+    format_metrics_table -- a tab-separated table is fine, even preferable,
+    in a terminal.
+    """
+    if not rows:
+        return "Natija yo'q."
+
+    def _sort_key(row: tuple[str, dict]) -> float:
+        expectancy = row[1]["expectancy_per_trade"]
+        return expectancy if not math.isnan(expectancy) else float("-inf")
+
+    ordered = sorted(rows, key=_sort_key, reverse=True)
+
+    lines = [f"\U0001f4ca <b>Backtest natijalari</b> ({len(ordered)} ta belgi)", ""]
+    for symbol, m in ordered:
+        expectancy = m["expectancy_per_trade"]
+        if math.isnan(expectancy):
+            lines.append(f"⚪ <b>{symbol}</b> — ma'lumot yetarli emas")
+            continue
+
+        emoji = "\U0001f7e2" if expectancy > 0 else ("\U0001f534" if expectancy < 0 else "⚪")
+        total_return = m["total_return_pct"]
+        return_text = "N/A" if math.isnan(total_return) else f"{total_return:+.2f}%"
+        lines.append(
+            f"{emoji} <b>{symbol}</b> — {expectancy:+.2f}$/savdo, {return_text}, "
+            f"sharpe {m['sharpe']:.2f}, {m['num_trades']} savdo (win {m['win_rate_pct']:.1f}%)"
+        )
+
+    lines.append("")
+    lines.append("<i>Bu tarixiy backtest — kelajakdagi natija kafolati emas.</i>")
     return "\n".join(lines)
 
 

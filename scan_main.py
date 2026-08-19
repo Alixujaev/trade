@@ -23,6 +23,7 @@ from core.config import AppConfig
 from data.yfinance_source import YFinanceSource
 from engine.scanner import Scanner
 from screening.sharia import ShariaFilter
+from signals.detectors import Setup
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -34,6 +35,18 @@ def build_scanner(cfg: AppConfig) -> Scanner:
     source = YFinanceSource()
     alert = TelegramAlertSink(cfg.telegram_bot_token, cfg.telegram_chat_id)
     return Scanner(source, alert, cfg)
+
+
+def format_setups(setups: list[Setup]) -> str:
+    """One-line Telegram-control-bot summary, matching live_main.format_signals'
+    style. The setups themselves were already alerted individually (with their
+    own Chart/decision buttons) by Scanner.run_once -- this is just the /scan
+    command's ack that a run happened.
+    """
+    if not setups:
+        return "Skanerlandi, yangi setup yo'q."
+    parts = ", ".join(setup.symbol for setup in setups)
+    return f"Skanerlandi: {len(setups)} ta setup topildi ({parts})."
 
 
 def main() -> None:
