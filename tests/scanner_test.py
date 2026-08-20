@@ -233,11 +233,100 @@ def test_scanner_config_defaults() -> None:
     assert cfg.fvg_atr_frac == 0.3
     assert cfg.fvg_lookback == 10
     assert cfg.round_number_tol_frac == 0.01
+    assert cfg.require_discount is True
 
     app = AppConfig()
     assert isinstance(app.scanner, ScannerConfig)
 
     print("[ok] scanner_config_defaults")
+
+
+def test_range_position() -> None:
+    from signals.detectors import range_position
+
+    # window of 5 bars, constant range [90,110] on every bar except the last
+    # bar's close, which sits 1/4 of the way up from the range low.
+    bars = [[100, 110, 90, 100]] * 4 + [[100, 110, 90, 95]]
+    df = _mk_bars(bars)
+
+    pos = range_position(df, lookback=5)
+    assert abs(pos - 0.25) < 1e-9  # (95-90)/(110-90) = 0.25
+
+    print("[ok] range_position")
+
+
+def test_range_position_no_lookahead() -> None:
+    from signals.detectors import range_position
+
+    bars = [[100, 110, 90, 100]] * 4 + [[100, 110, 90, 95]]
+    df_base = _mk_bars(bars)
+    pos_base = range_position(df_base, lookback=5)
+
+    future = [[200, 220, 180, 210]] * 3  # wildly different future bars
+    df_extended = _mk_bars(bars + future)
+
+    # same bar position, more data appended after it -> identical result
+    pos_same_slice = range_position(df_extended.iloc[:5], lookback=5)
+    assert abs(pos_same_slice - pos_base) < 1e-9
+
+    print("[ok] range_position_no_lookahead")
+
+
+def test_in_discount_and_premium_zone() -> None:
+    from signals.detectors import in_discount_zone
+
+    discount_bars = [[100, 110, 90, 100]] * 4 + [[100, 110, 90, 95]]  # close 95 <= mid 100
+    df_discount = _mk_bars(discount_bars)
+    assert in_discount_zone(df_discount, lookback=5) is True
+
+    premium_bars = [[100, 110, 90, 100]] * 4 + [[100, 110, 90, 105]]  # close 105 > mid 100
+    df_premium = _mk_bars(premium_bars)
+    assert in_discount_zone(df_premium, lookback=5) is False
+
+    print("[ok] in_discount_and_premium_zone")
+
+
+def test_scan_symbol_discount_gate() -> None:
+    from core.config import AppConfig, ScannerConfig
+    from signals.detectors import scan_symbol
+
+    # Same bullish_engulfing trigger bar shape, but the window's range differs
+    # so one lands in premium and the other in discount. sweep_lookback is
+    # reused as the range window (no second magic number).
+    prior_bearish = [104, 105, 98, 99]
+
+    # premium: modest filler range, tall last bar pulls midpoint down below its own close
+    filler = [[100, 105, 98, 100]] * 3
+    premium_last = [98, 112, 97, 110]  # engulfs prior body [99,104]; closes near its own high
+    df_premium = _mk_bars(filler + [prior_bearish] + [premium_last])
+
+    # discount: tall filler range pulls midpoint far above the (still engulfing) last close
+    tall_filler = [[100, 200, 98, 100]] * 3
+    discount_last = [98, 108, 97, 106]  # engulfs prior body [99,104]
+    df_discount = _mk_bars(tall_filler + [prior_bearish] + [discount_last])
+
+    cfg_on = AppConfig(scanner=ScannerConfig(sweep_lookback=5, require_discount=True))
+    cfg_off = AppConfig(scanner=ScannerConfig(sweep_lookback=5, require_discount=False))
+
+    # require_discount=True: premium-zone setup is blocked
+    blocked = scan_symbol(df_premium, "TEST", cfg_on, require_uptrend=False)
+    assert blocked is None
+
+    # require_discount=True: discount-zone setup passes
+    passed = scan_symbol(df_discount, "TEST", cfg_on, require_uptrend=False)
+    assert passed is not None
+    assert "bullish_engulfing" in passed.triggers
+    assert "discount" in passed.context
+    expected_pos = (106 - 97) / (200 - 97)
+    assert abs(passed.range_pos - expected_pos) < 1e-9
+
+    # require_discount=False: the premium-zone setup fires too (back-compat)
+    allowed_off = scan_symbol(df_premium, "TEST", cfg_off, require_uptrend=False)
+    assert allowed_off is not None
+    assert "bullish_engulfing" in allowed_off.triggers
+    assert "discount" not in allowed_off.context
+
+    print("[ok] scan_symbol_discount_gate")
 
 
 def test_enricher_alone_not_actionable() -> None:
@@ -264,7 +353,11 @@ def test_scan_symbol_no_lookahead() -> None:
     sweep_bar = [97, 99, 90, 98]
     df_base = _mk_bars(prior + [sweep_bar])  # 6 bars
 
-    cfg = AppConfig(scanner=ScannerConfig(sweep_lookback=5, sweep_reclaim_frac=0.5))
+    # require_discount=False: this test isolates the no-lookahead property of
+    # the sweep trigger itself, not the (separately tested) discount gate.
+    cfg = AppConfig(
+        scanner=ScannerConfig(sweep_lookback=5, sweep_reclaim_frac=0.5, require_discount=False)
+    )
 
     result_base = scan_symbol(df_base, "TEST", cfg, require_uptrend=False)
     assert result_base is not None
@@ -341,7 +434,7 @@ class _FakeAlert:
 def test_scanner_drop_forming_bar() -> None:
     import os
 
-    from core.config import AppConfig
+    from core.config import AppConfig, ScannerConfig
     from engine.scanner import Scanner
 
     idx = pd.date_range("2024-01-01", periods=3, freq="B")
@@ -357,9 +450,11 @@ def test_scanner_drop_forming_bar() -> None:
     )
 
     # drop_forming_bar=True: the engulfing pattern lives on the dropped bar -> no setup
+    # require_discount=False: this test is about drop_forming_bar, isolated from
+    # the (separately tested) discount gate.
     state_a = _tmp_path(".json")
     try:
-        cfg = AppConfig(state_file=state_a)
+        cfg = AppConfig(state_file=state_a, scanner=ScannerConfig(require_discount=False))
         scanner = Scanner(
             _FakeSource(df),
             _FakeAlert(),
@@ -377,7 +472,7 @@ def test_scanner_drop_forming_bar() -> None:
     # drop_forming_bar=False: the same engulfing pattern is now the last bar -> fires
     state_b = _tmp_path(".json")
     try:
-        cfg = AppConfig(state_file=state_b)
+        cfg = AppConfig(state_file=state_b, scanner=ScannerConfig(require_discount=False))
         alert = _FakeAlert()
         scanner = Scanner(
             _FakeSource(df),
@@ -403,7 +498,7 @@ def test_scanner_alert_on_change_and_state() -> None:
     import json
     import os
 
-    from core.config import AppConfig
+    from core.config import AppConfig, ScannerConfig
     from engine.scanner import Scanner
 
     idx = pd.date_range("2024-01-01", periods=2, freq="B")
@@ -418,9 +513,11 @@ def test_scanner_alert_on_change_and_state() -> None:
         index=idx,
     )  # bar0 bearish, bar1 bullish engulf -> fires with drop_forming_bar=False
 
+    # require_discount=False: this test is about alert-on-change/state
+    # persistence, isolated from the (separately tested) discount gate.
     state_path = _tmp_path(".json")
     try:
-        cfg = AppConfig(state_file=state_path)
+        cfg = AppConfig(state_file=state_path, scanner=ScannerConfig(require_discount=False))
         alert = _FakeAlert()
         scanner = Scanner(
             _FakeSource(df),
@@ -455,7 +552,7 @@ def test_scanner_alert_on_change_and_state() -> None:
 def test_scanner_alert_formatted_text() -> None:
     import os
 
-    from core.config import AppConfig
+    from core.config import AppConfig, ScannerConfig
     from engine.scanner import Scanner
 
     idx = pd.date_range("2024-01-01", periods=2, freq="B")
@@ -471,9 +568,11 @@ def test_scanner_alert_formatted_text() -> None:
     )  # bar0 bearish, bar1 bullish engulf -> fires with drop_forming_bar=False;
     # only 2 bars -> EMA/ATR warmups never complete, so context is empty here.
 
+    # require_discount=False: this test is about alert text formatting,
+    # isolated from the (separately tested) discount gate.
     state_path = _tmp_path(".json")
     try:
-        cfg = AppConfig(state_file=state_path)
+        cfg = AppConfig(state_file=state_path, scanner=ScannerConfig(require_discount=False))
         alert = _FakeAlert()
         scanner = Scanner(
             _FakeSource(df),
@@ -518,7 +617,7 @@ def test_scanner_alert_formatted_text() -> None:
 def test_scanner_alert_failure_preserves_state() -> None:
     import os
 
-    from core.config import AppConfig
+    from core.config import AppConfig, ScannerConfig
     from engine.scanner import Scanner
 
     idx = pd.date_range("2024-01-01", periods=2, freq="B")
@@ -544,9 +643,11 @@ def test_scanner_alert_failure_preserves_state() -> None:
                 raise RuntimeError("telegram down")
             self.sent.append(signal)
 
+    # require_discount=False: this test is about the alert-failure/state-
+    # preservation interplay, isolated from the (separately tested) discount gate.
     state_path = _tmp_path(".json")
     try:
-        cfg = AppConfig(state_file=state_path)
+        cfg = AppConfig(state_file=state_path, scanner=ScannerConfig(require_discount=False))
         alert = _FlakyAlert()
         scanner = Scanner(
             _FakeSource(df),
@@ -585,7 +686,7 @@ def test_scanner_corrupt_state_and_isolation() -> None:
     import os
     import tempfile
 
-    from core.config import AppConfig
+    from core.config import AppConfig, ScannerConfig
     from engine.scanner import Scanner
 
     idx = pd.date_range("2024-01-01", periods=2, freq="B")
@@ -613,8 +714,10 @@ def test_scanner_corrupt_state_and_isolation() -> None:
     with os.fdopen(fd, "w") as f:
         f.write("{not valid json")
 
+    # require_discount=False: this test is about corrupt-state recovery and
+    # per-symbol isolation, isolated from the (separately tested) discount gate.
     try:
-        cfg = AppConfig(state_file=corrupt_state)
+        cfg = AppConfig(state_file=corrupt_state, scanner=ScannerConfig(require_discount=False))
         scanner = Scanner(
             _FlakySource(good_df),
             _FakeAlert(),
@@ -696,6 +799,10 @@ def main() -> int:
         test_format_setup_alert_text_emoji_and_no_separators,
         test_near_fvg,
         test_scanner_config_defaults,
+        test_range_position,
+        test_range_position_no_lookahead,
+        test_in_discount_and_premium_zone,
+        test_scan_symbol_discount_gate,
         test_enricher_alone_not_actionable,
         test_scan_symbol_no_lookahead,
         test_scan_symbol_uptrend_gate,

@@ -103,6 +103,27 @@ def near_fvg(df: pd.DataFrame, atr_frac: float = 0.3, lookback: int = 10) -> boo
     return False
 
 
+def range_position(df: pd.DataFrame, lookback: int = 20) -> float:
+    """Where the last close sits within [min(low), max(high)] over the last
+    `lookback` completed bars. 0.0 = bottom of the range (deep discount),
+    1.0 = top of the range (deep premium).
+    """
+    window = df.iloc[-lookback:]
+    range_low = float(window["low"].min())
+    range_high = float(window["high"].max())
+    last_close = float(df["close"].iloc[-1])
+
+    span = range_high - range_low
+    if span <= 0:
+        return 0.5
+
+    return (last_close - range_low) / span
+
+
+def in_discount_zone(df: pd.DataFrame, lookback: int = 20) -> bool:
+    return range_position(df, lookback=lookback) <= 0.5
+
+
 _ROUND_NUMBER_UNIT = 5.0
 
 
@@ -128,6 +149,10 @@ class Setup:
     context: list[str]
     price: float
     confluence: int
+    # Where price sits in its recent range (0.0=range low, 1.0=range high).
+    # Carried through to the journal so premium-vs-discount entry quality can
+    # be analysed later; see scan_symbol's discount-zone gate below.
+    range_pos: float = 0.5
 
     @property
     def is_actionable(self) -> bool:
@@ -143,6 +168,7 @@ _TRIGGER_LABELS: dict[str, str] = {
 _CONTEXT_LABELS: dict[str, str] = {
     "uptrend": "uptrend",
     "near_fvg": "FVG yaqinida",
+    "discount": "discount zone",
 }
 
 _CHART_URL = "https://www.tradingview.com/chart/?symbol={symbol}"
@@ -228,9 +254,20 @@ def scan_symbol(
     if require_uptrend and not is_uptrend:
         return None
 
+    # Premium/discount gate: manual journaling of real alerts found 5/5 fired
+    # while price was in the PREMIUM zone (top of its recent range) -- a poor
+    # place to seek a long per the premium/discount concept. This is a GATE
+    # only (can block, never fires on its own) -- see require_discount.
+    pos = range_position(df, lookback=scanner_cfg.sweep_lookback)
+    is_discount = pos <= 0.5
+    if scanner_cfg.require_discount and not is_discount:
+        return None
+
     context: list[str] = []
     if is_uptrend:
         context.append("uptrend")
+    if is_discount:
+        context.append("discount")
     if near_fvg(df, atr_frac=scanner_cfg.fvg_atr_frac, lookback=scanner_cfg.fvg_lookback):
         context.append("near_fvg")
     if near_round_number(df, tol_frac=scanner_cfg.round_number_tol_frac):
@@ -243,4 +280,5 @@ def scan_symbol(
         context=context,
         price=price,
         confluence=len(triggers) + len(context),
+        range_pos=pos,
     )

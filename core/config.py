@@ -32,6 +32,7 @@ class ScannerConfig:
     fvg_atr_frac: float = 0.3
     fvg_lookback: int = 10
     round_number_tol_frac: float = 0.01
+    require_discount: bool = True
 
 
 @dataclass

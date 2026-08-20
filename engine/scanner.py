@@ -54,7 +54,8 @@ class Scanner:
             "SCANNER: setup formed, go look — not a trade signal. "
             f"triggers={','.join(setup.triggers)} "
             f"context={','.join(setup.context)} "
-            f"confluence={setup.confluence}"
+            f"confluence={setup.confluence} "
+            f"range_pos={setup.range_pos:.2f}"
         )
         bar_date = timestamp.strftime("%Y-%m-%d")
         return Signal(
