@@ -71,6 +71,7 @@ def detect_swings(df: pd.DataFrame, lookback: int = SWING_LOOKBACK) -> list[Swin
                 kind=kind,
                 label=label,
                 index_pos=idx,
+                confirmed_index_pos=idx + lookback,
             )
         )
 
