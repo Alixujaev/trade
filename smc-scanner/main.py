@@ -2,16 +2,28 @@
 
 from __future__ import annotations
 
+import argparse
+
 from config.settings import PRIMARY_INTERVAL
 from config.watchlist import get_watchlist
-from data.yfinance_provider import YFinanceProvider
+from data.factory import get_provider
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Watchlist bo'ylab OHLCV ma'lumotini tekshiradi")
+    parser.add_argument("--interval", default=PRIMARY_INTERVAL, help="Masalan: 1d, 4h")
+    parser.add_argument(
+        "--provider", default=None, help="yfinance yoki alpaca (default: settings.DATA_PROVIDER)"
+    )
+    return parser.parse_args()
 
 
 def main() -> None:
-    provider = YFinanceProvider()
+    args = parse_args()
+    provider = get_provider(args.provider)
     for symbol in get_watchlist():
         try:
-            df = provider.get_ohlcv(symbol, PRIMARY_INTERVAL)
+            df = provider.get_ohlcv(symbol, args.interval)
             if df.empty:
                 print(f"{symbol}: bo'sh ma'lumot")
                 continue

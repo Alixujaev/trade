@@ -5,3 +5,4 @@ data/cache/
 *.parquet
 .pytest_cache/
 chart.png
+.env

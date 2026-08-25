@@ -1,10 +1,11 @@
 """Swing struktura'ni ko'z bilan tekshirish uchun vizual skript.
 
 Ishlatish:
-    python scripts/plot_structure.py [SYMBOL] [LOOKBACK]
+    python scripts/plot_structure.py [SYMBOL] [LOOKBACK] [--interval 1d|4h|1h|1wk] [--provider yfinance|alpaca]
 
 Masalan: python scripts/plot_structure.py SPUS 2
-Chiqish: chart.png (close narx chizig'i + swing HIGH/LOW marker va label'lari).
+         python scripts/plot_structure.py SPUS --interval 4h --provider alpaca
+Chiqish: chart.png (close narx chizig'i + swing HIGH/LOW marker, BOS/CHoCH chiziqlari).
 """
 
 from __future__ import annotations
@@ -23,7 +24,7 @@ from matplotlib.lines import Line2D
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from config.settings import PRIMARY_INTERVAL, SWING_LOOKBACK  # noqa: E402
-from data.yfinance_provider import YFinanceProvider  # noqa: E402
+from data.factory import get_provider  # noqa: E402
 from smc.market_structure import detect_structure_events  # noqa: E402
 from smc.structure import detect_swings  # noqa: E402
 from smc.types import StructureEventType, StructureState, SwingKind  # noqa: E402
@@ -33,14 +34,18 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Swing struktura vizual tekshiruvi")
     parser.add_argument("symbol", nargs="?", default="SPUS", help="Masalan: SPUS")
     parser.add_argument("lookback", nargs="?", type=int, default=SWING_LOOKBACK)
+    parser.add_argument("--interval", default=PRIMARY_INTERVAL, help="Masalan: 1d, 4h")
+    parser.add_argument(
+        "--provider", default=None, help="yfinance yoki alpaca (default: settings.DATA_PROVIDER)"
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
 
-    provider = YFinanceProvider()
-    df = provider.get_ohlcv(args.symbol, PRIMARY_INTERVAL)
+    provider = get_provider(args.provider)
+    df = provider.get_ohlcv(args.symbol, args.interval)
     df = df.tail(200)  # oxirgi ~200 bar ko'z bilan tekshirish uchun yetarli
 
     swings = detect_swings(df, lookback=args.lookback)
@@ -104,7 +109,7 @@ def main() -> None:
             fontweight="bold",
         )
 
-    ax.set_title(f"{args.symbol} — swing struktura (lookback={args.lookback})")
+    ax.set_title(f"{args.symbol} — swing struktura ({args.interval}, lookback={args.lookback})")
 
     # Legend'ga BOS/CHoCH rang-chiziq sxemasini tushuntiruvchi proxy'lar qo'shamiz
     # (har bir event uchun alohida label bermaymiz — legend'da takrorlanish bo'lmasin)

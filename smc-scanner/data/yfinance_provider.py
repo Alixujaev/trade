@@ -9,12 +9,17 @@ from pathlib import Path
 import pandas as pd
 import yfinance as yf
 
-from config.settings import CACHE_DIR, CACHE_TTL_HOURS, PERIOD_1H, PERIOD_DEFAULT, VALID_INTERVALS
+from config.settings import CACHE_DIR, CACHE_TTL_HOURS, PERIOD_1H, PERIOD_DEFAULT
 from data.provider import DataProvider
 
 logger = logging.getLogger(__name__)
 
 REQUIRED_COLUMNS = ["open", "high", "low", "close", "volume"]
+
+# yfinance "4h"ni toza bermaydi (abstraksiya oqadigan joy — shuning uchun
+# umumiy VALID_INTERVALS emas, shu provider O'ZI qo'llab-quvvatlaydigan
+# subset'ga qarab validatsiya qilamiz)
+SUPPORTED_INTERVALS: set[str] = {"1d", "1wk", "1h"}
 
 
 class YFinanceProvider(DataProvider):
@@ -22,9 +27,10 @@ class YFinanceProvider(DataProvider):
 
     def get_ohlcv(self, symbol: str, interval: str, *, use_cache: bool = True) -> pd.DataFrame:
         symbol = symbol.upper()
-        if interval not in VALID_INTERVALS:
+        if interval not in SUPPORTED_INTERVALS:
             raise ValueError(
-                f"Noto'g'ri interval: {interval!r}. Ruxsat etilganlar: {sorted(VALID_INTERVALS)}"
+                f"YFinanceProvider '{interval!r}'ni qo'llab-quvvatlamaydi. "
+                f"Qo'llab-quvvatlanadiganlar: {sorted(SUPPORTED_INTERVALS)}"
             )
 
         cache_path = self._cache_path(symbol, interval)

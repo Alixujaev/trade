@@ -3,3 +3,5 @@ pandas
 numpy
 pyarrow
 matplotlib
+alpaca-py
+python-dotenv
