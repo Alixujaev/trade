@@ -16,3 +16,6 @@ CACHE_TTL_HOURS: int = 12
 # yf.download uchun davr (period) parametrlari
 PERIOD_1H: str = "730d"
 PERIOD_DEFAULT: str = "10y"
+
+# Swing detection uchun default lookback — vizual tekshiruvda eng toza struktura berdi
+SWING_LOOKBACK: int = 5
