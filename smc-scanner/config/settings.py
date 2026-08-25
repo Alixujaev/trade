@@ -33,3 +33,7 @@ ALPACA_LOOKBACK_DAYS_DEFAULT: int = 3650  # 1d/1wk uchun (~10 yil)
 
 # Default data provider: "yfinance" yoki "alpaca". factory.get_provider() shu yerdan o'qiydi.
 DATA_PROVIDER: str = "yfinance"
+
+# Displacement (FVG/OB asosi) uchun ATR parametrlari
+ATR_PERIOD: int = 14
+DISPLACEMENT_ATR_MULT: float = 1.5

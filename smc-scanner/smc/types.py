@@ -61,3 +61,31 @@ class StructureEvent:
     broken_swing_ts: pd.Timestamp  # buzilgan swing timestamp'i
     broken_swing_index_pos: int  # buzilgan swing'ning integer pozitsiyasi
     index_pos: int  # break candle'ning integer pozitsiyasi
+
+
+class ZoneType(Enum):
+    """Retest qilinadigan zona turi."""
+
+    FVG = auto()  # Fair Value Gap (imbalance)
+    ORDER_BLOCK = auto()
+
+
+@dataclass(frozen=True)
+class Zone:
+    """Bitta retest zonasi (FVG yoki Order Block).
+
+    `created_index_pos` — zonani tug'diruvchi PATTERN'ning OXIRGI (tasdiqlovchi)
+    bari, pattern boshlangan bar EMAS (masalan FVG'da bu 3-candle'ning oxirgisi,
+    OB'da esa displacement candle'ning o'zi) — chunki zona shu bardan oldin
+    hali "mavjud" deb bilib bo'lmaydi (lookahead bo'lardi).
+    """
+
+    zone_type: ZoneType
+    direction: StructureState  # BULLISH / BEARISH
+    top: float
+    bottom: float
+    created_ts: pd.Timestamp
+    created_index_pos: int
+    filled: bool = False
+    filled_ts: pd.Timestamp | None = None
+    filled_index_pos: int | None = None

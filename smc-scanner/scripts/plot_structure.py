@@ -19,6 +19,7 @@ import matplotlib
 matplotlib.use("Agg")  # Displaysiz (headless) muhitda ham ishlashi uchun
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 # Skript qayerdan ishga tushirilishidan qat'iy nazar paketlar topilishi uchun
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -28,6 +29,7 @@ from data.factory import get_provider  # noqa: E402
 from smc.market_structure import detect_structure_events  # noqa: E402
 from smc.structure import detect_swings  # noqa: E402
 from smc.types import StructureEventType, StructureState, SwingKind  # noqa: E402
+from smc.zones import detect_fvgs, detect_order_blocks  # noqa: E402
 
 
 def parse_args() -> argparse.Namespace:
@@ -50,8 +52,24 @@ def main() -> None:
 
     swings = detect_swings(df, lookback=args.lookback)
     events = detect_structure_events(df, swings)
+    open_fvgs = [z for z in detect_fvgs(df) if not z.filled]
+    open_obs = [z for z in detect_order_blocks(df) if not z.filled]
 
     fig, ax = plt.subplots(figsize=(14, 7))
+
+    # Ochiq FVG/OB zonalari — pastki qatlamda (zorder=1), boshqa hamma narsa ustidan chiziladi.
+    # Faqat ochiq (unfilled) zonalar ko'rsatiladi — chart ifloslanmasin. Bearish zonalar
+    # xiraroq (past alpha) — tizim LONG-ONLY, ular faqat kontekst/kelajakdagi exit-filtr uchun.
+    for zone, color, alpha in [
+        *[(z, "mediumseagreen", 0.15) for z in open_fvgs if z.direction is StructureState.BULLISH],
+        *[(z, "darkgreen", 0.12) for z in open_obs if z.direction is StructureState.BULLISH],
+        *[(z, "lightcoral", 0.10) for z in open_fvgs if z.direction is StructureState.BEARISH],
+        *[(z, "firebrick", 0.08) for z in open_obs if z.direction is StructureState.BEARISH],
+    ]:
+        ax.fill_between(
+            [zone.created_ts, df.index[-1]], zone.bottom, zone.top, color=color, alpha=alpha, zorder=1
+        )
+
     ax.plot(df.index, df["close"], color="steelblue", linewidth=1, label="close")
 
     # Marker'larni narxdan biroz uzoqlashtirish uchun offset (chart o'lchamiga mos)
@@ -119,6 +137,10 @@ def main() -> None:
         Line2D([0], [0], color="royalblue", lw=1.5, linestyle="--", label="bullish CHoCH"),
         Line2D([0], [0], color="darkorange", lw=1.5, label="bearish BOS"),
         Line2D([0], [0], color="darkorange", lw=1.5, linestyle="--", label="bearish CHoCH"),
+        Patch(facecolor="mediumseagreen", alpha=0.3, label="ochiq bullish FVG"),
+        Patch(facecolor="darkgreen", alpha=0.3, label="ochiq bullish OB"),
+        Patch(facecolor="lightcoral", alpha=0.3, label="ochiq bearish FVG"),
+        Patch(facecolor="firebrick", alpha=0.3, label="ochiq bearish OB"),
     ]
     ax.legend(handles=legend_handles, fontsize=8)
     fig.tight_layout()
@@ -128,6 +150,7 @@ def main() -> None:
     print(f"Chart saqlandi: {out_path.resolve()}")
     print(f"Topilgan swing'lar soni: {len(swings)}")
     print(f"BOS/CHoCH event'lar soni: {len(events)}")
+    print(f"Ochiq FVG: {len(open_fvgs)}, Ochiq OB: {len(open_obs)}")
 
 
 if __name__ == "__main__":
