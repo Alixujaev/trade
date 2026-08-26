@@ -192,3 +192,114 @@ def test_empty_signals_returns_empty_trades_no_crash() -> None:
     assert result.final_capital == result.initial_capital
     assert result.metrics["num_trades"] == 0
     assert result.metrics["win_rate"] == 0.0
+
+
+# --- exit_mode="trailing" testlari ---
+
+# Qo'lda hisoblangan 6-bar seriya (atr_period=3): har bar TR=2 (H-L=2, open=prevclose,
+# H=open+1, L=open-1 — shu qurilish TR'ni butun seriya davomida 2.0 doimiy qiladi).
+# entry_index_pos=0, entry=100, initial stop=90, trail_atr_mult=1.0.
+# running_high: 100->101->102->103->104 (bar1..4). ATR[1]=NaN (warmup), ATR[2..4]=2.0.
+# stop: 90 (bar1, ATR hali NaN) -> 100.0 (bar2: 102-1*2) -> 101.0 (bar3: 103-1*2)
+#       -> 102.0 (bar4: 104-1*2). bar5 low=99 <= 102.0 -> chiqish shu yerda, 102.0'da.
+_TRAILING_ROWS = [
+    {"open": 100, "high": 101, "low": 99, "close": 100},  # idx0 entry
+    {"open": 100, "high": 101, "low": 99, "close": 101},  # idx1
+    {"open": 101, "high": 102, "low": 100, "close": 102},  # idx2
+    {"open": 102, "high": 103, "low": 101, "close": 103},  # idx3
+    {"open": 103, "high": 104, "low": 102, "close": 103},  # idx4
+    {"open": 103, "high": 103.5, "low": 99, "close": 100},  # idx5 stop buziladi
+]
+
+
+def test_trailing_exit_price_and_mfe_hand_verified() -> None:
+    df = _make_df(_TRAILING_ROWS)
+    signal = _setup(0, entry=100.0, stop=90.0, target=999.0, ts=df.index[0])  # target trailing'da ishlatilmaydi
+
+    result = run_backtest(
+        df, [signal], risk_model="fixed_pct", risk_pct=0.01,
+        exit_mode="trailing", trail_atr_mult=1.0, atr_period=3,
+    )
+
+    assert len(result.trades) == 1
+    trade = result.trades[0]
+    assert trade.exit_reason == "trailing_stop"
+    assert trade.exit_price == pytest.approx(102.0)
+    assert trade.exit_index_pos == 5
+    assert trade.r_multiple == pytest.approx(0.2)  # (102-100)/(100-90)
+    assert trade.mae_r == pytest.approx(0.1)  # min_low=99 -> (100-99)/10
+    assert trade.mfe_r == pytest.approx(0.4)  # running_high=104 -> (104-100)/10
+
+
+def test_trailing_stop_never_decreases_through_non_triggering_dip() -> None:
+    """Stop=102.0'gacha ko'tarilgach, yangi high QILMAYDIGAN va stop'ni
+    BUZMAYDIGAN oraliq bar qo'shilsa ham, chiqish narxi O'ZGARMASLIGI kerak."""
+    rows = _TRAILING_ROWS[:5] + [
+        {"open": 103, "high": 103.5, "low": 102.2, "close": 102.5},  # dip: chiqish yo'q, yangi high yo'q
+        {"open": 102.5, "high": 103, "low": 99, "close": 100},  # endi stop buziladi
+    ]
+    df = _make_df(rows)
+    signal = _setup(0, entry=100.0, stop=90.0, target=999.0, ts=df.index[0])
+
+    result = run_backtest(
+        df, [signal], risk_model="fixed_pct", risk_pct=0.01,
+        exit_mode="trailing", trail_atr_mult=1.0, atr_period=3,
+    )
+
+    trade = result.trades[0]
+    assert trade.exit_price == pytest.approx(102.0)  # dip stop'ni pasaytirmadi
+    assert trade.exit_index_pos == 6
+
+
+def test_trailing_stop_does_not_ratchet_during_atr_warmup() -> None:
+    """ATR hali NaN (warmup) bo'lgan barlarda stop yangilanmasligi kerak — hatto
+    o'sha barlarda yangi high qilingan bo'lsa ham. Original stop keyin to'g'ri ishlaydi."""
+    rows = [
+        {"open": 100, "high": 101, "low": 99, "close": 100},  # idx0 entry
+        {"open": 100, "high": 110, "low": 99.5, "close": 105},  # idx1 katta yangi high, ATR hali NaN
+        {"open": 105, "high": 106, "low": 104, "close": 105},  # idx2 ATR hali NaN (atr_period=5)
+        {"open": 105, "high": 106, "low": 104, "close": 105},  # idx3 ATR hali NaN
+        {"open": 105, "high": 106, "low": 104, "close": 105},  # idx4 ATR endi valid, lekin yangi high yo'q
+        {"open": 105, "high": 106, "low": 85, "close": 87},  # idx5 original stop(90) buziladi
+    ]
+    df = _make_df(rows)
+    signal = _setup(0, entry=100.0, stop=90.0, target=999.0, ts=df.index[0])
+
+    result = run_backtest(
+        df, [signal], risk_model="fixed_pct", risk_pct=0.01,
+        exit_mode="trailing", trail_atr_mult=1.0, atr_period=5,
+    )
+
+    trade = result.trades[0]
+    # Agar stop noto'g'ri (masalan NaN bilan) yangilangan bo'lsa, na 90'da chiqadi,
+    # na "trailing_stop" bilan — bu test aynan shu xatoni ushlaydi.
+    assert trade.exit_reason == "trailing_stop"
+    assert trade.exit_price == pytest.approx(90.0)
+    assert trade.mfe_r == pytest.approx(1.0)  # running_high=110 -> (110-100)/10
+    assert trade.mae_r == pytest.approx(1.5)  # min_low=85 -> (100-85)/10
+
+
+def test_trailing_exit_no_lookahead_bias() -> None:
+    """Chiqish bariga yetib bormaydigan kesilgan data — pozitsiya 'end_of_data'
+    sifatida yopilishi kerak, kelajakdagi stop-buzilishni oldindan bilmasligi kerak."""
+    df_full = _make_df(_TRAILING_ROWS)
+    df_truncated = df_full.iloc[:5]  # idx5 (chiqish bari) yo'q
+    signal = _setup(0, entry=100.0, stop=90.0, target=999.0, ts=df_full.index[0])
+
+    result = run_backtest(
+        df_truncated, [signal], risk_model="fixed_pct", risk_pct=0.01,
+        exit_mode="trailing", trail_atr_mult=1.0, atr_period=3,
+    )
+
+    trade = result.trades[0]
+    assert trade.exit_reason == "end_of_data"
+    assert trade.exit_index_pos == 4
+    assert trade.exit_price == pytest.approx(103.0)  # close[4]
+
+
+def test_invalid_exit_mode_raises() -> None:
+    df = _make_df([{"open": 100, "high": 101, "low": 99, "close": 100}] * 3)
+    signal = _setup(0, entry=100.0, stop=90.0, target=110.0, ts=df.index[0])
+
+    with pytest.raises(ValueError):
+        run_backtest(df, [signal], exit_mode="bad_mode")

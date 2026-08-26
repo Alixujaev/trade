@@ -47,3 +47,8 @@ ATR_RISK_MULT: float = 1.0
 
 # Core watchlist: shu kundan ko'p vaqt o'tsa, halal statusni qayta tekshirish kerak deb belgilanadi
 REVIEW_INTERVAL_DAYS: int = 90
+
+# Trailing exit: stop = running_high - shu * ATR. Sodda (ATR-asosli) variant tanlandi —
+# swing-low-asosli trailing savdo davomida yangi tasdiqlangan swing'larni kuzatishni
+# talab qilardi (backtest/engine.py::_simulate_trailing_exit'ga qarang).
+TRAIL_ATR_MULT: float = 2.0

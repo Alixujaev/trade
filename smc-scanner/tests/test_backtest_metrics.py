@@ -33,6 +33,7 @@ def _make_trade(r_multiple: float, pnl: float, hold_days: float = 3.0) -> TradeR
         pnl=pnl,
         hold_duration_days=hold_days,
         mae_r=0.0,
+        mfe_r=max(r_multiple, 0.0),
     )
 
 
