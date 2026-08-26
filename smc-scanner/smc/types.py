@@ -89,3 +89,16 @@ class Zone:
     filled: bool = False
     filled_ts: pd.Timestamp | None = None
     filled_index_pos: int | None = None
+
+
+@dataclass(frozen=True)
+class TradeSetup:
+    """Bitta LONG entry setup — struktura + zona retest'idan hosil bo'lgan."""
+
+    entry_ts: pd.Timestamp
+    entry_price: float
+    stop_price: float
+    target_price: float
+    direction: StructureState  # doim BULLISH (long-only scope) — sxema izchilligi uchun saqlanadi
+    entry_index_pos: int
+    reason: str  # trigger qilgan zona turi — "FVG" yoki "ORDER_BLOCK"

@@ -37,3 +37,10 @@ DATA_PROVIDER: str = "yfinance"
 # Displacement (FVG/OB asosi) uchun ATR parametrlari
 ATR_PERIOD: int = 14
 DISPLACEMENT_ATR_MULT: float = 1.5
+
+# Signal engine: stop = zona bottom - shu * ATR
+STOP_BUFFER_ATR_MULT: float = 0.1
+# Signal engine: mos swing high topilmasa, fallback target = entry + shu * risk
+DEFAULT_TARGET_R_MULTIPLE: float = 2.0
+# Backtest "atr" risk_model: bir aksiya uchun risk = shu * ATR[entry]
+ATR_RISK_MULT: float = 1.0
