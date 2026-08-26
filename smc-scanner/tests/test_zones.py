@@ -5,6 +5,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
+from config.settings import DISPLACEMENT_ATR_MULT
 from smc.types import StructureState, ZoneType
 from smc.zones import compute_atr, detect_displacement, detect_fvgs, detect_order_blocks
 
@@ -141,6 +142,33 @@ def test_detect_fvgs_no_lookahead_bias() -> None:
     assert truncated_zones[0].filled_ts is None
     assert truncated_zones[0].filled_index_pos is None
     assert full_zones[0].filled is True  # to'liq data'da esa to'ldirilgan
+
+
+def test_mult_omitted_falls_back_to_settings_default() -> None:
+    """mult berilmasa, settings.DISPLACEMENT_ATR_MULT bilan bir xil natija berishi kerak."""
+    df = _make_ohlc_df(_BASE_ROWS)
+
+    default_fvgs = detect_fvgs(df, atr_period=3)
+    explicit_fvgs = detect_fvgs(df, atr_period=3, mult=DISPLACEMENT_ATR_MULT)
+    assert default_fvgs == explicit_fvgs
+
+    default_obs = detect_order_blocks(df, atr_period=3)
+    explicit_obs = detect_order_blocks(df, atr_period=3, mult=DISPLACEMENT_ATR_MULT)
+    assert default_obs == explicit_obs
+
+
+def test_mult_override_sweeps_without_touching_settings() -> None:
+    """Turli mult qiymatlarini settings'ni monkeypatch qilmasdan solishtirish mumkin bo'lishi kerak."""
+    df = _make_ohlc_df(_BASE_ROWS)
+    mult_before = DISPLACEMENT_ATR_MULT
+
+    strict = detect_fvgs(df, atr_period=3, mult=10.0)  # juda qattiq chegara — hech narsa topilmaydi
+    loose = detect_fvgs(df, atr_period=3, mult=1.0)
+
+    assert strict == []
+    assert len(loose) == 1
+    # settings qiymati o'zgarmagani (global holat ifloslanmagani)ni tasdiqlaymiz
+    assert DISPLACEMENT_ATR_MULT == mult_before
 
 
 def test_empty_or_insufficient_data_returns_empty_no_crash() -> None:
