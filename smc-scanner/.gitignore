@@ -6,3 +6,4 @@ data/cache/
 .pytest_cache/
 chart.png
 .env
+backtest_results.csv
