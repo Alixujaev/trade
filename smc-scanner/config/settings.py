@@ -44,3 +44,6 @@ STOP_BUFFER_ATR_MULT: float = 0.1
 DEFAULT_TARGET_R_MULTIPLE: float = 2.0
 # Backtest "atr" risk_model: bir aksiya uchun risk = shu * ATR[entry]
 ATR_RISK_MULT: float = 1.0
+
+# Core watchlist: shu kundan ko'p vaqt o'tsa, halal statusni qayta tekshirish kerak deb belgilanadi
+REVIEW_INTERVAL_DAYS: int = 90
