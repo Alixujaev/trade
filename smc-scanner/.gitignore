@@ -7,3 +7,4 @@ data/cache/
 chart.png
 .env
 backtest_results.csv
+trade_journal.csv
