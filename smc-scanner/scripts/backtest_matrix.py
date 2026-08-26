@@ -30,6 +30,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from backtest.engine import run_backtest  # noqa: E402
+from backtest.window import slice_date_range  # noqa: E402
 from config.settings import SWING_LOOKBACK  # noqa: E402
 from config.watchlist import get_watchlist  # noqa: E402
 from data.factory import get_provider  # noqa: E402
@@ -84,16 +85,22 @@ def run_one_combination(
     *,
     lookback: int = SWING_LOOKBACK,
     low_sample_threshold: int = LOW_SAMPLE_THRESHOLD,
+    start_date: str | None = None,
+    end_date: str | None = None,
 ) -> dict:
     """Bitta (symbol, interval, provider, risk_model, mult) kombinatsiyasi uchun natija qatori.
 
-    Xato bo'lsa (tarmoq, kredensial, yetarsiz data va h.k.) crash qilmasdan ERROR
-    maydoni to'ldirilgan qator qaytaradi — chaqiruvchi (main loop) davom etadi.
+    start_date/end_date berilsa, struktura/signal shu oyna ichidagi barlardan NOLDAN
+    quriladi (slice_date_range() generate_signals'dan OLDIN chaqiriladi — lookahead yo'q,
+    backtest/window.py'ga qarang). Xato bo'lsa (tarmoq, kredensial, yetarsiz data va h.k.)
+    crash qilmasdan ERROR maydoni to'ldirilgan qator qaytaradi — chaqiruvchi davom etadi.
     """
     base = {"SYMBOL": symbol, "INTERVAL": interval, "PROVIDER": provider_name,
             "RISK": risk_model, "MULT": mult}
     try:
         df = get_provider(provider_name).get_ohlcv(symbol, interval)
+        if start_date is not None or end_date is not None:
+            df = slice_date_range(df, start_date, end_date)
         signals = generate_signals(df, lookback=lookback, mult=mult)
         result = run_backtest(df, signals, risk_model=risk_model)
         m = result.metrics
