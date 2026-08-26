@@ -52,3 +52,9 @@ REVIEW_INTERVAL_DAYS: int = 90
 # swing-low-asosli trailing savdo davomida yangi tasdiqlangan swing'larni kuzatishni
 # talab qilardi (backtest/engine.py::_simulate_trailing_exit'ga qarang).
 TRAIL_ATR_MULT: float = 2.0
+
+# Taktik/paper qatlam risk boshqaruvi (telegram_bot/risk uchun) — bitta savdoga risk %,
+# kunlik jami risk limiti (% kapital) va maksimal ochiq pozisiya soni
+DEFAULT_RISK_PCT: float = 0.01
+MAX_DAILY_RISK_PCT: float = 0.02
+MAX_OPEN_POSITIONS: int = 3

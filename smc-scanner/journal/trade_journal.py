@@ -23,6 +23,7 @@ DEFAULT_JOURNAL_PATH: Path = Path(__file__).resolve().parent.parent / "trade_jou
 _COLUMNS = [
     "entry_id", "symbol", "entry_date", "entry_price", "stop_price", "target_price",
     "exit_mode", "reason", "rr_planned", "notes", "exit_date", "exit_price", "r_multiple",
+    "shares",
 ]
 
 
@@ -50,6 +51,7 @@ class TradeJournal:
         exit_mode: str,
         reason: str,
         notes: str = "",
+        shares: float | None = None,
     ) -> JournalEntry:
         """Yangi savdo yozuvini qo'shadi va CSV'ga saqlaydi. rr_planned avtomatik hisoblanadi
         (target_price berilgan va risk>0 bo'lsa; aks holda None — masalan trailing exit_mode'da)."""
@@ -71,6 +73,7 @@ class TradeJournal:
             reason=reason,
             rr_planned=rr_planned,
             notes=notes,
+            shares=shares,
         )
         self.entries.append(entry)
         self._save()
@@ -102,6 +105,14 @@ class TradeJournal:
                 return updated
         raise ValueError(f"entry_id={entry_id} topilmadi")
 
+    def open_entries(self) -> list[JournalEntry]:
+        """Hali yopilmagan (exit_price=None) yozuvlar."""
+        return [e for e in self.entries if e.exit_price is None]
+
+    def recent_entries(self, n: int = 10) -> list[JournalEntry]:
+        """Oxirgi N yozuv, qo'shilgan tartibida (eskisi oldin)."""
+        return self.entries[-n:]
+
     def stats(self) -> dict:
         """Rejalashtirilgan R:R vs amalga oshgan expectancy — raqamlar, sharh emas.
 
@@ -125,6 +136,7 @@ class TradeJournal:
                 "avg_win_r": None,
                 "avg_loss_r": None,
                 "expectancy_r": 0.0,
+                "profit_factor": None,
             }
 
         r_values = [e.r_multiple for e in closed]
@@ -141,6 +153,11 @@ class TradeJournal:
         loss_component = (len(losses) / len(closed)) * (avg_loss_r or 0.0)
         expectancy_r = win_component + loss_component
 
+        # profit_factor = yutuqlar yig'indisi / mag'lubiyatlar yig'indisining moduli.
+        # Mag'lubiyat bo'lmasa (bo'lish nolga) — None (cheksizlik emas, "hali ma'lumot yo'q").
+        loss_sum = abs(sum(losses))
+        profit_factor = sum(wins) / loss_sum if loss_sum > 0 else None
+
         return {
             "num_entries": len(self.entries),
             "num_open": len(self.entries) - len(closed),
@@ -151,6 +168,7 @@ class TradeJournal:
             "avg_win_r": avg_win_r,
             "avg_loss_r": avg_loss_r,
             "expectancy_r": expectancy_r,
+            "profit_factor": profit_factor,
         }
 
     def _load(self) -> list[JournalEntry]:
@@ -177,6 +195,7 @@ class TradeJournal:
                     exit_date=None if pd.isna(row["exit_date"]) else date.fromisoformat(row["exit_date"]),
                     exit_price=_none_if_nan(row["exit_price"]),
                     r_multiple=_none_if_nan(row["r_multiple"]),
+                    shares=_none_if_nan(row["shares"]) if "shares" in df.columns else None,
                 )
             )
         return entries

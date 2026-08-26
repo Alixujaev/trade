@@ -157,3 +157,127 @@ def test_empty_journal_header_only_file(tmp_path) -> None:
 
     assert journal.entries == []
     assert journal.stats()["num_entries"] == 0
+
+
+def test_add_entry_stores_shares(tmp_path) -> None:
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+
+    entry = journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG", shares=10,
+    )
+
+    assert entry.shares == 10
+
+
+def test_add_entry_shares_defaults_to_none(tmp_path) -> None:
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+
+    entry = journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+    )
+
+    assert entry.shares is None
+
+
+def test_shares_round_trips_through_csv(tmp_path) -> None:
+    csv_path = tmp_path / "journal.csv"
+    journal = TradeJournal(csv_path=csv_path)
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG", shares=10,
+    )
+
+    reloaded = TradeJournal(csv_path=csv_path)
+
+    assert reloaded.entries[0].shares == pytest.approx(10)
+
+
+def test_old_format_csv_without_shares_column_still_loads(tmp_path) -> None:
+    csv_path = tmp_path / "old.csv"
+    csv_path.write_text(
+        "entry_id,symbol,entry_date,entry_price,stop_price,target_price,exit_mode,"
+        "reason,rr_planned,notes,exit_date,exit_price,r_multiple\n"
+        "1,AAPL,2026-01-01,100.0,90.0,130.0,fixed,FVG,3.0,,,,\n"
+    )
+
+    journal = TradeJournal(csv_path=csv_path)
+
+    assert len(journal.entries) == 1
+    assert journal.entries[0].shares is None
+
+
+def test_open_entries_returns_only_unclosed(tmp_path) -> None:
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+    )
+    journal.add_entry(
+        symbol="AMD", entry_date=date(2026, 1, 1), entry_price=50.0, stop_price=45.0,
+        target_price=60.0, exit_mode="fixed", reason="FVG",
+    )
+    journal.close_entry(1, exit_date=date(2026, 1, 5), exit_price=110.0)
+
+    open_entries = journal.open_entries()
+
+    assert [e.entry_id for e in open_entries] == [2]
+
+
+def test_recent_entries_returns_last_n_in_order(tmp_path) -> None:
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    for i in range(5):
+        journal.add_entry(
+            symbol=f"SYM{i}", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+            target_price=130.0, exit_mode="fixed", reason="FVG",
+        )
+
+    recent = journal.recent_entries(2)
+
+    assert [e.symbol for e in recent] == ["SYM3", "SYM4"]
+
+
+def test_recent_entries_default_is_ten(tmp_path) -> None:
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    for i in range(15):
+        journal.add_entry(
+            symbol=f"SYM{i}", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+            target_price=130.0, exit_mode="fixed", reason="FVG",
+        )
+
+    assert len(journal.recent_entries()) == 10
+
+
+def test_stats_profit_factor_computed_from_r_multiples(tmp_path) -> None:
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    for _ in range(2):
+        journal.add_entry(
+            symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+            target_price=130.0, exit_mode="fixed", reason="FVG",
+        )
+    journal.close_entry(1, exit_date=date(2026, 1, 5), exit_price=120.0)  # R = +2.0
+    journal.close_entry(2, exit_date=date(2026, 1, 5), exit_price=90.0)  # R = -1.0
+
+    stats = journal.stats()
+
+    assert stats["profit_factor"] == pytest.approx(2.0)  # sum(wins)=2.0 / abs(sum(losses))=1.0
+
+
+def test_stats_profit_factor_none_when_no_losses(tmp_path) -> None:
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+    )
+    journal.close_entry(1, exit_date=date(2026, 1, 5), exit_price=120.0)
+
+    stats = journal.stats()
+
+    assert stats["profit_factor"] is None
+
+
+def test_stats_profit_factor_none_when_no_closed_trades(tmp_path) -> None:
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+
+    assert journal.stats()["profit_factor"] is None

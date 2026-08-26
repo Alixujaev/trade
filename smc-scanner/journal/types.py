@@ -28,3 +28,4 @@ class JournalEntry:
     exit_date: date | None = None
     exit_price: float | None = None
     r_multiple: float | None = None  # yopilgach: (exit-entry)/(entry-stop)
+    shares: float | None = None  # risk/position_sizing.py hisoblagan aksiyalar soni

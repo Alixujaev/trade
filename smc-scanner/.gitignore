@@ -8,3 +8,4 @@ chart.png
 .env
 backtest_results.csv
 trade_journal.csv
+paper_capital.json
