@@ -109,6 +109,55 @@ def test_scan_defaults_to_core_watchlist_when_no_args(monkeypatch) -> None:
     assert mock_run_scan.call_args.args[0] == ["SPUS"]
 
 
+def _good_and_bad_rr_rows() -> list[dict]:
+    good = {
+        "SYMBOL": "CSGP", "SETUP_REASON": "ORDER_BLOCK", "SETUP_ENTRY": 32.3, "SETUP_STOP": 31.15,
+        "SETUP_TARGET": None, "SETUP_RR": "N/A (trailing — maqsad yo'q)",
+        "SETUP_REFERENCE_TARGET": 40.0, "SETUP_PLANNED_RR": 6.7, "SETUP_LOW_RR_WARNING": False,
+        "SETUP_ENTRY_DATE": "2026-08-20", "HAS_ACTIVE_SETUP": True,
+        "STRUCTURE_STATE": "BULLISH", "ERROR": None,
+    }
+    bad = {
+        "SYMBOL": "JNJ", "SETUP_REASON": "FVG", "SETUP_ENTRY": 100.0, "SETUP_STOP": 90.0,
+        "SETUP_TARGET": None, "SETUP_RR": "N/A (trailing — maqsad yo'q)",
+        "SETUP_REFERENCE_TARGET": 100.3, "SETUP_PLANNED_RR": 0.03, "SETUP_LOW_RR_WARNING": True,
+        "SETUP_ENTRY_DATE": "2026-08-20", "HAS_ACTIVE_SETUP": True,
+        "STRUCTURE_STATE": "BULLISH", "ERROR": None,
+    }
+    return [good, bad]
+
+
+def test_scan_hides_low_rr_setup_by_default(monkeypatch) -> None:
+    monkeypatch.setenv("TELEGRAM_ALLOWED_USER_ID", "111")
+    monkeypatch.setattr(handlers, "run_scan", MagicMock(return_value=_good_and_bad_rr_rows()))
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.scan(update, context))
+
+    reply_text = update.effective_message.reply_text.call_args_list[1].args[0]
+    assert "CSGP" in reply_text
+    assert "JNJ" not in reply_text
+    assert "1 ta setup past R:R" in reply_text
+
+    kwargs = update.effective_message.reply_text.call_args_list[1].kwargs
+    buttons = [b for row in kwargs["reply_markup"].inline_keyboard for b in row]
+    assert all(b.callback_data != "add:JNJ" for b in buttons)
+    assert any(b.callback_data == "add:CSGP" for b in buttons)
+
+
+def test_scan_all_shows_low_rr_setup(monkeypatch) -> None:
+    monkeypatch.setenv("TELEGRAM_ALLOWED_USER_ID", "111")
+    monkeypatch.setattr(handlers, "run_scan", MagicMock(return_value=_good_and_bad_rr_rows()))
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.scan_all(update, context))
+
+    reply_text = update.effective_message.reply_text.call_args_list[1].args[0]
+    assert "CSGP" in reply_text
+    assert "JNJ" in reply_text
+    assert "sababli yashirildi" not in reply_text
+
+
 # ---- /status ----
 
 def test_status_shows_open_entries_and_risk_warnings(monkeypatch, tmp_path) -> None:

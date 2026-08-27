@@ -14,7 +14,7 @@ from config.settings import MAX_OPEN_POSITIONS, PRIMARY_INTERVAL, WATCHLIST_COMP
 from journal.trade_journal import TradeJournal
 from journal.types import JournalEntry
 from risk.rules import check_open_positions
-from scripts.tactical_scan import DEFAULT_EXIT_MODE, run_scan, scan_one_symbol
+from scripts.tactical_scan import DEFAULT_EXIT_MODE, filter_quality_setups, run_scan, scan_one_symbol
 from telegram_bot import keyboards
 from telegram_bot.auth import require_allowed_user
 from telegram_bot.formatting import (
@@ -71,19 +71,34 @@ async def menu_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     await handler(update, context)
 
 
-# ---- /scan ----
+# ---- /scan, /scan_all ----
+
+async def _run_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *, show_all: bool) -> None:
+    """Har belgi uchun alohida xabar YO'Q — bitta "ishlayapti" xabari, keyin
+    skanerlash tugagach bitta yakuniy xabar. show_all=False (default /scan) bo'lsa
+    past R:R (< MIN_PLANNED_RR) setup'lar yashiriladi — /scan_all (show_all=True)
+    bilan hammasi ko'rsatiladi. Auth-decorator'siz — chaqiruvchi handler'lar
+    (scan/scan_all) allaqachon himoyalangan (menu_button konvensiyasiga mos)."""
+    symbols = list(context.args) if context.args else [h.ticker for h in get_core_watchlist()]
+    suffix = " (hammasi)" if show_all else ""
+    await update.effective_message.reply_text(f"⏳ {len(symbols)} ta belgi skanerlanmoqda{suffix}...")
+    rows = run_scan(symbols, PRIMARY_INTERVAL, None, exit_mode=DEFAULT_EXIT_MODE)
+    visible, _ = filter_quality_setups(rows, show_all=show_all)
+    await update.effective_message.reply_text(
+        format_scan_summary(rows, show_all=show_all),
+        reply_markup=keyboards.build_scan_summary_keyboard(visible),
+    )
+
 
 @require_allowed_user
 async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Har belgi uchun alohida xabar YO'Q — bitta "ishlayapti" xabari, keyin
-    skanerlash tugagach bitta yakuniy xabar (faol setup'lar to'liq, qolgani soni)."""
-    symbols = list(context.args) if context.args else [h.ticker for h in get_core_watchlist()]
-    await update.effective_message.reply_text(f"⏳ {len(symbols)} ta belgi skanerlanmoqda...")
-    rows = run_scan(symbols, PRIMARY_INTERVAL, None, exit_mode=DEFAULT_EXIT_MODE)
-    await update.effective_message.reply_text(
-        format_scan_summary(rows),
-        reply_markup=keyboards.build_scan_summary_keyboard(rows),
-    )
+    await _run_scan(update, context, show_all=False)
+
+
+@require_allowed_user
+async def scan_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """/scan'ning past R:R setup'larni HAM ko'rsatadigan varianti."""
+    await _run_scan(update, context, show_all=True)
 
 
 # ---- /status ----

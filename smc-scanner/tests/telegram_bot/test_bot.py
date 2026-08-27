@@ -20,7 +20,9 @@ def test_build_application_registers_all_commands() -> None:
         if isinstance(handler, CommandHandler):
             command_names.update(handler.commands)
 
-    expected = {"start", "help", "scan", "status", "journal", "stats", "watchlist", "watchremove"}
+    expected = {
+        "start", "help", "scan", "scan_all", "status", "journal", "stats", "watchlist", "watchremove",
+    }
     assert expected <= command_names
 
 

@@ -186,6 +186,34 @@ def test_format_scan_summary_summarizes_errors() -> None:
     assert "XXXX" in msg
 
 
+def test_format_scan_summary_hides_low_rr_setups_by_default() -> None:
+    good = _active_setup_row()
+    good["SYMBOL"] = "CSGP"
+    bad = _trailing_row_with_reference_target(low_rr=True)
+    bad["SYMBOL"] = "BADCO"
+
+    msg = format_scan_summary([good, bad])
+
+    assert "CSGP" in msg
+    assert "BADCO" not in msg
+    assert "Faol setup topilgan (1 ta)" in msg
+    assert "1 ta setup past R:R" in msg
+
+
+def test_format_scan_summary_show_all_includes_low_rr_setups() -> None:
+    good = _active_setup_row()
+    good["SYMBOL"] = "CSGP"
+    bad = _trailing_row_with_reference_target(low_rr=True)
+    bad["SYMBOL"] = "BADCO"
+
+    msg = format_scan_summary([good, bad], show_all=True)
+
+    assert "CSGP" in msg
+    assert "BADCO" in msg
+    assert "Faol setup topilgan (2 ta)" in msg
+    assert "sababli yashirildi" not in msg
+
+
 def test_format_stats_message_contains_all_metrics() -> None:
     stats = {
         "num_entries": 10,

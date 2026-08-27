@@ -3,14 +3,17 @@
 Bu modul faqat MATN yasaydi — hisoblash yoki I/O yo'q (ma'lumot tactical_scan/journal/risk'dan
 allaqachon tayyor holda keladi). CLI'ning scripts/tactical_scan.py::format_scan_block'dan
 ATAYLAB alohida: taqdimot kanali (Telegram emoji/Markdown vs. terminal oddiy matn) farq qiladi,
-lekin ma'lumot manbai (run_scan/build_scan_row) bitta — u yerda takrorlanmaydi.
+lekin ma'lumot manbai (run_scan/build_scan_row) bitta — u yerda takrorlanmaydi. Istisno:
+filter_quality_setups() — sof filtrlash (I/O'siz), CLI va bot BIR XIL sifat-filtr siyosatini
+qo'llashi uchun tactical_scan.py'dan import qilinadi (takrorlanmasin).
 """
 
 from __future__ import annotations
 
-from config.settings import WATCHLIST_COMPACT_THRESHOLD
+from config.settings import MIN_PLANNED_RR, WATCHLIST_COMPACT_THRESHOLD
 from journal.types import JournalEntry
 from risk.rules import RiskCheckResult
+from scripts.tactical_scan import filter_quality_setups
 
 PAPER_DISCLAIMER = (
     "⚠️ Bu paper/o'quv qatlami. Signallar buy&hold'dan past return beradi. "
@@ -19,7 +22,8 @@ PAPER_DISCLAIMER = (
 
 HELP_TEXT = (
     "🤖 *Halal SMC Swing Scanner — buyruqlar*\n\n"
-    "/scan [SYMBOLS] — watchlist yoki berilgan ticker(lar)ni skan qiladi\n"
+    "/scan [SYMBOLS] — watchlist yoki berilgan ticker(lar)ni skan qiladi (past R:R yashirilgan)\n"
+    "/scan_all [SYMBOLS] — /scan kabi, lekin past R:R setup'larni ham ko'rsatadi\n"
     "/status — ochiq savdolar + ochiq pozitsiyalar holati\n"
     "/add — yangi savdo qo'shish (interaktiv)\n"
     "/close — ochiq savdoni yopish\n"
@@ -70,21 +74,26 @@ def format_setup_message(row: dict) -> str:
     return "\n".join(lines)
 
 
-def format_scan_summary(rows: list[dict]) -> str:
-    """/scan uchun BITTA yakuniy xabar — har belgi alohida xabar EMAS. Faol
-    setup'lar to'liq ko'rsatiladi (harakat kerak), setup yo'q belgilar shunchaki
+def format_scan_summary(
+    rows: list[dict], *, min_rr: float = MIN_PLANNED_RR, show_all: bool = False,
+) -> str:
+    """/scan uchun BITTA yakuniy xabar — har belgi alohida xabar EMAS. Sifatli
+    (planned_rr >= min_rr) faol setup'lar to'liq ko'rsatiladi (harakat kerak),
+    past R:R setup'lar default holatda YASHIRILADI (soni alohida qatorda —
+    show_all=True bilan hammasi ko'rinadi), setup yo'q belgilar shunchaki
     sonda hisoblanadi (ro'yxati emas — katta watchlist'da matn hajmi cheksiz
     o'smasin), xatolar qisqa qatorga yig'iladi."""
-    active = [r for r in rows if r.get("HAS_ACTIVE_SETUP")]
     errors = [r for r in rows if r.get("ERROR")]
-    no_setup_count = len(rows) - len(active) - len(errors)
+    visible, hidden = filter_quality_setups(rows, min_rr=min_rr, show_all=show_all)
+    active_total = len([r for r in rows if r.get("HAS_ACTIVE_SETUP")])
+    no_setup_count = len(rows) - active_total - len(errors)
 
     lines = [f"✅ Skanerlash yakunlandi: {len(rows)} ta belgi tekshirildi."]
 
-    if active:
+    if visible:
         lines.append("")
-        lines.append(f"📊 Faol setup topilgan ({len(active)} ta):")
-        for row in active:
+        lines.append(f"📊 Faol setup topilgan ({len(visible)} ta):")
+        for row in visible:
             lines.append("")
             lines.append(f"{row['SYMBOL']} — LONG")
             lines.append(f"Entry: ${row['SETUP_ENTRY']} | Stop: ${row['SETUP_STOP']}")
@@ -99,6 +108,8 @@ def format_scan_summary(rows: list[dict]) -> str:
 
     lines.append("")
     lines.append(f"Faol setupsiz: {no_setup_count} ta")
+    if hidden:
+        lines.append(f"🔒 {len(hidden)} ta setup past R:R (< {min_rr}) sababli yashirildi.")
     if errors:
         symbols = ", ".join(r["SYMBOL"] for r in errors[:10])
         more = f" (+{len(errors) - 10} yana)" if len(errors) > 10 else ""

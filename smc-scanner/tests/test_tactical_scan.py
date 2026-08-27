@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 import scripts.tactical_scan as scan_module
-from scripts.tactical_scan import build_scan_row, format_scan_block, run_scan
+from scripts.tactical_scan import build_scan_row, filter_quality_setups, format_scan_block, run_scan
 
 # Phase 3/5'da tekshirilgan: bearish BOS'lar, keyin bullish CHoCH idx=11'da (level=5).
 _TREND_REVERSAL = [10, 12, 11, 14, 13, 16, 15, 18, 17, 20, 18, 15, 12]
@@ -191,3 +191,63 @@ def test_format_scan_block_low_rr_shows_warning(monkeypatch) -> None:
 
     assert "⚠️" in block
     assert "Past R:R" in block
+
+
+# ---- filter_quality_setups ----
+
+def _row(symbol: str, *, active: bool = True, planned_rr: float | None = 2.0) -> dict:
+    return {"SYMBOL": symbol, "HAS_ACTIVE_SETUP": active, "SETUP_PLANNED_RR": planned_rr}
+
+
+def test_filter_quality_setups_splits_by_planned_rr() -> None:
+    good = _row("GOOD", planned_rr=2.0)
+    bad = _row("BAD", planned_rr=0.03)
+    inactive = _row("INACTIVE", active=False, planned_rr=None)
+
+    visible, hidden = filter_quality_setups([good, bad, inactive])
+
+    assert visible == [good]
+    assert hidden == [bad]
+
+
+def test_filter_quality_setups_show_all_hides_nothing() -> None:
+    good = _row("GOOD", planned_rr=2.0)
+    bad = _row("BAD", planned_rr=0.03)
+
+    visible, hidden = filter_quality_setups([good, bad], show_all=True)
+
+    assert visible == [good, bad]
+    assert hidden == []
+
+
+def test_filter_quality_setups_none_planned_rr_treated_as_visible() -> None:
+    """SETUP_PLANNED_RR kaliti yo'q (eski fixture'lar) yoki None (risk<=0) —
+    "past sifat" deb hisoblanmaydi, SETUP_LOW_RR_WARNING bilan bir xil konvensiya."""
+    no_key = {"SYMBOL": "NOKEY", "HAS_ACTIVE_SETUP": True}
+    explicit_none = _row("NONE_RR", planned_rr=None)
+
+    visible, hidden = filter_quality_setups([no_key, explicit_none])
+
+    assert visible == [no_key, explicit_none]
+    assert hidden == []
+
+
+def test_filter_quality_setups_custom_min_rr() -> None:
+    row = _row("MID", planned_rr=1.2)
+
+    visible_default, hidden_default = filter_quality_setups([row])
+    visible_custom, hidden_custom = filter_quality_setups([row], min_rr=1.0)
+
+    assert visible_default == [] and hidden_default == [row]
+    assert visible_custom == [row] and hidden_custom == []
+
+
+def test_format_scan_block_hidden_shows_placeholder_not_full_detail() -> None:
+    df = _make_df(_MIRRORED_BEARISH_TO_BULLISH, extra_rows=_RETEST_ROWS)
+    row = build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="trailing")
+
+    block = format_scan_block(row, hidden=True)
+
+    assert "YASHIRILDI" in block
+    assert "Ref.Target" not in block
+    assert "Invalidatsiya" not in block

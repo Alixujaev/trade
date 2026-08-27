@@ -177,6 +177,25 @@ def run_scan(
     return rows
 
 
+def filter_quality_setups(
+    rows: list[dict], *, min_rr: float = MIN_PLANNED_RR, show_all: bool = False,
+) -> tuple[list[dict], list[dict]]:
+    """Faol setup'larni (HAS_ACTIVE_SETUP=True) sifat bo'yicha ikkiga ajratadi:
+    (ko'rsatiladigan, past R:R sababli yashiriladigan). Faol bo'lmagan/xato
+    qatorlar bu funksiyaga kirmaydi — ular boshqa joyda (mavjudidek) ko'rsatiladi.
+    show_all=True bo'lsa hech narsa yashirilmaydi. planned_rr=None (risk<=0,
+    amalda deyarli uchramaydi) "past sifat" deb hisoblanmaydi — SETUP_LOW_RR_WARNING
+    bilan bir xil konvensiya (haqiqatan hisoblab bo'lmagan holat chalkashtirilmaydi)."""
+    active = [r for r in rows if r.get("HAS_ACTIVE_SETUP")]
+    if show_all:
+        return active, []
+    visible, hidden = [], []
+    for r in active:
+        rr = r.get("SETUP_PLANNED_RR")
+        (hidden if rr is not None and rr < min_rr else visible).append(r)
+    return visible, hidden
+
+
 def _reference_rr_text(row: dict) -> str:
     """"Ref.Target | Planned R:R" matni — fixed va trailing ikkalasida ham bir xil
     manbadan (SETUP_REFERENCE_TARGET/SETUP_PLANNED_RR). Signal umuman topilmagan
@@ -197,8 +216,10 @@ def _exit_text(row: dict) -> str:
     return f"Exit: fixed target {row['SETUP_TARGET']}"
 
 
-def format_scan_block(row: dict) -> str:
-    """Bitta symbol uchun o'qiladigan matn blokini yasaydi (jadval EMAS — o'quv fokusi)."""
+def format_scan_block(row: dict, *, hidden: bool = False) -> str:
+    """Bitta symbol uchun o'qiladigan matn blokini yasaydi (jadval EMAS — o'quv fokusi).
+    O'ZI FILTRLAMAYDI — `hidden` chaqiruvchi (main()) tomonidan filter_quality_setups()
+    natijasiga qarab beriladi."""
     if row.get("ERROR"):
         return f"=== {row['SYMBOL']} ===\nXato: {row['ERROR']}"
 
@@ -215,6 +236,11 @@ def format_scan_block(row: dict) -> str:
 
     if row["SETUP_REASON"] is None:
         lines.append("Faol setup: hozircha faol setup yo'q")
+    elif hidden:
+        lines.append(
+            "Faol setup: YASHIRILDI (Planned R:R past — --show-all yoki "
+            "--min-rr bilan ko'rsatish mumkin)"
+        )
     else:
         active_str = "HA" if row["HAS_ACTIVE_SETUP"] else "YO'Q (eski, tarixiy kontekst)"
         lines.append(f"Faol setup: {active_str} ({row['SETUP_BARS_AGO']} bar oldin, {row['SETUP_ENTRY_DATE']})")
@@ -239,20 +265,32 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--mult", type=float, default=None, help="Displacement ATR mult (default: settings)")
     parser.add_argument("--lookback", type=int, default=SWING_LOOKBACK)
     parser.add_argument("--exit-mode", default=DEFAULT_EXIT_MODE, choices=["fixed", "trailing"])
+    parser.add_argument("--show-all", action="store_true", help="Past R:R setup'larni ham ko'rsatish")
+    parser.add_argument(
+        "--min-rr", type=float, default=None, help="Sifat chegarasi (default: MIN_PLANNED_RR)"
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     symbols = args.symbols if args.symbols else [h.ticker for h in get_core_watchlist()]
+    min_rr = args.min_rr if args.min_rr is not None else MIN_PLANNED_RR
 
     print(BANNER)
     print()
 
     rows = run_scan(symbols, args.interval, args.provider, mult=args.mult, lookback=args.lookback, exit_mode=args.exit_mode)
+    _, hidden_rows = filter_quality_setups(rows, min_rr=min_rr, show_all=args.show_all)
+    hidden_symbols = {r["SYMBOL"] for r in hidden_rows}
     for row in rows:
-        print(format_scan_block(row))
+        print(format_scan_block(row, hidden=row["SYMBOL"] in hidden_symbols))
         print()
+    if hidden_rows:
+        print(
+            f"{len(hidden_rows)} ta setup past R:R (< {min_rr}) sababli yashirildi. "
+            "--show-all yoki --min-rr bilan ko'rsatish mumkin."
+        )
 
 
 if __name__ == "__main__":
