@@ -22,7 +22,8 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from smc.signal import generate_signals
+from smc.signal import compute_planned_rr, filter_by_planned_rr, generate_signals
+from smc.types import StructureState, TradeSetup
 
 # Bearish BOS'lar, keyin bullish CHoCH idx=11'da (level=5) — Phase 3'da tekshirilgan.
 _TREND_REVERSAL = [10, 12, 11, 14, 13, 16, 15, 18, 17, 20, 18, 15, 12]
@@ -122,3 +123,50 @@ def test_empty_or_insufficient_data_returns_empty_no_crash() -> None:
     index = pd.date_range("2024-01-01", periods=0, freq="D", tz="UTC")
     df_empty = pd.DataFrame(columns=["open", "high", "low", "close", "volume"], index=index)
     assert generate_signals(df_empty) == []
+
+
+# ---- compute_planned_rr / filter_by_planned_rr (Phase 11b) ----
+
+def test_compute_planned_rr_hand_verified() -> None:
+    """test_end_to_end_bullish_choch_then_fvg_retest'dagi bir xil signal: target
+    2R fallback formulasi bo'yicha hisoblangani uchun planned_rr ANIQ 2.0 bo'lishi
+    kerak (entry=15.6, stop≈9.737857, target≈27.324286)."""
+    df = _make_df(extra_rows=_RETEST_ROWS)
+    signal = generate_signals(df, lookback=1, mult=1.0)[0]
+
+    assert compute_planned_rr(signal) == pytest.approx(2.0)
+
+
+def test_compute_planned_rr_none_when_risk_non_positive() -> None:
+    setup = TradeSetup(
+        entry_ts=pd.Timestamp("2024-01-01", tz="UTC"), entry_price=100.0, stop_price=100.0,
+        target_price=110.0, direction=StructureState.BULLISH, entry_index_pos=0, reason="FVG",
+    )
+
+    assert compute_planned_rr(setup) is None
+
+
+def test_filter_by_planned_rr_none_returns_all_unchanged() -> None:
+    df = _make_df(extra_rows=_RETEST_ROWS)
+    signals = generate_signals(df, lookback=1, mult=1.0)
+
+    assert filter_by_planned_rr(signals, None) == signals
+
+
+def test_filter_by_planned_rr_filters_below_threshold() -> None:
+    df = _make_df(extra_rows=_RETEST_ROWS)  # planned_rr=2.0
+    signals = generate_signals(df, lookback=1, mult=1.0)
+
+    assert filter_by_planned_rr(signals, min_rr=1.5) == signals  # 2.0 >= 1.5
+    assert filter_by_planned_rr(signals, min_rr=2.5) == []  # 2.0 < 2.5
+
+
+def test_filter_by_planned_rr_does_not_mutate_retained_setups() -> None:
+    """Lookahead-xavfsizlik regressiyasi: filtrlash faqat SUBSET tanlaydi, hech
+    qanday maydonni qayta hisoblamaydi/o'zgartirmaydi."""
+    df = _make_df(extra_rows=_RETEST_ROWS)
+    signals = generate_signals(df, lookback=1, mult=1.0)
+
+    filtered = filter_by_planned_rr(signals, min_rr=1.0)
+
+    assert filtered[0] is signals[0]  # aynan o'sha (frozen) obyekt, nusxa/o'zgartirish yo'q

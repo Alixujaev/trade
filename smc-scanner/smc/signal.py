@@ -138,3 +138,25 @@ def generate_signals(
             )
 
     return signals
+
+
+def compute_planned_rr(setup: TradeSetup) -> float | None:
+    """Rejalashtirilgan R:R: (target_price-entry_price)/(entry_price-stop_price).
+    risk<=0 chekka holatida None. scripts/tactical_scan.py::build_scan_row VA
+    backtest solishtiruvi (scripts/rr_filter_comparison.py) shu BITTA formuladan
+    foydalanadi — takrorlanmaydi."""
+    risk = setup.entry_price - setup.stop_price
+    if risk <= 0:
+        return None
+    return (setup.target_price - setup.entry_price) / risk
+
+
+def filter_by_planned_rr(signals: list[TradeSetup], min_rr: float | None) -> list[TradeSetup]:
+    """min_rr=None -> signals o'zgarishsiz (hozirgi xatti-harakat). Aks holda faqat
+    compute_planned_rr(s) >= min_rr bo'lgan setup'lar qoladi. Lookahead xavfi YO'Q —
+    TradeSetup'lar allaqachon generate_signals() ichida lookahead'siz hisoblangan
+    (bu funksiya faqat tayyor ro'yxatning SUBSET'ini tanlaydi, hech narsani qayta
+    hisoblamaydi/o'zgartirmaydi)."""
+    if min_rr is None:
+        return signals
+    return [s for s in signals if (rr := compute_planned_rr(s)) is not None and rr >= min_rr]

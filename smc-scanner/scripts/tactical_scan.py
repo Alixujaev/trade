@@ -36,7 +36,7 @@ from config.core_watchlist import get_core_watchlist  # noqa: E402
 from config.settings import MIN_PLANNED_RR, PRIMARY_INTERVAL, SWING_LOOKBACK  # noqa: E402
 from data.factory import get_provider  # noqa: E402
 from smc.market_structure import current_structure_state, detect_structure_events  # noqa: E402
-from smc.signal import generate_signals  # noqa: E402
+from smc.signal import compute_planned_rr, generate_signals  # noqa: E402
 from smc.structure import detect_swings  # noqa: E402
 from smc.types import StructureState  # noqa: E402
 from smc.zones import detect_fvgs, detect_order_blocks  # noqa: E402
@@ -116,11 +116,9 @@ def build_scan_row(
         # Reference target: smc.signal.generate_signals allaqachon hisoblagan target_price —
         # exit_mode'dan qat'iy nazar HAR DOIM mavjud (swing-high yoki R-multiple fallback).
         row["SETUP_REFERENCE_TARGET"] = round(last_signal.target_price, 2)
-        risk = last_signal.entry_price - last_signal.stop_price
-        if risk > 0:
-            row["SETUP_PLANNED_RR"] = round(
-                (last_signal.target_price - last_signal.entry_price) / risk, 2
-            )
+        planned_rr = compute_planned_rr(last_signal)
+        if planned_rr is not None:
+            row["SETUP_PLANNED_RR"] = round(planned_rr, 2)
         row["SETUP_LOW_RR_WARNING"] = (
             row["SETUP_PLANNED_RR"] is not None and row["SETUP_PLANNED_RR"] < MIN_PLANNED_RR
         )
