@@ -42,6 +42,9 @@ DISPLACEMENT_ATR_MULT: float = 1.5
 STOP_BUFFER_ATR_MULT: float = 0.1
 # Signal engine: mos swing high topilmasa, fallback target = entry + shu * risk
 DEFAULT_TARGET_R_MULTIPLE: float = 2.0
+# Trailing (va fixed) setup'larda rejalashtirilgan R:R shu qiymatdan past bo'lsa,
+# ko'rsatish qatlamida ⚠️ bilan belgilanadi (FAQAT belgilash — yashirish YO'Q).
+MIN_PLANNED_RR: float = 1.5
 # Backtest "atr" risk_model: bir aksiya uchun risk = shu * ATR[entry]
 ATR_RISK_MULT: float = 1.0
 
@@ -53,8 +56,12 @@ REVIEW_INTERVAL_DAYS: int = 90
 # talab qilardi (backtest/engine.py::_simulate_trailing_exit'ga qarang).
 TRAIL_ATR_MULT: float = 2.0
 
-# Taktik/paper qatlam risk boshqaruvi (telegram_bot/risk uchun) — bitta savdoga risk %,
-# kunlik jami risk limiti (% kapital) va maksimal ochiq pozisiya soni
-DEFAULT_RISK_PCT: float = 0.01
-MAX_DAILY_RISK_PCT: float = 0.02
+# Taktik/paper qatlam risk boshqaruvi (telegram_bot/risk uchun) — maksimal ochiq
+# pozisiya soni. Kapital/pozitsiya-hajmi bu botda hisoblanmaydi — savdoga
+# kirish/chiqish boshqa platformada (masalan TradingView paper trading) qilinadi.
 MAX_OPEN_POSITIONS: int = 3
+
+# /watchlist: shu sondan ko'p bo'lsa, har yozuv uchun to'liq matn+🗑 tugma o'rniga
+# qisqa (kompakt) ro'yxat ko'rsatiladi — aks holda Telegram'ning 4096 belgili
+# xabar limitidan va yuzlab tugmali keyboard'dan oshib ketishi mumkin.
+WATCHLIST_COMPACT_THRESHOLD: int = 40

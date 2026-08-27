@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 import scripts.tactical_scan as scan_module
-from scripts.tactical_scan import build_scan_row, run_scan
+from scripts.tactical_scan import build_scan_row, format_scan_block, run_scan
 
 # Phase 3/5'da tekshirilgan: bearish BOS'lar, keyin bullish CHoCH idx=11'da (level=5).
 _TREND_REVERSAL = [10, 12, 11, 14, 13, 16, 15, 18, 17, 20, 18, 15, 12]
@@ -55,6 +55,41 @@ def test_build_scan_row_trailing_mode_reports_na_rr() -> None:
     assert row["SETUP_TARGET"] is None
     assert row["SETUP_RR"] == "N/A (trailing — maqsad yo'q)"
     assert row["SETUP_STOP"] == pytest.approx(9.74, abs=0.01)  # boshlang'ich stop hali ko'rsatiladi
+    # Reference target/planned R:R endi trailing'da ham hisoblanadi (Phase 11a)
+    assert row["SETUP_REFERENCE_TARGET"] == pytest.approx(27.32, abs=0.01)
+    assert row["SETUP_PLANNED_RR"] == pytest.approx(2.0)
+    assert row["SETUP_LOW_RR_WARNING"] is False
+
+
+def test_build_scan_row_reference_target_matches_target_in_fixed_mode() -> None:
+    """Fixed mode'da SETUP_REFERENCE_TARGET/SETUP_PLANNED_RR SETUP_TARGET/SETUP_RR bilan
+    bir xil bo'lishi kerak — ikkalasi ham bitta manbadan (last_signal.target_price)."""
+    df = _make_df(_MIRRORED_BEARISH_TO_BULLISH, extra_rows=_RETEST_ROWS)
+
+    row = build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="fixed")
+
+    assert row["SETUP_REFERENCE_TARGET"] == pytest.approx(row["SETUP_TARGET"])
+    assert row["SETUP_PLANNED_RR"] == pytest.approx(row["SETUP_RR"])
+    assert row["SETUP_LOW_RR_WARNING"] is False
+
+
+def test_build_scan_row_low_planned_rr_flags_warning(monkeypatch) -> None:
+    """MIN_PLANNED_RR'dan past planned_rr uchun ogohlantirish bayrog'i ko'tarilishi kerak."""
+    from smc.types import StructureState, TradeSetup
+
+    df = _make_df(_MIRRORED_BEARISH_TO_BULLISH, extra_rows=_RETEST_ROWS)
+    fake_setup = TradeSetup(
+        entry_ts=df.index[-1], entry_price=100.0, stop_price=90.0, target_price=110.0,
+        direction=StructureState.BULLISH, entry_index_pos=len(df) - 1, reason="FVG",
+    )
+    monkeypatch.setattr(scan_module, "generate_signals", lambda *a, **kw: [fake_setup])
+
+    row = build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="trailing")
+
+    # planned_rr = (110-100)/(100-90) = 1.0 < MIN_PLANNED_RR(1.5)
+    assert row["SETUP_REFERENCE_TARGET"] == pytest.approx(110.0)
+    assert row["SETUP_PLANNED_RR"] == pytest.approx(1.0)
+    assert row["SETUP_LOW_RR_WARNING"] is True
 
 
 def test_build_scan_row_no_signal_at_all() -> None:
@@ -124,3 +159,35 @@ def test_run_scan_handles_empty_data(monkeypatch) -> None:
 
     assert len(rows) == 1
     assert rows[0]["ERROR"] is not None
+
+
+def test_format_scan_block_trailing_shows_reference_target_and_planned_rr() -> None:
+    """CLI chiqishi ham botdagi kabi Ref.Target/Planned R:R ko'rsatishi kerak
+    (eski "Target: yo'q (trailing) — R:R: N/A" shablon emas)."""
+    df = _make_df(_MIRRORED_BEARISH_TO_BULLISH, extra_rows=_RETEST_ROWS)
+    row = build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="trailing")
+
+    block = format_scan_block(row)
+
+    assert "Ref.Target" in block
+    assert "27.32" in block
+    assert "Planned R:R" in block
+    assert "2.0" in block
+    assert "Exit: trailing stop" in block
+
+
+def test_format_scan_block_low_rr_shows_warning(monkeypatch) -> None:
+    from smc.types import StructureState, TradeSetup
+
+    df = _make_df(_MIRRORED_BEARISH_TO_BULLISH, extra_rows=_RETEST_ROWS)
+    fake_setup = TradeSetup(
+        entry_ts=df.index[-1], entry_price=100.0, stop_price=90.0, target_price=110.0,
+        direction=StructureState.BULLISH, entry_index_pos=len(df) - 1, reason="FVG",
+    )
+    monkeypatch.setattr(scan_module, "generate_signals", lambda *a, **kw: [fake_setup])
+    row = build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="trailing")
+
+    block = format_scan_block(row)
+
+    assert "⚠️" in block
+    assert "Past R:R" in block

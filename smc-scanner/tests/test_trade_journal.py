@@ -32,6 +32,69 @@ def test_add_entry_trailing_mode_has_no_rr_planned(tmp_path) -> None:
     assert entry.rr_planned is None
 
 
+def test_add_entry_reference_target_price_computes_rr_planned_when_no_target(tmp_path) -> None:
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+
+    entry = journal.add_entry(
+        symbol="AMD", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=None, exit_mode="trailing", reason="ORDER_BLOCK",
+        reference_target_price=130.0,
+    )
+
+    assert entry.rr_planned == pytest.approx(3.0)  # (130-100)/(100-90)
+    assert entry.reference_target_price == pytest.approx(130.0)
+    assert entry.target_price is None
+
+
+def test_add_entry_target_price_takes_priority_over_reference_target_price(tmp_path) -> None:
+    """Ikkalasi ham berilgan chekka holat: rr_planned target_price'dan hisoblanadi,
+    reference_target_price baribir saqlanadi (audit uchun), lekin hisobga olinmaydi."""
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+
+    entry = journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+        reference_target_price=999.0,
+    )
+
+    assert entry.rr_planned == pytest.approx(3.0)  # (130-100)/(100-90), 999 EMAS
+    assert entry.reference_target_price == pytest.approx(999.0)  # baribir saqlanadi
+
+
+def test_stats_avg_rr_planned_includes_trailing_entries_with_reference_target(tmp_path) -> None:
+    """reference_target_price berilgan trailing yozuv endi avg_rr_planned hisobiga kiradi —
+    test_stats_avg_rr_planned_excludes_trailing_entries'ning "aksincha" holati."""
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=120.0, exit_mode="fixed", reason="FVG",  # rr_planned=2.0
+    )
+    journal.add_entry(
+        symbol="AMD", entry_date=date(2026, 1, 1), entry_price=50.0, stop_price=45.0,
+        target_price=None, exit_mode="trailing", reason="ORDER_BLOCK",
+        reference_target_price=60.0,  # rr_planned=(60-50)/(50-45)=2.0
+    )
+
+    stats = journal.stats()
+
+    assert stats["avg_rr_planned"] == pytest.approx(2.0)  # (2.0+2.0)/2, ikkalasi ham hisobga olindi
+
+
+def test_csv_round_trip_preserves_reference_target_price(tmp_path) -> None:
+    csv_path = tmp_path / "journal.csv"
+    journal = TradeJournal(csv_path=csv_path)
+    journal.add_entry(
+        symbol="AMD", entry_date=date(2026, 2, 1), entry_price=50.0, stop_price=45.0,
+        target_price=None, exit_mode="trailing", reason="ORDER_BLOCK",
+        reference_target_price=60.0,
+    )
+
+    reloaded = TradeJournal(csv_path=csv_path)
+
+    assert reloaded.entries[0].reference_target_price == pytest.approx(60.0)
+    assert reloaded.entries[0].rr_planned == pytest.approx(2.0)
+
+
 def test_close_entry_hand_verified(tmp_path) -> None:
     journal = TradeJournal(csv_path=tmp_path / "journal.csv")
     entry = journal.add_entry(
@@ -157,55 +220,6 @@ def test_empty_journal_header_only_file(tmp_path) -> None:
 
     assert journal.entries == []
     assert journal.stats()["num_entries"] == 0
-
-
-def test_add_entry_stores_shares(tmp_path) -> None:
-    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
-
-    entry = journal.add_entry(
-        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
-        target_price=130.0, exit_mode="fixed", reason="FVG", shares=10,
-    )
-
-    assert entry.shares == 10
-
-
-def test_add_entry_shares_defaults_to_none(tmp_path) -> None:
-    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
-
-    entry = journal.add_entry(
-        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
-        target_price=130.0, exit_mode="fixed", reason="FVG",
-    )
-
-    assert entry.shares is None
-
-
-def test_shares_round_trips_through_csv(tmp_path) -> None:
-    csv_path = tmp_path / "journal.csv"
-    journal = TradeJournal(csv_path=csv_path)
-    journal.add_entry(
-        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
-        target_price=130.0, exit_mode="fixed", reason="FVG", shares=10,
-    )
-
-    reloaded = TradeJournal(csv_path=csv_path)
-
-    assert reloaded.entries[0].shares == pytest.approx(10)
-
-
-def test_old_format_csv_without_shares_column_still_loads(tmp_path) -> None:
-    csv_path = tmp_path / "old.csv"
-    csv_path.write_text(
-        "entry_id,symbol,entry_date,entry_price,stop_price,target_price,exit_mode,"
-        "reason,rr_planned,notes,exit_date,exit_price,r_multiple\n"
-        "1,AAPL,2026-01-01,100.0,90.0,130.0,fixed,FVG,3.0,,,,\n"
-    )
-
-    journal = TradeJournal(csv_path=csv_path)
-
-    assert len(journal.entries) == 1
-    assert journal.entries[0].shares is None
 
 
 def test_open_entries_returns_only_unclosed(tmp_path) -> None:

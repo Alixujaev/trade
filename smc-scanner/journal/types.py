@@ -24,8 +24,11 @@ class JournalEntry:
     exit_mode: str  # "fixed" | "trailing"
     reason: str  # masalan "FVG", "ORDER_BLOCK" yoki foydalanuvchi o'z izohi
     rr_planned: float | None  # (target-entry)/(entry-stop); target_price=None bo'lsa None
+    reference_target_price: float | None = None  # generate_signals'ning "reference" target'i
+    # (swing-high yoki R-multiple fallback) — target_price=None (trailing) bo'lsa ham
+    # mavjud bo'lishi mumkin, FAQAT rr_planned hisoblash uchun, HAQIQIY chiqish narxi
+    # EMAS (backtest'da ishlatilmaydi).
     notes: str = ""
     exit_date: date | None = None
     exit_price: float | None = None
     r_multiple: float | None = None  # yopilgach: (exit-entry)/(entry-stop)
-    shares: float | None = None  # risk/position_sizing.py hisoblagan aksiyalar soni

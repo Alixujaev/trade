@@ -33,7 +33,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from config.core_watchlist import get_core_watchlist  # noqa: E402
-from config.settings import PRIMARY_INTERVAL, SWING_LOOKBACK  # noqa: E402
+from config.settings import MIN_PLANNED_RR, PRIMARY_INTERVAL, SWING_LOOKBACK  # noqa: E402
 from data.factory import get_provider  # noqa: E402
 from smc.market_structure import current_structure_state, detect_structure_events  # noqa: E402
 from smc.signal import generate_signals  # noqa: E402
@@ -97,6 +97,9 @@ def build_scan_row(
         "SETUP_STOP": None,
         "SETUP_TARGET": None,
         "SETUP_RR": None,
+        "SETUP_REFERENCE_TARGET": None,
+        "SETUP_PLANNED_RR": None,
+        "SETUP_LOW_RR_WARNING": False,
         "SETUP_INVALIDATION": None,
         "ERROR": None,
     }
@@ -110,11 +113,23 @@ def build_scan_row(
         row["SETUP_ENTRY"] = round(last_signal.entry_price, 2)
         row["SETUP_STOP"] = round(last_signal.stop_price, 2)
 
+        # Reference target: smc.signal.generate_signals allaqachon hisoblagan target_price —
+        # exit_mode'dan qat'iy nazar HAR DOIM mavjud (swing-high yoki R-multiple fallback).
+        row["SETUP_REFERENCE_TARGET"] = round(last_signal.target_price, 2)
+        risk = last_signal.entry_price - last_signal.stop_price
+        if risk > 0:
+            row["SETUP_PLANNED_RR"] = round(
+                (last_signal.target_price - last_signal.entry_price) / risk, 2
+            )
+        row["SETUP_LOW_RR_WARNING"] = (
+            row["SETUP_PLANNED_RR"] is not None and row["SETUP_PLANNED_RR"] < MIN_PLANNED_RR
+        )
+
         if exit_mode == "fixed":
-            row["SETUP_TARGET"] = round(last_signal.target_price, 2)
-            risk = last_signal.entry_price - last_signal.stop_price
-            reward = last_signal.target_price - last_signal.entry_price
-            row["SETUP_RR"] = round(reward / risk, 2) if risk > 0 else None
+            # fixed-mode'da SETUP_TARGET/SETUP_RR = haqiqiy tradeable target — aynan
+            # SETUP_REFERENCE_TARGET/SETUP_PLANNED_RR bilan bir xil qiymat (bitta manba).
+            row["SETUP_TARGET"] = row["SETUP_REFERENCE_TARGET"]
+            row["SETUP_RR"] = row["SETUP_PLANNED_RR"]
         else:
             row["SETUP_RR"] = "N/A (trailing — maqsad yo'q)"
 
@@ -162,6 +177,26 @@ def run_scan(
     return rows
 
 
+def _reference_rr_text(row: dict) -> str:
+    """"Ref.Target | Planned R:R" matni — fixed va trailing ikkalasida ham bir xil
+    manbadan (SETUP_REFERENCE_TARGET/SETUP_PLANNED_RR). Signal umuman topilmagan
+    yoki risk<=0 chekka holatlarida "N/A" o'rniga qisqa sababi ko'rsatiladi."""
+    ref_target = row.get("SETUP_REFERENCE_TARGET")
+    if ref_target is None:
+        return "Ref.Target: N/A (signal topilmadi)"
+    planned_rr = row.get("SETUP_PLANNED_RR")
+    rr_text = f"{planned_rr}" if planned_rr is not None else "N/A (risk<=0)"
+    return f"Ref.Target: {ref_target} | Planned R:R: {rr_text}"
+
+
+def _exit_text(row: dict) -> str:
+    """Haqiqiy chiqish qanday bo'lishini aniq ko'rsatadi — Ref.Target FAQAT baholash
+    uchun, chalkashtirmaslik uchun har doim eslatiladi."""
+    if row["SETUP_TARGET"] is None:
+        return "Exit: trailing stop (real chiqish trailing bilan)"
+    return f"Exit: fixed target {row['SETUP_TARGET']}"
+
+
 def format_scan_block(row: dict) -> str:
     """Bitta symbol uchun o'qiladigan matn blokini yasaydi (jadval EMAS — o'quv fokusi)."""
     if row.get("ERROR"):
@@ -186,12 +221,12 @@ def format_scan_block(row: dict) -> str:
         lines.append(f"  Turi: {row['SETUP_REASON']} retest")
         lines.append(f"  Entry: {row['SETUP_ENTRY']}")
         lines.append(f"  Stop: {row['SETUP_STOP']}")
-        if row["SETUP_TARGET"] is not None:
-            lines.append(f"  Target: {row['SETUP_TARGET']} (R:R = {row['SETUP_RR']})")
-        else:
-            lines.append(f"  Target: yo'q (trailing) — R:R: {row['SETUP_RR']}")
+        lines.append(f"  {_reference_rr_text(row)}")
+        if row.get("SETUP_LOW_RR_WARNING"):
+            lines.append("  ⚠️ Past R:R — ehtiyot")
         lines.append(f"  Nega: {row['SETUP_REASON']} zonasi {row['SETUP_ENTRY_DATE']}'da retest qilindi")
         lines.append(f"  Invalidatsiya: {row['SETUP_INVALIDATION']}")
+        lines.append(f"  {_exit_text(row)}")
 
     return "\n".join(lines)
 

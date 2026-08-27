@@ -22,8 +22,8 @@ DEFAULT_JOURNAL_PATH: Path = Path(__file__).resolve().parent.parent / "trade_jou
 
 _COLUMNS = [
     "entry_id", "symbol", "entry_date", "entry_price", "stop_price", "target_price",
-    "exit_mode", "reason", "rr_planned", "notes", "exit_date", "exit_price", "r_multiple",
-    "shares",
+    "reference_target_price", "exit_mode", "reason", "rr_planned", "notes", "exit_date",
+    "exit_price", "r_multiple",
 ]
 
 
@@ -51,15 +51,18 @@ class TradeJournal:
         exit_mode: str,
         reason: str,
         notes: str = "",
-        shares: float | None = None,
+        reference_target_price: float | None = None,
     ) -> JournalEntry:
-        """Yangi savdo yozuvini qo'shadi va CSV'ga saqlaydi. rr_planned avtomatik hisoblanadi
-        (target_price berilgan va risk>0 bo'lsa; aks holda None — masalan trailing exit_mode'da)."""
+        """Yangi savdo yozuvini qo'shadi va CSV'ga saqlaydi. rr_planned avtomatik hisoblanadi:
+        avval target_price (mavjud, fixed-mode uchun), target_price=None bo'lsa
+        reference_target_price (trailing uchun, faqat baholash maqsadida); ikkalasi ham
+        None yoki risk<=0 bo'lsa rr_planned=None."""
+        rr_target = target_price if target_price is not None else reference_target_price
         rr_planned = None
-        if target_price is not None:
+        if rr_target is not None:
             risk = entry_price - stop_price
             if risk > 0:
-                rr_planned = (target_price - entry_price) / risk
+                rr_planned = (rr_target - entry_price) / risk
 
         next_id = max((e.entry_id for e in self.entries), default=0) + 1
         entry = JournalEntry(
@@ -69,11 +72,11 @@ class TradeJournal:
             entry_price=entry_price,
             stop_price=stop_price,
             target_price=target_price,
+            reference_target_price=reference_target_price,
             exit_mode=exit_mode,
             reason=reason,
             rr_planned=rr_planned,
             notes=notes,
-            shares=shares,
         )
         self.entries.append(entry)
         self._save()
@@ -188,6 +191,11 @@ class TradeJournal:
                     entry_price=float(row["entry_price"]),
                     stop_price=float(row["stop_price"]),
                     target_price=_none_if_nan(row["target_price"]),
+                    reference_target_price=(
+                        _none_if_nan(row["reference_target_price"])
+                        if "reference_target_price" in df.columns
+                        else None
+                    ),
                     exit_mode=str(row["exit_mode"]),
                     reason="" if pd.isna(row["reason"]) else str(row["reason"]),
                     rr_planned=_none_if_nan(row["rr_planned"]),
@@ -195,7 +203,6 @@ class TradeJournal:
                     exit_date=None if pd.isna(row["exit_date"]) else date.fromisoformat(row["exit_date"]),
                     exit_price=_none_if_nan(row["exit_price"]),
                     r_multiple=_none_if_nan(row["r_multiple"]),
-                    shares=_none_if_nan(row["shares"]) if "shares" in df.columns else None,
                 )
             )
         return entries
