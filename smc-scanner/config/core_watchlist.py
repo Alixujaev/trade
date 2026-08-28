@@ -27,9 +27,10 @@ PLACEHOLDER_HALAL_SOURCE = "TEKSHIRILISHI KERAK — manba kiriting"
 
 _VALID_CATEGORIES = {"stock", "etf"}
 
-# Runtime'da qo'shilgan/o'chirilgan yozuvlar shu faylda saqlanadi (paper_capital.json/
-# trade_journal.csv bilan bir xil fayl-asosli holat konvensiyasi). Fayl mavjud
-# bo'lmasa (hali hech narsa o'zgartirilmagan) — pastdagi CORE_WATCHLIST seed'i ishlatiladi.
+# Bazaviy ro'yxat DOIMO kod seed'idan (CORE_WATCHLIST) keladi. core_watchlist.json
+# faqat DELTA saqlaydi: {"added": [...], "removed": [...]}. Shu sabab eskirgan yoki
+# to'liq-snapshot JSON (masalan Railway persistent volume'da qolib ketgani) yangi
+# seed'ni BOSIB KETA OLMAYDI — u faqat qo'lda qo'shilgan/o'chirilganlarni beradi.
 DEFAULT_WATCHLIST_PATH: Path = Path(__file__).resolve().parent.parent / "core_watchlist.json"
 
 
@@ -105,15 +106,60 @@ def _build_seed() -> list[CoreHolding]:
 CORE_WATCHLIST: list[CoreHolding] = _build_seed()
 
 
-def get_core_watchlist(path: Path | str = DEFAULT_WATCHLIST_PATH) -> list[CoreHolding]:
-    """Saqlangan watchlist'ni qaytaradi; fayl mavjud bo'lmasa (hali hech narsa
-    o'zgartirilmagan) CORE_WATCHLIST seed'ining nusxasini qaytaradi — fayl
-    yaratmasdan (loyihaning boshqa fayl-asosli holatlari bilan bir xil konvensiya)."""
-    path = Path(path)
+def _ticker_of(row: dict) -> str:
+    return str(row.get("ticker", "")).strip().upper()
+
+
+def _empty_overlay() -> dict[str, list]:
+    return {"added": [], "removed": []}
+
+
+def _load_overlay(path: Path) -> dict[str, list]:
+    """core_watchlist.json'ni delta ko'rinishida qaytaradi: {"added": [...], "removed": [...]}.
+
+    Orqaga moslik: fayl eski ko'rinishda (holding dict'lar RO'YXATI, ya'ni to'liq
+    snapshot) bo'lsa — seed'da BO'LMAGAN ticker'lar "added"ga migratsiya qilinadi,
+    seed'dagilari e'tiborsiz qoladi (ular kod seed'ini bosib keta olmaydi). Fayl
+    yo'q bo'lsa bo'sh overlay. Bu funksiya faylni YARATMAYDI/O'ZGARTIRMAYDI."""
     if not path.exists():
-        return list(CORE_WATCHLIST)
+        return _empty_overlay()
     data = json.loads(path.read_text())
-    return [_holding_from_dict(d) for d in data]
+    if isinstance(data, dict):
+        return {
+            "added": list(data.get("added", [])),
+            "removed": [str(t).strip().upper() for t in data.get("removed", [])],
+        }
+    seed_tickers = {h.ticker for h in CORE_WATCHLIST}
+    migrated = [d for d in data if isinstance(d, dict) and _ticker_of(d) not in seed_tickers]
+    return {"added": migrated, "removed": []}
+
+
+def _write_overlay(path: Path, overlay: dict[str, list]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(overlay, ensure_ascii=False, indent=2))
+
+
+def get_core_watchlist(path: Path | str = DEFAULT_WATCHLIST_PATH) -> list[CoreHolding]:
+    """Kod seed'i (CORE_WATCHLIST) ustiga core_watchlist.json delta'sini qo'llab
+    qaytaradi: seed minus "removed", plyus "added" (qo'lda qo'shilgan metadata
+    seed'nikidan ustun). Fayl bo'lmasa — sof seed nusxasi. O'qish faylni
+    YARATMAYDI (loyihaning boshqa fayl-asosli holatlari bilan bir xil konvensiya)."""
+    overlay = _load_overlay(Path(path))
+    removed = set(overlay["removed"])
+
+    result: list[CoreHolding] = [h for h in CORE_WATCHLIST if h.ticker not in removed]
+    index = {h.ticker: i for i, h in enumerate(result)}
+
+    for row in overlay["added"]:
+        holding = _holding_from_dict(row)
+        if holding.ticker in removed:
+            continue
+        if holding.ticker in index:
+            result[index[holding.ticker]] = holding
+        else:
+            index[holding.ticker] = len(result)
+            result.append(holding)
+    return result
 
 
 def add_to_core_watchlist(
@@ -125,7 +171,7 @@ def add_to_core_watchlist(
     note: str = "",
     path: Path | str = DEFAULT_WATCHLIST_PATH,
 ) -> CoreHolding:
-    """Watchlist'ga yangi holding qo'shadi va saqlaydi.
+    """Watchlist'ga yangi holding qo'shadi va overlay'ga (core_watchlist.json) saqlaydi.
 
     MUHIM: bu funksiya halal/harom QARORINI HISOBLAMAYDI. `halal_source`
     berilmasa, haqiqiy manba topilguncha aniq PLACEHOLDER_HALAL_SOURCE belgisi
@@ -139,8 +185,7 @@ def add_to_core_watchlist(
     if category not in _VALID_CATEGORIES:
         raise ValueError(f"Noto'g'ri toifa: {category} (stock yoki etf bo'lishi kerak)")
 
-    watchlist = get_core_watchlist(path)
-    if any(h.ticker == ticker for h in watchlist):
+    if any(h.ticker == ticker for h in get_core_watchlist(path)):
         raise ValueError(f"{ticker} allaqachon watchlist'da bor.")
 
     if halal_source:
@@ -152,19 +197,29 @@ def add_to_core_watchlist(
         ticker=ticker, name=name, category=category,
         halal_source=resolved_source, last_reviewed=last_reviewed, note=note,
     )
-    watchlist.append(holding)
-    _save_core_watchlist(watchlist, path)
+
+    overlay = _load_overlay(Path(path))
+    overlay["removed"] = [t for t in overlay["removed"] if t != ticker]
+    overlay["added"] = [r for r in overlay["added"] if _ticker_of(r) != ticker]
+    overlay["added"].append(_holding_to_dict(holding))
+    _write_overlay(Path(path), overlay)
     return holding
 
 
 def remove_from_core_watchlist(ticker: str, path: Path | str = DEFAULT_WATCHLIST_PATH) -> bool:
-    """`ticker`ni watchlist'dan o'chiradi. Topilmasa xato tashlamaydi, False qaytaradi."""
+    """`ticker`ni watchlist'dan o'chiradi (overlay'ga yoziladi: seed ticker'i bo'lsa
+    "removed"ga, qo'lda qo'shilgani bo'lsa "added"dan olib tashlanadi). Topilmasa
+    xato tashlamaydi, False qaytaradi va faylga tegmaydi."""
     ticker = ticker.strip().upper()
-    watchlist = get_core_watchlist(path)
-    filtered = [h for h in watchlist if h.ticker != ticker]
-    if len(filtered) == len(watchlist):
+    if not any(h.ticker == ticker for h in get_core_watchlist(path)):
         return False
-    _save_core_watchlist(filtered, path)
+
+    overlay = _load_overlay(Path(path))
+    overlay["added"] = [r for r in overlay["added"] if _ticker_of(r) != ticker]
+    is_seed = any(h.ticker == ticker for h in CORE_WATCHLIST)
+    if is_seed and ticker not in overlay["removed"]:
+        overlay["removed"].append(ticker)
+    _write_overlay(Path(path), overlay)
     return True
 
 
@@ -179,12 +234,7 @@ def _holding_from_dict(d: dict) -> CoreHolding:
     )
 
 
-def _save_core_watchlist(watchlist: list[CoreHolding], path: Path | str) -> None:
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    rows = []
-    for h in watchlist:
-        row = asdict(h)
-        row["last_reviewed"] = h.last_reviewed.isoformat() if h.last_reviewed else None
-        rows.append(row)
-    path.write_text(json.dumps(rows, ensure_ascii=False, indent=2))
+def _holding_to_dict(h: CoreHolding) -> dict:
+    row = asdict(h)
+    row["last_reviewed"] = h.last_reviewed.isoformat() if h.last_reviewed else None
+    return row

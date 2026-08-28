@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from config.core_watchlist import (
+    CORE_WATCHLIST,
     PLACEHOLDER_HALAL_SOURCE,
     add_to_core_watchlist,
     get_core_watchlist,
@@ -148,3 +151,83 @@ def test_remove_from_core_watchlist_missing_ticker_returns_false(tmp_path) -> No
 
     assert removed is False
     assert not path.exists()  # hech narsa o'zgarmagani uchun fayl yaratilmaydi
+
+
+# ---- overlay (delta) semantikasi + orqaga moslik --------------------------------
+
+
+def _legacy_snapshot_rows(holdings) -> list[dict]:
+    return [
+        {
+            "ticker": h.ticker, "name": h.name, "category": h.category,
+            "halal_source": h.halal_source,
+            "last_reviewed": h.last_reviewed.isoformat() if h.last_reviewed else None,
+            "note": h.note,
+        }
+        for h in holdings
+    ]
+
+
+def test_legacy_full_snapshot_of_seed_does_not_shadow_seed(tmp_path) -> None:
+    """Railway bug: eskirgan to'liq-snapshot core_watchlist.json (faqat 6 ta eski
+    seed yozuvi) yangi 200+ talik kod seed'ini "yashirib" qo'yardi. Endi bunday
+    fayl faqat qo'shimchalarni beradi — seed'dagi ticker'lar e'tiborsiz qoladi."""
+    path = tmp_path / "core_watchlist.json"
+    old_six = [h for h in CORE_WATCHLIST if h.ticker in {"SPUS", "HLAL", "AAPL", "AMD", "AVGO", "FSLR"}]
+    path.write_text(json.dumps(_legacy_snapshot_rows(old_six), ensure_ascii=False))
+
+    watchlist = get_core_watchlist(path=path)
+
+    assert len(watchlist) == len(CORE_WATCHLIST) > 200
+    assert {h.ticker for h in watchlist} == {h.ticker for h in CORE_WATCHLIST}
+
+
+def test_legacy_snapshot_keeps_non_seed_entries_as_additions(tmp_path) -> None:
+    path = tmp_path / "core_watchlist.json"
+    rows = _legacy_snapshot_rows(CORE_WATCHLIST[:3]) + [
+        {"ticker": "ZMANUAL", "name": "Z Manual Co", "category": "stock",
+         "halal_source": "Musaffa", "last_reviewed": "2026-08-01", "note": "qo'lda"}
+    ]
+    path.write_text(json.dumps(rows, ensure_ascii=False))
+
+    tickers = {h.ticker for h in get_core_watchlist(path=path)}
+
+    assert "ZMANUAL" in tickers  # seed'da yo'q -> qo'shimcha sifatida saqlanadi
+    assert {h.ticker for h in CORE_WATCHLIST} <= tickers  # seed to'liq turadi
+
+
+def test_remove_of_seed_ticker_persists_as_overlay(tmp_path) -> None:
+    path = tmp_path / "core_watchlist.json"
+    seed_ticker = CORE_WATCHLIST[10].ticker
+
+    assert remove_from_core_watchlist(seed_ticker, path=path) is True
+    assert seed_ticker not in {h.ticker for h in get_core_watchlist(path=path)}
+
+    overlay = json.loads(path.read_text())
+    assert overlay["removed"] == [seed_ticker]
+    # boshqa hamma narsa joyida
+    assert len(get_core_watchlist(path=path)) == len(CORE_WATCHLIST) - 1
+
+
+def test_readd_after_remove_restores_seed_ticker(tmp_path) -> None:
+    path = tmp_path / "core_watchlist.json"
+    seed_ticker = CORE_WATCHLIST[10].ticker
+
+    remove_from_core_watchlist(seed_ticker, path=path)
+    add_to_core_watchlist(seed_ticker, "Re-added Co", "stock", path=path)
+
+    tickers = {h.ticker for h in get_core_watchlist(path=path)}
+    assert seed_ticker in tickers
+    overlay = json.loads(path.read_text())
+    assert seed_ticker not in overlay["removed"]
+
+
+def test_new_overlay_schema_round_trips(tmp_path) -> None:
+    path = tmp_path / "core_watchlist.json"
+
+    add_to_core_watchlist(_SYNTHETIC, _SYNTHETIC_NAME, "stock", path=path)
+    overlay = json.loads(path.read_text())
+
+    assert isinstance(overlay, dict)
+    assert [r["ticker"] for r in overlay["added"]] == [_SYNTHETIC]
+    assert overlay["removed"] == []
