@@ -19,6 +19,8 @@ from dataclasses import asdict, dataclass
 from datetime import date
 from pathlib import Path
 
+from config.tactical_watchlist import HLAL_HOLDINGS
+
 # Halal/harom qarorini bot HISOBLAMAYDI — manba berilmasa shu aniq belgi qo'yiladi
 # (soxta manba nomi yozilmaydi), CORE_WATCHLIST seed'idagi konvensiyaga mos.
 PLACEHOLDER_HALAL_SOURCE = "TEKSHIRILISHI KERAK — manba kiriting"
@@ -43,7 +45,10 @@ class CoreHolding:
     note: str = ""
 
 
-CORE_WATCHLIST: list[CoreHolding] = [
+# Foydalanuvchi qo'lda kiritgan boshlang'ich yozuvlar (sharia ETF'lar + bir nechta
+# aksiya). Bular har doim seed'da birinchi turadi va HLAL ro'yxatidagi bir xil
+# ticker'dan ustun (masalan AAPL/AMD/AVGO bu yerda ham, HLAL holdings'da ham bor).
+_CURATED_SEED: list[CoreHolding] = [
     CoreHolding(
         "SPUS", "SP Funds S&P 500 Sharia Industry Exclusions ETF", "etf",
         "ETF holdings (prospectus)", None,
@@ -69,6 +74,35 @@ CORE_WATCHLIST: list[CoreHolding] = [
         "TEKSHIRILISHI KERAK — manba kiriting", None,
     ),
 ]
+
+# HLAL (Wahed FTSE USA Shariah ETF) tarkibiy qismlari — config/tactical_watchlist.py
+# (data/hlal_holdings.csv'dan generatsiya, git'da). Bu ro'yxat DEPLOY bilan ketadi,
+# shuning uchun core_watchlist.json bo'lmagan muhitda ham (masalan Railway, u
+# gitignore'dagi JSON'ni olmaydi) /scan va /watchlist to'liq ro'yxatni ko'radi.
+#
+# halal_source — faqat PROVENANS (ro'yxat qayerdan olindi), mavjud ETF-holdings
+# seed'lari bilan bir xil uslub. last_reviewed=None: bu asbob orqali qayta
+# tekshirilmagan — soxta "tasdiqlangan" sana qo'yilmaydi.
+_HLAL_HALAL_SOURCE = "HLAL ETF holdings (Wahed FTSE USA Shariah ETF)"
+
+
+def _build_seed() -> list[CoreHolding]:
+    seed = list(_CURATED_SEED)
+    seen = {h.ticker for h in seed}
+    for ticker, name in HLAL_HOLDINGS:
+        if ticker in seen:
+            continue
+        seen.add(ticker)
+        seed.append(
+            CoreHolding(
+                ticker=ticker, name=name, category="stock",
+                halal_source=_HLAL_HALAL_SOURCE, last_reviewed=None,
+            )
+        )
+    return seed
+
+
+CORE_WATCHLIST: list[CoreHolding] = _build_seed()
 
 
 def get_core_watchlist(path: Path | str = DEFAULT_WATCHLIST_PATH) -> list[CoreHolding]:
