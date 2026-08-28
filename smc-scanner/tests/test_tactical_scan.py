@@ -162,6 +162,122 @@ def test_invalidated_setup_shown_in_scan_block() -> None:
     assert "stop'dan past yopildi" in text
 
 
+# ---- Entry holati: oxirgi close entry'ga nisbatan qayerda (missed/active/below/invalidated) ----
+
+def _ranged_df(final_close: float, *, bars: int = 30, rng: float = 2.0, mid: float = 100.0) -> pd.DataFrame:
+    """ATR ~= rng bo'ladigan df — hamma bar [mid-rng/2, mid+rng/2] oralig'ida, oxirgi
+    barning close'i final_close (kerak bo'lsa high/low kengaytiriladi)."""
+    rows = [
+        {"open": mid, "high": mid + rng / 2, "low": mid - rng / 2, "close": mid}
+        for _ in range(bars - 1)
+    ]
+    rows.append(
+        {
+            "open": mid,
+            "high": max(mid + rng / 2, final_close),
+            "low": min(mid - rng / 2, final_close),
+            "close": final_close,
+        }
+    )
+    index = pd.date_range("2024-01-01", periods=len(rows), freq="D", tz="UTC")
+    df = pd.DataFrame(rows, index=index)
+    df["volume"] = 1000
+    return df[["open", "high", "low", "close", "volume"]]
+
+
+def _entry_state_row(monkeypatch, final_close: float, *, entry: float = 100.0, stop: float = 95.0, rng: float = 2.0) -> dict:
+    from smc.types import StructureState, TradeSetup
+
+    df = _ranged_df(final_close, rng=rng)
+    fake_setup = TradeSetup(
+        entry_ts=df.index[-1], entry_price=entry, stop_price=stop, target_price=entry + 20.0,
+        direction=StructureState.BULLISH, entry_index_pos=len(df) - 1, reason="FVG",
+    )
+    monkeypatch.setattr(scan_module, "generate_signals", lambda *a, **kw: [fake_setup])
+    monkeypatch.setattr(scan_module, "current_structure_state", lambda *a, **kw: StructureState.BULLISH)
+    return build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="fixed")
+
+
+def test_entry_state_active_when_close_near_entry(monkeypatch) -> None:
+    """Oxirgi close entry ± 0.5*ATR ichida — chin faol, hozir kirsa bo'ladi."""
+    row = _entry_state_row(monkeypatch, 100.3)  # entry 100, ATR ~2 -> tol ~1.0
+
+    assert row["SETUP_ENTRY_STATE"] == "active"
+    assert row["HAS_ACTIVE_SETUP"] is True
+    assert row["SETUP_INVALIDATED"] is False
+    assert row["SETUP_ENTRY_TOLERANCE"] == pytest.approx(1.0, abs=0.15)
+
+
+def test_entry_state_missed_when_close_far_above_entry(monkeypatch) -> None:
+    """Oxirgi close entry + 0.5*ATR dan yuqori — poyezd ketdi, kirib bo'lmaydi."""
+    row = _entry_state_row(monkeypatch, 103.0)
+
+    assert row["SETUP_ENTRY_STATE"] == "missed"
+    assert row["HAS_ACTIVE_SETUP"] is False
+    assert row["SETUP_INVALIDATED"] is False
+
+
+def test_entry_state_below_when_close_under_entry_but_above_stop(monkeypatch) -> None:
+    """Oxirgi close entry - 0.5*ATR dan past, lekin stop'dan yuqori — zona ichida, momentum kuchsiz."""
+    row = _entry_state_row(monkeypatch, 97.0)  # entry 100, stop 95
+
+    assert row["SETUP_ENTRY_STATE"] == "below"
+    assert row["HAS_ACTIVE_SETUP"] is False
+    assert row["SETUP_INVALIDATED"] is False
+
+
+def test_entry_state_none_when_setup_invalidated(monkeypatch) -> None:
+    """Invalidatsiya bo'lgan setup (entry'dan keyin stop'dan past yopilgan) uchun
+    entry holati umuman hisoblanmaydi — None."""
+    from smc.types import StructureState, TradeSetup
+
+    df = _ranged_df(88.0, bars=30, rng=2.0)
+    for i in (-3, -2, -1):  # oxirgi 3 bar stop (95) dan past yopiladi
+        df.iloc[i, df.columns.get_loc("close")] = 88.0
+        df.iloc[i, df.columns.get_loc("low")] = 87.0
+    fake_setup = TradeSetup(
+        entry_ts=df.index[-4], entry_price=100.0, stop_price=95.0, target_price=120.0,
+        direction=StructureState.BULLISH, entry_index_pos=len(df) - 4, reason="FVG",
+    )
+    monkeypatch.setattr(scan_module, "generate_signals", lambda *a, **kw: [fake_setup])
+    monkeypatch.setattr(scan_module, "current_structure_state", lambda *a, **kw: StructureState.BULLISH)
+
+    row = build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="fixed")
+
+    assert row["SETUP_INVALIDATED"] is True
+    assert row["SETUP_INVALIDATED_REASON"] == "stop_close"
+    assert row["SETUP_ENTRY_STATE"] is None
+    assert row["HAS_ACTIVE_SETUP"] is False
+
+
+def test_entry_tolerance_scales_with_atr(monkeypatch) -> None:
+    """Bir xil close↔entry masofasi (1.2): past ATR'da 'missed', yuqori ATR'da 'active'.
+    Tolerantlik qat'iy % emas, ATR-asosli ekanini isbotlaydi."""
+    low_atr = _entry_state_row(monkeypatch, 101.2, stop=90.0, rng=0.5)   # ATR ~0.5 -> tol ~0.25
+    high_atr = _entry_state_row(monkeypatch, 101.2, stop=90.0, rng=5.0)  # ATR ~5.0 -> tol ~2.5
+
+    assert low_atr["SETUP_ENTRY_STATE"] == "missed"
+    assert high_atr["SETUP_ENTRY_STATE"] == "active"
+
+
+def test_missed_setup_shown_in_scan_block(monkeypatch) -> None:
+    row = _entry_state_row(monkeypatch, 103.0)
+
+    text = format_scan_block(row)
+
+    assert "O'TIB KETGAN" in text
+    assert "kirib bo'lmaydi" in text
+
+
+def test_below_zone_setup_shown_in_scan_block(monkeypatch) -> None:
+    row = _entry_state_row(monkeypatch, 97.0)
+
+    text = format_scan_block(row)
+
+    assert "ZONA ICHIDA" in text
+    assert "momentum" in text
+
+
 class _FakeProvider:
     def __init__(self, df: pd.DataFrame | None = None, error: Exception | None = None) -> None:
         self._df = df
@@ -225,13 +341,16 @@ def test_format_scan_block_low_rr_shows_warning(monkeypatch) -> None:
     from smc.types import StructureState, TradeSetup
 
     df = _make_df(_MIRRORED_BEARISH_TO_BULLISH, extra_rows=_RETEST_ROWS)
+    # entry/stop/target df'ning oxirgi close'iga (16.0) mos — setup ENTRY_ACTIVE bo'lib,
+    # to'liq blok (past R:R ogohlantirishi bilan) render qilinsin.
     fake_setup = TradeSetup(
-        entry_ts=df.index[-1], entry_price=100.0, stop_price=90.0, target_price=110.0,
+        entry_ts=df.index[-1], entry_price=16.0, stop_price=15.0, target_price=17.0,
         direction=StructureState.BULLISH, entry_index_pos=len(df) - 1, reason="FVG",
     )
     monkeypatch.setattr(scan_module, "generate_signals", lambda *a, **kw: [fake_setup])
     row = build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="trailing")
 
+    assert row["SETUP_ENTRY_STATE"] == "active"
     block = format_scan_block(row)
 
     assert "⚠️" in block

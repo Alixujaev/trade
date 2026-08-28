@@ -45,6 +45,10 @@ DISPLACEMENT_ATR_MULT: float = 1.5
 
 # Signal engine: stop = zona bottom - shu * ATR
 STOP_BUFFER_ATR_MULT: float = 0.1
+# Taktik skaner: "hozir kirsa bo'ladigan" oynasi = entry ± shu * ATR. ATR-asosli
+# (har ticker uchun moslashuvchan), qat'iy % emas. Oxirgi close shu oynadan yuqori
+# bo'lsa "o'tib ketgan" (kirib bo'lmaydi), past bo'lsa "zona ichida" (momentum kuchsiz).
+ENTRY_TOLERANCE_ATR_MULT: float = 0.5
 # Signal engine: mos swing high topilmasa, fallback target = entry + shu * risk
 DEFAULT_TARGET_R_MULTIPLE: float = 2.0
 # Trailing (va fixed) setup'larda rejalashtirilgan R:R shu qiymatdan past bo'lsa,

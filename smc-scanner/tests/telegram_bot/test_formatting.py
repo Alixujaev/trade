@@ -199,6 +199,67 @@ def test_format_scan_summary_lists_invalidated_setups() -> None:
     assert "Faol setupsiz: 0 ta" in msg  # invalidated "faol setupsiz"ga sanalmaydi
 
 
+def test_format_scan_summary_lists_missed_setups() -> None:
+    """Entry o'tib ketgan (narx entry'dan yuqori) setup asosiy ro'yxatda EMAS,
+    alohida "O'tib ketgan" bo'limida."""
+    row = {
+        "SYMBOL": "TPG", "HAS_ACTIVE_SETUP": False, "SETUP_INVALIDATED": False,
+        "SETUP_ENTRY_STATE": "missed", "SETUP_ENTRY": 52.56, "SETUP_STOP": 50.0,
+        "SETUP_ENTRY_DATE": "2026-08-20", "LAST_CLOSE": 53.94, "ERROR": None,
+    }
+
+    msg = format_scan_summary([row])
+
+    assert "O'tib ketgan" in msg
+    assert "TPG" in msg
+    assert "Faol setup topilmadi" in msg  # asosiy ro'yxatda emas
+    assert "Faol setupsiz: 0 ta" in msg   # missed "faol setupsiz"ga sanalmaydi
+
+
+def test_format_scan_summary_lists_below_zone_setups() -> None:
+    """Narx entry'dan past (lekin stop'dan yuqori) — alohida "Zona ichida" bo'limi."""
+    row = {
+        "SYMBOL": "CSGP", "HAS_ACTIVE_SETUP": False, "SETUP_INVALIDATED": False,
+        "SETUP_ENTRY_STATE": "below", "SETUP_ENTRY": 32.3, "SETUP_STOP": 31.15,
+        "SETUP_ENTRY_DATE": "2026-08-20", "LAST_CLOSE": 31.6, "ERROR": None,
+    }
+
+    msg = format_scan_summary([row])
+
+    assert "Zona ichida" in msg
+    assert "CSGP" in msg
+    assert "Faol setup topilmadi" in msg
+    assert "Faol setupsiz: 0 ta" in msg
+
+
+def test_format_scan_summary_separates_all_four_entry_states() -> None:
+    active = _active_setup_row()
+    active["SYMBOL"] = "AAA"
+    missed = {
+        "SYMBOL": "TPG", "HAS_ACTIVE_SETUP": False, "SETUP_ENTRY_STATE": "missed",
+        "SETUP_ENTRY": 52.5, "SETUP_STOP": 50.0, "SETUP_ENTRY_DATE": "2026-08-20",
+        "LAST_CLOSE": 53.9, "ERROR": None,
+    }
+    below = {
+        "SYMBOL": "CSGP", "HAS_ACTIVE_SETUP": False, "SETUP_ENTRY_STATE": "below",
+        "SETUP_ENTRY": 32.3, "SETUP_STOP": 31.15, "SETUP_ENTRY_DATE": "2026-08-20",
+        "LAST_CLOSE": 31.6, "ERROR": None,
+    }
+    invalid = {
+        "SYMBOL": "DD", "HAS_ACTIVE_SETUP": False, "SETUP_INVALIDATED": True,
+        "SETUP_INVALIDATED_REASON": "stop_close", "SETUP_ENTRY": 70.0, "SETUP_STOP": 68.0,
+        "SETUP_ENTRY_DATE": "2026-08-20", "LAST_CLOSE": 67.0, "ERROR": None,
+    }
+
+    msg = format_scan_summary([active, missed, below, invalid])
+
+    assert "Faol setup topilgan (1 ta)" in msg
+    assert "🚂 O'tib ketgan — kirib bo'lmaydi (1 ta)" in msg
+    assert "⚠️ Zona ichida — entry'dan past, momentum kuchsiz (1 ta)" in msg
+    assert "Bekor bo'lgan setup (1 ta)" in msg
+    assert "Faol setupsiz: 0 ta" in msg
+
+
 def test_format_scan_summary_summarizes_errors() -> None:
     rows = [
         {"SYMBOL": "XXXX", "HAS_ACTIVE_SETUP": False, "ERROR": "bo'sh ma'lumot qaytdi"},

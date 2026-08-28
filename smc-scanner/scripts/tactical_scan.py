@@ -33,13 +33,18 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from config.core_watchlist import get_core_watchlist  # noqa: E402
-from config.settings import MIN_PLANNED_RR, PRIMARY_INTERVAL, SWING_LOOKBACK  # noqa: E402
+from config.settings import (  # noqa: E402
+    ENTRY_TOLERANCE_ATR_MULT,
+    MIN_PLANNED_RR,
+    PRIMARY_INTERVAL,
+    SWING_LOOKBACK,
+)
 from data.factory import get_provider  # noqa: E402
 from smc.market_structure import current_structure_state, detect_structure_events  # noqa: E402
 from smc.signal import compute_planned_rr, generate_signals  # noqa: E402
 from smc.structure import detect_swings  # noqa: E402
 from smc.types import StructureState  # noqa: E402
-from smc.zones import detect_fvgs, detect_order_blocks  # noqa: E402
+from smc.zones import compute_atr, detect_fvgs, detect_order_blocks  # noqa: E402
 
 # Loyihaning o'z 2-10 kunlik swing gorizontiga mos — shundan eski setup "faol" emas,
 # tarixiy kontekst sifatida ko'rsatiladi.
@@ -51,6 +56,16 @@ ACTIVE_SETUP_LOOKBACK_BARS: int = 10
 #   structure_bearish — joriy struktura holati BEARISH'ga o'tgan
 _INVALIDATION_STOP_CLOSE = "stop_close"
 _INVALIDATION_STRUCTURE_BEARISH = "structure_bearish"
+
+# Oxirgi close'ning entry'ga nisbatan joylashuviga qarab setup holati (faqat lookback
+# ichidagi, invalidatsiya bo'lmagan setup uchun hisoblanadi). tol = ENTRY_TOLERANCE_ATR_MULT*ATR:
+#   active — oxirgi close entry ± tol ichida → HOZIR kirsa bo'ladi (asosiy "Faol" ro'yxat)
+#   missed — oxirgi close entry + tol dan YUQORI → poyezd ketdi, kirib bo'lmaydi
+#   below  — oxirgi close entry - tol dan PAST (lekin stop'dan yuqori) → zona ichida, momentum kuchsiz
+# Bu qiymatlar SETUP_* kalitlar kabi row-sxemasining qismi — oshkora (underscore'siz).
+ENTRY_STATE_ACTIVE = "active"
+ENTRY_STATE_MISSED = "missed"
+ENTRY_STATE_BELOW = "below"
 
 # Default "trailing" — Stage 1'ning (scripts/exit_comparison.py) haqiqiy o'lchovi
 # asosida: 6 ta default symbol bo'yicha trailing o'rtacha EDGE'da (+4.88) va
@@ -107,6 +122,8 @@ def build_scan_row(
         "HAS_ACTIVE_SETUP": False,
         "SETUP_INVALIDATED": False,
         "SETUP_INVALIDATED_REASON": None,
+        "SETUP_ENTRY_STATE": None,
+        "SETUP_ENTRY_TOLERANCE": None,
         "SETUP_ENTRY": None,
         "SETUP_STOP": None,
         "SETUP_TARGET": None,
@@ -122,6 +139,8 @@ def build_scan_row(
         bars_ago = (n - 1) - last_signal.entry_index_pos
         within_lookback = bars_ago <= ACTIVE_SETUP_LOOKBACK_BARS
 
+        last_close = float(df["close"].iloc[-1])
+
         # Entry'dan keyingi barlarda invalidatsiya: narx boshlang'ich stop'dan past
         # yopilganmi, yoki struktura bearish'ga o'tganmi. (Faqat lookback ichidagi
         # setup uchun ma'noli — undan eskisi allaqachon "tarixiy kontekst".)
@@ -132,12 +151,38 @@ def build_scan_row(
         elif state is StructureState.BEARISH:
             invalidated_reason = _INVALIDATION_STRUCTURE_BEARISH
 
+        # Entry holati — oxirgi close entry'ga nisbatan qayerda? (faqat "tirik" setup uchun).
+        # tol = ENTRY_TOLERANCE_ATR_MULT * ATR — har ticker uchun moslashuvchan (qat'iy % emas).
+        # Oxirgi close stop'dan ham past bo'lsa "below" chiqadi (stop-close invalidatsiyasi
+        # yuqorida entry'dan keyingi barlar bo'yicha allaqachon tekshirilgan).
+        entry_state: str | None = None
+        entry_tol: float | None = None
+        if within_lookback and invalidated_reason is None:
+            atr_series = compute_atr(df)
+            atr_now = atr_series.iloc[-1]
+            if pd.isna(atr_now):
+                atr_now = atr_series.iloc[last_signal.entry_index_pos]
+            if pd.isna(atr_now):
+                atr_now = last_signal.entry_price * 0.01  # ATR aniqlanmasa — oxirgi chora
+            entry_tol = ENTRY_TOLERANCE_ATR_MULT * float(atr_now)
+            entry = last_signal.entry_price
+            if last_close > entry + entry_tol:
+                entry_state = ENTRY_STATE_MISSED
+            elif last_close < entry - entry_tol:
+                entry_state = ENTRY_STATE_BELOW
+            else:
+                entry_state = ENTRY_STATE_ACTIVE
+
         row["SETUP_REASON"] = last_signal.reason
         row["SETUP_ENTRY_DATE"] = last_signal.entry_ts.date().isoformat()
         row["SETUP_BARS_AGO"] = bars_ago
         row["SETUP_INVALIDATED"] = within_lookback and invalidated_reason is not None
         row["SETUP_INVALIDATED_REASON"] = invalidated_reason if row["SETUP_INVALIDATED"] else None
-        row["HAS_ACTIVE_SETUP"] = within_lookback and invalidated_reason is None
+        row["SETUP_ENTRY_STATE"] = entry_state
+        row["SETUP_ENTRY_TOLERANCE"] = round(entry_tol, 2) if entry_tol is not None else None
+        # "Faol" endi = narx AYNAN entry oynasida (hozir kirsa bo'ladi). Oyna tashqarisidagi
+        # (missed/below) yoki invalidatsiya bo'lgan setup'lar asosiy ro'yxatga tushmaydi.
+        row["HAS_ACTIVE_SETUP"] = entry_state == ENTRY_STATE_ACTIVE
         row["SETUP_ENTRY"] = round(last_signal.entry_price, 2)
         row["SETUP_STOP"] = round(last_signal.stop_price, 2)
 
@@ -280,6 +325,17 @@ def format_scan_block(row: dict, *, hidden: bool = False) -> str:
         lines.append(
             f"Faol setup: BEKOR BO'LGAN — {invalidation_text(row)} "
             f"(setup {row['SETUP_ENTRY_DATE']}, entry {row['SETUP_ENTRY']}, stop {row['SETUP_STOP']})"
+        )
+    elif row.get("SETUP_ENTRY_STATE") == ENTRY_STATE_MISSED:
+        lines.append(
+            f"Faol setup: 🚂 O'TIB KETGAN — narx entry {row['SETUP_ENTRY']}'dan yuqori, "
+            f"kirib bo'lmaydi (oxirgi close {row['LAST_CLOSE']}, setup {row['SETUP_ENTRY_DATE']})"
+        )
+    elif row.get("SETUP_ENTRY_STATE") == ENTRY_STATE_BELOW:
+        lines.append(
+            f"Faol setup: ⚠️ ZONA ICHIDA — narx entry {row['SETUP_ENTRY']}'dan past, momentum "
+            f"kuchsiz (stop {row['SETUP_STOP']}, oxirgi close {row['LAST_CLOSE']}, "
+            f"setup {row['SETUP_ENTRY_DATE']})"
         )
     elif hidden:
         lines.append(
