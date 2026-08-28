@@ -45,6 +45,13 @@ from smc.zones import detect_fvgs, detect_order_blocks  # noqa: E402
 # tarixiy kontekst sifatida ko'rsatiladi.
 ACTIVE_SETUP_LOOKBACK_BARS: int = 10
 
+# Setup lookback ichida bo'lsa ham QUYIDAGI hollarda "bekor bo'lgan" deb belgilanadi
+# (HAS_ACTIVE_SETUP=False, lekin SETUP_INVALIDATED=True — ro'yxatda alohida ko'rinadi):
+#   stop_close       — entry'dan keyin biror bar boshlang'ich stop'dan PAST yopilgan
+#   structure_bearish — joriy struktura holati BEARISH'ga o'tgan
+_INVALIDATION_STOP_CLOSE = "stop_close"
+_INVALIDATION_STRUCTURE_BEARISH = "structure_bearish"
+
 # Default "trailing" — Stage 1'ning (scripts/exit_comparison.py) haqiqiy o'lchovi
 # asosida: 6 ta default symbol bo'yicha trailing o'rtacha EDGE'da (+4.88) va
 # expectancy'da (0.558R vs 0.201R) fixed'dan ustun chiqdi, 4/6 symbolda RETURN% ham
@@ -84,6 +91,11 @@ def build_scan_row(
     n = len(df)
     row: dict = {
         "SYMBOL": symbol,
+        # Bot qaysi barni ko'rayotgani aniq ko'rinsin — TradingView bilan solishtirish
+        # va kesh eskirganini o'z vaqtida sezish uchun (kunlik bot 1 bar orqada bo'lishi
+        # normal, lekin undan ko'p bo'lsa — kesh muammosi).
+        "LAST_BAR_DATE": df.index[-1].date().isoformat() if n else None,
+        "LAST_CLOSE": round(float(df["close"].iloc[-1]), 2) if n else None,
         "STRUCTURE_STATE": state.name if state is not None else "N/A",
         "LAST_EVENT_TYPE": last_event.event_type.name if last_event else None,
         "LAST_EVENT_DIRECTION": last_event.direction.name if last_event else None,
@@ -93,6 +105,8 @@ def build_scan_row(
         "SETUP_ENTRY_DATE": None,
         "SETUP_BARS_AGO": None,
         "HAS_ACTIVE_SETUP": False,
+        "SETUP_INVALIDATED": False,
+        "SETUP_INVALIDATED_REASON": None,
         "SETUP_ENTRY": None,
         "SETUP_STOP": None,
         "SETUP_TARGET": None,
@@ -106,10 +120,24 @@ def build_scan_row(
 
     if last_signal is not None:
         bars_ago = (n - 1) - last_signal.entry_index_pos
+        within_lookback = bars_ago <= ACTIVE_SETUP_LOOKBACK_BARS
+
+        # Entry'dan keyingi barlarda invalidatsiya: narx boshlang'ich stop'dan past
+        # yopilganmi, yoki struktura bearish'ga o'tganmi. (Faqat lookback ichidagi
+        # setup uchun ma'noli — undan eskisi allaqachon "tarixiy kontekst".)
+        invalidated_reason: str | None = None
+        after_entry = df.iloc[last_signal.entry_index_pos + 1 :]
+        if len(after_entry) and bool((after_entry["close"] < last_signal.stop_price).any()):
+            invalidated_reason = _INVALIDATION_STOP_CLOSE
+        elif state is StructureState.BEARISH:
+            invalidated_reason = _INVALIDATION_STRUCTURE_BEARISH
+
         row["SETUP_REASON"] = last_signal.reason
         row["SETUP_ENTRY_DATE"] = last_signal.entry_ts.date().isoformat()
         row["SETUP_BARS_AGO"] = bars_ago
-        row["HAS_ACTIVE_SETUP"] = bars_ago <= ACTIVE_SETUP_LOOKBACK_BARS
+        row["SETUP_INVALIDATED"] = within_lookback and invalidated_reason is not None
+        row["SETUP_INVALIDATED_REASON"] = invalidated_reason if row["SETUP_INVALIDATED"] else None
+        row["HAS_ACTIVE_SETUP"] = within_lookback and invalidated_reason is None
         row["SETUP_ENTRY"] = round(last_signal.entry_price, 2)
         row["SETUP_STOP"] = round(last_signal.stop_price, 2)
 
@@ -214,6 +242,17 @@ def _exit_text(row: dict) -> str:
     return f"Exit: fixed target {row['SETUP_TARGET']}"
 
 
+_INVALIDATION_LABELS: dict[str, str] = {
+    _INVALIDATION_STOP_CLOSE: "narx boshlang'ich stop'dan past yopildi",
+    _INVALIDATION_STRUCTURE_BEARISH: "struktura bearish'ga o'tdi",
+}
+
+
+def invalidation_text(row: dict) -> str:
+    """SETUP_INVALIDATED_REASON'ni o'qiladigan o'zbekcha izohga aylantiradi."""
+    return _INVALIDATION_LABELS.get(row.get("SETUP_INVALIDATED_REASON"), "bekor bo'ldi")
+
+
 def format_scan_block(row: dict, *, hidden: bool = False) -> str:
     """Bitta symbol uchun o'qiladigan matn blokini yasaydi (jadval EMAS — o'quv fokusi).
     O'ZI FILTRLAMAYDI — `hidden` chaqiruvchi (main()) tomonidan filter_quality_setups()
@@ -222,6 +261,9 @@ def format_scan_block(row: dict, *, hidden: bool = False) -> str:
         return f"=== {row['SYMBOL']} ===\nXato: {row['ERROR']}"
 
     lines = [f"=== {row['SYMBOL']} ==="]
+
+    if row.get("LAST_BAR_DATE"):
+        lines.append(f"Oxirgi bar: {row['LAST_BAR_DATE']} (close {row['LAST_CLOSE']})")
 
     structure_line = f"Joriy struktura: {row['STRUCTURE_STATE']}"
     if row["LAST_EVENT_TYPE"]:
@@ -234,6 +276,11 @@ def format_scan_block(row: dict, *, hidden: bool = False) -> str:
 
     if row["SETUP_REASON"] is None:
         lines.append("Faol setup: hozircha faol setup yo'q")
+    elif row.get("SETUP_INVALIDATED"):
+        lines.append(
+            f"Faol setup: BEKOR BO'LGAN — {invalidation_text(row)} "
+            f"(setup {row['SETUP_ENTRY_DATE']}, entry {row['SETUP_ENTRY']}, stop {row['SETUP_STOP']})"
+        )
     elif hidden:
         lines.append(
             "Faol setup: YASHIRILDI (Planned R:R past — --show-all yoki "

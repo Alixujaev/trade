@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import time
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -15,6 +16,30 @@ from data.provider import DataProvider
 logger = logging.getLogger(__name__)
 
 REQUIRED_COLUMNS = ["open", "high", "low", "close", "volume"]
+
+# Bar-sana tekshiruvi shu interval'larga qo'llanadi (kunlik/haftalik — bir kunlik
+# lag ham sezilarli). Intraday interval'lar faqat TTL bilan boshqariladi.
+_DATE_STALE_INTERVALS: set[str] = {"1d"}
+
+# US savdo sessiyasi ~20:00 UTC (yozda) / 21:00 UTC (qishda) yopiladi. 21:00 UTC dan
+# keyin shu kunning kunlik bari yopilgan deb hisoblanadi (yfinance yetkazib berish
+# kechikishiga ham marja).
+_SESSION_CLOSE_HOUR_UTC = 21
+
+
+def _latest_expected_session_date(now: datetime | None = None) -> date:
+    """Oxirgi 'yopilgan bo'lishi kutiladigan' US savdo kuni (UTC bo'yicha).
+
+    Bugungi sessiya hali yopilmagan bo'lsa (yoki hafta oxiri) -> oldingi savdo kuni.
+    BAYRAMLAR hisobga OLINMAYDI — bayram kunlarida kesh bir marta ortiqcha
+    yangilanadi (yfinance o'sha bar'ni bermaydi), natija to'g'ri qoladi."""
+    now = now or datetime.now(timezone.utc)
+    d = now.date()
+    if now.hour < _SESSION_CLOSE_HOUR_UTC:
+        d -= timedelta(days=1)
+    while d.weekday() >= 5:  # 5=shanba, 6=yakshanba
+        d -= timedelta(days=1)
+    return d
 
 # yfinance "4h"ni toza bermaydi (abstraksiya oqadigan joy — shuning uchun
 # umumiy VALID_INTERVALS emas, shu provider O'ZI qo'llab-quvvatlaydigan
@@ -34,8 +59,10 @@ class YFinanceProvider(DataProvider):
             )
 
         cache_path = self._cache_path(symbol, interval)
-        if use_cache and self._is_cache_fresh(cache_path):
-            return pd.read_parquet(cache_path)
+        if use_cache and cache_path.exists():
+            cached = pd.read_parquet(cache_path)
+            if self._is_cache_fresh(cache_path, cached, interval):
+                return cached
 
         period = PERIOD_1H if interval == "1h" else PERIOD_DEFAULT
         raw = yf.download(symbol, period=period, interval=interval, auto_adjust=True, progress=False)
@@ -79,11 +106,24 @@ class YFinanceProvider(DataProvider):
         return CACHE_DIR / f"{symbol}_{interval}.parquet"
 
     @staticmethod
-    def _is_cache_fresh(path: Path) -> bool:
+    def _is_cache_fresh(path: Path, df: pd.DataFrame | None = None, interval: str = "1d") -> bool:
+        """Kesh 'yangi'mi:
+
+        1) fayl yoshi < CACHE_TTL_HOURS BO'LISHI SHART; VA
+        2) kunlik (`_DATE_STALE_INTERVALS`) uchun qo'shimcha: keshdagi oxirgi bar
+           o'tgan oxirgi savdo kunidan (`_latest_expected_session_date`) eski
+           BO'LMASLIGI kerak — aks holda yoshi qancha yosh bo'lsa ham "eski"
+           (masalan: skan ertalab ishlagan, kunlik bar kechqurun yopilgan)."""
         if not path.exists():
             return False
         age_hours = (time.time() - path.stat().st_mtime) / 3600
-        return age_hours < CACHE_TTL_HOURS
+        if age_hours >= CACHE_TTL_HOURS:
+            return False
+        if interval in _DATE_STALE_INTERVALS and df is not None and len(df):
+            last_bar_date = pd.Timestamp(df.index[-1]).date()
+            if last_bar_date < _latest_expected_session_date():
+                return False
+        return True
 
     @staticmethod
     def _write_cache(df: pd.DataFrame, path: Path) -> None:

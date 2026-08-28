@@ -173,6 +173,32 @@ def test_format_scan_summary_lists_active_setups_with_details() -> None:
     assert "Faol setupsiz: 1 ta" in msg
 
 
+def test_format_scan_summary_shows_last_close_and_below_entry_warning() -> None:
+    row = _active_setup_row()
+    row["LAST_BAR_DATE"] = "2026-08-27"
+    row["LAST_CLOSE"] = 141.0  # entry 150 dan past
+
+    msg = format_scan_summary([row])
+
+    assert "Oxirgi close: $141.0 (2026-08-27)" in msg
+    assert "narx entry'dan past" in msg
+
+
+def test_format_scan_summary_lists_invalidated_setups() -> None:
+    row = {
+        "SYMBOL": "CSGP", "HAS_ACTIVE_SETUP": False, "SETUP_INVALIDATED": True,
+        "SETUP_INVALIDATED_REASON": "stop_close", "SETUP_ENTRY": 32.3, "SETUP_STOP": 31.15,
+        "SETUP_ENTRY_DATE": "2026-08-20", "LAST_CLOSE": 30.9, "ERROR": None,
+    }
+
+    msg = format_scan_summary([row])
+
+    assert "Bekor bo'lgan setup (1 ta)" in msg
+    assert "CSGP" in msg
+    assert "stop'dan past yopildi" in msg
+    assert "Faol setupsiz: 0 ta" in msg  # invalidated "faol setupsiz"ga sanalmaydi
+
+
 def test_format_scan_summary_summarizes_errors() -> None:
     rows = [
         {"SYMBOL": "XXXX", "HAS_ACTIVE_SETUP": False, "ERROR": "bo'sh ma'lumot qaytdi"},

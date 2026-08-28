@@ -115,6 +115,51 @@ def test_build_scan_row_old_setup_marked_inactive() -> None:
     assert row["SETUP_REASON"] == "FVG"  # setup hali qaytariladi (tarixiy kontekst)
     assert row["SETUP_BARS_AGO"] > 10
     assert row["HAS_ACTIVE_SETUP"] is False
+    assert row["SETUP_INVALIDATED"] is False  # eski = "tarixiy", "bekor bo'lgan" EMAS
+
+
+# Signal idx16'da (entry 15.6, stop ~9.74) trigger bo'ladi; keyin narx stop'dan
+# past yopiladigan bir nechta bar — lookback ichida, lekin invalidatsiya bo'lgan.
+_STOP_BREACH_TAIL = [
+    {"open": 12, "high": 12.5, "low": 8.5, "close": 9.0},
+    {"open": 9.0, "high": 9.5, "low": 8.0, "close": 8.5},
+]
+
+
+def test_build_scan_row_invalidated_when_price_closes_below_stop() -> None:
+    df = _make_df(_MIRRORED_BEARISH_TO_BULLISH, extra_rows=_RETEST_ROWS + _STOP_BREACH_TAIL)
+
+    row = build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="fixed")
+
+    assert row["SETUP_REASON"] == "FVG"
+    assert row["SETUP_BARS_AGO"] <= 10          # hali lookback ichida
+    assert row["HAS_ACTIVE_SETUP"] is False     # ...lekin faol EMAS
+    assert row["SETUP_INVALIDATED"] is True
+    assert row["SETUP_INVALIDATED_REASON"] == "stop_close"
+
+
+def test_build_scan_row_invalidated_when_structure_turns_bearish(monkeypatch) -> None:
+    from smc.types import StructureState
+
+    df = _make_df(_MIRRORED_BEARISH_TO_BULLISH, extra_rows=_RETEST_ROWS)
+    monkeypatch.setattr(scan_module, "current_structure_state", lambda *a, **kw: StructureState.BEARISH)
+
+    row = build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="fixed")
+
+    assert row["SETUP_REASON"] == "FVG"
+    assert row["HAS_ACTIVE_SETUP"] is False
+    assert row["SETUP_INVALIDATED"] is True
+    assert row["SETUP_INVALIDATED_REASON"] == "structure_bearish"
+
+
+def test_invalidated_setup_shown_in_scan_block() -> None:
+    df = _make_df(_MIRRORED_BEARISH_TO_BULLISH, extra_rows=_RETEST_ROWS + _STOP_BREACH_TAIL)
+    row = build_scan_row("TST", df, lookback=1, mult=1.0, exit_mode="fixed")
+
+    text = format_scan_block(row)
+
+    assert "BEKOR BO'LGAN" in text
+    assert "stop'dan past yopildi" in text
 
 
 class _FakeProvider:

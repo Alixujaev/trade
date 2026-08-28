@@ -18,7 +18,12 @@ VALID_INTERVALS: set[str] = {"1d", "1wk", "1h", "4h"}
 
 # Parquet kesh papkasi — CWD'ga emas, paket ildiziga nisbatan aniqlanadi
 CACHE_DIR: Path = Path(__file__).resolve().parent.parent / "data" / "cache"
-CACHE_TTL_HOURS: int = 12
+# Kesh yoshi chegarasi (soat). Kunlik (1d) kesh uchun BUNDAN tashqari bar-sana
+# tekshiruvi ham bor (data/yfinance_provider.py::_is_cache_fresh): oxirgi bar
+# o'tgan oxirgi savdo kunidan eski bo'lsa, yoshi ne bo'lishidan qat'i nazar
+# kesh "eski" hisoblanadi. TTL bu yerda faqat "bugungi to'lmagan barni qayta
+# tortish" oralig'i (kunlik bot uchun 12h juda katta edi -> 4h).
+CACHE_TTL_HOURS: int = 4
 
 # yf.download uchun davr (period) parametrlari
 PERIOD_1H: str = "730d"

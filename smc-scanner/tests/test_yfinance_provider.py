@@ -10,8 +10,13 @@ import data.yfinance_provider as yfp_module
 from data.yfinance_provider import YFinanceProvider
 
 
-def _base_ohlcv(periods: int = 10, freq: str = "D", tz: str | None = None) -> pd.DataFrame:
-    dates = pd.date_range("2024-01-01", periods=periods, freq=freq, tz=tz)
+def _base_ohlcv(
+    periods: int = 10, freq: str = "D", tz: str | None = None, *, end: object | None = None
+) -> pd.DataFrame:
+    if end is not None:
+        dates = pd.date_range(end=end, periods=periods, freq=freq, tz=tz)
+    else:
+        dates = pd.date_range("2024-01-01", periods=periods, freq=freq, tz=tz)
     return pd.DataFrame(
         {
             "Open": np.arange(periods, dtype=float) + 100,
@@ -135,9 +140,13 @@ def test_get_ohlcv_empty_download_raises(monkeypatch, tmp_path) -> None:
 def test_cache_roundtrip_avoids_second_network_call(monkeypatch, tmp_path) -> None:
     call_count = {"n": 0}
 
+    # Oxirgi bar BUGUNGI sanada -> bar-sana tekshiruvi keshni "eski" demaydi
+    # (bu test faqat TTL/roundtrip xatti-harakatini tekshiradi).
+    recent = _base_ohlcv(end=pd.Timestamp.now(tz="UTC").normalize())
+
     def fake_download(symbol: str, **kwargs) -> pd.DataFrame:
         call_count["n"] += 1
-        return _build_flat_raw()
+        return recent.copy()
 
     monkeypatch.setattr(yfp_module, "CACHE_DIR", tmp_path)
     monkeypatch.setattr(yfp_module.yf, "download", fake_download)
@@ -154,3 +163,51 @@ def test_cache_roundtrip_avoids_second_network_call(monkeypatch, tmp_path) -> No
     second = provider.get_ohlcv("SPUS", "1d", use_cache=True)
     assert call_count["n"] == 1
     pd.testing.assert_frame_equal(first, second)
+
+
+# --- bar-sana asosli "eskirish" (kunlik lag muammosi) ---
+
+from datetime import datetime, timezone  # noqa: E402
+
+from data.yfinance_provider import _latest_expected_session_date  # noqa: E402
+
+
+def test_latest_expected_session_date_before_close_is_previous_day() -> None:
+    # Chorshanba 10:00 UTC (sessiya hali yopilmagan) -> seshanba
+    d = _latest_expected_session_date(datetime(2026, 8, 26, 10, 0, tzinfo=timezone.utc))
+    assert d.isoformat() == "2026-08-25"
+
+
+def test_latest_expected_session_date_after_close_is_same_day() -> None:
+    # Chorshanba 22:00 UTC (sessiya yopilgan) -> chorshanba
+    d = _latest_expected_session_date(datetime(2026, 8, 26, 22, 0, tzinfo=timezone.utc))
+    assert d.isoformat() == "2026-08-26"
+
+
+def test_latest_expected_session_date_weekend_rolls_back_to_friday() -> None:
+    # Yakshanba -> juma
+    d = _latest_expected_session_date(datetime(2026, 8, 30, 12, 0, tzinfo=timezone.utc))
+    assert d.isoformat() == "2026-08-28"
+
+
+def test_daily_cache_stale_when_last_bar_behind_session(monkeypatch, tmp_path) -> None:
+    """Kesh fayli yangi yozilgan bo'lsa ham (TTL ichida), oxirgi bari o'tgan savdo
+    kunidan eski bo'lsa -> qayta tortiladi (aynan CSGP holati: skan ertalab ishlagan,
+    kunlik bar keyin yopilgan)."""
+    call_count = {"n": 0}
+    stale = _base_ohlcv(periods=10)  # 2024-01-.. — bugundan ancha eski
+
+    def fake_download(symbol: str, **kwargs) -> pd.DataFrame:
+        call_count["n"] += 1
+        return stale.copy()
+
+    monkeypatch.setattr(yfp_module, "CACHE_DIR", tmp_path)
+    monkeypatch.setattr(yfp_module.yf, "download", fake_download)
+
+    provider = YFinanceProvider()
+    provider.get_ohlcv("SPUS", "1d", use_cache=True)
+    assert call_count["n"] == 1
+
+    # fayl endigina yozildi (mtime = hozir, TTL ichida), lekin bar-sana eski:
+    provider.get_ohlcv("SPUS", "1d", use_cache=True)
+    assert call_count["n"] == 2  # bar-sana eskiligi sabab qayta tortildi

@@ -13,7 +13,7 @@ from __future__ import annotations
 from config.settings import MIN_PLANNED_RR, WATCHLIST_COMPACT_THRESHOLD
 from journal.types import JournalEntry
 from risk.rules import RiskCheckResult
-from scripts.tactical_scan import filter_quality_setups
+from scripts.tactical_scan import filter_quality_setups, invalidation_text
 
 PAPER_DISCLAIMER = (
     "⚠️ Bu paper/o'quv qatlami. Signallar buy&hold'dan past return beradi. "
@@ -88,7 +88,8 @@ def format_scan_summary(
     errors = [r for r in rows if r.get("ERROR")]
     visible, hidden = filter_quality_setups(rows, min_rr=min_rr, show_all=show_all)
     active_total = len([r for r in rows if r.get("HAS_ACTIVE_SETUP")])
-    no_setup_count = len(rows) - active_total - len(errors)
+    invalidated = [r for r in rows if r.get("SETUP_INVALIDATED")]
+    no_setup_count = len(rows) - active_total - len(errors) - len(invalidated)
 
     lines = [f"✅ Skanerlash yakunlandi: {len(rows)} ta belgi tekshirildi."]
 
@@ -100,6 +101,12 @@ def format_scan_summary(
             lines.append(f"{row['SYMBOL']} — LONG")
             lines.append(f"Entry: ${row['SETUP_ENTRY']} | Stop: ${row['SETUP_STOP']}")
             lines.append(_format_reference_rr_line(row))
+            last_close = row.get("LAST_CLOSE")
+            if last_close is not None:
+                note = " ⚠️ narx entry'dan past" if (
+                    row.get("SETUP_ENTRY") is not None and last_close < row["SETUP_ENTRY"]
+                ) else ""
+                lines.append(f"Oxirgi close: ${last_close} ({row.get('LAST_BAR_DATE')}){note}")
             if row.get("SETUP_LOW_RR_WARNING"):
                 lines.append("⚠️ Past R:R — ehtiyot")
             lines.append(f"Sabab: {row['SETUP_REASON']} zonasi {row['SETUP_ENTRY_DATE']}'da retest qilindi")
@@ -107,6 +114,16 @@ def format_scan_summary(
     else:
         lines.append("")
         lines.append("Faol setup topilmadi.")
+
+    if invalidated:
+        lines.append("")
+        lines.append(f"❌ Bekor bo'lgan setup ({len(invalidated)} ta):")
+        for row in invalidated:
+            close_part = f", oxirgi close ${row['LAST_CLOSE']}" if row.get("LAST_CLOSE") is not None else ""
+            lines.append(
+                f"{row['SYMBOL']} — {invalidation_text(row)} "
+                f"(entry ${row['SETUP_ENTRY']}, stop ${row['SETUP_STOP']}{close_part}, {row['SETUP_ENTRY_DATE']})"
+            )
 
     lines.append("")
     lines.append(f"Faol setupsiz: {no_setup_count} ta")
