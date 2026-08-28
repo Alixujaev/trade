@@ -23,7 +23,9 @@ PAPER_DISCLAIMER = (
 HELP_TEXT = (
     "🤖 *Halal SMC Swing Scanner — buyruqlar*\n\n"
     "/scan [SYMBOLS] — watchlist yoki berilgan ticker(lar)ni skan qiladi (past R:R yashirilgan)\n"
-    "/scan_all [SYMBOLS] — /scan kabi, lekin past R:R setup'larni ham ko'rsatadi\n"
+    # `_` legacy Markdown'da kursiv boshlaydi — juftlanmagan `_` butun xabarni
+    # "Can't parse entities" bilan yiqitadi (start/help/❓ tugma hammasi jim qoladi).
+    "/scan\\_all [SYMBOLS] — /scan kabi, lekin past R:R setup'larni ham ko'rsatadi\n"
     "/status — ochiq savdolar + ochiq pozitsiyalar holati\n"
     "/add — yangi savdo qo'shish (interaktiv)\n"
     "/close — ochiq savdoni yopish\n"

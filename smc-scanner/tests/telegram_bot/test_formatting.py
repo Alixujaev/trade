@@ -325,3 +325,13 @@ def test_help_text_mentions_paper_disclaimer() -> None:
     assert "paper" in HELP_TEXT.lower()
     assert "/scan" in HELP_TEXT
     assert "/add" in HELP_TEXT
+
+
+def test_help_text_is_valid_legacy_markdown() -> None:
+    """HELP_TEXT parse_mode="Markdown" bilan yuboriladi (handlers.start). Juftlanmagan
+    `_`/`*` bo'lsa Telegram butun xabarni rad etadi va /start, /help hamda "❓ Yordam"
+    tugmasi jimgina ishlamay qoladi — shu regressiyani ushlab turadi."""
+    unescaped_underscores = HELP_TEXT.replace("\\_", "").count("_")
+    unescaped_asterisks = HELP_TEXT.replace("\\*", "").count("*")
+    assert unescaped_underscores % 2 == 0, "juftlanmagan `_` — legacy Markdown yiqiladi"
+    assert unescaped_asterisks % 2 == 0, "juftlanmagan `*` — legacy Markdown yiqiladi"
