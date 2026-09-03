@@ -124,6 +124,13 @@ MIN_BREAKOUT_RR: float = 1.5
 # Position sizing: bir savdoda hisob kapitalining shu ulushi risk qilinadi (TZ 12).
 RISK_PCT_PER_TRADE: float = 0.01
 
+# Portfel-darajali backtest (backtest/portfolio.py). MAX_OPEN_POSITIONS (telegram
+# qatlami) dan ALOHIDA — bu FAQAT portfel simulyatoriga tegishli.
+MAX_CONCURRENT_POSITIONS: int = 10
+# Ochiq pozitsiyalar rejalashtirilgan riski (stop-out zarari) yig'indisi joriy
+# realized kapitalning shu ulushidan oshmasligi kerak — aks holda yangi pozitsiya yo'q.
+MAX_PORTFOLIO_RISK_PCT: float = 0.10
+
 # --- Signal scoring 0-100 (TZ 11) ---
 # Swing weighting. V1'da SMC qatlami yo'q -> "smc" doim 0, amaliy maksimal ~90.
 SCORE_WEIGHTS: dict[str, float] = {
