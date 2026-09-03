@@ -93,7 +93,13 @@ class Zone:
 
 @dataclass(frozen=True)
 class TradeSetup:
-    """Bitta LONG entry setup — struktura + zona retest'idan hosil bo'lgan."""
+    """Bitta LONG entry setup — struktura + zona retest'idan (yoki V1 breakout+retest'idan) hosil bo'lgan.
+
+    Oxirgi to'rt maydon IXTIYORIY (default'li) — V1 breakout+retest strategiyasi
+    (strategy/breakout_retest.py, strategy/scoring.py) uchun qo'shilgan. Eski
+    smc/signal.py ularni to'ldirmaydi; backtest/engine.py va compute_planned_rr
+    ular haqida bilmaydi va e'tiborsiz qoldiradi (moslik saqlanadi).
+    """
 
     entry_ts: pd.Timestamp
     entry_price: float
@@ -101,4 +107,10 @@ class TradeSetup:
     target_price: float
     direction: StructureState  # doim BULLISH (long-only scope) — sxema izchilligi uchun saqlanadi
     entry_index_pos: int
-    reason: str  # trigger qilgan zona turi — "FVG" yoki "ORDER_BLOCK"
+    reason: str  # trigger qilgan zona turi — "FVG" / "ORDER_BLOCK" / "BREAKOUT_RETEST@<band>"
+
+    # --- V1 breakout+retest qo'shimchalari (ixtiyoriy) ---
+    score: float | None = None  # 0..100 signal ball (strategy/scoring.py to'ldiradi)
+    score_reasons: tuple[str, ...] = ()  # ball komponentlarining izohlari
+    breakout_index_pos: int | None = None  # resistance breakout tasdiqlangan bar
+    retest_index_pos: int | None = None  # eski resistance (endi support) retest qilingan bar

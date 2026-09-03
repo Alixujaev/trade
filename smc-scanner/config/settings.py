@@ -74,3 +74,71 @@ MAX_OPEN_POSITIONS: int = 3
 # qisqa (kompakt) ro'yxat ko'rsatiladi — aks holda Telegram'ning 4096 belgili
 # xabar limitidan va yuzlab tugmali keyboard'dan oshib ketishi mumkin.
 WATCHLIST_COMPACT_THRESHOLD: int = 40
+
+
+# ======================================================================
+# V1 breakout+retest strategiyasi (TZ 5-15). Barcha qiymat backtest bilan
+# qo'lda sozlanadi — bu yerda "chiroyli ko'rinishi uchun" hech narsa tanlanmagan,
+# TZ'dagi standart qiymatlardan boshlanadi.
+# ======================================================================
+
+# --- Trend rejimi (EMA regime filter, TZ 5) ---
+EMA_FAST_PERIOD: int = 20
+EMA_MID_PERIOD: int = 50
+EMA_SLOW_PERIOD: int = 200
+
+# --- Volume tasdig'i (TZ 10) ---
+# Breakout barida current_volume / volume_MA shu qiymatdan katta bo'lishi kerak.
+VOLUME_MA_PERIOD: int = 20
+VOLUME_BREAKOUT_RATIO: float = 1.5
+# Scoring: volume nisbati shu qiymatga yetganda volume sub-ball = 1.0 (to'yinish).
+VOLUME_RATIO_SATURATION: float = 3.0
+
+# --- Support/Resistance zonalari (TZ 7) ---
+# Klaster tasma yarim-kengligi = shu * ATR (median). Swing narxlari shu tasmaga
+# sig'sa bitta zona (band) deb birlashtiriladi.
+SR_CLUSTER_ATR_MULT: float = 0.5
+# ATR butunlay NaN bo'lsa (juda qisqa data) fallback: narxning shu ulushi.
+SR_CLUSTER_PCT: float = 0.01
+# Zona bo'lishi uchun minimal reaksiya (teginish) soni.
+SR_MIN_TOUCHES: int = 3
+# strength: shu ta teginishda touch sub-ball = 1.0 (to'yinish).
+SR_TOUCH_SATURATION: int = 5
+
+# --- Breakout + retest state machine (TZ 8.1-8.2) ---
+# Breakout'dan keyin retest shu bar ichida sodir bo'lishi kerak, aks holda setup bekor.
+RETEST_MAX_BARS: int = 15
+# Retest "tegdi" deb hisoblash uchun zona chegarasiga yaqinlik dopuski = shu * ATR.
+RETEST_TOLERANCE_ATR_MULT: float = 0.25
+# Retest'dan keyin bullish tasdiq shamchasi shu bar ichida kelishi kerak.
+CONFIRMATION_MAX_BARS: int = 5
+
+# --- Risk / stop / target (TZ 12, 14) ---
+BREAKOUT_SL_ATR_MULT: float = 1.0
+# "structure" = zona bottom - k*ATR | "atr" = entry - k*ATR | "widest" = ikkisidan pasti.
+BREAKOUT_STOP_MODE: str = "structure"
+# Keyingi qarshilik zonasi topilmasa (yoki R:R past bo'lsa) fallback target = entry + shu * risk.
+BREAKOUT_TP_R_MULTIPLE: float = 2.0
+# Rejalashtirilgan R:R shu qiymatdan past bo'lsa, setup UMUMAN emit qilinmaydi (TZ 14).
+MIN_BREAKOUT_RR: float = 1.5
+# Position sizing: bir savdoda hisob kapitalining shu ulushi risk qilinadi (TZ 12).
+RISK_PCT_PER_TRADE: float = 0.01
+
+# --- Signal scoring 0-100 (TZ 11) ---
+# Swing weighting. V1'da SMC qatlami yo'q -> "smc" doim 0, amaliy maksimal ~90.
+SCORE_WEIGHTS: dict[str, float] = {
+    "trend": 0.30,
+    "structure": 0.20,
+    "setup": 0.20,
+    "volume": 0.10,
+    "smc": 0.10,
+    "risk": 0.10,
+}
+# >=strong_buy -> STRONG_BUY, >=buy -> BUY, >=watch -> WATCH, aks holda NO_TRADE.
+SCORE_THRESHOLDS: dict[str, float] = {"strong_buy": 80.0, "buy": 70.0, "watch": 60.0}
+# risk sub-ball: R:R shu qiymatga yetganda sub-ball = 1.0.
+SCORE_RR_SATURATION: float = 3.0
+
+# --- Backtest xarajatlari (TZ 15) — brokerga qarab moslanadi ---
+BREAKOUT_COMMISSION_PCT: float = 0.0005
+BREAKOUT_SLIPPAGE_PCT: float = 0.0005

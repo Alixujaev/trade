@@ -7,5 +7,6 @@ data/cache/
 chart.png
 .env
 backtest_results.csv
+breakout_retest_results.csv
 trade_journal.csv
 core_watchlist.json
