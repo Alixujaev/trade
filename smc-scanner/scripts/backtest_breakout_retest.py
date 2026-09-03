@@ -34,6 +34,12 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from backtest.engine import run_backtest  # noqa: E402
+from backtest.portfolio import (  # noqa: E402
+    PortfolioConfig,
+    SymbolData,
+    build_timeline,
+    make_buy_hold_benchmarks,
+)
 from backtest.types import TradeResult  # noqa: E402
 from backtest.window import slice_date_range  # noqa: E402
 from config.core_watchlist import get_core_watchlist  # noqa: E402
@@ -155,6 +161,7 @@ def run_one_symbol(
         row["ERROR"] = None
         if collect_trades:
             row["_new_trades"] = res_new.trades
+            row["_df"] = df
         return row
     except Exception as exc:  # noqa: BLE001 — har qanday xatoni qatorga aylantiramiz
         return {**base, "BARS": None, "ERROR": str(exc)}
@@ -165,6 +172,42 @@ def build_results(symbols: list[str], **kw) -> pd.DataFrame:
     rows = [run_one_symbol(symbol, **kw) for symbol in symbols]
     display_rows = [{k: v for k, v in row.items() if not k.startswith("_")} for row in rows]
     return pd.DataFrame(display_rows)
+
+
+def equal_weight_benchmark_block(
+    sym_dfs: list[tuple[str, pd.DataFrame]],
+    benchmark_df: pd.DataFrame | None,
+    *,
+    interval: str,
+    commission_pct: float,
+    slippage_pct: float,
+    benchmark_ticker: str = "SPUS",
+) -> pd.DataFrame:
+    """Teng-vazn buy&hold + bitta ticker buy&hold — xom total_return% / cagr% / maxDD% / Sharpe / Sortino.
+
+    Bo'sh sym_dfs -> bo'sh DataFrame.
+    """
+    sym_data = [SymbolData(symbol=s, df=d, signals=[]) for s, d in sym_dfs if d is not None and len(d)]
+    if not sym_data:
+        return pd.DataFrame(columns=["benchmark", "total_return%", "cagr%", "max_dd%", "sharpe", "sortino"])
+    timeline = build_timeline(sym_data)
+    cfg = PortfolioConfig(interval=interval, commission_pct=commission_pct, slippage_pct=slippage_pct)
+    benches = make_buy_hold_benchmarks(
+        sym_data, timeline, cfg=cfg, benchmark_df=benchmark_df, benchmark_ticker=benchmark_ticker,
+    )
+    rows = []
+    for b in benches:
+        if b.metrics:
+            m = b.metrics
+            rows.append({
+                "benchmark": b.name, "total_return%": round(m["return_pct"], 2),
+                "cagr%": round(m["cagr_pct"], 2), "max_dd%": round(m["max_drawdown_pct"], 2),
+                "sharpe": round(m["sharpe"], 3), "sortino": round(m["sortino"], 3),
+            })
+        else:
+            rows.append({"benchmark": b.name, "total_return%": None, "cagr%": None,
+                         "max_dd%": None, "sharpe": None, "sortino": None})
+    return pd.DataFrame(rows, columns=["benchmark", "total_return%", "cagr%", "max_dd%", "sharpe", "sortino"])
 
 
 def summarize(results: pd.DataFrame) -> dict:
@@ -249,8 +292,12 @@ def main() -> None:
 
     rows = [run_one_symbol(symbol, collect_trades=True, **kw) for symbol in symbols]
     all_new_trades: list[TradeResult] = []
+    sym_dfs: list[tuple[str, pd.DataFrame]] = []
     for row in rows:
         all_new_trades.extend(row.pop("_new_trades", []))
+        df = row.pop("_df", None)
+        if df is not None:
+            sym_dfs.append((row["SYMBOL"], df))
 
     results = pd.DataFrame(rows)
 
@@ -272,6 +319,20 @@ def main() -> None:
         if key != "verdict":
             print(f"{key}: {value}")
     print("\n" + summary.get("verdict", ""))
+
+    # Teng-vazn buy&hold PORTFEL benchmark'i (xom total_return% / cagr% + risk-adjusted)
+    try:
+        bench_df = get_provider(args.provider).get_ohlcv("SPUS", args.interval)
+        bench_df = slice_date_range(bench_df, start, args.end)
+    except Exception:  # noqa: BLE001
+        bench_df = None
+    bench_block = equal_weight_benchmark_block(
+        sym_dfs, bench_df, interval=args.interval,
+        commission_pct=args.commission_pct, slippage_pct=args.slippage_pct,
+    )
+    if not bench_block.empty:
+        print("\n--- Teng-vazn buy&hold portfel benchmark'i (bir xil universe + oyna) ---")
+        print(bench_block.to_string(index=False))
 
     curve = portfolio_equity_curve(all_new_trades)
     if len(curve) > 1:

@@ -7,14 +7,19 @@ bilan `--max-concurrent` pozitsiya, ochiq risk `--max-portfolio-risk` bilan chek
 leverage yo'q, har bar mark-to-market equity → haqiqiy max DD / CAGR / Sharpe / Sortino.
 Oxirida ESKI (ketma-ket) vs YANGI (portfel) natijani yonma-yon ko'rsatadi.
 
+Chiqishda Robot vs teng-vazn buy&hold vs bitta-ticker buy&hold bitta jadvalda,
+bir xil ustunlar bilan (total_return%, cagr%, max_dd%, sharpe, sortino).
+--oos-start berilsa TRAIN va OOS oynalar alohida jadval bilan chiqadi.
+
 Ishlatish:
     python scripts/backtest_portfolio.py [SYMBOLS...] \
-        [--start 2020-09-01] [--end 2025-09-01] [--interval 1d] [--provider yfinance] \
+        [--start 2020-09-01] [--end 2025-09-01] [--oos-start 2023-09-01] \
+        [--interval 1d] [--provider yfinance] \
         [--commission-pct 0.0005] [--slippage-pct 0.0005] [--min-score 60] \
         [--max-concurrent 10] [--max-portfolio-risk 0.10] \
         [--risk-model fixed_pct|atr] [--exit-mode fixed|trailing] \
         [--initial-capital 100000] [--benchmark-ticker SPUS] \
-        [--output-csv portfolio_backtest_results.csv]
+        [--capital-constrained-benchmark] [--output-csv portfolio_backtest_results.csv]
 
 SYMBOLS bo'sh -> get_core_watchlist() (6 curated + 211 HLAL). --start bo'sh -> ~5 yil oldin.
 """
@@ -73,6 +78,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--require-trend", dest="require_trend", action="store_true", default=True)
     parser.add_argument("--no-require-trend", dest="require_trend", action="store_false")
     parser.add_argument("--benchmark-ticker", default="SPUS")
+    parser.add_argument(
+        "--oos-start", default=None,
+        help="ISO sana: berilsa train=[--start, --oos-start) va OOS=[--oos-start, --end] "
+             "alohida hisoblanadi (walk-forward)",
+    )
+    parser.add_argument(
+        "--capital-constrained-benchmark", dest="capital_constrained_benchmark",
+        action="store_true", default=False,
+        help="4-benchmark qatori: robot signallari, max_concurrent slot, teng-vazn, chiqmasdan buy&hold",
+    )
     parser.add_argument("--output-csv", default="portfolio_backtest_results.csv")
     return parser.parse_args()
 
@@ -122,13 +137,14 @@ def load_benchmark_df(
         return None, str(exc)
 
 
-def run(args: argparse.Namespace) -> tuple[PortfolioResult, list[dict]]:
-    """CLI argumentlaridan to'liq portfel natijasini (+ xato qatorlari) qaytaradi."""
+def run_one_window(
+    args: argparse.Namespace, *, start: str | None, end: str | None
+) -> tuple[PortfolioResult, list[dict]]:
+    """Bitta [start, end] oynasi uchun portfel natijasi (+ xato qatorlari)."""
     symbols = args.symbols if args.symbols else [h.ticker for h in get_core_watchlist()]
-    start = args.start or five_years_ago_iso()
 
     data, error_rows = load_universe(
-        symbols, interval=args.interval, provider_name=args.provider, start=start, end=args.end,
+        symbols, interval=args.interval, provider_name=args.provider, start=start, end=end,
         lookback=args.lookback, min_rr=args.min_rr, require_trend=args.require_trend,
         min_score=args.min_score,
     )
@@ -143,17 +159,80 @@ def run(args: argparse.Namespace) -> tuple[PortfolioResult, list[dict]]:
         interval=args.interval,
     )
     bench_df, _bench_err = load_benchmark_df(
-        args.benchmark_ticker, interval=args.interval, provider_name=args.provider,
-        start=start, end=args.end,
+        args.benchmark_ticker, interval=args.interval, provider_name=args.provider, start=start, end=end,
     )
-    result = run_portfolio(data, cfg=cfg, benchmark_df=bench_df, benchmark_ticker=args.benchmark_ticker)
+    result = run_portfolio(
+        data, cfg=cfg, benchmark_df=bench_df, benchmark_ticker=args.benchmark_ticker,
+        include_constrained=args.capital_constrained_benchmark,
+    )
     return result, error_rows
 
 
-def build_trade_rows(result: PortfolioResult) -> pd.DataFrame:
+def run(args: argparse.Namespace) -> tuple[PortfolioResult, list[dict]]:
+    """Bitta oynali (--oos-start'siz) qulaylik wrapper'i."""
+    return run_one_window(args, start=args.start or five_years_ago_iso(), end=args.end)
+
+
+def run_windows(
+    args: argparse.Namespace,
+) -> list[tuple[str, str, str | None, PortfolioResult, list[dict]]]:
+    """--oos-start berilsa (TRAIN, OOS), aks holda (TO'LIQ) — har biri (label, start, end, result, errors)."""
+    start = args.start or five_years_ago_iso()
+    if not args.oos_start:
+        result, errs = run_one_window(args, start=start, end=args.end)
+        return [("TO'LIQ", start, args.end, result, errs)]
+
+    train_end = (pd.Timestamp(args.oos_start) - pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+    train_result, train_errs = run_one_window(args, start=start, end=train_end)
+    oos_result, oos_errs = run_one_window(args, start=args.oos_start, end=args.end)
+    return [
+        ("TRAIN", start, train_end, train_result, train_errs),
+        ("OOS", args.oos_start, args.end, oos_result, oos_errs),
+    ]
+
+
+_TABLE_COLS = ["strategy", "total_return%", "cagr%", "max_dd%", "sharpe", "sortino"]
+_BENCH_LABELS = {
+    "equal_weight_buy_hold": "Teng-vazn buy&hold",
+    "capital_constrained_buy_hold": "Constrained buy&hold",
+}
+
+
+def unified_table(result: PortfolioResult) -> pd.DataFrame:
+    """Robot vs har benchmark — bir xil ustunlar (total_return%, cagr%, max_dd%, sharpe, sortino)."""
+    m = result.metrics
+    rows = [{
+        "strategy": "Robot (portfel)",
+        "total_return%": m["total_return_pct"], "cagr%": m["cagr_pct"],
+        "max_dd%": m["max_drawdown_pct"], "sharpe": m["sharpe"], "sortino": m["sortino"],
+    }]
+    for b in result.benchmarks:
+        label = _BENCH_LABELS.get(b.name, b.name)
+        if b.metrics:
+            bm = b.metrics
+            rows.append({
+                "strategy": label,
+                "total_return%": bm["return_pct"], "cagr%": bm["cagr_pct"],
+                "max_dd%": bm["max_drawdown_pct"], "sharpe": bm["sharpe"], "sortino": bm["sortino"],
+            })
+        else:
+            rows.append({
+                "strategy": label, "total_return%": None, "cagr%": None,
+                "max_dd%": None, "sharpe": None, "sortino": None,
+            })
+    df = pd.DataFrame(rows, columns=_TABLE_COLS)
+    for c in ("total_return%", "cagr%", "max_dd%"):
+        df[c] = df[c].astype(float).round(2)
+    for c in ("sharpe", "sortino"):
+        df[c] = df[c].astype(float).round(3)
+    return df
+
+
+def build_trade_rows(result: PortfolioResult, *, window: str = "TO'LIQ") -> pd.DataFrame:
     """Har yopilgan savdo -> bir CSV qator (sof funksiya, IO yo'q)."""
     rows = [
         {
+            "WINDOW": window,
             "SYMBOL": sym,
             "ENTRY_TS": t.entry_ts,
             "EXIT_TS": t.exit_ts,
@@ -170,7 +249,7 @@ def build_trade_rows(result: PortfolioResult) -> pd.DataFrame:
         for sym, t in zip(result.trade_symbols, result.trades)
     ]
     return pd.DataFrame(rows, columns=[
-        "SYMBOL", "ENTRY_TS", "EXIT_TS", "ENTRY_PRICE", "EXIT_PRICE", "SHARES",
+        "WINDOW", "SYMBOL", "ENTRY_TS", "EXIT_TS", "ENTRY_PRICE", "EXIT_PRICE", "SHARES",
         "EXIT_REASON", "R_MULTIPLE", "PNL", "HOLD_DAYS", "MAE_R", "MFE_R",
     ])
 
@@ -214,49 +293,49 @@ def summarize(result: PortfolioResult, *, old_curve: list[float] | None = None) 
     return out
 
 
-def print_report(result: PortfolioResult, summary: dict, error_rows: list[dict]) -> None:
+def print_window_report(
+    label: str,
+    start: str,
+    end: str | None,
+    result: PortfolioResult,
+    error_rows: list[dict],
+    *,
+    show_explanation: bool,
+) -> None:
     m = result.metrics
+    print(f"\n=== {label}  ({start} .. {end or 'oxirigacha'}) ===")
     print(
-        f"initial_capital={result.initial_capital} trades={m['num_trades']} "
-        f"skipped={m['num_skipped']} timeline_bars={len(result.timeline)}"
+        f"timeline_bars={len(result.timeline)}  savdolar={m['num_trades']}  "
+        f"o'tkazilgan={m['num_skipped']}  o'rtacha_konkurent={round(m['avg_concurrent_positions'], 2)} "
+        f"(cap={m['max_concurrent_positions']})"
     )
     if error_rows:
-        print(f"{len(error_rows)} symbol yuklanmadi/yetarsiz (ERROR).")
+        print(f"{len(error_rows)} symbol yuklanmadi/yetarsiz.")
 
-    print("\n--- ESKI ketma-ket-kompaund  vs  YANGI portfel simulyatori ---")
-    print(
-        f"ESKI (barcha signal, cap'siz ketma-ket kompaund, 1.0 boshlanish): "
-        f"final={summary['old_final_multiple']}x  max_dd={summary['old_max_dd_pct']}%  "
-        f"signallar={summary['old_num_signals']}"
-    )
-    print(
-        f"YANGI (portfel): return={summary['new_return_pct']}%  CAGR={summary['new_cagr_pct']}%  "
-        f"max_dd={summary['new_max_dd_pct']}%  Sharpe={summary['new_sharpe']}  "
-        f"Sortino={summary['new_sortino']}"
-    )
-    print(
-        f"                 o'rtacha konkurent poz={summary['new_avg_concurrent']} "
-        f"(cap={summary['new_max_concurrent']})  o'tkazilgan={summary['new_skipped_by_reason']}"
-    )
-    for b in result.benchmarks:
-        if b.metrics:
-            mm = b.metrics
-            print(
-                f"Benchmark {b.name}: return={mm['return_pct']:.2f}%  CAGR={mm['cagr_pct']:.2f}%  "
-                f"maxDD={mm['max_drawdown_pct']:.2f}%  Sharpe={mm['sharpe']:.3f}  Sortino={mm['sortino']:.3f}"
-            )
-        else:
-            print(f"Benchmark {b.name}: XATO - {b.error}")
-    print("\n" + summary["explanation"])
+    print(unified_table(result).to_string(index=False))
+
+    naive = result.naive_all_signals_curve
+    if naive and len(naive) > 1:
+        print(
+            f"[ESKI ketma-ket kompaund, {len(naive) - 1} signal, 1.0 boshlanish]: "
+            f"final={naive[-1]:.1f}x  max_dd={max_drawdown_pct(naive):.1f}%  "
+            f"(portfel o'tkazgan: {m['skipped_by_reason']})"
+        )
+
+    if show_explanation:
+        print("\n" + summarize(result)["explanation"])
 
 
 def main() -> None:
     args = parse_args()
-    result, error_rows = run(args)
-    summary = summarize(result)  # ESKI egri chizig'i result.naive_all_signals_curve dan
-    print_report(result, summary, error_rows)
+    windows = run_windows(args)
 
-    build_trade_rows(result).to_csv(args.output_csv, index=False)
+    all_rows: list[pd.DataFrame] = []
+    for i, (label, start, end, result, error_rows) in enumerate(windows):
+        print_window_report(label, start, end, result, error_rows, show_explanation=(i == 0))
+        all_rows.append(build_trade_rows(result, window=label))
+
+    pd.concat(all_rows, ignore_index=True).to_csv(args.output_csv, index=False)
     print(f"\nTo'liq savdolar saqlandi: {Path(args.output_csv).resolve()}")
 
 

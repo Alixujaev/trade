@@ -16,7 +16,9 @@ from scripts.backtest_portfolio import (
     load_universe,
     parse_args,
     run,
+    run_windows,
     summarize,
+    unified_table,
 )
 
 _COLUMNS = ["open", "high", "low", "close", "volume"]
@@ -85,7 +87,8 @@ def _args(**overrides) -> argparse.Namespace:
         commission_pct=0.0, slippage_pct=0.0, min_score=None, max_concurrent=10,
         max_portfolio_risk=1.0, risk_model="fixed_pct", exit_mode="fixed",
         initial_capital=100_000.0, lookback=1, min_rr=1.5, require_trend=False,
-        benchmark_ticker="SPUS", output_csv="portfolio_backtest_results.csv",
+        benchmark_ticker="SPUS", oos_start=None, capital_constrained_benchmark=False,
+        output_csv="portfolio_backtest_results.csv",
     )
     base.update(overrides)
     return argparse.Namespace(**base)
@@ -104,7 +107,18 @@ def test_parse_args_defaults(monkeypatch) -> None:
     assert args.benchmark_ticker == "SPUS"
     assert args.initial_capital == pytest.approx(100_000.0)
     assert args.require_trend is True
+    assert args.oos_start is None
+    assert args.capital_constrained_benchmark is False
     assert args.output_csv == "portfolio_backtest_results.csv"
+
+
+def test_parse_args_oos_and_constrained(monkeypatch) -> None:
+    monkeypatch.setattr(
+        "sys.argv", ["prog", "--oos-start", "2023-01-01", "--capital-constrained-benchmark"]
+    )
+    args = parse_args()
+    assert args.oos_start == "2023-01-01"
+    assert args.capital_constrained_benchmark is True
 
 
 def test_parse_args_no_require_trend(monkeypatch) -> None:
@@ -283,13 +297,23 @@ def test_summarize_no_valid_rows() -> None:
 
 def test_build_trade_rows_columns() -> None:
     result = _fake_result()
-    df = build_trade_rows(result)
+    df = build_trade_rows(result, window="TRAIN")
     assert list(df.columns) == [
-        "SYMBOL", "ENTRY_TS", "EXIT_TS", "ENTRY_PRICE", "EXIT_PRICE", "SHARES",
+        "WINDOW", "SYMBOL", "ENTRY_TS", "EXIT_TS", "ENTRY_PRICE", "EXIT_PRICE", "SHARES",
         "EXIT_REASON", "R_MULTIPLE", "PNL", "HOLD_DAYS", "MAE_R", "MFE_R",
     ]
     assert len(df) == 2
     assert list(df["SYMBOL"]) == ["A", "B"]
+    assert list(df["WINDOW"]) == ["TRAIN", "TRAIN"]
+
+
+def test_unified_table_columns() -> None:
+    result = _fake_result()
+    # _fake_result benchmarks bo'sh -> faqat Robot qatori
+    tbl = unified_table(result)
+    assert list(tbl.columns) == ["strategy", "total_return%", "cagr%", "max_dd%", "sharpe", "sortino"]
+    assert list(tbl["strategy"]) == ["Robot (portfel)"]
+    assert tbl.iloc[0]["total_return%"] == pytest.approx(0.4)
 
 
 def test_main_writes_csv_no_network(monkeypatch, tmp_path) -> None:
@@ -306,7 +330,47 @@ def test_main_writes_csv_no_network(monkeypatch, tmp_path) -> None:
     out = tmp_path / "portfolio_backtest_results.csv"
     assert out.exists()
     header = out.read_text(encoding="utf-8").splitlines()[0]
-    assert header.startswith("SYMBOL,ENTRY_TS,EXIT_TS")
+    assert header.startswith("WINDOW,SYMBOL,ENTRY_TS,EXIT_TS")
+
+
+def test_run_windows_single_when_no_oos_start(monkeypatch) -> None:
+    df = _make_df(_breakout_rows())
+    monkeypatch.setattr(bt_module, "get_provider", lambda name: _FakeProvider(df=df))
+
+    windows = run_windows(_args(symbols=["A", "B"]))
+    assert len(windows) == 1
+    assert windows[0][0] == "TO'LIQ"
+
+
+def test_run_windows_train_oos_split(monkeypatch) -> None:
+    df = _make_df(_breakout_rows())  # 2020-01-01 .. 2020-01-30 (30 bar)
+    monkeypatch.setattr(bt_module, "get_provider", lambda name: _FakeProvider(df=df))
+
+    windows = run_windows(_args(symbols=["A", "B"], oos_start="2020-01-16"))
+    assert [w[0] for w in windows] == ["TRAIN", "OOS"]
+    train_label, train_start, train_end, train_res, _ = windows[0]
+    oos_label, oos_start, oos_end, oos_res, _ = windows[1]
+    assert train_end == "2020-01-15"  # oos_start - 1 kun
+    assert oos_start == "2020-01-16"
+    # TRAIN timeline oxiri <= 2020-01-15, OOS timeline boshi >= 2020-01-16
+    if train_res.timeline:
+        assert train_res.timeline[-1] <= pd.Timestamp("2020-01-15", tz="UTC")
+    if oos_res.timeline:
+        assert oos_res.timeline[0] >= pd.Timestamp("2020-01-16", tz="UTC")
+
+
+def test_capital_constrained_flag_adds_benchmark_row(monkeypatch) -> None:
+    df = _make_df(_breakout_rows())
+    monkeypatch.setattr(bt_module, "get_provider", lambda name: _FakeProvider(df=df))
+
+    result, _ = run(_args(symbols=["A", "B"], capital_constrained_benchmark=True))
+    names = [b.name for b in result.benchmarks]
+    assert "capital_constrained_buy_hold" in names
+    assert len(result.benchmarks) == 3
+
+    tbl = unified_table(result)
+    assert "Constrained buy&hold" in list(tbl["strategy"])
+    assert len(tbl) == 4  # Robot + 3 benchmark
 
 
 # ======================================================================

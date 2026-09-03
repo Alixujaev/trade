@@ -9,6 +9,7 @@ import scripts.backtest_breakout_retest as bt_module
 from backtest.types import TradeResult
 from scripts.backtest_breakout_retest import (
     build_results,
+    equal_weight_benchmark_block,
     five_years_ago_iso,
     portfolio_equity_curve,
     run_one_symbol,
@@ -191,3 +192,25 @@ def test_portfolio_equity_curve_math() -> None:
 
 def test_portfolio_equity_curve_empty() -> None:
     assert portfolio_equity_curve([]) == [1.0]
+
+
+def test_equal_weight_benchmark_block_math() -> None:
+    a = _make_df([{"open": p, "high": p, "low": p, "close": p} for p in [100, 110, 120, 130]])
+    b = _make_df([{"open": p, "high": p, "low": p, "close": p} for p in [50, 55, 60, 66]])
+    spus = _make_df([{"open": p, "high": p, "low": p, "close": p} for p in [10, 11, 12, 13]])
+
+    block = equal_weight_benchmark_block(
+        [("A", a), ("B", b)], spus, interval="1d", commission_pct=0.0, slippage_pct=0.0,
+    )
+    assert list(block.columns) == ["benchmark", "total_return%", "cagr%", "max_dd%", "sharpe", "sortino"]
+    assert list(block["benchmark"]) == ["equal_weight_buy_hold", "buy_hold:SPUS"]
+    # teng-vazn: A +30%, B +32% -> o'rtacha ~ +31%
+    ew = block.iloc[0]
+    assert 30.0 <= ew["total_return%"] <= 32.0
+    # SPUS: 10 -> 13 = +30%
+    assert block.iloc[1]["total_return%"] == pytest.approx(30.0, abs=0.1)
+
+
+def test_equal_weight_benchmark_block_empty() -> None:
+    block = equal_weight_benchmark_block([], None, interval="1d", commission_pct=0.0, slippage_pct=0.0)
+    assert block.empty

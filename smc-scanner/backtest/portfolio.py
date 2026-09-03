@@ -365,12 +365,114 @@ def equal_weight_buy_hold_curve(
     return curve
 
 
+def capital_constrained_buy_hold_curve(
+    symbols: list[SymbolData],
+    timeline: list[pd.Timestamp],
+    *,
+    cfg: PortfolioConfig,
+) -> list[float]:
+    """Robot ENTRY signallarini oladi, `max_concurrent_positions` slot bilan cheklaydi,
+    teng-vazn (kapital/max_concurrent) sotib oladi va oyna oxirigacha USHLAB TURADI
+    (robot exit mantig'i ISHLATILMAYDI). Bir symbolda bitta pozitsiya (robot bilan mos).
+
+    Maqsad: robotning stop/target/trailing chiqishlari teng-vaznli "sotib ol va ushla"
+    ga nisbatan qiymat qo'shadimi — shuni ajratib ko'rsatish.
+    """
+    if not timeline:
+        return []
+    max_concurrent = cfg.max_concurrent_positions
+    if max_concurrent <= 0:
+        return [cfg.initial_capital] * len(timeline)
+
+    candidates, _ = build_candidates(symbols, cfg=cfg)
+    close_ffill = _ffill_close_matrix(symbols, timeline)
+    ts_to_k = {ts: k for k, ts in enumerate(timeline)}
+    entries_by_k: dict[int, list[PortfolioCandidate]] = {}
+    for c in sorted(candidates, key=lambda c: (c.entry_ts, c.symbol)):
+        entries_by_k.setdefault(ts_to_k[c.entry_ts], []).append(c)
+
+    alloc = cfg.initial_capital / max_concurrent
+    held: list[tuple[str, float]] = []  # (symbol, shares)
+    held_symbols: set[str] = set()
+    cash = cfg.initial_capital
+
+    curve: list[float] = []
+    for k in range(len(timeline)):
+        for c in entries_by_k.get(k, []):
+            if len(held) >= max_concurrent or c.symbol in held_symbols:
+                continue
+            spend = min(alloc, cash)
+            eff_entry = c.entry_price * (1.0 + cfg.slippage_pct)
+            if spend <= 0 or eff_entry <= 0:
+                continue
+            shares = spend * (1.0 - cfg.commission_pct) / eff_entry
+            held.append((c.symbol, shares))
+            held_symbols.add(c.symbol)
+            cash -= spend
+        curve.append(cash + sum(sh * float(close_ffill[sym][k]) for sym, sh in held))
+    return curve
+
+
+def make_buy_hold_benchmarks(
+    symbols: list[SymbolData],
+    timeline: list[pd.Timestamp],
+    *,
+    cfg: PortfolioConfig,
+    benchmark_df: pd.DataFrame | None,
+    benchmark_ticker: str,
+    include_constrained: bool = False,
+) -> list[BenchmarkResult]:
+    """Teng-vazn buy&hold + bitta ticker buy&hold (+ ixtiyoriy capital-constrained BH).
+
+    Har biri bir xil `curve_metrics` (return_pct, cagr_pct, max_drawdown_pct, sharpe, sortino).
+    """
+    ppy = cfg.periods_per_year or _periods_per_year_for(cfg.interval)
+
+    def _bench(name: str, curve: list[float], error: str | None = None) -> BenchmarkResult:
+        return BenchmarkResult(
+            name=name,
+            equity_curve=curve,
+            metrics=curve_metrics(curve, timeline, periods_per_year=ppy,
+                                  risk_free_rate=cfg.risk_free_rate) if curve else {},
+            error=error,
+        )
+
+    out = [
+        _bench(
+            "equal_weight_buy_hold",
+            equal_weight_buy_hold_curve(
+                symbols, timeline, initial_capital=cfg.initial_capital,
+                commission_pct=cfg.commission_pct, slippage_pct=cfg.slippage_pct,
+            ),
+        )
+    ]
+    if benchmark_df is None:
+        out.append(BenchmarkResult(
+            name=f"buy_hold:{benchmark_ticker}", equity_curve=[], metrics={},
+            error=f"{benchmark_ticker} yuklanmadi",
+        ))
+    else:
+        out.append(_bench(
+            f"buy_hold:{benchmark_ticker}",
+            single_ticker_buy_hold_curve(
+                benchmark_df, timeline, initial_capital=cfg.initial_capital,
+                commission_pct=cfg.commission_pct, slippage_pct=cfg.slippage_pct,
+            ),
+        ))
+    if include_constrained:
+        out.append(_bench(
+            "capital_constrained_buy_hold",
+            capital_constrained_buy_hold_curve(symbols, timeline, cfg=cfg),
+        ))
+    return out
+
+
 # ======================================================================
 # Yig'ish / oldindan hisoblash
 # ======================================================================
 
 
-def _build_timeline(symbols: list[SymbolData]) -> list[pd.Timestamp]:
+def build_timeline(symbols: list[SymbolData]) -> list[pd.Timestamp]:
     """Barcha symbol df.index'lari union (o'sish tartibida) — portfel "soati"."""
     if not symbols:
         return []
@@ -581,7 +683,7 @@ def _empty_metrics() -> dict:
 
 def simulate_portfolio(symbols: list[SymbolData], *, cfg: PortfolioConfig) -> PortfolioResult:
     """Butun universe signal'larini yagona kalendar bo'ylab, umumiy kapital bilan simulyatsiya qiladi."""
-    timeline = _build_timeline(symbols)
+    timeline = build_timeline(symbols)
     if not timeline:
         return PortfolioResult(
             trades=[], trade_symbols=[], skipped=[], timeline=[], equity_curve=[],
@@ -757,40 +859,14 @@ def run_portfolio(
     cfg: PortfolioConfig,
     benchmark_df: pd.DataFrame | None,
     benchmark_ticker: str,
+    include_constrained: bool = False,
 ) -> PortfolioResult:
-    """simulate_portfolio + 2 benchmark + ESKI (cap'siz ketma-ket kompaund) egri chizig'i."""
+    """simulate_portfolio + buy&hold benchmark'lar + ESKI (cap'siz ketma-ket) egri chizig'i."""
     result = simulate_portfolio(symbols, cfg=cfg)
-    timeline = result.timeline
-    ppy = cfg.periods_per_year or _periods_per_year_for(cfg.interval)
-
-    ew_curve = equal_weight_buy_hold_curve(
-        symbols, timeline, initial_capital=cfg.initial_capital,
-        commission_pct=cfg.commission_pct, slippage_pct=cfg.slippage_pct,
+    benches = make_buy_hold_benchmarks(
+        symbols, result.timeline, cfg=cfg, benchmark_df=benchmark_df,
+        benchmark_ticker=benchmark_ticker, include_constrained=include_constrained,
     )
-    ew = BenchmarkResult(
-        name="equal_weight_buy_hold",
-        equity_curve=ew_curve,
-        metrics=curve_metrics(ew_curve, timeline, periods_per_year=ppy, risk_free_rate=cfg.risk_free_rate)
-        if ew_curve else {},
-    )
-
-    if benchmark_df is None:
-        bh = BenchmarkResult(
-            name=f"buy_hold:{benchmark_ticker}", equity_curve=[], metrics={},
-            error=f"{benchmark_ticker} yuklanmadi",
-        )
-    else:
-        bh_curve = single_ticker_buy_hold_curve(
-            benchmark_df, timeline, initial_capital=cfg.initial_capital,
-            commission_pct=cfg.commission_pct, slippage_pct=cfg.slippage_pct,
-        )
-        bh = BenchmarkResult(
-            name=f"buy_hold:{benchmark_ticker}",
-            equity_curve=bh_curve,
-            metrics=curve_metrics(bh_curve, timeline, periods_per_year=ppy, risk_free_rate=cfg.risk_free_rate)
-            if bh_curve else {},
-        )
-
     return dataclasses.replace(
-        result, benchmarks=[ew, bh], naive_all_signals_curve=naive_all_signals_curve(symbols, cfg=cfg)
+        result, benchmarks=benches, naive_all_signals_curve=naive_all_signals_curve(symbols, cfg=cfg)
     )

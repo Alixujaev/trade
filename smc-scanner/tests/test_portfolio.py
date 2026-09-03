@@ -14,9 +14,11 @@ from backtest.portfolio import (
     avg_concurrent_positions,
     build_candidates,
     cagr_pct,
+    capital_constrained_buy_hold_curve,
     curve_metrics,
     curve_return_pct,
     equal_weight_buy_hold_curve,
+    make_buy_hold_benchmarks,
     max_concurrent_positions,
     naive_all_signals_curve,
     periodic_returns,
@@ -168,6 +170,54 @@ def test_equal_weight_delisted_symbol_freezes() -> None:
     # alloc=500. A shares=5 (doim 100). B shares=10, close ffill: [50,80,80,80]
     # k0: 500+500=1000 ; k1: 500+800=1300 ; k2,k3: muzlaydi 1300
     assert curve == pytest.approx([1000.0, 1300.0, 1300.0, 1300.0])
+
+
+def test_capital_constrained_buy_hold_curve_caps_slots_and_holds() -> None:
+    a_df = _target_df(100.0, 999.0, hit_bar=99, n=6)  # target tegmaydi
+    b_df = _target_df(100.0, 999.0, hit_bar=99, n=6)
+    c_df = _target_df(100.0, 999.0, hit_bar=99, n=6)
+    a = _sym("A", a_df, [_setup(0, entry=100.0, stop=90.0, target=999.0, ts=a_df.index[0])])
+    b = _sym("B", b_df, [_setup(0, entry=100.0, stop=90.0, target=999.0, ts=b_df.index[0])])
+    c = _sym("C", c_df, [_setup(0, entry=100.0, stop=90.0, target=999.0, ts=c_df.index[0])])
+    tl = list(a_df.index)
+    cfg = PortfolioConfig(initial_capital=100_000.0, max_concurrent_positions=2,
+                          max_portfolio_risk_pct=1.0)
+
+    curve = capital_constrained_buy_hold_curve([a, b, c], tl, cfg=cfg)
+    # cap 2 -> faqat A va B sotib olinadi (alloc 50k har biri), C naqd (0 emas: C hech qachon
+    # sotib olinmaydi -> uning ulushi ham naqd EMAS, chunki teng-vazn faqat max_concurrent slot).
+    # k0: cash = 100k - 100k = 0 ; held: A 500 aksiya, B 500 aksiya @100 -> 0 + 500*100 + 500*100 = 100k
+    assert curve[0] == pytest.approx(100_000.0)
+    # narx o'zgarmaydi (flat 100) -> egri chiziq tekis
+    assert curve == pytest.approx([100_000.0] * len(tl))
+
+
+def test_make_buy_hold_benchmarks_shape() -> None:
+    df = _make_df(_flat_rows([100, 110, 120, 130]))
+    syms = [_sym("A", df, []), _sym("B", df, [])]
+    tl = list(df.index)
+    cfg = PortfolioConfig(initial_capital=10_000.0)
+
+    without = make_buy_hold_benchmarks(syms, tl, cfg=cfg, benchmark_df=df, benchmark_ticker="SPUS")
+    assert [b.name for b in without] == ["equal_weight_buy_hold", "buy_hold:SPUS"]
+    for b in without:
+        assert set(b.metrics) == {"return_pct", "cagr_pct", "max_drawdown_pct", "sharpe", "sortino"}
+
+    withc = make_buy_hold_benchmarks(
+        syms, tl, cfg=cfg, benchmark_df=df, benchmark_ticker="SPUS", include_constrained=True
+    )
+    assert [b.name for b in withc] == [
+        "equal_weight_buy_hold", "buy_hold:SPUS", "capital_constrained_buy_hold"
+    ]
+
+
+def test_make_buy_hold_benchmarks_missing_ticker() -> None:
+    df = _make_df(_flat_rows([100, 110, 120]))
+    syms = [_sym("A", df, [])]
+    b = make_buy_hold_benchmarks(syms, list(df.index), cfg=PortfolioConfig(),
+                                 benchmark_df=None, benchmark_ticker="ZZZ")
+    assert b[1].name == "buy_hold:ZZZ"
+    assert b[1].equity_curve == [] and b[1].error is not None
 
 
 # ======================================================================

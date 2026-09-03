@@ -30,6 +30,12 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from backtest.engine import run_backtest  # noqa: E402
+from backtest.portfolio import (  # noqa: E402
+    PortfolioConfig,
+    SymbolData,
+    build_timeline,
+    make_buy_hold_benchmarks,
+)
 from backtest.window import slice_date_range  # noqa: E402
 from config.settings import SWING_LOOKBACK  # noqa: E402
 from config.watchlist import get_watchlist  # noqa: E402
@@ -168,6 +174,49 @@ def aggregate_by(df: pd.DataFrame, column: str) -> pd.DataFrame:
     return valid.groupby(column)[numeric_cols].mean(numeric_only=True)
 
 
+def equal_weight_benchmark_by_interval(
+    symbols: list[str], intervals: list[str], providers: list[str] | None
+) -> pd.DataFrame:
+    """Har interval uchun teng-vazn buy&hold + SPUS buy&hold portfel benchmark'i
+    (total_return% / cagr% / max_dd% / sharpe / sortino). Matritsa parametrlariga
+    (risk_model, mult) bog'liq emas. Xatoli symbol/interval jimgina tashlab ketiladi."""
+    out_rows: list[dict] = []
+    for interval in intervals:
+        provider_name = (providers[0] if providers else _default_provider_for_interval(interval))
+        sym_data: list[SymbolData] = []
+        for symbol in symbols:
+            try:
+                df = get_provider(provider_name).get_ohlcv(symbol, interval)
+                if df is not None and len(df):
+                    sym_data.append(SymbolData(symbol=symbol, df=df, signals=[]))
+            except Exception:  # noqa: BLE001
+                continue
+        if not sym_data:
+            continue
+        try:
+            bench_df = get_provider(provider_name).get_ohlcv("SPUS", interval)
+        except Exception:  # noqa: BLE001
+            bench_df = None
+        timeline = build_timeline(sym_data)
+        benches = make_buy_hold_benchmarks(
+            sym_data, timeline, cfg=PortfolioConfig(interval=interval),
+            benchmark_df=bench_df, benchmark_ticker="SPUS",
+        )
+        for b in benches:
+            if not b.metrics:
+                continue
+            m = b.metrics
+            out_rows.append({
+                "INTERVAL": interval, "BENCHMARK": b.name,
+                "RETURN%": round(m["return_pct"], 2), "CAGR%": round(m["cagr_pct"], 2),
+                "MAXDD%": round(m["max_drawdown_pct"], 2),
+                "SHARPE": round(m["sharpe"], 3), "SORTINO": round(m["sortino"], 3),
+            })
+    return pd.DataFrame(
+        out_rows, columns=["INTERVAL", "BENCHMARK", "RETURN%", "CAGR%", "MAXDD%", "SHARPE", "SORTINO"]
+    )
+
+
 def main() -> None:
     args = parse_args()
     symbols = args.symbols if args.symbols else get_watchlist()
@@ -210,6 +259,11 @@ def main() -> None:
     if not by_symbol.empty:
         print("\n--- Symbol bo'yicha o'rtacha ---")
         print(by_symbol.to_string())
+
+    bench = equal_weight_benchmark_by_interval(symbols, intervals, providers)
+    if not bench.empty:
+        print("\n--- Teng-vazn buy&hold portfel benchmark'i (interval bo'yicha) ---")
+        print(bench.to_string(index=False))
 
     matrix.to_csv(args.output_csv, index=False)
     print(f"\nTo'liq natija saqlandi: {Path(args.output_csv).resolve()}")

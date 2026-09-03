@@ -10,6 +10,7 @@ from scripts.backtest_matrix import (
     _default_provider_for_interval,
     aggregate_by,
     build_matrix,
+    equal_weight_benchmark_by_interval,
     run_one_combination,
     top_by_edge,
 )
@@ -140,3 +141,25 @@ def test_aggregate_by_interval_ignores_error_rows(monkeypatch) -> None:
     agg = aggregate_by(matrix, "INTERVAL")
     assert "1d" in agg.index
     assert "TRADES" in agg.columns
+
+
+def test_equal_weight_benchmark_by_interval(monkeypatch) -> None:
+    df = _make_df([{"open": p, "high": p, "low": p, "close": p} for p in [100, 110, 120, 130]])
+    monkeypatch.setattr(matrix_module, "get_provider", lambda name: _FakeProvider(df=df))
+
+    bench = equal_weight_benchmark_by_interval(["A", "B"], ["1d"], ["yfinance"])
+    assert list(bench.columns) == [
+        "INTERVAL", "BENCHMARK", "RETURN%", "CAGR%", "MAXDD%", "SHARPE", "SORTINO"
+    ]
+    assert set(bench["BENCHMARK"]) == {"equal_weight_buy_hold", "buy_hold:SPUS"}
+    assert (bench["INTERVAL"] == "1d").all()
+    # +30% ko'tarilish
+    assert bench.iloc[0]["RETURN%"] == pytest.approx(30.0, abs=0.5)
+
+
+def test_equal_weight_benchmark_by_interval_all_fail(monkeypatch) -> None:
+    monkeypatch.setattr(
+        matrix_module, "get_provider", lambda name: _FakeProvider(error=RuntimeError("yo'q"))
+    )
+    bench = equal_weight_benchmark_by_interval(["A"], ["1d"], ["yfinance"])
+    assert bench.empty
