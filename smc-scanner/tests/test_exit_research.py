@@ -15,11 +15,13 @@ from scripts.exit_research import (
     best_exit,
     build_csv_rows,
     build_result_table,
-    compute_verdicts,
+    compute_level1_verdict,
+    compute_level2_verdicts,
     load_universe_frozen,
     run_all_models,
     run_windows_all_models,
     verdict_for_model,
+    verdict_for_selection,
     write_experiment,
 )
 
@@ -197,7 +199,12 @@ def test_exit_research_no_lookahead(monkeypatch) -> None:
 # ======================================================================
 
 
-def test_verdict_inconclusive_low_sample() -> None:
+# ======================================================================
+# LEVEL 2 (Exit): verdict_for_model / compute_level2_verdicts
+# ======================================================================
+
+
+def test_verdict_for_model_inconclusive_low_sample() -> None:
     v = verdict_for_model(
         oos_trade_count=5, oos_sharpe=2.0, baseline_oos_sharpe=0.5,
         min_oos_trades=30, meaningful_margin=0.15,
@@ -205,15 +212,15 @@ def test_verdict_inconclusive_low_sample() -> None:
     assert v == "INCONCLUSIVE (low sample)"
 
 
-def test_verdict_alpha_requires_margin() -> None:
+def test_verdict_for_model_requires_margin() -> None:
     kw = dict(oos_trade_count=50, baseline_oos_sharpe=1.0, min_oos_trades=30, meaningful_margin=0.15)
-    assert verdict_for_model(oos_sharpe=1.2, **kw) == "ALPHA: exit value qo'shdi"  # delta=0.2>=0.15
+    assert verdict_for_model(oos_sharpe=1.2, **kw) == "EXIT IMPROVEMENT"  # delta=0.2>=0.15
     assert verdict_for_model(oos_sharpe=1.1, **kw) == "INCONCLUSIVE"  # delta=0.1<0.15
     assert verdict_for_model(oos_sharpe=1.0, **kw) == "NO EDGE"  # delta=0
     assert verdict_for_model(oos_sharpe=0.9, **kw) == "NO EDGE"  # delta<0
 
 
-def test_verdict_higher_return_lower_sharpe_is_no_edge() -> None:
+def test_verdict_for_model_higher_return_lower_sharpe_is_no_edge() -> None:
     # Spec's own example: return yuqori bo'lsa ham, Sharpe past -> NO EDGE.
     v = verdict_for_model(
         oos_trade_count=50, oos_sharpe=0.80, baseline_oos_sharpe=0.95,
@@ -222,32 +229,57 @@ def test_verdict_higher_return_lower_sharpe_is_no_edge() -> None:
     assert v == "NO EDGE"
 
 
-def test_compute_verdicts_uses_no_exit_baseline_not_constrained_bh() -> None:
-    # Constrained BH Sharpe=0.5 (past); NoExit Sharpe=1.0 (yuqori). Candidate "A" Sharpe=1.1.
-    # Constrained BH'ga nisbatan delta=0.6 -> ALPHA bo'lardi; NoExit'ga nisbatan delta=0.1 -> INCONCLUSIVE.
-    # compute_verdicts NoExit'ni ishlatishi kerak -- natija INCONCLUSIVE bo'lishi shart.
+def test_compute_level2_verdicts_uses_no_exit_capped_baseline_not_constrained_bh() -> None:
+    # Constrained BH Sharpe=0.5 (past); NoExit-capped Sharpe=1.0 (yuqori). Candidate "A" Sharpe=1.1.
+    # Constrained BH'ga nisbatan delta=0.6 -> EXIT IMPROVEMENT bo'lardi; NoExit-capped'ga
+    # nisbatan delta=0.1 -> INCONCLUSIVE. compute_level2_verdicts NoExit-capped'ni ishlatishi
+    # kerak -- natija INCONCLUSIVE bo'lishi shart.
     constrained_bh = _fake_benchmark("capital_constrained_buy_hold", sharpe=0.5)
     oos_results = {
         "NOEXIT": _fake_portfolio_result(sharpe=1.0, num_trades=50, benchmarks=[constrained_bh]),
         "A": _fake_portfolio_result(sharpe=1.1, num_trades=50, benchmarks=[constrained_bh]),
     }
-    verdicts = compute_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15)
+    verdicts = compute_level2_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15)
     assert verdicts["A"] == "INCONCLUSIVE"
 
 
-def test_compute_verdicts_no_verdict_for_no_exit_itself() -> None:
+def test_compute_level2_verdicts_no_verdict_for_no_exit_itself() -> None:
     oos_results = {
         "NOEXIT": _fake_portfolio_result(sharpe=1.0, num_trades=50),
         "A": _fake_portfolio_result(sharpe=0.5, num_trades=50),
     }
-    verdicts = compute_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15)
+    verdicts = compute_level2_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15)
     assert "NOEXIT" not in verdicts
     assert "A" in verdicts
 
 
-def test_compute_verdicts_empty_when_no_exit_missing() -> None:
+def test_compute_level2_verdicts_empty_when_no_exit_missing() -> None:
     oos_results = {"A": _fake_portfolio_result(sharpe=0.5, num_trades=50)}
-    assert compute_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15) == {}
+    assert compute_level2_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15) == {}
+
+
+def test_compute_level2_verdicts_baseline_low_sample_overrides_individual() -> None:
+    # NoExit-capped trade_count=6 (< min_oos_trades=30) -- doim band bo'lgan slot(lar) tufayli
+    # kutilgan holat. "A" o'zining 50 savdosi va katta Sharpe delta'siga qaramay, verdict
+    # BASELINE'ning O'ZI shovqinli bo'lgani uchun "INCONCLUSIVE (baseline low sample)" bo'lishi
+    # kerak -- bu shu vazifaning asosiy regressiya testi (avvalgi xatoni tuzatadi).
+    oos_results = {
+        "NOEXIT": _fake_portfolio_result(sharpe=1.044, num_trades=6),
+        "A": _fake_portfolio_result(sharpe=2.0, num_trades=50),  # delta=0.956 -- odatda EXIT IMPROVEMENT
+    }
+    verdicts = compute_level2_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15)
+    assert verdicts["A"] == "INCONCLUSIVE (baseline low sample)"
+
+
+def test_compute_level2_verdicts_normal_when_baseline_has_enough_trades() -> None:
+    oos_results = {
+        "NOEXIT": _fake_portfolio_result(sharpe=1.0, num_trades=40),
+        "A": _fake_portfolio_result(sharpe=1.2, num_trades=40),  # delta=0.2 >= 0.15
+        "B": _fake_portfolio_result(sharpe=1.0, num_trades=40),  # delta=0.0 -> NO EDGE
+    }
+    verdicts = compute_level2_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15)
+    assert verdicts["A"] == "EXIT IMPROVEMENT"
+    assert verdicts["B"] == "NO EDGE"
 
 
 def test_best_exit_none_when_no_alpha() -> None:
@@ -258,12 +290,78 @@ def test_best_exit_none_when_no_alpha() -> None:
     assert msg == "NO EXIT EDGE FOUND"
 
 
-def test_best_exit_picks_max_sharpe_among_alpha() -> None:
-    verdicts = {"A": "ALPHA: exit value qo'shdi", "B": "NO EDGE", "C": "ALPHA: exit value qo'shdi"}
+def test_best_exit_picks_max_sharpe_among_exit_improvement() -> None:
+    verdicts = {"A": "EXIT IMPROVEMENT", "B": "NO EDGE", "C": "EXIT IMPROVEMENT"}
     sharpes = {"A": 0.9, "B": 2.0, "C": 1.2}
     key, msg = best_exit(verdicts, sharpes)
     assert key == "C"
-    assert msg.startswith("ALPHA")
+    assert msg.startswith("EXIT IMPROVEMENT")
+
+
+# ======================================================================
+# LEVEL 1 (Selection): verdict_for_selection / compute_level1_verdict
+# ======================================================================
+
+
+def test_verdict_for_selection_requires_margin() -> None:
+    kw = dict(oos_trade_count=100, equal_weight_oos_sharpe=1.0, min_oos_trades=30, meaningful_margin=0.15)
+    assert verdict_for_selection(selection_oos_sharpe=1.2, **kw) == "SELECTION EDGE"  # delta=0.2>=0.15
+    assert verdict_for_selection(selection_oos_sharpe=1.1, **kw) == "INCONCLUSIVE"  # delta=0.1<0.15
+    assert verdict_for_selection(selection_oos_sharpe=1.0, **kw) == "NO SELECTION EDGE"  # delta=0
+    assert verdict_for_selection(selection_oos_sharpe=0.5, **kw) == "NO SELECTION EDGE"  # delta<0
+
+
+def test_verdict_for_selection_low_sample() -> None:
+    v = verdict_for_selection(
+        oos_trade_count=5, selection_oos_sharpe=2.0, equal_weight_oos_sharpe=0.5,
+        min_oos_trades=30, meaningful_margin=0.15,
+    )
+    assert v == "INCONCLUSIVE (low sample)"
+
+
+def test_compute_level1_verdict_selection_edge() -> None:
+    benches = [
+        _fake_benchmark("equal_weight_buy_hold", sharpe=0.5),
+        _fake_benchmark_with_trade_count("selection_bh", sharpe=0.8, trade_count=100),
+    ]
+    oos_results = {"NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=6, benchmarks=benches)}
+    v = compute_level1_verdict(oos_results, min_oos_trades=30, meaningful_margin=0.15)
+    assert v == "SELECTION EDGE"
+
+
+def test_compute_level1_verdict_no_selection_edge() -> None:
+    benches = [
+        _fake_benchmark("equal_weight_buy_hold", sharpe=0.8),
+        _fake_benchmark_with_trade_count("selection_bh", sharpe=0.5, trade_count=100),
+    ]
+    oos_results = {"NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=6, benchmarks=benches)}
+    v = compute_level1_verdict(oos_results, min_oos_trades=30, meaningful_margin=0.15)
+    assert v == "NO SELECTION EDGE"
+
+
+def test_compute_level1_verdict_inconclusive_margin() -> None:
+    benches = [
+        _fake_benchmark("equal_weight_buy_hold", sharpe=0.5),
+        _fake_benchmark_with_trade_count("selection_bh", sharpe=0.6, trade_count=100),
+    ]
+    oos_results = {"NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=6, benchmarks=benches)}
+    v = compute_level1_verdict(oos_results, min_oos_trades=30, meaningful_margin=0.15)
+    assert v == "INCONCLUSIVE"
+
+
+def test_compute_level1_verdict_inconclusive_low_sample() -> None:
+    # Selection-BH o'zi 5 candidate'dan iborat -- juda kam, hatto katta delta bilan ham low-sample.
+    benches = [
+        _fake_benchmark("equal_weight_buy_hold", sharpe=0.5),
+        _fake_benchmark_with_trade_count("selection_bh", sharpe=2.0, trade_count=5),
+    ]
+    oos_results = {"NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=6, benchmarks=benches)}
+    v = compute_level1_verdict(oos_results, min_oos_trades=30, meaningful_margin=0.15)
+    assert v == "INCONCLUSIVE (low sample)"
+
+
+def test_compute_level1_verdict_empty_when_no_results() -> None:
+    assert compute_level1_verdict({}, min_oos_trades=30, meaningful_margin=0.15) == "INCONCLUSIVE (low sample)"
 
 
 # ======================================================================
@@ -271,23 +369,27 @@ def test_best_exit_picks_max_sharpe_among_alpha() -> None:
 # ======================================================================
 
 
-def test_json_experiment_includes_noexit_metrics_and_baseline_field(tmp_path) -> None:
+def test_json_experiment_includes_noexit_capped_and_selection_bh_metrics(tmp_path) -> None:
     path = write_experiment(
         model_key="A", universe=["AAPL"], start="2020-01-01", end="2026-01-01",
         oos_start="2023-01-01", interval="1d", commission_pct=0.0, slippage_pct=0.0005,
         train_metrics={"sharpe": 1.0}, oos_metrics={"sharpe": 0.5},
         benchmarks={
             "equal_weight_buy_hold": {"sharpe": 0.3},
+            "selection_bh": {"sharpe": 0.6, "trade_count": 120},
             "capital_constrained_buy_hold": {"sharpe": 0.4},
-            "no_exit": {"sharpe": 0.45, "total_return_pct": 12.0, "trade_count": 40},
+            "no_exit_capped": {"sharpe": 0.45, "total_return_pct": 12.0, "trade_count": 40},
         },
-        skip_breakdown={"max_concurrent": 2}, verdict="NO EDGE", experiments_dir=tmp_path,
+        skip_breakdown={"max_concurrent": 2}, verdict="NO EDGE",
+        selection_verdict="SELECTION EDGE", experiments_dir=tmp_path,
     )
     payload = json.loads(path.read_text(encoding="utf-8"))
-    assert payload["verdict_baseline"] == "no_exit"
-    assert "no_exit" in payload["benchmarks"]
-    assert payload["benchmarks"]["no_exit"]["sharpe"] == pytest.approx(0.45)
-    assert payload["benchmarks"]["no_exit"]["trade_count"] == 40
+    assert payload["verdict_baseline"] == {"selection": "equal_weight_bh", "exit": "no_exit_capped"}
+    assert payload["selection_verdict"] == "SELECTION EDGE"
+    assert "no_exit_capped" in payload["benchmarks"]
+    assert payload["benchmarks"]["no_exit_capped"]["sharpe"] == pytest.approx(0.45)
+    assert payload["benchmarks"]["no_exit_capped"]["trade_count"] == 40
+    assert payload["benchmarks"]["selection_bh"]["trade_count"] == 120
 
 
 def test_json_experiment_schema_fields(tmp_path) -> None:
@@ -296,17 +398,18 @@ def test_json_experiment_schema_fields(tmp_path) -> None:
         oos_start="2023-01-01", interval="1d", commission_pct=0.0, slippage_pct=0.0005,
         train_metrics={"sharpe": 1.0}, oos_metrics={"sharpe": 0.5},
         benchmarks={"equal_weight_buy_hold": {"sharpe": 0.3}}, skip_breakdown={"max_concurrent": 2},
-        verdict="NO EDGE", experiments_dir=tmp_path,
+        verdict="NO EDGE", selection_verdict="NO SELECTION EDGE", experiments_dir=tmp_path,
     )
     assert path.exists()
     payload = json.loads(path.read_text(encoding="utf-8"))
     for key in (
         "exit_model", "params", "universe", "period", "oos_start", "interval", "costs",
         "train_metrics", "oos_metrics", "benchmarks", "skip_breakdown", "verdict",
-        "verdict_baseline", "git_commit", "timestamp",
+        "selection_verdict", "verdict_baseline", "git_commit", "timestamp",
     ):
         assert key in payload
-    assert payload["verdict_baseline"] == "no_exit"
+    assert payload["verdict_baseline"] == {"selection": "equal_weight_bh", "exit": "no_exit_capped"}
+    assert payload["selection_verdict"] == "NO SELECTION EDGE"
     assert payload["exit_model"] == "fixed_sl_tp"
     assert payload["universe"] == ["AAPL", "MSFT"]
     assert payload["period"] == {"start": "2020-01-01", "end": "2026-01-01"}
@@ -317,7 +420,8 @@ def test_json_experiment_never_overwrites(tmp_path) -> None:
     kwargs = dict(
         model_key="B", universe=["AAPL"], start="2020-01-01", end=None, oos_start="2023-01-01",
         interval="1d", commission_pct=0.0, slippage_pct=0.0005, train_metrics={}, oos_metrics={},
-        benchmarks={}, skip_breakdown={}, verdict="NO EDGE", experiments_dir=tmp_path,
+        benchmarks={}, skip_breakdown={}, verdict="NO EDGE", selection_verdict="INCONCLUSIVE",
+        experiments_dir=tmp_path,
     )
     p1 = write_experiment(**kwargs)
     p2 = write_experiment(**kwargs)
@@ -333,6 +437,7 @@ def test_json_experiment_never_overwrites(tmp_path) -> None:
 def test_build_result_table_row_order_and_control_label() -> None:
     benches = [
         _fake_benchmark("equal_weight_buy_hold", sharpe=0.8),
+        _fake_benchmark_with_trade_count("selection_bh", sharpe=0.6, trade_count=120),
         _fake_benchmark("capital_constrained_buy_hold", sharpe=0.5),
     ]
     model_results = {
@@ -340,34 +445,39 @@ def test_build_result_table_row_order_and_control_label() -> None:
         "NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=10, benchmarks=benches),
         "B": _fake_portfolio_result(sharpe=0.7, num_trades=10, benchmarks=benches),
     }
-    verdicts = {"A": "ALPHA: exit value qo'shdi", "B": "NO EDGE"}
+    verdicts = {"A": "EXIT IMPROVEMENT", "B": "NO EDGE"}
 
     table = build_result_table(model_results, verdicts=verdicts)
 
     labels = list(table["Model"])
     assert labels[0] == "Equal-weight BH"
-    assert labels[1] == "Constrained BH"
-    assert labels[2] == "NoExit (control)"
-    assert labels[3:] == [
+    assert labels[1] == "Selection-BH"
+    assert labels[2] == "Constrained BH"
+    assert labels[3] == "NoExit-capped (control)"
+    assert labels[4:] == [
         f"A ({er_module._EXIT_MODEL_NAMES['A']})", f"B ({er_module._EXIT_MODEL_NAMES['B']})",
     ]
 
-    noexit_row = table[table["Model"] == "NoExit (control)"].iloc[0]
+    noexit_row = table[table["Model"] == "NoExit-capped (control)"].iloc[0]
     assert noexit_row["Verdict"] == "CONTROL"
 
     a_row = table[table["Model"].str.startswith("A (")].iloc[0]
-    assert a_row["Verdict"] == "ALPHA: exit value qo'shdi"
+    assert a_row["Verdict"] == "EXIT IMPROVEMENT"
 
     constrained_row = table[table["Model"] == "Constrained BH"].iloc[0]
     assert constrained_row["Verdict"] == "-"
+
+    selection_row = table[table["Model"] == "Selection-BH"].iloc[0]
+    assert selection_row["Verdict"] == "-"
+    assert selection_row["Trades"] == 120
 
 
 def test_build_result_table_no_exit_control_regardless_of_verdicts_dict() -> None:
     # Hatto agar `verdicts` dict'ida "NOEXIT" kaliti bo'lsa ham (bo'lmasligi kerak, lekin
     # himoya sifatida), jadval qatori har doim "CONTROL" ko'rsatishi kerak.
     model_results = {"NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=10)}
-    table = build_result_table(model_results, verdicts={"NOEXIT": "ALPHA: exit value qo'shdi"})
-    assert table[table["Model"] == "NoExit (control)"].iloc[0]["Verdict"] == "CONTROL"
+    table = build_result_table(model_results, verdicts={"NOEXIT": "EXIT IMPROVEMENT"})
+    assert table[table["Model"] == "NoExit-capped (control)"].iloc[0]["Verdict"] == "CONTROL"
 
 
 # ======================================================================
@@ -407,35 +517,41 @@ def _fake_benchmark(name: str, *, sharpe: float) -> BenchmarkResult:
     )
 
 
+def _fake_benchmark_with_trade_count(name: str, *, sharpe: float, trade_count: int) -> BenchmarkResult:
+    b = _fake_benchmark(name, sharpe=sharpe)
+    return BenchmarkResult(name=b.name, equity_curve=b.equity_curve, metrics={**b.metrics, "trade_count": trade_count})
+
+
 def test_csv_export_one_row_per_split_and_model() -> None:
-    # benchmarks=[] -> Equal-weight/Constrained BH qatorlari HAM chiqadi (bo'sh/0 metrikalar
-    # bilan) -- har split uchun 2 benchmark + 2 model = 4 qator, jami 8.
+    # benchmarks=[] -> Equal-weight/Selection-BH/Constrained BH qatorlari HAM chiqadi
+    # (bo'sh/0 metrikalar bilan) -- har split uchun 3 benchmark + 2 model = 5 qator, jami 10.
     all_results = {
         "TRAIN": {"A": _fake_portfolio_result(sharpe=1.0, num_trades=3), "B": _fake_portfolio_result(sharpe=1.2, num_trades=4)},
         "OOS": {"A": _fake_portfolio_result(sharpe=0.5, num_trades=2), "B": _fake_portfolio_result(sharpe=0.8, num_trades=5)},
     }
-    verdicts = {"A": "NO EDGE", "B": "ALPHA: exit value qo'shdi"}
+    verdicts = {"A": "NO EDGE", "B": "EXIT IMPROVEMENT"}
 
     df = build_csv_rows(all_results, verdicts=verdicts)
 
-    assert len(df) == 8
+    assert len(df) == 10
     model_rows = df[df["model"].isin(["fixed_sl_tp", "atr_sl_tp"])]
     assert set(zip(model_rows["split"], model_rows["model"])) == {
         ("TRAIN", "fixed_sl_tp"), ("TRAIN", "atr_sl_tp"), ("OOS", "fixed_sl_tp"), ("OOS", "atr_sl_tp"),
     }
     oos_b = df[(df["split"] == "OOS") & (df["model"] == "atr_sl_tp")].iloc[0]
-    assert oos_b["verdict"] == "ALPHA: exit value qo'shdi"
+    assert oos_b["verdict"] == "EXIT IMPROVEMENT"
     train_a = df[(df["split"] == "TRAIN") & (df["model"] == "fixed_sl_tp")].iloc[0]
     assert train_a["verdict"] == "-"  # TRAIN split'da verdict yo'q
 
-    bench_rows = df[df["model"].isin(["Equal-weight BH", "Constrained BH"])]
-    assert len(bench_rows) == 4  # 2 split x 2 benchmark
+    bench_rows = df[df["model"].isin(["Equal-weight BH", "Selection-BH", "Constrained BH"])]
+    assert len(bench_rows) == 6  # 2 split x 3 benchmark
     assert (bench_rows["verdict"] == "-").all()
 
 
 def test_build_csv_rows_includes_benchmarks_and_control_row() -> None:
     benches = [
         _fake_benchmark("equal_weight_buy_hold", sharpe=0.8),
+        _fake_benchmark_with_trade_count("selection_bh", sharpe=0.6, trade_count=120),
         _fake_benchmark("capital_constrained_buy_hold", sharpe=0.5),
     ]
     all_results = {
@@ -448,18 +564,22 @@ def test_build_csv_rows_includes_benchmarks_and_control_row() -> None:
             "NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=3, benchmarks=benches),
         },
     }
-    verdicts = {"A": "ALPHA: exit value qo'shdi"}
+    verdicts = {"A": "EXIT IMPROVEMENT"}
 
     df = build_csv_rows(all_results, verdicts=verdicts)
 
-    assert set(df["model"]) == {"Equal-weight BH", "Constrained BH", "no_exit", "fixed_sl_tp"}
-    no_exit_rows = df[df["model"] == "no_exit"]
+    assert set(df["model"]) == {
+        "Equal-weight BH", "Selection-BH", "Constrained BH", "no_exit_capped", "fixed_sl_tp",
+    }
+    no_exit_rows = df[df["model"] == "no_exit_capped"]
     assert len(no_exit_rows) == 2  # TRAIN + OOS
     assert (no_exit_rows["verdict"] == "CONTROL").all()
-    bench_rows = df[df["model"].isin(["Equal-weight BH", "Constrained BH"])]
+    bench_rows = df[df["model"].isin(["Equal-weight BH", "Selection-BH", "Constrained BH"])]
     assert (bench_rows["verdict"] == "-").all()
+    selection_row = df[df["model"] == "Selection-BH"].iloc[0]
+    assert selection_row["trade_count"] == 120
     oos_a = df[(df["split"] == "OOS") & (df["model"] == "fixed_sl_tp")].iloc[0]
-    assert oos_a["verdict"] == "ALPHA: exit value qo'shdi"
+    assert oos_a["verdict"] == "EXIT IMPROVEMENT"
 
 
 # ======================================================================

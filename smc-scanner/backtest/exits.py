@@ -456,7 +456,7 @@ class NoExitExit(NoExitConfig):
     mustaqil o'zgaruvchilar).
     """
 
-    name: str = "no_exit"
+    name: str = "no_exit_capped"
 
     def find_exit(
         self,

@@ -41,6 +41,7 @@ def _latest_expected_session_date(now: datetime | None = None) -> date:
         d -= timedelta(days=1)
     return d
 
+
 # yfinance "4h"ni toza bermaydi (abstraksiya oqadigan joy — shuning uchun
 # umumiy VALID_INTERVALS emas, shu provider O'ZI qo'llab-quvvatlaydigan
 # subset'ga qarab validatsiya qilamiz)
@@ -50,7 +51,9 @@ SUPPORTED_INTERVALS: set[str] = {"1d", "1wk", "1h"}
 class YFinanceProvider(DataProvider):
     """yfinance kutubxonasiga asoslangan DataProvider implementatsiyasi."""
 
-    def get_ohlcv(self, symbol: str, interval: str, *, use_cache: bool = True) -> pd.DataFrame:
+    def get_ohlcv(
+        self, symbol: str, interval: str, *, use_cache: bool = True
+    ) -> pd.DataFrame:
         symbol = symbol.upper()
         if interval not in SUPPORTED_INTERVALS:
             raise ValueError(
@@ -65,9 +68,13 @@ class YFinanceProvider(DataProvider):
                 return cached
 
         period = PERIOD_1H if interval == "1h" else PERIOD_DEFAULT
-        raw = yf.download(symbol, period=period, interval=interval, auto_adjust=True, progress=False)
+        raw = yf.download(
+            symbol, period=period, interval=interval, auto_adjust=True, progress=False
+        )
         if raw is None or raw.empty:
-            raise ValueError(f"{symbol} ({interval}) uchun yfinance'dan bo'sh ma'lumot qaytdi")
+            raise ValueError(
+                f"{symbol} ({interval}) uchun yfinance'dan bo'sh ma'lumot qaytdi"
+            )
 
         clean = self._clean(raw)
         self._write_cache(clean, cache_path)
@@ -106,24 +113,30 @@ class YFinanceProvider(DataProvider):
         return CACHE_DIR / f"{symbol}_{interval}.parquet"
 
     @staticmethod
-    def _is_cache_fresh(path: Path, df: pd.DataFrame | None = None, interval: str = "1d") -> bool:
-        """Kesh 'yangi'mi:
+    def _is_cache_fresh(
+        path: Path, df: pd.DataFrame | None = None, interval: str = "1d"
+    ) -> bool:
+        """Kesh 'yangi'mi.
 
-        1) fayl yoshi < CACHE_TTL_HOURS BO'LISHI SHART; VA
-        2) kunlik (`_DATE_STALE_INTERVALS`) uchun qo'shimcha: keshdagi oxirgi bar
-           o'tgan oxirgi savdo kunidan (`_latest_expected_session_date`) eski
-           BO'LMASLIGI kerak — aks holda yoshi qancha yosh bo'lsa ham "eski"
-           (masalan: skan ertalab ishlagan, kunlik bar kechqurun yopilgan)."""
+        Kunlik (`_DATE_STALE_INTERVALS`) uchun: HAL QILUVCHI mezon — keshdagi
+        oxirgi bar sanasi. Oxirgi kutilgan savdo kunidan eski BO'LMASA, kesh yangi
+        (fayl diskka qachon yozilganidan qat'i nazar — mtime bu yerda ahamiyatsiz).
+        Intraday interval'lar uchun bar-sana ishlamaydi -> fayl-yoshi TTL bilan
+        boshqariladi."""
         if not path.exists():
             return False
-        age_hours = (time.time() - path.stat().st_mtime) / 3600
-        if age_hours >= CACHE_TTL_HOURS:
-            return False
-        if interval in _DATE_STALE_INTERVALS and df is not None and len(df):
-            last_bar_date = pd.Timestamp(df.index[-1]).date()
-            if last_bar_date < _latest_expected_session_date():
+
+        # Kunlik: faqat bar-sanaga qara (mtime TTL emas). Bar-sana o'lchovsiz
+        # bo'lsa (df berilmagan/bo'sh) — konservativ ravishda eski deb hisoblaymiz.
+        if interval in _DATE_STALE_INTERVALS:
+            if df is None or not len(df):
                 return False
-        return True
+            last_bar_date = pd.Timestamp(df.index[-1]).date()
+            return last_bar_date >= _latest_expected_session_date()
+
+        # Intraday: fayl-yoshi TTL
+        age_hours = (time.time() - path.stat().st_mtime) / 3600
+        return age_hours < CACHE_TTL_HOURS
 
     @staticmethod
     def _write_cache(df: pd.DataFrame, path: Path) -> None:

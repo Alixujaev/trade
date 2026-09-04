@@ -511,7 +511,7 @@ def test_exit_model_registry_builds_all_known_keys() -> None:
 def test_exit_model_registry_key_is_case_insensitive() -> None:
     for variant in ("noexit", "NoExit", "NOEXIT"):
         model = build_exit_model(variant)
-        assert model.name == "no_exit"
+        assert model.name == "no_exit_capped"
 
 
 # ======================================================================

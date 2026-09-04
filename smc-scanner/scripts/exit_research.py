@@ -71,6 +71,7 @@ _EXIT_REASON_LABELS: dict[str, str] = {
 
 _BENCH_LABELS = {
     "equal_weight_buy_hold": "Equal-weight BH",
+    "selection_bh": "Selection-BH",
     "capital_constrained_buy_hold": "Constrained BH",
 }
 
@@ -152,7 +153,7 @@ def run_one_exit_model(
     cfg = dataclasses.replace(cfg_base, exit_model=build_exit_model(model_key))
     return run_portfolio(
         symbols, cfg=cfg, benchmark_df=benchmark_df, benchmark_ticker=benchmark_ticker,
-        include_constrained=True,
+        include_constrained=True, include_selection=True,
     )
 
 
@@ -258,7 +259,7 @@ def benchmark_report_metrics(bm: dict) -> dict:
         "expectancy_r": None,
         "profit_factor": None,
         "avg_hold_bars": None,
-        "trade_count": None,
+        "trade_count": bm.get("trade_count"),
     }
 
 
@@ -279,6 +280,25 @@ def _benchmark_by_name(result: PortfolioResult, name: str) -> dict:
 # ======================================================================
 
 
+def _tiered_verdict(
+    *,
+    sample_trade_count: int,
+    sharpe_delta: float,
+    min_oos_trades: int,
+    meaningful_margin: float,
+    edge_label: str,
+    no_edge_label: str,
+) -> str:
+    """Ikkala tier (Level 1/Level 2) uchun umumiy margin+low-sample gate mantig'i."""
+    if sample_trade_count < min_oos_trades:
+        return "INCONCLUSIVE (low sample)"
+    if sharpe_delta >= meaningful_margin:
+        return edge_label
+    if sharpe_delta > 0:
+        return "INCONCLUSIVE"
+    return no_edge_label
+
+
 def verdict_for_model(
     *,
     oos_trade_count: int,
@@ -287,44 +307,70 @@ def verdict_for_model(
     min_oos_trades: int = MIN_OOS_TRADES,
     meaningful_margin: float = MEANINGFUL_MARGIN,
 ) -> str:
-    """1) low sample -> INCONCLUSIVE. 2) delta=oos_sharpe-baseline_oos_sharpe:
-    >=margin -> ALPHA; 0<delta<margin -> INCONCLUSIVE; <=0 -> NO EDGE.
+    """LEVEL 2 (Exit): 1) low sample -> INCONCLUSIVE. 2) delta=oos_sharpe-baseline_oos_sharpe:
+    >=margin -> 'EXIT IMPROVEMENT'; 0<delta<margin -> INCONCLUSIVE; <=0 -> NO EDGE.
 
-    `baseline_oos_sharpe` — control group Sharpe'i (NoExit/Signal-BH, `compute_verdicts`
-    orqali). Constrained BH EMAS: constrained BH boshqa sizing (fixed-$) ishlatadi va
-    hech qachon exit qilib capital recycle qilmaydi, shu bois exit-timing ta'sirini sof
-    isbotlay olmaydi (confounded) — faqat ma'lumot/kontekst uchun jadvalda qoladi.
+    `baseline_oos_sharpe` — NoExit-capped (control group, bir xil max_concurrent/
+    max_portfolio_risk ostida) OOS Sharpe'i, `compute_level2_verdicts` orqali. Constrained BH
+    EMAS: constrained BH boshqa sizing (fixed-$) ishlatadi va hech qachon exit qilib capital
+    recycle qilmaydi, shu bois exit-timing ta'sirini sof isbotlay olmaydi (confounded) —
+    faqat ma'lumot/kontekst uchun jadvalda qoladi.
     """
-    if oos_trade_count < min_oos_trades:
-        return "INCONCLUSIVE (low sample)"
-    delta = oos_sharpe - baseline_oos_sharpe
-    if delta >= meaningful_margin:
-        return "ALPHA: exit value qo'shdi"
-    if delta > 0:
-        return "INCONCLUSIVE"
-    return "NO EDGE"
+    return _tiered_verdict(
+        sample_trade_count=oos_trade_count, sharpe_delta=oos_sharpe - baseline_oos_sharpe,
+        min_oos_trades=min_oos_trades, meaningful_margin=meaningful_margin,
+        edge_label="EXIT IMPROVEMENT", no_edge_label="NO EDGE",
+    )
 
 
-def compute_verdicts(
+def verdict_for_selection(
+    *,
+    oos_trade_count: int,
+    selection_oos_sharpe: float,
+    equal_weight_oos_sharpe: float,
+    min_oos_trades: int = MIN_OOS_TRADES,
+    meaningful_margin: float = MEANINGFUL_MARGIN,
+) -> str:
+    """LEVEL 1 (Selection): Selection-BH OOS Sharpe'ni Equal-weight BH OOS Sharpe'iga
+    solishtiradi — 'SELECTION EDGE' / 'NO SELECTION EDGE' / 'INCONCLUSIVE (low sample)'."""
+    return _tiered_verdict(
+        sample_trade_count=oos_trade_count,
+        sharpe_delta=selection_oos_sharpe - equal_weight_oos_sharpe,
+        min_oos_trades=min_oos_trades, meaningful_margin=meaningful_margin,
+        edge_label="SELECTION EDGE", no_edge_label="NO SELECTION EDGE",
+    )
+
+
+def compute_level2_verdicts(
     oos_results: dict[str, PortfolioResult],
     *,
     min_oos_trades: int = MIN_OOS_TRADES,
     meaningful_margin: float = MEANINGFUL_MARGIN,
 ) -> dict[str, str]:
-    """Har exit model (NoExit'dan TASHQARI) uchun OOS natijalar asosida verdict hisoblaydi,
-    NoExit (Signal-BH) OOS Sharpe'iga nisbatan — confounded constrained-BH baseline EMAS
-    (constrained BH boshqa sizing + hech qachon capital recycle qilmaydi, shu bois exit-timing
-    ta'sirini sof isbotlay olmaydi). NoExit natija ro'yxatda bo'lmasa — bo'sh dict qaytaradi
-    (chaqiruvchi ogohlantirish chiqarishi kerak).
+    """LEVEL 2 (Exit): har A-F (NoExit-capped'dan TASHQARI) uchun OOS Sharpe'ni NoExit-capped
+    (bir xil max_concurrent/max_portfolio_risk ostidagi control) OOS Sharpe'iga solishtiradi —
+    ikkalasi ham BIR XIL cheklov ostida, shuning uchun adolatli (apples-to-apples).
+    Constrained-BH confounded baseline EMAS.
+
+    NoExit-capped natija ro'yxatda bo'lmasa — bo'sh dict. NoExit-capped'ning O'ZI
+    MIN_OOS_TRADES'dan kam savdo qilgan bo'lsa (odatda shunday — doim BAND bo'lgan
+    slot(lar) tufayli kam savdo) — BARCHA A-F uchun 'INCONCLUSIVE (baseline low sample)'
+    (har bir modelning o'z trade_count'idan qat'i nazar — baseline shovqinli bo'lsa,
+    solishtiruvning O'ZI ishonchsiz).
     """
     if "NOEXIT" not in oos_results:
         return {}
-    no_exit_sharpe = oos_results["NOEXIT"].metrics["sharpe"]
+    no_exit_result = oos_results["NOEXIT"]
+    no_exit_trade_count = sum(1 for t in no_exit_result.trades if t.leg != "partial")
+    no_exit_sharpe = no_exit_result.metrics["sharpe"]
 
     verdicts: dict[str, str] = {}
     for key, result in oos_results.items():
         if key == "NOEXIT":
             continue  # control group -- o'ziga verdict berilmaydi
+        if no_exit_trade_count < min_oos_trades:
+            verdicts[key] = "INCONCLUSIVE (baseline low sample)"
+            continue
         trade_count = sum(1 for t in result.trades if t.leg != "partial")
         verdicts[key] = verdict_for_model(
             oos_trade_count=trade_count, oos_sharpe=result.metrics["sharpe"],
@@ -334,12 +380,39 @@ def compute_verdicts(
     return verdicts
 
 
+def compute_level1_verdict(
+    oos_results: dict[str, PortfolioResult],
+    *,
+    min_oos_trades: int = MIN_OOS_TRADES,
+    meaningful_margin: float = MEANINGFUL_MARGIN,
+) -> str:
+    """LEVEL 1 (Selection): Selection-BH OOS Sharpe'ni Equal-weight BH OOS Sharpe'iga
+    solishtiradi (bitta oyna uchun BITTA xulosa — har-modelga emas). Selection-BH'ning
+    trade_count'i (= candidate soni) MIN_OOS_TRADES'dan kam bo'lsa -> low-sample. Har qanday
+    OOS natijaning `.benchmarks` ishlatiladi — barchasida bir xil (bir xil universe/oyna/
+    xarajat)."""
+    if not oos_results:
+        return "INCONCLUSIVE (low sample)"
+    first = next(iter(oos_results.values()))
+    selection_bm = _benchmark_by_name(first, "selection_bh")
+    equal_weight_bm = _benchmark_by_name(first, "equal_weight_buy_hold")
+    if not selection_bm:
+        return "INCONCLUSIVE (low sample)"
+    trade_count = selection_bm.get("trade_count") or 0
+    return verdict_for_selection(
+        oos_trade_count=trade_count, selection_oos_sharpe=selection_bm.get("sharpe", 0.0),
+        equal_weight_oos_sharpe=equal_weight_bm.get("sharpe", 0.0),
+        min_oos_trades=min_oos_trades, meaningful_margin=meaningful_margin,
+    )
+
+
 def best_exit(verdicts: dict[str, str], oos_sharpes: dict[str, float]) -> tuple[str | None, str]:
-    """OOS bo'yicha max(Sharpe) ALPHA model. Hech biri ALPHA bo'lmasa (None, ...)."""
-    alpha_keys = [k for k, v in verdicts.items() if v.startswith("ALPHA")]
-    if not alpha_keys:
+    """LEVEL 2 (Exit): OOS bo'yicha max(Sharpe) 'EXIT IMPROVEMENT' model. Hech biri bo'lmasa
+    (None, 'NO EXIT EDGE FOUND')."""
+    edge_keys = [k for k, v in verdicts.items() if v.startswith("EXIT IMPROVEMENT")]
+    if not edge_keys:
         return None, "NO EXIT EDGE FOUND"
-    key = max(alpha_keys, key=lambda k: oos_sharpes[k])
+    key = max(edge_keys, key=lambda k: oos_sharpes[k])
     return key, verdicts[key]
 
 
@@ -393,7 +466,7 @@ def build_result_table(
     if "NOEXIT" in model_results:
         no_exit_result = model_results["NOEXIT"]
         rm = to_report_metrics(no_exit_result.metrics, trades=no_exit_result.trades)
-        rows.append(_row("NoExit (control)", rm, verdict="CONTROL"))
+        rows.append(_row("NoExit-capped (control)", rm, verdict="CONTROL"))
 
     for key, result in model_results.items():
         if key == "NOEXIT":
@@ -443,9 +516,14 @@ def write_experiment(
     benchmarks: dict,
     skip_breakdown: dict,
     verdict: str,
+    selection_verdict: str,
     experiments_dir: Path = EXPERIMENTS_DIR,
 ) -> Path:
-    """experiments/<id>.json yaratadi. HECH QACHON overwrite qilmaydi."""
+    """experiments/<id>.json yaratadi. HECH QACHON overwrite qilmaydi.
+
+    `verdict` — LEVEL 2 (Exit), shu model uchun. `selection_verdict` — LEVEL 1 (Selection),
+    bitta run ichida BARCHA model fayllari uchun bir xil (oyna-darajasidagi xulosa).
+    """
     experiments_dir.mkdir(parents=True, exist_ok=True)
     model_name = _EXIT_MODEL_NAMES.get(model_key, model_key)
     commit = git_commit_hash()
@@ -463,7 +541,8 @@ def write_experiment(
         "benchmarks": benchmarks,
         "skip_breakdown": skip_breakdown,
         "verdict": verdict,
-        "verdict_baseline": "no_exit",
+        "selection_verdict": selection_verdict,
+        "verdict_baseline": {"selection": "equal_weight_bh", "exit": "no_exit_capped"},
         "git_commit": commit,
         "timestamp": timestamp.isoformat(),
     }
@@ -551,8 +630,13 @@ def main() -> None:
     windows = run_windows_all_models(args, model_keys=model_keys)
 
     verdicts: dict[str, str] = {}
+    selection_verdict = "INCONCLUSIVE (low sample)"
     if "OOS" in windows:
-        verdicts = compute_verdicts(
+        verdicts = compute_level2_verdicts(
+            windows["OOS"], min_oos_trades=args.min_oos_trades,
+            meaningful_margin=args.meaningful_margin,
+        )
+        selection_verdict = compute_level1_verdict(
             windows["OOS"], min_oos_trades=args.min_oos_trades,
             meaningful_margin=args.meaningful_margin,
         )
@@ -563,13 +647,22 @@ def main() -> None:
         print(table.to_string(index=False))
 
     if "OOS" in windows:
+        first_oos = next(iter(windows["OOS"].values()))
+        sel_bm = _benchmark_by_name(first_oos, "selection_bh")
+        eq_bm = _benchmark_by_name(first_oos, "equal_weight_buy_hold")
+        print(
+            f"\nLEVEL 1 (Selection): {selection_verdict}  "
+            f"(Selection-BH Sharpe={sel_bm.get('sharpe', 0.0):.3f} vs "
+            f"Equal-weight Sharpe={eq_bm.get('sharpe', 0.0):.3f}, "
+            f"trades={sel_bm.get('trade_count', 0)})"
+        )
         oos_sharpes = {key: r.metrics["sharpe"] for key, r in windows["OOS"].items()}
         best_key, best_verdict = best_exit(verdicts, oos_sharpes)
         if best_key is None:
-            print(f"\nBEST EXIT: None / VERDICT: {best_verdict}")
+            print(f"LEVEL 2 (Exit): BEST EXIT: None / VERDICT: {best_verdict}")
         else:
             print(
-                f"\nBEST EXIT: {best_key} ({_EXIT_MODEL_NAMES[best_key]})  "
+                f"LEVEL 2 (Exit): BEST EXIT: {best_key} ({_EXIT_MODEL_NAMES[best_key]})  "
                 f"OOS Sharpe={oos_sharpes[best_key]:.3f}  VERDICT: {best_verdict}"
             )
 
@@ -592,7 +685,7 @@ def main() -> None:
             oos_metrics["exit_reason_breakdown"] = exit_reason_breakdown(oos_result.trades)
             benchmarks = {b.name: b.metrics for b in oos_result.benchmarks}
             if no_exit_report is not None:
-                benchmarks["no_exit"] = no_exit_report
+                benchmarks["no_exit_capped"] = no_exit_report
             path = write_experiment(
                 model_key=key, universe=universe, start=start, end=args.end,
                 oos_start=args.oos_start, interval=args.interval,
@@ -600,6 +693,7 @@ def main() -> None:
                 train_metrics=train_metrics, oos_metrics=oos_metrics, benchmarks=benchmarks,
                 skip_breakdown=oos_result.metrics["skipped_by_reason"],
                 verdict=verdicts.get(key, "N/A (no NoExit baseline)"),
+                selection_verdict=selection_verdict,
             )
             print(f"Experiment saqlandi: {path}")
 

@@ -25,6 +25,7 @@ from backtest.portfolio import (
     naive_all_signals_curve,
     periodic_returns,
     run_portfolio,
+    selection_buy_hold_curve,
     sharpe_ratio,
     simulate_portfolio,
     single_ticker_buy_hold_curve,
@@ -194,6 +195,97 @@ def test_capital_constrained_buy_hold_curve_caps_slots_and_holds() -> None:
     assert curve == pytest.approx([100_000.0] * len(tl))
 
 
+# ======================================================================
+# selection_buy_hold_curve -- Level 1 (Selection) control: CHEKLOVSIZ
+# ======================================================================
+
+
+def test_selection_bh_no_cap() -> None:
+    # 3 symbol, bir xil kunda entry, max_concurrent_positions=1 -- constrained-BH bo'lsa
+    # faqat 1 tasi olinardi; Selection-BH UCHALASINI HAM olishi kerak.
+    a_df = _target_df(100.0, 999.0, hit_bar=99, n=4)
+    b_df = _target_df(200.0, 999.0, hit_bar=99, n=4)
+    c_df = _target_df(300.0, 999.0, hit_bar=99, n=4)
+    a = _sym("A", a_df, [_setup(0, entry=100.0, stop=90.0, target=999.0, ts=a_df.index[0])])
+    b = _sym("B", b_df, [_setup(0, entry=200.0, stop=190.0, target=999.0, ts=b_df.index[0])])
+    c = _sym("C", c_df, [_setup(0, entry=300.0, stop=290.0, target=999.0, ts=c_df.index[0])])
+    tl = list(a_df.index)
+    cfg = PortfolioConfig(initial_capital=90_000.0, max_concurrent_positions=1, max_portfolio_risk_pct=1.0)
+
+    curve = selection_buy_hold_curve([a, b, c], tl, cfg=cfg)
+
+    # 3 candidate -> alloc=30k har biri. Barchasi ochiladi (cap yo'q) -> k0: cash=0, 3x30k=90k.
+    assert curve[0] == pytest.approx(90_000.0)
+    assert curve == pytest.approx([90_000.0] * len(tl))  # narxlar flat
+
+
+def test_selection_bh_equal_weight_allocation() -> None:
+    a_df = _target_df(100.0, 999.0, hit_bar=99, n=3)
+    b_df = _target_df(50.0, 999.0, hit_bar=99, n=3)
+    a = _sym("A", a_df, [_setup(0, entry=100.0, stop=90.0, target=999.0, ts=a_df.index[0])])
+    b = _sym("B", b_df, [_setup(0, entry=50.0, stop=45.0, target=999.0, ts=b_df.index[0])])
+    tl = list(a_df.index)
+    cfg = PortfolioConfig(initial_capital=1000.0, max_portfolio_risk_pct=1.0)
+
+    curve = selection_buy_hold_curve([a, b], tl, cfg=cfg)
+
+    # alloc=500 har biriga. A: 5 aksiya @100=500. B: 10 aksiya @50=500. k0 -> 0+500+500=1000.
+    assert curve[0] == pytest.approx(1000.0)
+
+
+def test_selection_bh_multiple_positions_same_symbol_allowed() -> None:
+    # Bitta symbol, ikkita ALOHIDA signal -- constrained-BH'da (one_position_per_symbol
+    # konvensiyasi) ikkinchisi skip bo'lardi; Selection-BH'da IKKALASI HAM ochiladi.
+    df = _target_df(100.0, 999.0, hit_bar=99, n=5)
+    s1 = _setup(0, entry=100.0, stop=90.0, target=999.0, ts=df.index[0])
+    s2 = _setup(2, entry=100.0, stop=90.0, target=999.0, ts=df.index[2])
+    a = _sym("A", df, [s1, s2])
+    tl = list(df.index)
+    cfg = PortfolioConfig(initial_capital=1000.0, max_portfolio_risk_pct=1.0)
+
+    curve = selection_buy_hold_curve([a], tl, cfg=cfg)
+
+    # 2 candidate -> alloc=500 har biri. k0: faqat s1 ochilgan (500 held + 500 cash) = 1000.
+    assert curve[0] == pytest.approx(1000.0)
+    # k2: s2 ham ochiladi -> ikkalasi ham held (narx flat 100) -> hali 1000.
+    assert curve[2] == pytest.approx(1000.0)
+
+
+def test_selection_bh_empty_candidates_returns_flat_capital() -> None:
+    df = _make_df(_flat_rows([100, 100, 100]))
+    a = _sym("A", df, [])  # signalsiz
+    tl = list(df.index)
+    cfg = PortfolioConfig(initial_capital=5000.0)
+
+    curve = selection_buy_hold_curve([a], tl, cfg=cfg)
+
+    assert curve == pytest.approx([5000.0] * len(tl))
+
+
+def test_selection_bh_no_lookahead_bias() -> None:
+    a_df = _target_df(100.0, 110.0, hit_bar=2, n=5)
+    b_df = _target_df(50.0, 60.0, hit_bar=3, n=5)
+    a = _sym("A", a_df, [_setup(0, entry=100.0, stop=90.0, target=110.0, ts=a_df.index[0])])
+    b = _sym("B", b_df, [_setup(1, entry=50.0, stop=45.0, target=60.0, ts=b_df.index[1])])
+    cfg = PortfolioConfig(initial_capital=100_000.0, max_portfolio_risk_pct=1.0)
+    tl_full = list(a_df.index)
+
+    full = selection_buy_hold_curve([a, b], tl_full, cfg=cfg)
+
+    cutoff_pos = 3  # a_df/b_df bir xil sana oralig'ida
+    T = a_df.index[cutoff_pos]
+
+    def _trunc(sym: SymbolData) -> SymbolData:
+        tdf = sym.df[sym.df.index <= T]
+        tsig = [s for s in sym.signals if s.entry_ts <= T]
+        return SymbolData(symbol=sym.symbol, df=tdf, signals=tsig)
+
+    tl_trunc = [ts for ts in tl_full if ts <= T]
+    trunc = selection_buy_hold_curve([_trunc(a), _trunc(b)], tl_trunc, cfg=cfg)
+
+    assert full[: cutoff_pos + 1] == pytest.approx(trunc)
+
+
 def test_make_buy_hold_benchmarks_shape() -> None:
     df = _make_df(_flat_rows([100, 110, 120, 130]))
     syms = [_sym("A", df, []), _sym("B", df, [])]
@@ -211,6 +303,17 @@ def test_make_buy_hold_benchmarks_shape() -> None:
     assert [b.name for b in withc] == [
         "equal_weight_buy_hold", "buy_hold:SPUS", "capital_constrained_buy_hold"
     ]
+
+    withs = make_buy_hold_benchmarks(
+        syms, tl, cfg=cfg, benchmark_df=df, benchmark_ticker="SPUS",
+        include_constrained=True, include_selection=True,
+    )
+    assert [b.name for b in withs] == [
+        "equal_weight_buy_hold", "buy_hold:SPUS", "selection_bh", "capital_constrained_buy_hold",
+    ]
+    selection_metrics = withs[2].metrics
+    assert "trade_count" in selection_metrics  # selection_bh o'ziga xos qo'shimcha maydon
+    assert set(withs[0].metrics) == {"return_pct", "cagr_pct", "max_drawdown_pct", "sharpe", "sortino"}  # boshqalarida yo'q
 
 
 def test_make_buy_hold_benchmarks_missing_ticker() -> None:

@@ -422,6 +422,51 @@ def capital_constrained_buy_hold_curve(
     return curve
 
 
+def selection_buy_hold_curve(
+    symbols: list[SymbolData], timeline: list[pd.Timestamp], *, cfg: PortfolioConfig,
+) -> list[float]:
+    """Robot ENTRY signallarini CHEKLOVSIZ oladi -- max_concurrent_positions/
+    max_portfolio_risk_pct/one_position_per_symbol QO'LLANMAYDI, hech bir signal skip
+    qilinmaydi. Har candidate'ga teng-vazn (kapital/candidates soni) allocation, oyna
+    oxirigacha ushlab turiladi (exit/stop/target yo'q, capital_constrained_buy_hold_curve
+    bilan bir xil "hold forever" konvensiyasi).
+
+    Maqsad: "robot tanlagan AYNAN o'sha aksiyalarni (entry-selection) hech qanday
+    capacity-cheklovisiz exitsiz ushlab tursam nima bo'lardi?" -- bu entry-selection
+    sifatini capacity-cheklovlaridan (max_concurrent) ajratib ko'rsatadi. Bir symbolda
+    bir vaqtda bir nechta pozitsiya bo'lishi mumkin (signal generatori qayta-qayta signal
+    bersa) -- CHEKLOVSIZ degani shu, hech narsa "allaqachon band" deb skip qilinmaydi.
+    """
+    if not timeline:
+        return []
+    candidates, _ = build_candidates(symbols, cfg=cfg)
+    if not candidates:
+        return [cfg.initial_capital] * len(timeline)
+
+    close_ffill = _ffill_close_matrix(symbols, timeline)
+    ts_to_k = {ts: k for k, ts in enumerate(timeline)}
+    entries_by_k: dict[int, list[PortfolioCandidate]] = {}
+    for c in sorted(candidates, key=lambda c: (c.entry_ts, c.symbol)):
+        entries_by_k.setdefault(ts_to_k[c.entry_ts], []).append(c)
+
+    alloc = cfg.initial_capital / len(candidates)
+    held: list[tuple[str, float]] = []  # (symbol, shares) -- bir symbolda bir nechta bo'lishi mumkin
+    cash = cfg.initial_capital
+
+    curve: list[float] = []
+    for k in range(len(timeline)):
+        for c in entries_by_k.get(k, []):
+            spend = min(alloc, cash)
+            eff_entry = c.entry_price * (1.0 + cfg.slippage_pct)
+            if spend <= 0 or eff_entry <= 0:
+                continue
+            shares = spend * (1.0 - cfg.commission_pct) / eff_entry
+            held.append((c.symbol, shares))
+            cash -= spend
+        curve.append(cash + sum(sh * float(close_ffill[sym][k]) for sym, sh in held))
+    return curve
+
+
 def make_buy_hold_benchmarks(
     symbols: list[SymbolData],
     timeline: list[pd.Timestamp],
@@ -430,21 +475,24 @@ def make_buy_hold_benchmarks(
     benchmark_df: pd.DataFrame | None,
     benchmark_ticker: str,
     include_constrained: bool = False,
+    include_selection: bool = False,
 ) -> list[BenchmarkResult]:
-    """Teng-vazn buy&hold + bitta ticker buy&hold (+ ixtiyoriy capital-constrained BH).
+    """Teng-vazn buy&hold + bitta ticker buy&hold (+ ixtiyoriy selection-BH + capital-constrained BH).
 
-    Har biri bir xil `curve_metrics` (return_pct, cagr_pct, max_drawdown_pct, sharpe, sortino).
+    Har biri bir xil `curve_metrics` (return_pct, cagr_pct, max_drawdown_pct, sharpe, sortino);
+    selection_bh qo'shimcha `trade_count` (candidate soni) ham olib yuradi.
     """
     ppy = cfg.periods_per_year or _periods_per_year_for(cfg.interval)
 
-    def _bench(name: str, curve: list[float], error: str | None = None) -> BenchmarkResult:
-        return BenchmarkResult(
-            name=name,
-            equity_curve=curve,
-            metrics=curve_metrics(curve, timeline, periods_per_year=ppy,
-                                  risk_free_rate=cfg.risk_free_rate) if curve else {},
-            error=error,
-        )
+    def _bench(
+        name: str, curve: list[float], error: str | None = None, extra: dict | None = None
+    ) -> BenchmarkResult:
+        metrics = curve_metrics(
+            curve, timeline, periods_per_year=ppy, risk_free_rate=cfg.risk_free_rate
+        ) if curve else {}
+        if extra and metrics:
+            metrics = {**metrics, **extra}
+        return BenchmarkResult(name=name, equity_curve=curve, metrics=metrics, error=error)
 
     out = [
         _bench(
@@ -467,6 +515,13 @@ def make_buy_hold_benchmarks(
                 benchmark_df, timeline, initial_capital=cfg.initial_capital,
                 commission_pct=cfg.commission_pct, slippage_pct=cfg.slippage_pct,
             ),
+        ))
+    if include_selection:
+        sel_candidates, _ = build_candidates(symbols, cfg=cfg)
+        out.append(_bench(
+            "selection_bh",
+            selection_buy_hold_curve(symbols, timeline, cfg=cfg),
+            extra={"trade_count": len(sel_candidates)},
         ))
     if include_constrained:
         out.append(_bench(
@@ -949,12 +1004,14 @@ def run_portfolio(
     benchmark_df: pd.DataFrame | None,
     benchmark_ticker: str,
     include_constrained: bool = False,
+    include_selection: bool = False,
 ) -> PortfolioResult:
     """simulate_portfolio + buy&hold benchmark'lar + ESKI (cap'siz ketma-ket) egri chizig'i."""
     result = simulate_portfolio(symbols, cfg=cfg)
     benches = make_buy_hold_benchmarks(
         symbols, result.timeline, cfg=cfg, benchmark_df=benchmark_df,
         benchmark_ticker=benchmark_ticker, include_constrained=include_constrained,
+        include_selection=include_selection,
     )
     return dataclasses.replace(
         result, benchmarks=benches, naive_all_signals_curve=naive_all_signals_curve(symbols, cfg=cfg)
