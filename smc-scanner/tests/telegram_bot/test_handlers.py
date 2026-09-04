@@ -158,6 +158,55 @@ def test_scan_all_shows_low_rr_setup(monkeypatch) -> None:
     assert "sababli yashirildi" not in reply_text
 
 
+# ---- /scan dedup + cooldown (TZ 18) ----
+
+def _amd_setup_row() -> dict:
+    return {
+        "SYMBOL": "AMD", "SETUP_REASON": "FVG", "SETUP_ENTRY": 150.0, "SETUP_STOP": 140.0,
+        "SETUP_TARGET": 175.0, "SETUP_RR": 2.5, "SETUP_ENTRY_DATE": "2026-08-20",
+        "HAS_ACTIVE_SETUP": True, "STRUCTURE_STATE": "BULLISH", "ERROR": None,
+    }
+
+
+def test_scan_second_call_dedups_same_setup(monkeypatch) -> None:
+    """Bir xil setup ikkinchi /scan'da qayta yuborilmasligi kerak (cooldown ichida) —
+    matnda ko'rinmaydi va tugma chiqmaydi, lekin dedup soni ko'rsatiladi."""
+    monkeypatch.setenv("TELEGRAM_ALLOWED_USER_ID", "111")
+    monkeypatch.setattr(handlers, "run_scan", MagicMock(return_value=[_amd_setup_row()]))
+
+    first_update, context = _make_update(), _make_context(args=["AMD"])
+    _run(handlers.scan(first_update, context))
+    first_reply = first_update.effective_message.reply_text.call_args_list[1].args[0]
+    assert "AMD" in first_reply
+    assert "Faol setup topilgan (1 ta)" in first_reply
+
+    second_update = _make_update()
+    _run(handlers.scan(second_update, context))
+    second_reply = second_update.effective_message.reply_text.call_args_list[1].args[0]
+
+    assert "Faol setup topilgan" not in second_reply
+    assert "oldin yuborilgan" in second_reply
+    assert "1 ta yangi yuborildi" not in second_reply  # 0 ta yangi
+    assert "1 ta oldin yuborilgani uchun o'tkazib yuborildi" in second_reply
+
+    kwargs = second_update.effective_message.reply_text.call_args_list[1].kwargs
+    assert kwargs["reply_markup"] is None  # dedup qilingan setup uchun tugma yo'q
+
+
+def test_scan_first_call_shows_new_setup_with_dedup_summary(monkeypatch) -> None:
+    """Birinchi /scan'da setup yangi hisoblanadi — dedup xulosasida "0 ta o'tkazib
+    yuborilgan"."""
+    monkeypatch.setenv("TELEGRAM_ALLOWED_USER_ID", "111")
+    monkeypatch.setattr(handlers, "run_scan", MagicMock(return_value=[_amd_setup_row()]))
+    update, context = _make_update(), _make_context(args=["AMD"])
+
+    _run(handlers.scan(update, context))
+
+    reply_text = update.effective_message.reply_text.call_args_list[1].args[0]
+    assert "1 ta yangi yuborildi" in reply_text
+    assert "0 ta oldin yuborilgani uchun o'tkazib yuborildi" in reply_text
+
+
 # ---- /status ----
 
 def test_status_shows_open_entries_and_risk_warnings(monkeypatch, tmp_path) -> None:

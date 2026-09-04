@@ -83,15 +83,25 @@ def format_setup_message(row: dict) -> str:
 
 def format_scan_summary(
     rows: list[dict], *, min_rr: float = MIN_PLANNED_RR, show_all: bool = False,
+    dedup_new: list[dict] | None = None, dedup_skipped_count: int = 0,
 ) -> str:
     """/scan uchun BITTA yakuniy xabar — har belgi alohida xabar EMAS. Sifatli
     (planned_rr >= min_rr) faol setup'lar to'liq ko'rsatiladi (harakat kerak),
     past R:R setup'lar default holatda YASHIRILADI (soni alohida qatorda —
     show_all=True bilan hammasi ko'rinadi), setup yo'q belgilar shunchaki
     sonda hisoblanadi (ro'yxati emas — katta watchlist'da matn hajmi cheksiz
-    o'smasin), xatolar qisqa qatorga yig'iladi."""
+    o'smasin), xatolar qisqa qatorga yig'iladi.
+
+    dedup_new/dedup_skipped_count — ixtiyoriy (TZ 18): handler dedup+cooldown
+    (signals/dedup.py) qo'llagandan keyin beradi. dedup_new = sifat-filtrdan
+    o'tgan setup'lar ichidan YANGI (cooldown o'tgan yoki birinchi marta ko'rilgan)
+    bo'lganlari — shular ko'rsatiladi/tugmaga chiqadi, qolganlari (dedup_skipped_count)
+    faqat sonda hisoblanadi. dedup_new=None (default) — ESKI xatti-harakat: bu
+    funksiya o'zi dedup HAQIDA HECH NARSA bilmaydi, filter_quality_setups
+    natijasi to'liq ko'rsatiladi (CLI va eski chaqiruvlar uchun backward-compat)."""
     errors = [r for r in rows if r.get("ERROR")]
     visible, hidden = filter_quality_setups(rows, min_rr=min_rr, show_all=show_all)
+    shown = visible if dedup_new is None else dedup_new
     active_total = len([r for r in rows if r.get("HAS_ACTIVE_SETUP")])
     invalidated = [r for r in rows if r.get("SETUP_INVALIDATED")]
     missed = [r for r in rows if r.get("SETUP_ENTRY_STATE") == ENTRY_STATE_MISSED]
@@ -102,10 +112,10 @@ def format_scan_summary(
 
     lines = [f"✅ Skanerlash yakunlandi: {len(rows)} ta belgi tekshirildi."]
 
-    if visible:
+    if shown:
         lines.append("")
-        lines.append(f"📊 Faol setup topilgan ({len(visible)} ta):")
-        for row in visible:
+        lines.append(f"📊 Faol setup topilgan ({len(shown)} ta):")
+        for row in shown:
             lines.append("")
             lines.append(f"{row['SYMBOL']} — LONG")
             lines.append(f"Entry: ${row['SETUP_ENTRY']} | Stop: ${row['SETUP_STOP']}")
@@ -120,6 +130,9 @@ def format_scan_summary(
                 lines.append("⚠️ Past R:R — ehtiyot")
             lines.append(f"Sabab: {row['SETUP_REASON']} zonasi {row['SETUP_ENTRY_DATE']}'da retest qilindi")
             lines.append(_format_exit_line(row))
+    elif dedup_new is not None and visible:
+        lines.append("")
+        lines.append("Yangi faol setup yo'q — barchasi oldin yuborilgan (cooldown ichida).")
     else:
         lines.append("")
         lines.append("Faol setup topilmadi.")
@@ -162,6 +175,11 @@ def format_scan_summary(
     lines.append(f"Faol setupsiz: {no_setup_count} ta")
     if hidden:
         lines.append(f"🔒 {len(hidden)} ta setup past R:R (< {min_rr}) sababli yashirildi.")
+    if dedup_new is not None:
+        lines.append(
+            f"🔁 Dedup: {len(visible)} ta topildi, {len(shown)} ta yangi yuborildi, "
+            f"{dedup_skipped_count} ta oldin yuborilgani uchun o'tkazib yuborildi."
+        )
     if errors:
         symbols = ", ".join(r["SYMBOL"] for r in errors[:10])
         more = f" (+{len(errors) - 10} yana)" if len(errors) > 10 else ""
