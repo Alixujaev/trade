@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import dataclasses
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -636,3 +638,122 @@ def test_portfolio_no_lookahead_bias() -> None:
         assert ft.shares == pytest.approx(tt.shares)
         assert ft.pnl == pytest.approx(tt.pnl)
         assert ft.r_multiple == pytest.approx(tt.r_multiple)
+
+
+# ======================================================================
+# exit_model (Exit Research v0 seam) — additive, exit_mode dispatch bilan mos kelishi
+# ======================================================================
+
+
+def test_portfolio_config_exit_model_none_preserves_existing_behavior() -> None:
+    """exit_model=None (default) -- exit_mode dispatch avvalgidek ishlaydi, o'zgarishsiz."""
+    df = _target_df(100.0, 110.0, hit_bar=2, n=5)
+    setup = _setup(0, entry=100.0, stop=90.0, target=110.0, ts=df.index[0])
+    a = _sym("A", df, [setup])
+    cfg = PortfolioConfig(initial_capital=10_000.0, risk_pct=0.01, max_portfolio_risk_pct=1.0)
+
+    assert cfg.exit_model is None
+    res = simulate_portfolio([a], cfg=cfg)
+
+    assert len(res.trades) == 1
+    assert res.trades[0].exit_reason == "target"
+    assert res.trades[0].leg == "full"
+
+
+def test_portfolio_precompute_candidate_uses_exit_model_when_set() -> None:
+    """exit_model=FixedSLTPExit() -- exit_mode='fixed' bilan bir xil nomzodlar berishi kerak."""
+    from backtest.exits import FixedSLTPExit
+
+    df = _target_df(100.0, 110.0, hit_bar=2, n=5)
+    setup = _setup(0, entry=100.0, stop=90.0, target=110.0, ts=df.index[0])
+    a = _sym("A", df, [setup])
+
+    cfg_mode = PortfolioConfig(initial_capital=10_000.0, risk_pct=0.01, max_portfolio_risk_pct=1.0,
+                                exit_mode="fixed")
+    cfg_model = PortfolioConfig(initial_capital=10_000.0, risk_pct=0.01, max_portfolio_risk_pct=1.0,
+                                 exit_model=FixedSLTPExit())
+
+    candidates_mode, _ = build_candidates([a], cfg=cfg_mode)
+    candidates_model, _ = build_candidates([a], cfg=cfg_model)
+
+    assert len(candidates_mode) == len(candidates_model) == 1
+    cm, ce = candidates_mode[0], candidates_model[0]
+    assert cm.exit_index_pos == ce.exit_index_pos
+    assert cm.exit_price == pytest.approx(ce.exit_price)
+    assert cm.exit_reason == ce.exit_reason
+    assert ce.partial is None
+
+
+def test_portfolio_partial_exit_keeps_symbol_slot_occupied_until_final_leg() -> None:
+    """Model E (partial_tp_trailing) orqali: (a) bitta entry ikkita TradeResult beradi
+    (leg='partial' + leg='final'); (b) A'ning o'zida ikkinchi signal partial'dan keyin ham
+    'symbol_already_open' sifatida skip qilinadi (slot BO'SHATILMAYDI); (c) partial'da
+    ozod bo'lgan naqd boshqa symbol (B)ning YANGI entry'sini moliyalashtiradi — buni
+    exit_model=None (partial yo'q) bilan solishtirib isbotlaymiz: o'sha holatda B
+    'insufficient_capital' bilan skip qilinishi kerak (naqd A yopilguncha 0 qoladi)."""
+    from backtest.exits import PartialTpTrailingExit
+
+    a_rows = [
+        {"open": 100, "high": 100, "low": 100, "close": 100},  # idx0 A entry
+        {"open": 100, "high": 112, "low": 99, "close": 111},  # idx1 partial trigger (level=110)
+        {"open": 111, "high": 112, "low": 108, "close": 111},  # idx2 -- B entra shu kuni
+        {"open": 111, "high": 112, "low": 100, "close": 105},  # idx3
+        {"open": 105, "high": 106, "low": 60, "close": 65},  # idx4 crash -- final leg yopiladi
+    ]
+    b_rows = [
+        {"open": 50, "high": 51, "low": 49, "close": 50},  # idx0 filler
+        {"open": 50, "high": 51, "low": 49, "close": 50},  # idx1 filler
+        {"open": 50, "high": 51, "low": 49, "close": 50},  # idx2 B entry
+        {"open": 50, "high": 54, "low": 46, "close": 51},  # idx3 (< partial level 60, > stop 40)
+        {"open": 51, "high": 54, "low": 46, "close": 50},  # idx4 end_of_data
+    ]
+    a_df = _make_df(a_rows)
+    b_df = _make_df(b_rows)
+
+    a_setup1 = _setup(0, entry=100.0, stop=90.0, target=999.0, ts=a_df.index[0])
+    a_setup2 = _setup(2, entry=111.0, stop=100.0, target=999.0, ts=a_df.index[2])  # slot band bo'lgani uchun skip
+    b_setup = _setup(2, entry=50.0, stop=40.0, target=999.0, ts=b_df.index[2])
+
+    a = _sym("A", a_df, [a_setup1, a_setup2])
+    b = _sym("B", b_df, [b_setup])
+
+    exit_model = PartialTpTrailingExit(
+        partial_tp_r=1.0, partial_size=0.5, trail_atr_multiplier=5.0, atr_period=2
+    )
+    cfg_partial = PortfolioConfig(
+        initial_capital=1000.0, risk_pct=1.0, max_portfolio_risk_pct=1.0,
+        max_concurrent_positions=10, commission_pct=0.0, slippage_pct=0.0,
+        exit_model=exit_model,
+    )
+
+    res = simulate_portfolio([a, b], cfg=cfg_partial)
+
+    # (a) A'ning entry'si ikkita TradeResult beradi.
+    a_trades = [t for sym, t in zip(res.trade_symbols, res.trades) if sym == "A"]
+    assert len(a_trades) == 2
+    legs = {t.leg for t in a_trades}
+    assert legs == {"partial", "final"}
+    partial_trade = next(t for t in a_trades if t.leg == "partial")
+    final_trade = next(t for t in a_trades if t.leg == "final")
+    assert partial_trade.exit_price == pytest.approx(110.0)
+    assert partial_trade.shares == pytest.approx(5.0)
+    assert final_trade.exit_reason == "trailing_stop"
+    assert final_trade.shares == pytest.approx(5.0)
+
+    # (b) A'ning ikkinchi signali (a_setup2) slot band bo'lgani uchun skip qilingan.
+    a_skips = [s for s in res.skipped if s.symbol == "A"]
+    assert any(s.reason == "symbol_already_open" for s in a_skips)
+
+    # (c) B muvaffaqiyatli kirgan -- buning uchun A'ning partial'idan ozod bo'lgan naqd
+    # kerak edi (pastda ko'rsatilganidek, buning YO'Q holatida B skip bo'lardi).
+    b_trades = [t for sym, t in zip(res.trade_symbols, res.trades) if sym == "B"]
+    assert len(b_trades) == 1
+    assert b_trades[0].shares == pytest.approx(11.0)
+    assert not any(s.symbol == "B" for s in res.skipped)
+
+    # Kontrast: exit_model YO'Q (partial yo'q) -- A yopilguncha naqd 0 qoladi, B skip bo'ladi.
+    cfg_no_partial = dataclasses.replace(cfg_partial, exit_model=None, exit_mode="fixed")
+    res_no_partial = simulate_portfolio([a, b], cfg=cfg_no_partial)
+    b_skips_no_partial = [s for s in res_no_partial.skipped if s.symbol == "B"]
+    assert any(s.reason == "insufficient_capital" for s in b_skips_no_partial)
+    assert not any(sym == "B" for sym in res_no_partial.trade_symbols)

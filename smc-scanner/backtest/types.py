@@ -27,6 +27,9 @@ class TradeResult:
     # (r_multiple doim ORIGINAL stop masofasidan hisoblanadi, shuning uchun +5R'ga
     # ko'tarilib +0.3R'da yopilgan savdo bilan boshidan +0.3R'da yopilgan savdo bir
     # xil r_multiple ko'rsatadi — mfe_r shu farqni ko'rinadigan qiladi)
+    leg: str = "full"  # "full" (standart) | "partial" | "final" — Model E (partial TP + trailing)
+    # bitta pozitsiyani ikki TradeResult'ga ajratganda ishlatiladi; boshqa barcha
+    # exit modellari uchun har doim "full" (default) qoladi.
 
 
 @dataclass(frozen=True)

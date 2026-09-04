@@ -28,6 +28,7 @@ import numpy as np
 import pandas as pd
 
 from backtest.engine import _simulate_fixed_exit, _simulate_trailing_exit
+from backtest.exits import ExitModel, PartialLeg
 from backtest.metrics import (
     avg_hold_days,
     avg_r_multiple,
@@ -74,7 +75,8 @@ class PortfolioConfig:
     max_concurrent_positions: int = MAX_CONCURRENT_POSITIONS
     max_portfolio_risk_pct: float = MAX_PORTFOLIO_RISK_PCT
     risk_model: str = "fixed_pct"  # "fixed_pct" | "atr"
-    exit_mode: str = "fixed"  # "fixed" | "trailing"
+    exit_mode: str = "fixed"  # "fixed" | "trailing" — exit_model berilmasa ishlatiladi
+    exit_model: ExitModel | None = None  # berilsa: exit_mode'ni almashtiradi (Exit Research v0)
     commission_pct: float = 0.0
     slippage_pct: float = 0.0
     atr_period: int = ATR_PERIOD
@@ -112,6 +114,8 @@ class PortfolioCandidate:
     min_low: float
     running_high: float
     sizing_per_share_risk: float  # risk_model'ga qarab (narx yoki ATR)
+    partial: PartialLeg | None = None  # faqat exit_model=partial_tp_trailing beradi
+    partial_ts: pd.Timestamp | None = None  # sym.df.index[partial.index_pos]
 
 
 @dataclass(frozen=True)
@@ -133,6 +137,11 @@ class OpenPosition:
     planned_risk_dollars: float  # shares*(entry_price-stop_price)
     min_low: float
     running_high: float
+    remaining_shares: float  # partial leg yopilgach kamayadi; boshqa hollarda == shares
+    partial: PartialLeg | None = None
+    partial_ts: pd.Timestamp | None = None
+    partial_k: int | None = None  # partial_ts'ning timeline'dagi pozitsiyasi
+    partial_realized: bool = False
 
 
 @dataclass(frozen=True)
@@ -516,7 +525,16 @@ def _precompute_candidate(
     if setup.entry_price - setup.stop_price <= 0:
         return None
 
-    if cfg.exit_mode == "fixed":
+    partial: PartialLeg | None = None
+    if cfg.exit_model is not None:
+        result = cfg.exit_model.find_exit(setup, sym.df, closes=closes, highs=highs, lows=lows, atr=atr)
+        exit_index_pos = result.exit_index_pos
+        exit_price = result.exit_price
+        exit_reason = result.exit_reason
+        min_low = result.min_low
+        running_high = result.running_high
+        partial = result.partial
+    elif cfg.exit_mode == "fixed":
         exit_index_pos, exit_price, exit_reason, min_low, running_high = _simulate_fixed_exit(
             sym.df, setup, closes, highs, lows, n
         )
@@ -539,6 +557,8 @@ def _precompute_candidate(
         min_low=min_low,
         running_high=running_high,
         sizing_per_share_risk=_sizing_per_share_risk(setup, cfg=cfg, atr=atr),
+        partial=partial,
+        partial_ts=sym.df.index[partial.index_pos] if partial is not None else None,
     )
 
 
@@ -621,14 +641,16 @@ def _plan_entry(
 
 
 def _realize(pos: OpenPosition, *, cfg: PortfolioConfig) -> tuple[TradeResult, float]:
-    """Ochiq pozitsiyani yopadi. Qaytaradi (TradeResult, cash_in) —
-    cash_in = shares*effective_exit - commission (naqdga qaytadigan mablag').
+    """Ochiq pozitsiyani (yoki uning partial'dan keyingi qolgan ulushini) yopadi.
 
-    Formulalar engine.py 222-237 bilan AYNAN bir xil.
+    Qaytaradi (TradeResult, cash_in) — cash_in = remaining_shares*effective_exit - commission
+    (naqdga qaytadigan mablag'). Formulalar engine.py 222-237 bilan AYNAN bir xil —
+    `pos.partial is None` bo'lsa `remaining_shares == shares`, farq yo'q.
     """
+    shares = pos.remaining_shares
     effective_exit = pos.exit_price * (1.0 - cfg.slippage_pct)
-    gross_pnl = pos.shares * (effective_exit - pos.effective_entry)
-    commission = cfg.commission_pct * pos.shares * (pos.effective_entry + effective_exit)
+    gross_pnl = shares * (effective_exit - pos.effective_entry)
+    commission = cfg.commission_pct * shares * (pos.effective_entry + effective_exit)
     pnl = gross_pnl - commission
 
     actual_risk = pos.entry_price - pos.stop_price
@@ -644,15 +666,63 @@ def _realize(pos: OpenPosition, *, cfg: PortfolioConfig) -> tuple[TradeResult, f
         exit_price=pos.exit_price,
         entry_index_pos=pos.entry_index_pos,  # symbol-lokal
         exit_index_pos=pos.exit_index_pos,  # symbol-lokal
-        shares=pos.shares,
+        shares=shares,
         exit_reason=pos.exit_reason,
         r_multiple=r_multiple,
         pnl=pnl,
         hold_duration_days=hold_days,
         mae_r=mae_r,
         mfe_r=mfe_r,
+        leg="final" if pos.partial is not None else "full",
     )
-    return trade, pos.shares * effective_exit - commission
+    return trade, shares * effective_exit - commission
+
+
+def _realize_partial(
+    pos: OpenPosition, *, cfg: PortfolioConfig
+) -> tuple[TradeResult, float, OpenPosition]:
+    """Partial leg'ni (Model E) yopadi — slot/symbol-lock BO'SHATILMAYDI, faqat
+    `remaining_shares`/`open_risk`ning tegishli ulushi kamayadi.
+
+    Qaytaradi (TradeResult, cash_in, yangilangan OpenPosition). `_realize` bilan bir
+    xil komissiya/slippage formulasi, lekin `pos.shares * partial.fraction` ustida.
+    """
+    assert pos.partial is not None and pos.partial_ts is not None
+    partial_shares = pos.shares * pos.partial.fraction
+    effective_exit = pos.partial.price * (1.0 - cfg.slippage_pct)
+    gross_pnl = partial_shares * (effective_exit - pos.effective_entry)
+    commission = cfg.commission_pct * partial_shares * (pos.effective_entry + effective_exit)
+    pnl = gross_pnl - commission
+
+    actual_risk = pos.entry_price - pos.stop_price
+    r_multiple = (pos.partial.price - pos.entry_price) / actual_risk
+    mae_r = (pos.entry_price - pos.min_low) / actual_risk
+    mfe_r = (pos.running_high - pos.entry_price) / actual_risk
+    hold_days = (pos.partial_ts - pos.entry_ts).total_seconds() / 86400
+
+    trade = TradeResult(
+        entry_ts=pos.entry_ts,
+        exit_ts=pos.partial_ts,
+        entry_price=pos.entry_price,
+        exit_price=pos.partial.price,
+        entry_index_pos=pos.entry_index_pos,
+        exit_index_pos=pos.partial.index_pos,
+        shares=partial_shares,
+        exit_reason=pos.partial.reason,
+        r_multiple=r_multiple,
+        pnl=pnl,
+        hold_duration_days=hold_days,
+        mae_r=mae_r,
+        mfe_r=mfe_r,
+        leg="partial",
+    )
+    updated_pos = dataclasses.replace(
+        pos,
+        remaining_shares=pos.shares - partial_shares,
+        planned_risk_dollars=pos.planned_risk_dollars * (1.0 - pos.partial.fraction),
+        partial_realized=True,
+    )
+    return trade, partial_shares * effective_exit - commission, updated_pos
 
 
 # ======================================================================
@@ -725,7 +795,9 @@ def simulate_portfolio(symbols: list[SymbolData], *, cfg: PortfolioConfig) -> Po
                 stop_price=cand.stop_price, exit_price=cand.exit_price,
                 exit_reason=cand.exit_reason, shares=shares, effective_entry=eff_entry,
                 planned_risk_dollars=planned_risk, min_low=cand.min_low,
-                running_high=cand.running_high,
+                running_high=cand.running_high, remaining_shares=shares,
+                partial=cand.partial, partial_ts=cand.partial_ts,
+                partial_k=ts_to_k[cand.partial_ts] if cand.partial_ts is not None else None,
             )
             open_positions.append(pos)
             open_by_symbol.add(pos.symbol)
@@ -735,7 +807,21 @@ def simulate_portfolio(symbols: list[SymbolData], *, cfg: PortfolioConfig) -> Po
         # 2-faza: konkurentlik namunasi (kunning "peak heat"i)
         concurrency.append(len(open_positions))
 
-        # 3-faza: EXIT
+        # 3-faza: EXIT (a) PARTIAL — slot/symbol-lock BO'SHATILMAYDI, faqat
+        # remaining_shares/open_risk tegishli ulushi kamayadi (Model E, partial_tp_trailing)
+        for pos in [
+            p for p in open_positions
+            if p.partial is not None and not p.partial_realized and p.partial_k == k
+        ]:
+            trade, cash_in, updated_pos = _realize_partial(pos, cfg=cfg)
+            closed_trades.append(trade)
+            trade_symbols.append(pos.symbol)
+            cash += cash_in
+            equity += trade.pnl
+            open_risk -= pos.planned_risk_dollars - updated_pos.planned_risk_dollars
+            open_positions[open_positions.index(pos)] = updated_pos
+
+        # 3-faza: EXIT (b) TO'LIQ (yoki partial'dan keyingi qolgan ulush)
         for pos in [p for p in open_positions if p.exit_k == k]:
             trade, cash_in = _realize(pos, cfg=cfg)
             closed_trades.append(trade)
@@ -746,8 +832,11 @@ def simulate_portfolio(symbols: list[SymbolData], *, cfg: PortfolioConfig) -> Po
             open_positions.remove(pos)
             open_by_symbol.discard(pos.symbol)
 
-        # 4-faza: mark-to-market equity (exit'lardan KEYIN)
-        mtm = cash + sum(p.shares * float(close_ffill[p.symbol][k]) for p in open_positions)
+        # 4-faza: mark-to-market equity (exit'lardan KEYIN) — remaining_shares ishlatiladi
+        # (partial'dan keyin ekspozitsiya kichraygan bo'ladi)
+        mtm = cash + sum(
+            p.remaining_shares * float(close_ffill[p.symbol][k]) for p in open_positions
+        )
         equity_curve.append(mtm)
 
     # Himoya: har exit_ts timeline ichida bo'lgani uchun bu bo'sh bo'lishi kerak.
