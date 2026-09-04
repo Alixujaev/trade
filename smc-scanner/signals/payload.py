@@ -124,7 +124,7 @@ _SETUP_TYPE_BY_REASON_PREFIX: dict[str, str] = {
 }
 
 
-def _setup_type_from_reason(reason: str) -> str:
+def setup_type_from_reason(reason: str) -> str:
     """TradeSetup.reason ("FVG"/"ORDER_BLOCK"/"BREAKOUT_RETEST@<band>") -> qisqa setup_type."""
     for prefix, setup_type in _SETUP_TYPE_BY_REASON_PREFIX.items():
         if reason.startswith(prefix):
@@ -170,7 +170,7 @@ def payload_from_setup(
     return SignalPayload(
         symbol=symbol,
         mode=mode,
-        setup_type=_setup_type_from_reason(setup.reason),
+        setup_type=setup_type_from_reason(setup.reason),
         score=score,
         score_label=score_label_for(score),
         direction=setup.direction,

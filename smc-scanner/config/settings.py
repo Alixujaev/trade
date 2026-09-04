@@ -49,6 +49,10 @@ STOP_BUFFER_ATR_MULT: float = 0.1
 # (har ticker uchun moslashuvchan), qat'iy % emas. Oxirgi close shu oynadan yuqori
 # bo'lsa "o'tib ketgan" (kirib bo'lmaydi), past bo'lsa "zona ichida" (momentum kuchsiz).
 ENTRY_TOLERANCE_ATR_MULT: float = 0.5
+# signals/scanner.py: SignalPayload.entry_zone kengligi = entry ± shu * ATR. MUHIM:
+# ENTRY_TOLERANCE_ATR_MULT'dan ALOHIDA — u "narx hali kirish oynasidami" degan TAKTIK
+# qayta-tekshiruv, bu esa payload'da KO'RSATILADIGAN zonaning KENGLIGI (display concern).
+ENTRY_ZONE_ATR_MULT: float = 0.25
 # Signal engine: mos swing high topilmasa, fallback target = entry + shu * risk
 DEFAULT_TARGET_R_MULTIPLE: float = 2.0
 # Trailing (va fixed) setup'larda rejalashtirilgan R:R shu qiymatdan past bo'lsa,
