@@ -9,6 +9,7 @@ from risk.rules import RiskCheckResult
 from config.core_watchlist import CoreHolding
 from telegram_bot.formatting import (
     HELP_TEXT,
+    chunk_signal_messages,
     format_add_confirmation,
     format_journal_entry_line,
     format_scan_summary,
@@ -422,3 +423,47 @@ def test_help_text_is_valid_legacy_markdown() -> None:
     unescaped_asterisks = HELP_TEXT.replace("\\*", "").count("*")
     assert unescaped_underscores % 2 == 0, "juftlanmagan `_` — legacy Markdown yiqiladi"
     assert unescaped_asterisks % 2 == 0, "juftlanmagan `*` — legacy Markdown yiqiladi"
+
+
+# ======================================================================
+# chunk_signal_messages — signals/swing kartalarini 4096-xavfsiz guruhlash
+# ======================================================================
+
+
+def test_chunk_signal_messages_empty_input() -> None:
+    assert chunk_signal_messages([]) == []
+
+
+def test_chunk_signal_messages_packs_multiple_short_cards_into_one_message() -> None:
+    cards = ["karta A", "karta B", "karta C"]
+    result = chunk_signal_messages(cards, max_length=4096)
+    assert len(result) == 1
+    assert "karta A" in result[0]
+    assert "karta B" in result[0]
+    assert "karta C" in result[0]
+
+
+def test_chunk_signal_messages_splits_when_next_card_would_exceed_limit() -> None:
+    # Har karta 30 belgi, max_length=50 -> bitta xabarga faqat 1 ta karta sig'adi
+    # (30 + "\n\n"(2) + 30 = 62 > 50).
+    cards = ["A" * 30, "B" * 30, "C" * 30]
+    result = chunk_signal_messages(cards, max_length=50)
+
+    assert len(result) == 3
+    for message in result:
+        assert len(message) <= 50
+    # Hech biri yo'qolmagan/takrorlanmagan.
+    joined = "".join(result)
+    assert joined.count("A") == 30
+    assert joined.count("B") == 30
+    assert joined.count("C") == 30
+
+
+def test_chunk_signal_messages_hard_splits_a_single_oversized_card() -> None:
+    oversized = "X" * 130
+    result = chunk_signal_messages([oversized], max_length=50)
+
+    assert len(result) == 3  # 130 = 50 + 50 + 30
+    for message in result:
+        assert len(message) <= 50
+    assert "".join(result) == oversized

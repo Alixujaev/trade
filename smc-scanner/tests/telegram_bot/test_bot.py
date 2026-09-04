@@ -37,6 +37,21 @@ def test_build_application_registers_menu_command() -> None:
     assert "menu" in command_names
 
 
+def test_signals_and_swing_commands_registered() -> None:
+    """/scan (yuqorida allaqachon qamrab olingan) eski tactical_scan.py pipeline'iga
+    tegishli — o'zgartirilmagan. Yangi non-directive signals/scanner.py oqimi /signals
+    va /swing nomlari bilan ro'yxatga olinadi (naming conflict /scan bilan hal qilindi:
+    foydalanuvchi tasdig'i bilan /scan o'zgarishsiz qoldirildi, yangisi boshqa nom oldi)."""
+    app = build_application("123456:fake-token-for-tests")
+
+    command_names: set[str] = set()
+    for handler in app.handlers[0]:
+        if isinstance(handler, CommandHandler):
+            command_names.update(handler.commands)
+
+    assert {"signals", "swing"} <= command_names
+
+
 def test_build_application_registers_add_and_close_conversations() -> None:
     app = build_application("123456:fake-token-for-tests")
 

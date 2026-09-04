@@ -79,6 +79,11 @@ MAX_OPEN_POSITIONS: int = 3
 # xabar limitidan va yuzlab tugmali keyboard'dan oshib ketishi mumkin.
 WATCHLIST_COMPACT_THRESHOLD: int = 40
 
+# telegram_bot/handlers.py: /signals va /swing bitta skan natijasida yuboradigan
+# MAKSIMAL setup soni (score bo'yicha eng yuqorilari) — Telegram 4096 belgi
+# limitidan va uzun xabar oqimidan himoya qiladi.
+MAX_SIGNALS_PER_SCAN: int = 10
+
 
 # ======================================================================
 # V1 breakout+retest strategiyasi (TZ 5-15). Barcha qiymat backtest bilan

@@ -9,7 +9,8 @@ funksiyasi to'g'ridan-to'g'ri chaqiriladi (asyncio.run bilan, pytest-asyncio yo'
 from __future__ import annotations
 
 import asyncio
-from datetime import date
+import dataclasses
+from datetime import date, datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
@@ -17,7 +18,10 @@ from telegram.ext import ConversationHandler
 
 from config.core_watchlist import CoreHolding
 from config.core_watchlist import add_to_core_watchlist as _real_add_to_core_watchlist
+from config.settings import SCORE_THRESHOLDS
 from journal.trade_journal import TradeJournal
+from signals.payload import HistoricalContext, SignalContext, SignalMode, SignalPayload
+from smc.types import StructureState
 from telegram_bot import handlers, keyboards
 
 
@@ -730,3 +734,178 @@ def test_quickadd_cancel_clears_pending_draft() -> None:
 
     assert "pending_quickadd" not in context.user_data
     update.callback_query.edit_message_text.assert_awaited_once()
+
+
+# ---- /signals, /swing ----
+
+
+def _make_signal_payload(
+    symbol: str = "AAPL", *, score: float = 80.0, direction: StructureState = StructureState.BULLISH,
+    trend: str = "BULLISH", structure: str = "BOS",
+) -> SignalPayload:
+    return SignalPayload(
+        symbol=symbol, mode=SignalMode.SWING, setup_type="breakout_retest", score=score,
+        score_label="SETUP", direction=direction, entry_zone=(99.0, 101.0), invalidation=90.0,
+        potential_target=120.0, risk_reward=2.0,
+        context=SignalContext(trend=trend, structure=structure, volume_confirmed=True),
+        historical_context=HistoricalContext(expectancy_r=0.6, win_rate_pct=52.8, period_label="2020-2026"),
+        generated_at=datetime(2026, 1, 1, 9, 0, tzinfo=timezone.utc), timeframe="1d",
+        data_freshness=date(2026, 1, 1),
+    )
+
+
+def _patch_signal_scan(monkeypatch, *, results=None, skipped=None, side_effect=None) -> MagicMock:
+    monkeypatch.setenv("TELEGRAM_ALLOWED_USER_ID", "111")
+    holdings = [CoreHolding("AAPL", "Apple", "stock", "TEKSHIRILISHI KERAK", None)]
+    monkeypatch.setattr(handlers, "get_core_watchlist", lambda: holdings)
+    monkeypatch.setattr(handlers, "get_provider", MagicMock(return_value="FAKE_PROVIDER"))
+    if side_effect is not None:
+        mock_scan_universe = MagicMock(side_effect=side_effect)
+    else:
+        mock_scan_universe = MagicMock(return_value=(results or {}, skipped or []))
+    monkeypatch.setattr(handlers, "scan_universe", mock_scan_universe)
+    return mock_scan_universe
+
+
+def _all_reply_texts(update) -> list[str]:
+    return [call.args[0] for call in update.effective_message.reply_text.call_args_list]
+
+
+def test_signals_calls_scan_universe(monkeypatch) -> None:
+    mock_scan_universe = _patch_signal_scan(monkeypatch, results={}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    mock_scan_universe.assert_called_once()
+    assert mock_scan_universe.call_args.args[0] == ["AAPL"]
+    kwargs = mock_scan_universe.call_args.kwargs
+    assert kwargs["mode"] == SignalMode.SWING
+    assert kwargs["min_score"] == SCORE_THRESHOLDS["watch"]
+
+
+def test_swing_calls_scan_universe_with_swing_mode(monkeypatch) -> None:
+    mock_scan_universe = _patch_signal_scan(monkeypatch, results={}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.swing_scan(update, context))
+
+    mock_scan_universe.assert_called_once()
+    assert mock_scan_universe.call_args.kwargs["mode"] == SignalMode.SWING
+
+
+def test_scan_formats_payload(monkeypatch) -> None:
+    payload = _make_signal_payload("AAPL", score=84.0)
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    from signals.payload import format_payload
+
+    expected_card = format_payload(payload)
+    assert expected_card in _all_reply_texts(update)
+
+
+def test_scan_respects_max_signals(monkeypatch) -> None:
+    payloads = [_make_signal_payload(f"SYM{i}", score=float(90 - i)) for i in range(15)]
+    _patch_signal_scan(monkeypatch, results={"MULTI": payloads}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    texts = _all_reply_texts(update)
+    joined = "\n".join(texts)
+    # Eng yuqori 10 tasi (score 90..81, SYM0..SYM9) ko'rinishi kerak.
+    for i in range(10):
+        assert f"SYM{i}" in joined
+    # Qolgan 5 tasi (SYM10..SYM14, score 80..76) ko'rinmasligi kerak.
+    for i in range(10, 15):
+        assert f"SYM{i}" not in joined
+    summary = texts[-1]
+    assert "Setups: 15" in summary
+    assert "ko'rsatildi: 10" in summary
+
+
+def test_telegram_message_limit(monkeypatch) -> None:
+    # Har birining tarixiy kontekst maydoni sun'iy uzaytirilgan -- jamlanganda 4096'dan oshadi.
+    long_period = "2020-2026 " + ("X" * 500)
+    payloads = []
+    for i in range(20):
+        p = _make_signal_payload(f"SYM{i}", score=float(90 - i))
+        p = dataclasses.replace(
+            p, historical_context=HistoricalContext(
+                expectancy_r=0.6, win_rate_pct=52.8, period_label=long_period,
+            ),
+        )
+        payloads.append(p)
+    _patch_signal_scan(monkeypatch, results={"MULTI": payloads}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    for text in _all_reply_texts(update):
+        assert len(text) <= 4096
+
+
+def test_scan_no_setups(monkeypatch) -> None:
+    _patch_signal_scan(monkeypatch, results={}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    texts = _all_reply_texts(update)
+    assert any("Skan tugadi. Hozircha setup yo'q" in t for t in texts)
+
+
+def test_scan_no_setups_with_skips(monkeypatch) -> None:
+    _patch_signal_scan(monkeypatch, results={}, skipped=[{"symbol": "X", "reason": "yetarsiz data"}])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    texts = _all_reply_texts(update)
+    no_setup_msg = next(t for t in texts if "Hozircha setup yo'q" in t)
+    assert "Skipped: 1" in no_setup_msg
+    assert "yetarsiz data" not in no_setup_msg
+
+
+def test_scan_handles_error(monkeypatch) -> None:
+    _patch_signal_scan(monkeypatch, side_effect=RuntimeError("boom"))
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))  # crash bo'lmasligi kerak
+
+    texts = _all_reply_texts(update)
+    assert "Skanerlashda xatolik, qayta urinib ko'ring." in texts
+    assert not any("boom" in t for t in texts)
+
+
+def test_bearish_does_not_offer_short(monkeypatch) -> None:
+    payload = _make_signal_payload(
+        "AAPL", score=70.0, direction=StructureState.BEARISH, trend="BEARISH", structure="CHoCH",
+    )
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    texts = _all_reply_texts(update)
+    joined = "\n".join(texts).lower()
+    assert "short" not in joined
+    assert "avoid" in joined or "exit" in joined
+
+
+def test_no_directive_language(monkeypatch) -> None:
+    bullish = _make_signal_payload("AAPL", score=85.0)
+    bearish = _make_signal_payload(
+        "MSFT", score=70.0, direction=StructureState.BEARISH, trend="BEARISH", structure="CHoCH",
+    )
+    _patch_signal_scan(monkeypatch, results={"AAPL": [bullish], "MSFT": [bearish]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    joined = "\n".join(_all_reply_texts(update)).lower()
+    for banned in ("buy", "sell", "strong buy", "🚀", "enter now"):
+        assert banned not in joined, f"'{banned}' Telegram javobida topildi"
