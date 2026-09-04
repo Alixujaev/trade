@@ -133,6 +133,13 @@ class TimeExitConfig:
     max_hold_bars: int = 20  # yangi default — repo'da presedent yo'q
 
 
+@dataclass(frozen=True)
+class NoExitConfig:
+    """NoExit (Signal-BH) — parametrsiz. Stop yo'q, target yo'q; faqat exit qoidasini
+    o'chirib, boshqa hamma narsani (risk-based sizing, concurrency, capital recycling,
+    komissiya, slippage) A-F bilan bir xil ushlab turish uchun control group."""
+
+
 # ======================================================================
 # Model A — Fixed SL/TP (mavjud _simulate_fixed_exit'ga adapter, qayta yozilmagan)
 # ======================================================================
@@ -430,10 +437,55 @@ class TimeBasedExit(TimeExitConfig):
 
 
 # ======================================================================
+# NoExit — control group (Signal-BH). Har pozitsiya oyna oxirigacha (mavjud data
+# oxirigacha) ushlab turiladi. Stop/target/struktura/vaqt — hech qanday exit qoidasi yo'q.
+# ======================================================================
+
+
+@dataclass(frozen=True)
+class NoExitExit(NoExitConfig):
+    """Control group: pozitsiya OYNA OXIRIGACHA (mavjud data oxirigacha) ushlab turiladi.
+
+    Exit modellari A-F'dan farqli, lekin constrained-BH'dan HAM farqli: bu model
+    portfolio.py orqali A-F BILAN AYNAN BIR XIL yo'ldan o'tadi — xuddi shu risk-based
+    sizing (_plan_entry), xuddi shu max_concurrent/max_portfolio_risk, xuddi shu
+    komissiya/slippage. Bitta farq: exit qoidasi yo'q. Shu tufayli A-F vs NoExit
+    solishtiruvi FAQAT exit-timing'ni izolyatsiya qiladi — constrained BH'dagi kabi
+    sizing/capital-recycling confound'i yo'q (constrained BH fixed-$ sizing ishlatadi va
+    hech qachon exit qilib capital recycle qilmaydi — ikkalasi ham exit qoidasidan
+    mustaqil o'zgaruvchilar).
+    """
+
+    name: str = "no_exit"
+
+    def find_exit(
+        self,
+        setup: TradeSetup,
+        df: pd.DataFrame,
+        *,
+        closes: np.ndarray,
+        highs: np.ndarray,
+        lows: np.ndarray,
+        atr: pd.Series,
+    ) -> ExitResult:
+        n = len(df)
+        exit_index_pos = n - 1
+        exit_price = float(closes[-1])
+
+        min_low = setup.entry_price
+        running_high = setup.entry_price
+        for j in range(setup.entry_index_pos + 1, exit_index_pos + 1):
+            min_low = min(min_low, float(lows[j]))
+            running_high = max(running_high, float(highs[j]))
+
+        return ExitResult(exit_index_pos, exit_price, "NO_EXIT", min_low, running_high)
+
+
+# ======================================================================
 # Registry / factory
 # ======================================================================
 
-EXIT_MODEL_KEYS: tuple[str, ...] = ("A", "B", "C", "D", "E", "F")
+EXIT_MODEL_KEYS: tuple[str, ...] = ("A", "B", "C", "D", "E", "F", "NOEXIT")
 
 _REGISTRY: dict[str, type] = {
     "A": FixedSLTPExit,
@@ -442,6 +494,7 @@ _REGISTRY: dict[str, type] = {
     "D": StructureBreakExit,
     "E": PartialTpTrailingExit,
     "F": TimeBasedExit,
+    "NOEXIT": NoExitExit,
 }
 
 

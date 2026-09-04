@@ -51,7 +51,7 @@ from config.settings import (  # noqa: E402
 from scripts.backtest_breakout_retest import five_years_ago_iso  # noqa: E402
 from scripts.backtest_portfolio import load_benchmark_df, load_universe  # noqa: E402
 
-DEFAULT_EXITS = "A,B,C,D,E,F"
+DEFAULT_EXITS = "A,B,C,D,E,F,NoExit"
 DEFAULT_SLIPPAGE_PCT = 0.0005  # 0.05% — barcha exit modellari uchun bir xil, default
 MIN_OOS_TRADES = 30
 MEANINGFUL_MARGIN = 0.15
@@ -283,15 +283,21 @@ def verdict_for_model(
     *,
     oos_trade_count: int,
     oos_sharpe: float,
-    constrained_bh_oos_sharpe: float,
+    baseline_oos_sharpe: float,
     min_oos_trades: int = MIN_OOS_TRADES,
     meaningful_margin: float = MEANINGFUL_MARGIN,
 ) -> str:
-    """1) low sample -> INCONCLUSIVE. 2) delta=oos_sharpe-constrained_bh_oos_sharpe:
-    >=margin -> ALPHA; 0<delta<margin -> INCONCLUSIVE; <=0 -> NO EDGE."""
+    """1) low sample -> INCONCLUSIVE. 2) delta=oos_sharpe-baseline_oos_sharpe:
+    >=margin -> ALPHA; 0<delta<margin -> INCONCLUSIVE; <=0 -> NO EDGE.
+
+    `baseline_oos_sharpe` — control group Sharpe'i (NoExit/Signal-BH, `compute_verdicts`
+    orqali). Constrained BH EMAS: constrained BH boshqa sizing (fixed-$) ishlatadi va
+    hech qachon exit qilib capital recycle qilmaydi, shu bois exit-timing ta'sirini sof
+    isbotlay olmaydi (confounded) — faqat ma'lumot/kontekst uchun jadvalda qoladi.
+    """
     if oos_trade_count < min_oos_trades:
         return "INCONCLUSIVE (low sample)"
-    delta = oos_sharpe - constrained_bh_oos_sharpe
+    delta = oos_sharpe - baseline_oos_sharpe
     if delta >= meaningful_margin:
         return "ALPHA: exit value qo'shdi"
     if delta > 0:
@@ -305,22 +311,24 @@ def compute_verdicts(
     min_oos_trades: int = MIN_OOS_TRADES,
     meaningful_margin: float = MEANINGFUL_MARGIN,
 ) -> dict[str, str]:
-    """Har exit model uchun OOS natijalar asosida verdict hisoblaydi.
-
-    Constrained BH Sharpe barcha modellar uchun bir xil (bir xil universe/oyna/xarajat) —
-    birinchi mavjud natijadan olinadi.
+    """Har exit model (NoExit'dan TASHQARI) uchun OOS natijalar asosida verdict hisoblaydi,
+    NoExit (Signal-BH) OOS Sharpe'iga nisbatan — confounded constrained-BH baseline EMAS
+    (constrained BH boshqa sizing + hech qachon capital recycle qilmaydi, shu bois exit-timing
+    ta'sirini sof isbotlay olmaydi). NoExit natija ro'yxatda bo'lmasa — bo'sh dict qaytaradi
+    (chaqiruvchi ogohlantirish chiqarishi kerak).
     """
-    if not oos_results:
+    if "NOEXIT" not in oos_results:
         return {}
-    first = next(iter(oos_results.values()))
-    constrained_sharpe = _benchmark_by_name(first, "capital_constrained_buy_hold").get("sharpe", 0.0)
+    no_exit_sharpe = oos_results["NOEXIT"].metrics["sharpe"]
 
     verdicts: dict[str, str] = {}
     for key, result in oos_results.items():
+        if key == "NOEXIT":
+            continue  # control group -- o'ziga verdict berilmaydi
         trade_count = sum(1 for t in result.trades if t.leg != "partial")
         verdicts[key] = verdict_for_model(
             oos_trade_count=trade_count, oos_sharpe=result.metrics["sharpe"],
-            constrained_bh_oos_sharpe=constrained_sharpe, min_oos_trades=min_oos_trades,
+            baseline_oos_sharpe=no_exit_sharpe, min_oos_trades=min_oos_trades,
             meaningful_margin=meaningful_margin,
         )
     return verdicts
@@ -369,7 +377,9 @@ def build_result_table(
     model_results: dict[str, PortfolioResult], *, verdicts: dict[str, str] | None = None
 ) -> pd.DataFrame:
     """Ustunlar: Model, Return, CAGR, DD, Sharpe, Sortino, Calmar, Expectancy, Profit Factor,
-    Avg Hold, Trades, Verdict. Qatorlar: Equal-weight BH, Constrained BH, so'ng A-F."""
+    Avg Hold, Trades, Verdict. Qatorlar tartibi: Equal-weight BH (pol), Constrained BH
+    (kontekst, verdict'ga ta'sir qilmaydi), NoExit (control -- verdict shunga bog'langan),
+    so'ng A-F."""
     if not model_results:
         return pd.DataFrame(columns=_TABLE_COLS)
 
@@ -380,7 +390,14 @@ def build_result_table(
         bm = _benchmark_by_name(first, bench_name)
         rows.append(_row(label, benchmark_report_metrics(bm), verdict=None))
 
+    if "NOEXIT" in model_results:
+        no_exit_result = model_results["NOEXIT"]
+        rm = to_report_metrics(no_exit_result.metrics, trades=no_exit_result.trades)
+        rows.append(_row("NoExit (control)", rm, verdict="CONTROL"))
+
     for key, result in model_results.items():
+        if key == "NOEXIT":
+            continue
         rm = to_report_metrics(result.metrics, trades=result.trades)
         label = f"{key} ({_EXIT_MODEL_NAMES.get(key, key)})"
         rows.append(_row(label, rm, verdict=verdicts.get(key)))
@@ -446,6 +463,7 @@ def write_experiment(
         "benchmarks": benchmarks,
         "skip_breakdown": skip_breakdown,
         "verdict": verdict,
+        "verdict_baseline": "no_exit",
         "git_commit": commit,
         "timestamp": timestamp.isoformat(),
     }
@@ -470,23 +488,44 @@ _CSV_COLS = [
 ]
 
 
+def _csv_metric_fields(rm: dict) -> dict:
+    """Model va benchmark qatorlari o'rtasida ORTAQ 10 raqamli ustun (verdict/split/model'siz)."""
+    return {
+        "total_return_pct": rm["total_return_pct"], "cagr_pct": rm["cagr_pct"],
+        "max_dd_pct": rm["max_dd_pct"], "sharpe": rm["sharpe"], "sortino": rm["sortino"],
+        "calmar_pct": rm["calmar_pct"], "expectancy_r": rm["expectancy_r"],
+        "profit_factor": rm["profit_factor"], "avg_hold_bars": rm["avg_hold_bars"],
+        "trade_count": rm["trade_count"],
+    }
+
+
 def build_csv_rows(
     all_results: dict[str, dict[str, PortfolioResult]], *, verdicts: dict[str, str] | None = None
 ) -> pd.DataFrame:
-    """(split, model) -> bitta qator. `verdicts` faqat OOS split uchun to'ldiriladi."""
+    """(split, model) -> bitta qator. Uch benchmark (Equal-weight/Constrained/NoExit) + A-F.
+    `verdicts` faqat OOS split'dagi A-F qatorlariga qo'llanadi; NoExit har doim 'CONTROL',
+    Equal-weight/Constrained BH har doim '-'."""
     verdicts = verdicts or {}
     rows: list[dict] = []
     for split, model_results in all_results.items():
+        if model_results:
+            first = next(iter(model_results.values()))
+            for bench_name, label in _BENCH_LABELS.items():
+                bm = _benchmark_by_name(first, bench_name)
+                rm = benchmark_report_metrics(bm)
+                rows.append({"split": split, "model": label, **_csv_metric_fields(rm), "verdict": "-"})
+
         for key, result in model_results.items():
             rm = to_report_metrics(result.metrics, trades=result.trades)
+            if key == "NOEXIT":
+                verdict = "CONTROL"
+            elif split == "OOS":
+                verdict = verdicts.get(key, "-")
+            else:
+                verdict = "-"
             rows.append({
                 "split": split, "model": _EXIT_MODEL_NAMES.get(key, key),
-                "total_return_pct": rm["total_return_pct"], "cagr_pct": rm["cagr_pct"],
-                "max_dd_pct": rm["max_dd_pct"], "sharpe": rm["sharpe"], "sortino": rm["sortino"],
-                "calmar_pct": rm["calmar_pct"], "expectancy_r": rm["expectancy_r"],
-                "profit_factor": rm["profit_factor"], "avg_hold_bars": rm["avg_hold_bars"],
-                "trade_count": rm["trade_count"],
-                "verdict": verdicts.get(key, "-") if split == "OOS" else "-",
+                **_csv_metric_fields(rm), "verdict": verdict,
             })
     return pd.DataFrame(rows, columns=_CSV_COLS)
 
@@ -502,6 +541,12 @@ def main() -> None:
     for key in model_keys:
         if key not in EXIT_MODEL_KEYS:
             raise SystemExit(f"Noma'lum exit model: {key!r} (kutilgan: {EXIT_MODEL_KEYS})")
+    if "NOEXIT" not in model_keys:
+        print(
+            "OGOHLANTIRISH: NoExit (control) --exits ro'yxatida yo'q -- verdict hisoblanmaydi "
+            "(barcha exit modellari uchun Verdict='N/A (no NoExit baseline)').",
+            file=sys.stderr,
+        )
 
     windows = run_windows_all_models(args, model_keys=model_keys)
 
@@ -531,7 +576,14 @@ def main() -> None:
     if "TRAIN" in windows and "OOS" in windows:
         universe = args.symbols if args.symbols else [h.ticker for h in get_core_watchlist()]
         start = args.start or five_years_ago_iso()
+        no_exit_oos = windows["OOS"].get("NOEXIT")
+        no_exit_report = (
+            to_report_metrics(no_exit_oos.metrics, trades=no_exit_oos.trades)
+            if no_exit_oos is not None else None
+        )
         for key in model_keys:
+            if key == "NOEXIT":
+                continue  # control group -- o'zi uchun alohida experiment yozilmaydi
             train_result = windows["TRAIN"][key]
             oos_result = windows["OOS"][key]
             train_metrics = to_report_metrics(train_result.metrics, trades=train_result.trades)
@@ -539,13 +591,15 @@ def main() -> None:
             train_metrics["exit_reason_breakdown"] = exit_reason_breakdown(train_result.trades)
             oos_metrics["exit_reason_breakdown"] = exit_reason_breakdown(oos_result.trades)
             benchmarks = {b.name: b.metrics for b in oos_result.benchmarks}
+            if no_exit_report is not None:
+                benchmarks["no_exit"] = no_exit_report
             path = write_experiment(
                 model_key=key, universe=universe, start=start, end=args.end,
                 oos_start=args.oos_start, interval=args.interval,
                 commission_pct=args.commission_pct, slippage_pct=args.slippage_pct / 100.0,
                 train_metrics=train_metrics, oos_metrics=oos_metrics, benchmarks=benchmarks,
                 skip_breakdown=oos_result.metrics["skipped_by_reason"],
-                verdict=verdicts.get(key, "N/A"),
+                verdict=verdicts.get(key, "N/A (no NoExit baseline)"),
             )
             print(f"Experiment saqlandi: {path}")
 

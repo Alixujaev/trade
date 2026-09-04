@@ -9,7 +9,7 @@ import pandas as pd
 import pytest
 
 import scripts.exit_research as er_module
-from backtest.portfolio import PortfolioResult
+from backtest.portfolio import BenchmarkResult, PortfolioResult
 from backtest.types import TradeResult
 from scripts.exit_research import (
     best_exit,
@@ -112,13 +112,13 @@ def test_entry_generation_runs_exactly_once(monkeypatch) -> None:
 
     symbols, _errors = load_universe_frozen(_args(), start="2020-01-01", end=None)
     all_results = run_all_models(
-        symbols, model_keys=["A", "B", "C", "D", "E", "F"],
+        symbols, model_keys=["A", "B", "C", "D", "E", "F", "NOEXIT"],
         cfg_base=er_module.PortfolioConfig(max_portfolio_risk_pct=1.0),
         benchmark_df=None, benchmark_ticker="SPUS",
     )
 
-    assert len(all_results) == 6
-    # 2 symbol -> load_universe_frozen 2 marta chaqiradi (har symbol uchun 1) -- 6 model UCHUN QAYTA EMAS.
+    assert len(all_results) == 7
+    # 2 symbol -> load_universe_frozen 2 marta chaqiradi (har symbol uchun 1) -- 7 model UCHUN QAYTA EMAS.
     assert calls["n"] == 2
 
 
@@ -133,7 +133,7 @@ def test_all_exit_models_receive_identical_entry_set(monkeypatch) -> None:
 
     symbols, _errors = load_universe_frozen(_args(), start="2020-01-01", end=None)
     all_results = run_all_models(
-        symbols, model_keys=["A", "B", "C", "D", "E", "F"],
+        symbols, model_keys=["A", "B", "C", "D", "E", "F", "NOEXIT"],
         cfg_base=er_module.PortfolioConfig(max_portfolio_risk_pct=1.0),
         benchmark_df=None, benchmark_ticker="SPUS",
     )
@@ -199,14 +199,14 @@ def test_exit_research_no_lookahead(monkeypatch) -> None:
 
 def test_verdict_inconclusive_low_sample() -> None:
     v = verdict_for_model(
-        oos_trade_count=5, oos_sharpe=2.0, constrained_bh_oos_sharpe=0.5,
+        oos_trade_count=5, oos_sharpe=2.0, baseline_oos_sharpe=0.5,
         min_oos_trades=30, meaningful_margin=0.15,
     )
     assert v == "INCONCLUSIVE (low sample)"
 
 
 def test_verdict_alpha_requires_margin() -> None:
-    kw = dict(oos_trade_count=50, constrained_bh_oos_sharpe=1.0, min_oos_trades=30, meaningful_margin=0.15)
+    kw = dict(oos_trade_count=50, baseline_oos_sharpe=1.0, min_oos_trades=30, meaningful_margin=0.15)
     assert verdict_for_model(oos_sharpe=1.2, **kw) == "ALPHA: exit value qo'shdi"  # delta=0.2>=0.15
     assert verdict_for_model(oos_sharpe=1.1, **kw) == "INCONCLUSIVE"  # delta=0.1<0.15
     assert verdict_for_model(oos_sharpe=1.0, **kw) == "NO EDGE"  # delta=0
@@ -216,10 +216,38 @@ def test_verdict_alpha_requires_margin() -> None:
 def test_verdict_higher_return_lower_sharpe_is_no_edge() -> None:
     # Spec's own example: return yuqori bo'lsa ham, Sharpe past -> NO EDGE.
     v = verdict_for_model(
-        oos_trade_count=50, oos_sharpe=0.80, constrained_bh_oos_sharpe=0.95,
+        oos_trade_count=50, oos_sharpe=0.80, baseline_oos_sharpe=0.95,
         min_oos_trades=30, meaningful_margin=0.15,
     )
     assert v == "NO EDGE"
+
+
+def test_compute_verdicts_uses_no_exit_baseline_not_constrained_bh() -> None:
+    # Constrained BH Sharpe=0.5 (past); NoExit Sharpe=1.0 (yuqori). Candidate "A" Sharpe=1.1.
+    # Constrained BH'ga nisbatan delta=0.6 -> ALPHA bo'lardi; NoExit'ga nisbatan delta=0.1 -> INCONCLUSIVE.
+    # compute_verdicts NoExit'ni ishlatishi kerak -- natija INCONCLUSIVE bo'lishi shart.
+    constrained_bh = _fake_benchmark("capital_constrained_buy_hold", sharpe=0.5)
+    oos_results = {
+        "NOEXIT": _fake_portfolio_result(sharpe=1.0, num_trades=50, benchmarks=[constrained_bh]),
+        "A": _fake_portfolio_result(sharpe=1.1, num_trades=50, benchmarks=[constrained_bh]),
+    }
+    verdicts = compute_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15)
+    assert verdicts["A"] == "INCONCLUSIVE"
+
+
+def test_compute_verdicts_no_verdict_for_no_exit_itself() -> None:
+    oos_results = {
+        "NOEXIT": _fake_portfolio_result(sharpe=1.0, num_trades=50),
+        "A": _fake_portfolio_result(sharpe=0.5, num_trades=50),
+    }
+    verdicts = compute_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15)
+    assert "NOEXIT" not in verdicts
+    assert "A" in verdicts
+
+
+def test_compute_verdicts_empty_when_no_exit_missing() -> None:
+    oos_results = {"A": _fake_portfolio_result(sharpe=0.5, num_trades=50)}
+    assert compute_verdicts(oos_results, min_oos_trades=30, meaningful_margin=0.15) == {}
 
 
 def test_best_exit_none_when_no_alpha() -> None:
@@ -243,6 +271,25 @@ def test_best_exit_picks_max_sharpe_among_alpha() -> None:
 # ======================================================================
 
 
+def test_json_experiment_includes_noexit_metrics_and_baseline_field(tmp_path) -> None:
+    path = write_experiment(
+        model_key="A", universe=["AAPL"], start="2020-01-01", end="2026-01-01",
+        oos_start="2023-01-01", interval="1d", commission_pct=0.0, slippage_pct=0.0005,
+        train_metrics={"sharpe": 1.0}, oos_metrics={"sharpe": 0.5},
+        benchmarks={
+            "equal_weight_buy_hold": {"sharpe": 0.3},
+            "capital_constrained_buy_hold": {"sharpe": 0.4},
+            "no_exit": {"sharpe": 0.45, "total_return_pct": 12.0, "trade_count": 40},
+        },
+        skip_breakdown={"max_concurrent": 2}, verdict="NO EDGE", experiments_dir=tmp_path,
+    )
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    assert payload["verdict_baseline"] == "no_exit"
+    assert "no_exit" in payload["benchmarks"]
+    assert payload["benchmarks"]["no_exit"]["sharpe"] == pytest.approx(0.45)
+    assert payload["benchmarks"]["no_exit"]["trade_count"] == 40
+
+
 def test_json_experiment_schema_fields(tmp_path) -> None:
     path = write_experiment(
         model_key="A", universe=["AAPL", "MSFT"], start="2020-01-01", end="2026-01-01",
@@ -256,9 +303,10 @@ def test_json_experiment_schema_fields(tmp_path) -> None:
     for key in (
         "exit_model", "params", "universe", "period", "oos_start", "interval", "costs",
         "train_metrics", "oos_metrics", "benchmarks", "skip_breakdown", "verdict",
-        "git_commit", "timestamp",
+        "verdict_baseline", "git_commit", "timestamp",
     ):
         assert key in payload
+    assert payload["verdict_baseline"] == "no_exit"
     assert payload["exit_model"] == "fixed_sl_tp"
     assert payload["universe"] == ["AAPL", "MSFT"]
     assert payload["period"] == {"start": "2020-01-01", "end": "2026-01-01"}
@@ -278,11 +326,58 @@ def test_json_experiment_never_overwrites(tmp_path) -> None:
 
 
 # ======================================================================
+# Result table
+# ======================================================================
+
+
+def test_build_result_table_row_order_and_control_label() -> None:
+    benches = [
+        _fake_benchmark("equal_weight_buy_hold", sharpe=0.8),
+        _fake_benchmark("capital_constrained_buy_hold", sharpe=0.5),
+    ]
+    model_results = {
+        "A": _fake_portfolio_result(sharpe=1.0, num_trades=10, benchmarks=benches),
+        "NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=10, benchmarks=benches),
+        "B": _fake_portfolio_result(sharpe=0.7, num_trades=10, benchmarks=benches),
+    }
+    verdicts = {"A": "ALPHA: exit value qo'shdi", "B": "NO EDGE"}
+
+    table = build_result_table(model_results, verdicts=verdicts)
+
+    labels = list(table["Model"])
+    assert labels[0] == "Equal-weight BH"
+    assert labels[1] == "Constrained BH"
+    assert labels[2] == "NoExit (control)"
+    assert labels[3:] == [
+        f"A ({er_module._EXIT_MODEL_NAMES['A']})", f"B ({er_module._EXIT_MODEL_NAMES['B']})",
+    ]
+
+    noexit_row = table[table["Model"] == "NoExit (control)"].iloc[0]
+    assert noexit_row["Verdict"] == "CONTROL"
+
+    a_row = table[table["Model"].str.startswith("A (")].iloc[0]
+    assert a_row["Verdict"] == "ALPHA: exit value qo'shdi"
+
+    constrained_row = table[table["Model"] == "Constrained BH"].iloc[0]
+    assert constrained_row["Verdict"] == "-"
+
+
+def test_build_result_table_no_exit_control_regardless_of_verdicts_dict() -> None:
+    # Hatto agar `verdicts` dict'ida "NOEXIT" kaliti bo'lsa ham (bo'lmasligi kerak, lekin
+    # himoya sifatida), jadval qatori har doim "CONTROL" ko'rsatishi kerak.
+    model_results = {"NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=10)}
+    table = build_result_table(model_results, verdicts={"NOEXIT": "ALPHA: exit value qo'shdi"})
+    assert table[table["Model"] == "NoExit (control)"].iloc[0]["Verdict"] == "CONTROL"
+
+
+# ======================================================================
 # CSV export
 # ======================================================================
 
 
-def _fake_portfolio_result(*, sharpe: float, num_trades: int) -> PortfolioResult:
+def _fake_portfolio_result(
+    *, sharpe: float, num_trades: int, benchmarks: list[BenchmarkResult] | None = None
+) -> PortfolioResult:
     trades = [
         TradeResult(
             entry_ts=pd.Timestamp("2020-01-01", tz="UTC"), exit_ts=pd.Timestamp("2020-01-02", tz="UTC"),
@@ -300,11 +395,21 @@ def _fake_portfolio_result(*, sharpe: float, num_trades: int) -> PortfolioResult
     return PortfolioResult(
         trades=trades, trade_symbols=["A"] * num_trades, skipped=[], timeline=[], equity_curve=[],
         concurrency_samples=[], initial_capital=100_000.0, final_capital=105_000.0, metrics=metrics,
-        benchmarks=[],
+        benchmarks=benchmarks if benchmarks is not None else [],
+    )
+
+
+def _fake_benchmark(name: str, *, sharpe: float) -> BenchmarkResult:
+    return BenchmarkResult(
+        name=name, equity_curve=[], metrics={
+            "return_pct": 5.0, "cagr_pct": 10.0, "max_drawdown_pct": -2.0, "sharpe": sharpe, "sortino": sharpe,
+        },
     )
 
 
 def test_csv_export_one_row_per_split_and_model() -> None:
+    # benchmarks=[] -> Equal-weight/Constrained BH qatorlari HAM chiqadi (bo'sh/0 metrikalar
+    # bilan) -- har split uchun 2 benchmark + 2 model = 4 qator, jami 8.
     all_results = {
         "TRAIN": {"A": _fake_portfolio_result(sharpe=1.0, num_trades=3), "B": _fake_portfolio_result(sharpe=1.2, num_trades=4)},
         "OOS": {"A": _fake_portfolio_result(sharpe=0.5, num_trades=2), "B": _fake_portfolio_result(sharpe=0.8, num_trades=5)},
@@ -313,11 +418,89 @@ def test_csv_export_one_row_per_split_and_model() -> None:
 
     df = build_csv_rows(all_results, verdicts=verdicts)
 
-    assert len(df) == 4
-    assert set(zip(df["split"], df["model"])) == {
+    assert len(df) == 8
+    model_rows = df[df["model"].isin(["fixed_sl_tp", "atr_sl_tp"])]
+    assert set(zip(model_rows["split"], model_rows["model"])) == {
         ("TRAIN", "fixed_sl_tp"), ("TRAIN", "atr_sl_tp"), ("OOS", "fixed_sl_tp"), ("OOS", "atr_sl_tp"),
     }
     oos_b = df[(df["split"] == "OOS") & (df["model"] == "atr_sl_tp")].iloc[0]
     assert oos_b["verdict"] == "ALPHA: exit value qo'shdi"
     train_a = df[(df["split"] == "TRAIN") & (df["model"] == "fixed_sl_tp")].iloc[0]
     assert train_a["verdict"] == "-"  # TRAIN split'da verdict yo'q
+
+    bench_rows = df[df["model"].isin(["Equal-weight BH", "Constrained BH"])]
+    assert len(bench_rows) == 4  # 2 split x 2 benchmark
+    assert (bench_rows["verdict"] == "-").all()
+
+
+def test_build_csv_rows_includes_benchmarks_and_control_row() -> None:
+    benches = [
+        _fake_benchmark("equal_weight_buy_hold", sharpe=0.8),
+        _fake_benchmark("capital_constrained_buy_hold", sharpe=0.5),
+    ]
+    all_results = {
+        "TRAIN": {
+            "A": _fake_portfolio_result(sharpe=1.0, num_trades=3, benchmarks=benches),
+            "NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=3, benchmarks=benches),
+        },
+        "OOS": {
+            "A": _fake_portfolio_result(sharpe=1.5, num_trades=3, benchmarks=benches),
+            "NOEXIT": _fake_portfolio_result(sharpe=0.9, num_trades=3, benchmarks=benches),
+        },
+    }
+    verdicts = {"A": "ALPHA: exit value qo'shdi"}
+
+    df = build_csv_rows(all_results, verdicts=verdicts)
+
+    assert set(df["model"]) == {"Equal-weight BH", "Constrained BH", "no_exit", "fixed_sl_tp"}
+    no_exit_rows = df[df["model"] == "no_exit"]
+    assert len(no_exit_rows) == 2  # TRAIN + OOS
+    assert (no_exit_rows["verdict"] == "CONTROL").all()
+    bench_rows = df[df["model"].isin(["Equal-weight BH", "Constrained BH"])]
+    assert (bench_rows["verdict"] == "-").all()
+    oos_a = df[(df["split"] == "OOS") & (df["model"] == "fixed_sl_tp")].iloc[0]
+    assert oos_a["verdict"] == "ALPHA: exit value qo'shdi"
+
+
+# ======================================================================
+# main() -- NoExit ogohlantirish
+# ======================================================================
+
+
+def test_main_warns_when_no_exit_excluded_from_exits(monkeypatch, capsys, tmp_path) -> None:
+    df = _make_df(_breakout_rows())
+    monkeypatch.setattr("scripts.backtest_portfolio.get_provider", lambda name: _FakeProvider(df=df))
+    monkeypatch.setattr(er_module, "EXPERIMENTS_DIR", tmp_path)
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "prog", "A", "B", "--start", "2020-01-01", "--lookback", "1", "--min-rr", "1.5",
+            "--no-require-trend", "--exits", "A,B", "--max-concurrent", "10",
+            "--max-portfolio-risk", "1.0",
+        ],
+    )
+
+    er_module.main()
+
+    err = capsys.readouterr().err
+    assert "OGOHLANTIRISH" in err
+    assert "NoExit" in err
+
+
+def test_main_no_warning_when_no_exit_included(monkeypatch, capsys, tmp_path) -> None:
+    df = _make_df(_breakout_rows())
+    monkeypatch.setattr("scripts.backtest_portfolio.get_provider", lambda name: _FakeProvider(df=df))
+    monkeypatch.setattr(er_module, "EXPERIMENTS_DIR", tmp_path)
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "prog", "A", "B", "--start", "2020-01-01", "--lookback", "1", "--min-rr", "1.5",
+            "--no-require-trend", "--exits", "A,NoExit", "--max-concurrent", "10",
+            "--max-portfolio-risk", "1.0",
+        ],
+    )
+
+    er_module.main()
+
+    err = capsys.readouterr().err
+    assert "OGOHLANTIRISH" not in err

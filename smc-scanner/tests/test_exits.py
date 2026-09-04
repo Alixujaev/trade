@@ -500,9 +500,75 @@ def test_partial_tp_trailing_no_lookahead_bias() -> None:
 # ======================================================================
 
 
-def test_exit_model_registry_builds_all_six_letters() -> None:
+def test_exit_model_registry_builds_all_known_keys() -> None:
     for key in EXIT_MODEL_KEYS:
         model = build_exit_model(key)
         assert hasattr(model, "find_exit")
         assert hasattr(model, "name")
         assert isinstance(model.name, str) and model.name
+
+
+def test_exit_model_registry_key_is_case_insensitive() -> None:
+    for variant in ("noexit", "NoExit", "NOEXIT"):
+        model = build_exit_model(variant)
+        assert model.name == "no_exit"
+
+
+# ======================================================================
+# NoExit (Signal-BH control group)
+# ======================================================================
+
+
+from backtest.exits import NoExitExit  # noqa: E402
+
+
+def test_no_exit_holds_to_end() -> None:
+    # Ataylab: chuqur pastga tushish (stop-out'ga o'xshaydigan) VA baland ko'tarilish
+    # (target-ga o'xshaydigan) bor -- NoExit ikkalasiga ham e'tibor bermasligi kerak.
+    rows = [
+        {"open": 100, "high": 100, "low": 100, "close": 100},  # idx0 entry
+        {"open": 100, "high": 101, "low": 5, "close": 10},  # idx1 chuqur dip (stop-out'ga o'xshaydi)
+        {"open": 10, "high": 500, "low": 9, "close": 400},  # idx2 katta spike (target'ga o'xshaydi)
+        {"open": 400, "high": 410, "low": 390, "close": 405},  # idx3
+        {"open": 405, "high": 420, "low": 395, "close": 88},  # idx4 oxirgi bar
+    ]
+    df = _make_df(rows)
+    setup = _setup(0, entry=100.0, stop=90.0, target=120.0, ts=df.index[0])
+    atr = compute_atr(df, 14)
+    closes, highs, lows = _arrays(df)
+
+    result = NoExitExit().find_exit(setup, df, closes=closes, highs=highs, lows=lows, atr=atr)
+
+    assert result.exit_index_pos == len(df) - 1
+    assert result.exit_price == pytest.approx(closes[-1])
+    assert result.exit_reason == "NO_EXIT"
+    assert result.partial is None
+
+
+def test_no_exit_no_lookahead_bias() -> None:
+    rows = [
+        {"open": 100, "high": 100, "low": 100, "close": 100},  # idx0 entry
+        {"open": 100, "high": 101, "low": 5, "close": 10},  # idx1
+        {"open": 10, "high": 500, "low": 9, "close": 400},  # idx2
+        {"open": 400, "high": 410, "low": 390, "close": 405},  # idx3
+        {"open": 405, "high": 420, "low": 395, "close": 88},  # idx4
+    ]
+    df_full = _make_df(rows)
+    df_truncated = df_full.iloc[:3]  # idx3, idx4 yo'q
+    setup = _setup(0, entry=100.0, stop=90.0, target=120.0, ts=df_full.index[0])
+    atr_full = compute_atr(df_full, 14)
+    atr_trunc = compute_atr(df_truncated, 14)
+    model = NoExitExit()
+
+    closes_f, highs_f, lows_f = _arrays(df_full)
+    full = model.find_exit(setup, df_full, closes=closes_f, highs=highs_f, lows=lows_f, atr=atr_full)
+    assert full.exit_index_pos == 4
+    assert full.exit_price == pytest.approx(closes_f[4])
+
+    closes_t, highs_t, lows_t = _arrays(df_truncated)
+    truncated = model.find_exit(
+        setup, df_truncated, closes=closes_t, highs=highs_t, lows=lows_t, atr=atr_trunc
+    )
+    assert truncated.exit_index_pos == 2
+    assert truncated.exit_price == pytest.approx(closes_t[2])
+    assert truncated.exit_reason == "NO_EXIT"
