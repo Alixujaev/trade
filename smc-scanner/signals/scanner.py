@@ -23,6 +23,7 @@ from config.settings import (
     ATR_PERIOD,
     ENTRY_ZONE_ATR_MULT,
     MIN_BREAKOUT_RR,
+    MOMENTUM_WARNING_BARS,
     SIGNAL_RECENCY_BARS,
     SWING_LOOKBACK,
     VOLUME_MA_PERIOD,
@@ -81,6 +82,28 @@ def _entry_zone(setup: TradeSetup, atr: pd.Series, *, mult: float) -> tuple[floa
     return (setup.entry_price - width, setup.entry_price + width)
 
 
+def recent_momentum_warning(
+    df: pd.DataFrame, entry_low: float, *, bars: int = MOMENTUM_WARNING_BARS,
+) -> bool:
+    """Falling-knife ogohlantirishi: oxirgi (joriy) close entry zonasi ostida VA
+    so'nggi `bars` ta bar ketma-ket pastroq yopilgan bo'lsa -- True.
+
+    ATAYLAB `setup.entry_index_pos`ga emas, df'ning ENG SO'NGGI barlariga qaraydi
+    (trend/structure/ATR/hajm konvensiyasidan farqli, ular determinizm uchun entry
+    barida muzlatiladi) -- chunki bu ogohlantirishning butun maqsadi aynan shu: entry
+    konteksti eski bo'lib, narx keyin ham tushishda davom etgan holatni ushlash.
+    Lookahead yo'q -- faqat mavjud (o'tgan/joriy) barlar o'qiladi, df chegarasidan
+    tashqariga hech qachon chiqilmaydi. FAQAT ogohlantirish (bool bayroq) -- filtr
+    EMAS, score/setup'ga ta'sir qilmaydi.
+    """
+    if len(df) < bars + 1:
+        return False
+    closes = df["close"].iloc[-(bars + 1):]
+    if closes.iloc[-1] >= entry_low:
+        return False
+    return bool((closes.diff().iloc[1:] < 0).all())
+
+
 def scan_symbol(
     df: pd.DataFrame,
     symbol: str,
@@ -95,6 +118,7 @@ def scan_symbol(
     entry_zone_atr_mult: float = ENTRY_ZONE_ATR_MULT,
     interval: str = "1d",
     recency_bars: int | None = SIGNAL_RECENCY_BARS,
+    momentum_warning_bars: int = MOMENTUM_WARNING_BARS,
 ) -> list[SignalPayload]:
     """Bitta symbol uchun: setup topish -> ball berish -> filtrlash -> to'liq kontekstli
     `SignalPayload`larga aylantirish. Tarmoq/IO yo'q — `df` allaqachon yuklangan.
@@ -139,6 +163,7 @@ def scan_symbol(
         volume_confirmed = is_volume_confirmed(df, breakout_pos, period=volume_ma_period)
 
         entry_zone = _entry_zone(setup, atr, mult=entry_zone_atr_mult)
+        momentum_warning = recent_momentum_warning(df, entry_zone[0], bars=momentum_warning_bars)
 
         setup_type = setup_type_from_reason(setup.reason)
         expectancy_r, win_rate_pct, period_label = HISTORICAL_STATS.get(
@@ -158,6 +183,7 @@ def scan_symbol(
             timeframe=interval,
             mode=mode,
             entry_zone=entry_zone,
+            momentum_warning=momentum_warning,
         ))
     return payloads
 
@@ -176,6 +202,7 @@ def scan_universe(
     volume_ma_period: int = VOLUME_MA_PERIOD,
     entry_zone_atr_mult: float = ENTRY_ZONE_ATR_MULT,
     recency_bars: int | None = SIGNAL_RECENCY_BARS,
+    momentum_warning_bars: int = MOMENTUM_WARNING_BARS,
 ) -> tuple[dict[str, list[SignalPayload]], list[dict[str, str]]]:
     """Har symbol uchun ma'lumotni `provider` orqali oladi va `scan_symbol`ni chaqiradi.
 
@@ -212,6 +239,7 @@ def scan_universe(
                 require_trend=require_trend, atr_period=atr_period,
                 volume_ma_period=volume_ma_period, entry_zone_atr_mult=entry_zone_atr_mult,
                 interval=interval, recency_bars=recency_bars,
+                momentum_warning_bars=momentum_warning_bars,
             )
         except Exception as exc:  # noqa: BLE001
             reason = f"skan xatosi: {exc}"

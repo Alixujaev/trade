@@ -92,6 +92,13 @@ MAX_SIGNALS_PER_SCAN: int = 10
 # murojaat qiladi, scan_symbol'ni umuman chaqirmaydi.
 SIGNAL_RECENCY_BARS: int = 10
 
+# signals/scanner.py::recent_momentum_warning — /signals kartasida "falling knife"
+# ogohlantirishi uchun: narx entry zonasi ostida VA so'nggi shu sonli bar ketma-ket
+# pastroq yopilsa, struktura konteksti (entry barida muzlatilgan) eskirgan bo'lishi
+# mumkinligi haqida ogohlantirish ko'rsatiladi. FAQAT ogohlantirish — filtr EMAS,
+# score/ranking/dedup'ga ta'sir qilmaydi.
+MOMENTUM_WARNING_BARS: int = 5
+
 
 # ======================================================================
 # V1 breakout+retest strategiyasi (TZ 5-15). Barcha qiymat backtest bilan

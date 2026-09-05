@@ -160,6 +160,14 @@ class SignalPayload:
     # target_price qaysi mantiq bilan tanlangani: "resistance" | "fallback" | None (audit —
     # R:R deyarli hamma joyda 2.0 bo'lishining sababi, format_payload'da ko'rsatiladi).
     target_source: str | None = None
+    # Oxirgi mavjud (tasdiqlangan) bar close narxi — entry_zone'ga nisbatan qayerda
+    # ekanini ko'rsatish uchun (zone_status). None — noma'lum/berilmagan.
+    current_price: float | None = None
+    # FAQAT ogohlantirish (filtr EMAS, score'ga ta'sir qilmaydi) — narx entry zonasi
+    # ostida VA so'nggi bir necha bar ketma-ket pastroq yopilgan bo'lsa True
+    # (signals/scanner.py::recent_momentum_warning). "Falling knife" holatini
+    # ushlaydi: entry barida muzlatilgan struktura konteksti eskirgan bo'lishi mumkin.
+    momentum_warning: bool = False
 
 
 # ======================================================================
@@ -197,14 +205,17 @@ def payload_from_setup(
     smc: str | None = None,
     entry_zone: tuple[float, float] | None = None,
     generated_at: datetime | None = None,
+    current_price: float | None = None,
+    momentum_warning: bool = False,
 ) -> SignalPayload:
     """`TradeSetup`dan `SignalPayload` quradi — hech narsani QAYTA HISOBLAMAYDI, faqat
     mavjud maydonlarni map qiladi.
 
-    `trend`/`structure`/`volume_confirmed`/`smc`/`historical_*` — TradeSetup'da YO'Q
-    kontekst (strategy/scoring.py allaqachon hisoblab bergan bo'lardi); chaqiruvchi
-    tashqaridan uzatadi. `entry_zone` berilmasa — TradeSetup bitta narx (entry_price)
-    saqlagani uchun (low, high) = (entry_price, entry_price) sifatida qo'yiladi (haqiqiy
+    `trend`/`structure`/`volume_confirmed`/`smc`/`historical_*`/`current_price` —
+    TradeSetup'da YO'Q kontekst (strategy/scoring.py allaqachon hisoblab bergan
+    bo'lardi, yoki scanner oxirgi bar close'idan oladi); chaqiruvchi tashqaridan
+    uzatadi. `entry_zone` berilmasa — TradeSetup bitta narx (entry_price) saqlagani
+    uchun (low, high) = (entry_price, entry_price) sifatida qo'yiladi (haqiqiy
     zona kengligi keyingi scanner-integratsiya bosqichida qo'shiladi).
     """
     if entry_zone is None:
@@ -240,6 +251,8 @@ def payload_from_setup(
         entry_ts=setup.entry_ts.date(),
         score_reasons=setup.score_reasons,
         target_source=setup.target_source,
+        current_price=current_price,
+        momentum_warning=momentum_warning,
     )
 
 
@@ -285,6 +298,7 @@ _AVOID_HEADER_TEMPLATE = "{symbol} — {mode} setup — AVOID / EXIT candidate"
 _SETUP_LINE_TEMPLATE = "Setup: {setup_type}   |   Score: {score:.0f}/100 ({score_label})"
 _CONTEXT_LINE_TEMPLATE = "Trend: {trend}   Structure: {structure}   Volume: {volume}"
 _ENTRY_ZONE_LINE_TEMPLATE = "Entry zone: ${low:.2f} – ${high:.2f}"
+_CURRENT_PRICE_LINE_TEMPLATE = "Joriy: ${current:.2f} — {status}"
 _INVALIDATION_LINE_TEMPLATE = "Invalidation: ${invalidation:.2f}"
 _TARGET_LINE_TEMPLATE = "Target: ${target:.2f}   R:R: {rr:.1f}{source_note}"
 _TARGET_SOURCE_DISPLAY: dict[str, str] = {
@@ -302,6 +316,9 @@ _BACKTEST_LINE_TEMPLATE = (
     "({period}). {disclaimer}"
 )
 _FOOTER_LINE_TEMPLATE = "Generated: {generated}   Data: {data}"
+_MOMENTUM_WARNING_LINE = (
+    "⚠️ So'nggi momentum pastga — struktura eskirgan bo'lishi mumkin, chartni tekshiring."
+)
 
 _VOLUME_DISPLAY = {True: "Confirmed", False: "Not confirmed"}
 
@@ -310,10 +327,27 @@ def _setup_type_display(setup_type: str) -> str:
     return _SETUP_TYPE_DISPLAY.get(setup_type, setup_type.replace("_", " ").title())
 
 
+def zone_status(current_price: float, entry_low: float, entry_high: float) -> str:
+    """Joriy narx entry zonaga nisbatan QAYERDA ekanini tavsiflaydi — FAQAT holat,
+    direktiv EMAS ("kir"/"kirma"/"buy" yo'q; non-directive guard).
+
+    - current < entry_low  -> "zona ostida ($X past, hali faol emas)"
+    - entry_low <= current <= entry_high -> "zona ichida (faol)"
+    - current > entry_high -> "zona ustida ($X yuqori, o'tib ketgan)"
+    """
+    if current_price < entry_low:
+        return f"zona ostida (${entry_low - current_price:.2f} past, hali faol emas)"
+    if current_price > entry_high:
+        return f"zona ustida (${current_price - entry_high:.2f} yuqori, o'tib ketgan)"
+    return "zona ichida (faol)"
+
+
 def format_payload(payload: SignalPayload) -> str:
     """`SignalPayload`ni Telegram-friendly, monospace-mos matnga aylantiradi.
 
-    Emoji yo'q, hech qanday direktiv til ishlatilmaydi. Bearish (`direction=BEARISH`)
+    Emoji yo'q, hech qanday direktiv til ishlatilmaydi — bitta istisno: `momentum_warning`
+    qatorida ⚠️ ishlatiladi (butun repoda "diqqat, lekin harakatga chorlamaydi" ma'nosida
+    standart belgi, masalan telegram_bot/formatting.py). Bearish (`direction=BEARISH`)
     setup'lar uchun entry/target ko'rsatilmaydi — faqat "AVOID / EXIT candidate" holati
     va invalidation darajasi.
 
@@ -321,7 +355,8 @@ def format_payload(payload: SignalPayload) -> str:
     ichida qo'shiladi — R:R deyarli hamma joyda 2.0 bo'lishining manbasi ochiq
     bo'lishi uchun (audit topilmasi: bu prediction emas, geometrik fallback).
     `score_reasons` bo'sh bo'lmasa "Evidence:" bloki qo'shiladi — scanner ko'rgan
-    faktlar, yangi bashorat EMAS.
+    faktlar, yangi bashorat EMAS. `current_price` mavjud bo'lsa entry zona qatoridan
+    keyin "Joriy: $X — <zone_status>" qatori qo'shiladi (faqat holat, direktiv EMAS).
     """
     is_bearish = payload.direction is StructureState.BEARISH
     header_template = _AVOID_HEADER_TEMPLATE if is_bearish else _LONG_HEADER_TEMPLATE
@@ -342,6 +377,13 @@ def format_payload(payload: SignalPayload) -> str:
     else:
         low, high = payload.entry_zone
         lines.append(_ENTRY_ZONE_LINE_TEMPLATE.format(low=low, high=high))
+        if payload.current_price is not None:
+            lines.append(_CURRENT_PRICE_LINE_TEMPLATE.format(
+                current=payload.current_price,
+                status=zone_status(payload.current_price, low, high),
+            ))
+        if payload.momentum_warning:
+            lines.append(_MOMENTUM_WARNING_LINE)
         lines.append(_INVALIDATION_LINE_TEMPLATE.format(invalidation=payload.invalidation))
         source_label = _TARGET_SOURCE_DISPLAY.get(payload.target_source, "")
         source_note = f" ({source_label})" if source_label else ""

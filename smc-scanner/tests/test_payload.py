@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import dataclasses
 from datetime import date, datetime, timezone
 
 import pytest
@@ -14,10 +15,11 @@ from signals.payload import (
     format_payload,
     payload_from_setup,
     score_label_for,
+    zone_status,
 )
 from smc.types import StructureState, TradeSetup
 
-_BANNED_SUBSTRINGS = ["buy", "sell", "short", "🚀", "enter now"]
+_BANNED_SUBSTRINGS = ["buy", "sell", "short", "🚀", "enter now", "kir", "kirma"]
 
 
 def _setup(
@@ -297,6 +299,140 @@ def test_format_payload_omits_target_source_label_when_none() -> None:
     assert "Target: $127.00   R:R: 2.7\n" in text
     assert "fallback geometry" not in text
     assert "resistance-based" not in text
+
+
+# ======================================================================
+# zone_status — joriy narx entry zonaga nisbatan qayerda (sof funksiya)
+# ======================================================================
+
+
+def test_zone_status_below() -> None:
+    assert zone_status(57.51, 57.66, 58.60) == "zona ostida ($0.15 past, hali faol emas)"
+
+
+def test_zone_status_inside_middle() -> None:
+    assert zone_status(58.00, 57.66, 58.60) == "zona ichida (faol)"
+
+
+def test_zone_status_inside_at_low_boundary() -> None:
+    assert zone_status(57.66, 57.66, 58.60) == "zona ichida (faol)"
+
+
+def test_zone_status_inside_at_high_boundary() -> None:
+    assert zone_status(58.60, 57.66, 58.60) == "zona ichida (faol)"
+
+
+def test_zone_status_above() -> None:
+    assert zone_status(58.80, 57.66, 58.60) == "zona ustida ($0.20 yuqori, o'tib ketgan)"
+
+
+def test_zone_status_exact_difference_below() -> None:
+    assert zone_status(99.0, 100.0, 105.0) == "zona ostida ($1.00 past, hali faol emas)"
+
+
+def test_zone_status_exact_difference_above() -> None:
+    assert zone_status(110.0, 100.0, 105.0) == "zona ustida ($5.00 yuqori, o'tib ketgan)"
+
+
+def test_zone_status_no_directive_language() -> None:
+    """Faqat holat tavsifi — "kir"/"kirma"/"buy" kabi direktiv til YO'Q (non-directive
+    guard, signals/payload.py'ning asosiy tamoyili)."""
+    outputs = [
+        zone_status(57.51, 57.66, 58.60),
+        zone_status(58.00, 57.66, 58.60),
+        zone_status(58.80, 57.66, 58.60),
+    ]
+    lowered = "\n".join(outputs).lower()
+    for banned in _BANNED_SUBSTRINGS:
+        assert banned.lower() not in lowered, f"'{banned}' zone_status natijasida topildi"
+
+
+# ======================================================================
+# format_payload — "Joriy narx" qatori (entry zonaga nisbatan holat)
+# ======================================================================
+
+
+def test_format_payload_shows_current_price_line_when_present() -> None:
+    payload = dataclasses.replace(_payload(), entry_zone=(57.66, 58.60), current_price=57.51)
+    text = format_payload(payload)
+
+    assert "Joriy: $57.51 — zona ostida ($0.15 past, hali faol emas)" in text
+
+
+def test_format_payload_current_price_line_placed_after_entry_zone() -> None:
+    payload = dataclasses.replace(_payload(), current_price=58.00)
+    lines = format_payload(payload).splitlines()
+
+    entry_zone_idx = next(i for i, l in enumerate(lines) if l.startswith("Entry zone:"))
+    assert lines[entry_zone_idx + 1].startswith("Joriy:")
+
+
+def test_format_payload_omits_current_price_line_when_none() -> None:
+    payload = _payload()  # current_price default'i None
+    text = format_payload(payload)
+
+    assert "Joriy:" not in text
+
+
+def test_format_payload_current_price_no_directive_language() -> None:
+    payload = dataclasses.replace(_payload(), current_price=58.80)
+    text = format_payload(payload)
+
+    lowered = text.lower()
+    for banned in _BANNED_SUBSTRINGS:
+        assert banned.lower() not in lowered, f"'{banned}' formatlangan matnda topildi"
+
+
+# ======================================================================
+# format_payload — momentum_warning qatori (falling-knife ogohlantirishi)
+# ======================================================================
+
+
+def test_format_payload_shows_momentum_warning_line_when_true() -> None:
+    payload = dataclasses.replace(_payload(), momentum_warning=True)
+    text = format_payload(payload)
+
+    assert "⚠️ So'nggi momentum pastga — struktura eskirgan bo'lishi mumkin, chartni tekshiring." in text
+
+
+def test_format_payload_omits_momentum_warning_line_when_false() -> None:
+    payload = _payload()  # momentum_warning default'i False
+
+    assert "⚠️" not in format_payload(payload)
+
+
+def test_format_payload_momentum_warning_placed_after_current_price_line() -> None:
+    payload = dataclasses.replace(_payload(), current_price=58.00, momentum_warning=True)
+    lines = format_payload(payload).splitlines()
+
+    joriy_idx = next(i for i, l in enumerate(lines) if l.startswith("Joriy:"))
+    assert lines[joriy_idx + 1].startswith("⚠️")
+
+
+def test_format_payload_momentum_warning_placed_after_entry_zone_when_no_current_price() -> None:
+    payload = dataclasses.replace(_payload(), momentum_warning=True)  # current_price=None
+    lines = format_payload(payload).splitlines()
+
+    entry_zone_idx = next(i for i, l in enumerate(lines) if l.startswith("Entry zone:"))
+    assert lines[entry_zone_idx + 1].startswith("⚠️")
+
+
+def test_format_payload_momentum_warning_no_directive_language() -> None:
+    """`_BANNED_SUBSTRINGS`dagi bare "kir" bu yerda o'tkazib yuboriladi -- u neytral
+    so'zlar ichida ham uchraydigan blunt substring ("eskirgan", "tekshiring"), haqiqiy
+    direktiv emas; aniqroq "kirma" baribir tekshiriladi."""
+    payload = dataclasses.replace(_payload(), momentum_warning=True)
+    text = format_payload(payload)
+
+    lowered = text.lower()
+    for banned in _BANNED_SUBSTRINGS:
+        if banned == "kir":
+            continue
+        assert banned.lower() not in lowered, f"'{banned}' momentum warning qatorida topildi"
+
+
+def test_momentum_warning_defaults_to_false() -> None:
+    assert _payload().momentum_warning is False
 
 
 # ======================================================================

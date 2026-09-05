@@ -6,7 +6,13 @@ import pandas as pd
 import pytest
 
 from signals.payload import SignalContext, SignalMode, SignalPayload, HistoricalContext
-from signals.scanner import _entry_zone, _structure_display, scan_symbol, scan_universe
+from signals.scanner import (
+    _entry_zone,
+    _structure_display,
+    recent_momentum_warning,
+    scan_symbol,
+    scan_universe,
+)
 from smc.types import StructureEvent, StructureEventType, StructureState, TradeSetup
 from smc.zones import compute_atr
 
@@ -243,6 +249,105 @@ def test_scan_symbol_no_lookahead() -> None:
     assert f.context.structure == t.context.structure
     assert f.context.volume_confirmed == t.context.volume_confirmed
     assert f.invalidation == pytest.approx(t.invalidation)
+
+
+# ======================================================================
+# recent_momentum_warning -- falling-knife ogohlantirishi (sof funksiya)
+# ======================================================================
+
+
+def test_recent_momentum_warning_true_below_zone_with_consecutive_lower_closes() -> None:
+    # entry_low=100; so'nggi 6 close ketma-ket pastroq, oxirgisi zona ostida (95<100).
+    rows = [
+        {"open": 111, "high": 112, "low": 109, "close": 110},
+        {"open": 110, "high": 111, "low": 107, "close": 108},
+        {"open": 108, "high": 109, "low": 105, "close": 106},
+        {"open": 106, "high": 107, "low": 103, "close": 104},
+        {"open": 104, "high": 105, "low": 101, "close": 102},
+        {"open": 102, "high": 103, "low": 93, "close": 95},
+    ]
+    df = _make_df(rows)
+    assert recent_momentum_warning(df, entry_low=100.0, bars=5) is True
+
+
+def test_recent_momentum_warning_false_when_price_inside_zone() -> None:
+    # Ketma-ket pasayish bor, lekin oxirgi close (101) hali entry_low (100) dan past EMAS.
+    rows = [
+        {"open": 112, "high": 113, "low": 110, "close": 111},
+        {"open": 111, "high": 112, "low": 108, "close": 109},
+        {"open": 109, "high": 110, "low": 106, "close": 107},
+        {"open": 107, "high": 108, "low": 103, "close": 104},
+        {"open": 104, "high": 105, "low": 102, "close": 103},
+        {"open": 103, "high": 104, "low": 100, "close": 101},
+    ]
+    df = _make_df(rows)
+    assert recent_momentum_warning(df, entry_low=100.0, bars=5) is False
+
+
+def test_recent_momentum_warning_false_when_below_zone_but_momentum_mixed() -> None:
+    # Zona ostida (95<100), lekin ketma-ketlik buzilgan (108 -> 109 -- bitta yuqoriga).
+    rows = [
+        {"open": 111, "high": 112, "low": 109, "close": 110},
+        {"open": 110, "high": 111, "low": 107, "close": 108},
+        {"open": 108, "high": 110, "low": 107, "close": 109},
+        {"open": 109, "high": 110, "low": 103, "close": 104},
+        {"open": 104, "high": 105, "low": 101, "close": 102},
+        {"open": 102, "high": 103, "low": 93, "close": 95},
+    ]
+    df = _make_df(rows)
+    assert recent_momentum_warning(df, entry_low=100.0, bars=5) is False
+
+
+def test_recent_momentum_warning_false_when_insufficient_bars() -> None:
+    rows = [
+        {"open": 105, "high": 106, "low": 103, "close": 104},
+        {"open": 104, "high": 105, "low": 101, "close": 102},
+        {"open": 102, "high": 103, "low": 93, "close": 95},
+    ]
+    df = _make_df(rows)  # 3 bar < bars(5)+1
+    assert recent_momentum_warning(df, entry_low=100.0, bars=5) is False
+
+
+# ======================================================================
+# scan_symbol -- momentum_warning to'liq pipeline orqali (falling knife trap)
+# ======================================================================
+
+
+def _fwonk_style_rows() -> list[dict]:
+    """_breakout_rows() bilan bir xil breakout+retest+entry (idx0-22), lekin entry'dan
+    keyin (idx23-29) narx ketma-ket pastga tushadi va entry zonasidan (~$105.6) pastga
+    o'tadi -- FWONK ($108 -> $95.50) uslubidagi davom etayotgan breakdown."""
+    rows = _breakout_rows()[:23]  # idx0-22: baza + breakout(20) + retest(21) + entry(22)
+    rows += [
+        {"open": 106, "high": 107, "low": 102, "close": 104},   # 23
+        {"open": 104, "high": 105, "low": 100, "close": 102},   # 24
+        {"open": 102, "high": 103, "low": 97, "close": 99},     # 25
+        {"open": 99, "high": 100, "low": 95, "close": 97},      # 26
+        {"open": 97, "high": 98, "low": 93, "close": 95.5},     # 27
+        {"open": 95.5, "high": 96, "low": 91, "close": 93},     # 28
+        {"open": 93, "high": 94, "low": 88, "close": 90},       # 29 -- davom etayotgan breakdown
+    ]
+    return rows
+
+
+def test_scan_symbol_flags_momentum_warning_for_fwonk_style_breakdown() -> None:
+    df = _make_df(_fwonk_style_rows())
+    payloads = scan_symbol(df, "FWONK", **_SCAN_KW)
+
+    assert len(payloads) == 1
+    assert payloads[0].momentum_warning is True
+    # MUHIM CHEGARA: ogohlantirish score/setup'ga ta'sir qilmaydi -- setup baribir bor.
+    assert payloads[0].direction is StructureState.BULLISH
+
+
+def test_scan_symbol_no_momentum_warning_for_healthy_retest() -> None:
+    """_breakout_rows() (SLB-uslub): entry'dan keyin narx ko'tariladi -- ogohlantirish
+    chiqmasligi kerak (sog'lom retest, falling knife emas)."""
+    df = _make_df(_breakout_rows())
+    payloads = scan_symbol(df, "SLB", **_SCAN_KW)
+
+    assert len(payloads) == 1
+    assert payloads[0].momentum_warning is False
 
 
 # ======================================================================
