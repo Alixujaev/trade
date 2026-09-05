@@ -413,6 +413,13 @@ _MOMENTUM_WARNING_LINE = (
 
 _VOLUME_DISPLAY = {True: "Confirmed", False: "Not confirmed"}
 
+# MOVED_PAST bir qatorli xulosa (TZ: to'liq karta EMAS) — narx entry zonadan o'tib
+# ketgan setup'lar savdo uchun keraksiz (kirish kech), lekin "necha setup o'tib
+# ketdi" o'lchov/latency ma'lumoti sifatida foydali. Faqat symbol + zonadan qancha
+# yuqori (distance) — score/entry/target/evidence YO'Q, non-directive.
+_MOVED_PAST_SUMMARY_HEADER = "O'tib ketgan (kirish kech):"
+_MOVED_PAST_LINE_TEMPLATE = "- {symbol}: zonadan {distance:+.1f}% yuqorida"
+
 
 def _setup_type_display(setup_type: str) -> str:
     return _SETUP_TYPE_DISPLAY.get(setup_type, setup_type.replace("_", " ").title())
@@ -489,4 +496,26 @@ def format_payload(payload: SignalPayload) -> str:
         data=payload.data_freshness.strftime("%Y-%m-%d"),
     ))
 
+    return "\n".join(lines)
+
+
+def format_moved_past_summary(payloads: list[SignalPayload]) -> str:
+    """MOVED_PAST payload'lar uchun BIR QATORLI xulosa bloki — to'liq karta EMAS.
+
+    Narx entry zonadan yuqoriga o'tib ketgan setup'lar (kirish kech, savdo uchun
+    keraksiz) telegram_bot/handlers.py::_run_signal_scan'da to'liq karta o'rniga
+    shu blokka yig'iladi — joyni band qilmasin, chin faol (ZONE_REACHED/DETECTED)
+    setuplardan e'tiborni chalg'itmasin. Faqat symbol + zonadan qancha yuqori
+    (`distance_to_zone`) — score/entry/target/evidence YO'Q, non-directive
+    (`test_payload_no_directive_language`ga mos).
+
+    `payloads` bo'sh bo'lsa — bo'sh satr ("") qaytadi; chaqiruvchi bo'sh natijani
+    umuman qo'shmasligi kerak (bloк ko'rsatilmaydi, TZ)."""
+    if not payloads:
+        return ""
+    lines = [_MOVED_PAST_SUMMARY_HEADER]
+    for payload in payloads:
+        lines.append(_MOVED_PAST_LINE_TEMPLATE.format(
+            symbol=payload.symbol, distance=payload.distance_to_zone or 0.0,
+        ))
     return "\n".join(lines)

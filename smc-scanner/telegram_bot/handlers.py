@@ -26,7 +26,15 @@ from journal.types import JournalEntry
 from risk.rules import check_open_positions
 from scripts.tactical_scan import DEFAULT_EXIT_MODE, filter_quality_setups, run_scan, scan_one_symbol
 from signals.dedup import DedupStore
-from signals.payload import SignalMode, SignalPayload, format_payload, signal_id_for_payload, signal_id_for_row
+from signals.payload import (
+    SetupStatus,
+    SignalMode,
+    SignalPayload,
+    format_moved_past_summary,
+    format_payload,
+    signal_id_for_payload,
+    signal_id_for_row,
+)
 from signals.scanner import scan_universe
 from telegram_bot import keyboards
 from telegram_bot.auth import require_allowed_user
@@ -201,6 +209,33 @@ def _dedup_filter_new_payloads(payloads: list[SignalPayload]) -> tuple[list[Sign
     return new_payloads, collapsed_count + cooldown_skipped
 
 
+_DISPLAY_STATUS_PRIORITY: dict[SetupStatus, int] = {SetupStatus.ZONE_REACHED: 0, SetupStatus.DETECTED: 1}
+
+
+def _split_by_display_status(
+    payloads: list[SignalPayload],
+) -> tuple[list[SignalPayload], list[SignalPayload]]:
+    """Full-karta (DETECTED/ZONE_REACHED) va MOVED_PAST (bir qatorli xulosa)
+    guruhlariga ajratadi. SKAN MANTIG'INI O'ZGARTIRMAYDI — `payloads` allaqachon
+    `scan_universe`da topilgan/hisoblangan; bu faqat YUBORISH shaklini tanlaydi.
+
+    MOVED_PAST (narx entry zonadan o'tib ketgan, kirish kech) to'liq karta
+    sifatida chin faol (ZONE_REACHED/DETECTED) setup'lardan e'tiborni
+    chalg'itmasin — ular alohida bir qatorli xulosaga tushadi
+    (`signals.payload.format_moved_past_summary`) va MAX_SIGNALS_PER_SCAN
+    cheklovi ularga QO'LLANMAYDI (faqat full-karta guruhiga qo'llanadi).
+
+    Full-karta guruhi ZONE_REACHED (chin faol) avval, keyin DETECTED
+    (yaqinlashayotgan) tartibida qaytadi; har biri ichida kirish tartibi (score
+    bo'yicha kamayish, chaqiruvchidan meros) saqlanadi — `sorted` stable.
+    `status=None` (nazariy — scan_symbol current_price'ni har doim beradi)
+    xavfsiz default sifatida full-kartaga tushadi, hech qachon yashirilmaydi."""
+    cards = [p for p in payloads if p.status is not SetupStatus.MOVED_PAST]
+    cards.sort(key=lambda p: _DISPLAY_STATUS_PRIORITY.get(p.status, 0))
+    moved_past = [p for p in payloads if p.status is SetupStatus.MOVED_PAST]
+    return cards, moved_past
+
+
 async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *, mode: SignalMode) -> None:
     symbols = [h.ticker for h in get_core_watchlist()]
     min_score = SCORE_THRESHOLDS["watch"]
@@ -229,18 +264,25 @@ async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *
         return
 
     new_payloads, dedup_skipped_count = _dedup_filter_new_payloads(all_payloads)
-    shown = new_payloads[:MAX_SIGNALS_PER_SCAN]
 
-    if not shown:
+    if not new_payloads:
         await update.effective_message.reply_text(
             "Yangi setup yo'q — barchasi oldin yuborilgan (cooldown ichida).\n"
             f"🔁 Dedup: {total_found} ta topildi, {dedup_skipped_count} ta o'tkazib yuborildi."
         )
         return
 
-    cards = [format_payload(p) for p in shown]
-    for message in chunk_signal_messages(cards):
-        await update.effective_message.reply_text(message)
+    card_payloads, moved_past_payloads = _split_by_display_status(new_payloads)
+    shown = card_payloads[:MAX_SIGNALS_PER_SCAN]
+
+    if shown:
+        cards = [format_payload(p) for p in shown]
+        for message in chunk_signal_messages(cards):
+            await update.effective_message.reply_text(message)
+
+    moved_past_summary = format_moved_past_summary(moved_past_payloads)
+    if moved_past_summary:
+        await update.effective_message.reply_text(moved_past_summary)
 
     count_line = f"Setups: {total_found}"
     if total_found > len(shown):
@@ -249,9 +291,10 @@ async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *
         f"🔁 Dedup: {total_found} ta topildi, {len(new_payloads)} ta yangi, "
         f"{dedup_skipped_count} ta o'tkazib yuborildi."
     )
-    await update.effective_message.reply_text(
-        f"Scan complete.\n{count_line}\nSkipped: {len(skipped)}\n{dedup_line}"
-    )
+    summary = f"Scan complete.\n{count_line}\nSkipped: {len(skipped)}\n{dedup_line}"
+    if moved_past_payloads:
+        summary += f"\n{len(moved_past_payloads)} ta o'tib ketgan (bir qatorli xulosada)."
+    await update.effective_message.reply_text(summary)
 
 
 @require_allowed_user
