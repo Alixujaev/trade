@@ -15,6 +15,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
 import pandas as pd
+import pytest
 from telegram.ext import ConversationHandler
 
 from config.core_watchlist import CoreHolding
@@ -1401,3 +1402,145 @@ def test_mixed_all_three_statuses_sample(monkeypatch) -> None:
     assert joined.index("MSFT — SWING setup") < joined.index("AAPL — SWING setup")
     assert "O'tib ketgan (kirish kech):\n- NVDA: zonadan +3.5% yuqorida" in joined
     assert "1 ta o'tib ketgan (bir qatorli xulosada)" in texts[-1]
+
+
+# ---- /signals'dan tezkor-qo'shish -- setup snapshot journalga (TZ) ----
+
+
+def test_signal_quickadd_start_caches_payload_and_shows_confirmation(monkeypatch) -> None:
+    payload = _with_status(
+        _make_signal_payload("AAPL", score=84.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.ZONE_REACHED,
+    )
+    payload = dataclasses.replace(payload, current_price=100.5, entry_zone=(99.0, 101.0))
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    scan_update, context = _make_update(), _make_context()
+    _run(handlers.signals_scan(scan_update, context))
+
+    add_update = _make_callback_update("sigadd:AAPL")
+    _run(handlers.signal_quickadd_start(add_update, context))
+
+    draft = context.user_data["pending_quickadd"]
+    assert draft["symbol"] == "AAPL"
+    assert draft["entry_price"] == pytest.approx(100.5)  # current_price ishlatiladi
+    assert draft["stop_price"] == payload.invalidation
+    assert draft["target_price"] is None  # non-directive -- exit qarori foydalanuvchiniki
+    assert draft["reference_target_price"] == payload.potential_target
+    assert draft["setup_type"] == payload.setup_type
+    assert draft["score"] == payload.score
+    assert draft["status"] == "ZONE_REACHED"
+
+    text = add_update.callback_query.edit_message_text.call_args_list[0].args[0]
+    assert "Jurnalga qo'shilsinmi?" in text
+    assert "reply_markup" in add_update.callback_query.edit_message_text.call_args_list[0].kwargs
+
+
+def test_signal_quickadd_start_falls_back_to_zone_midpoint_when_no_current_price(monkeypatch) -> None:
+    """current_price yo'q bo'lsa (masalan payload observation'siz) -- entry_zone
+    o'rtachasi ishlatiladi."""
+    payload = _make_signal_payload("AAPL", score=84.0, entry_ts=date(2026, 1, 1))
+    payload = dataclasses.replace(payload, current_price=None, entry_zone=(98.0, 102.0))
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    scan_update, context = _make_update(), _make_context()
+    _run(handlers.signals_scan(scan_update, context))
+
+    add_update = _make_callback_update("sigadd:AAPL")
+    _run(handlers.signal_quickadd_start(add_update, context))
+
+    assert context.user_data["pending_quickadd"]["entry_price"] == pytest.approx(100.0)
+
+
+def test_signal_quickadd_start_expired_cache_shows_message(monkeypatch) -> None:
+    """Kesh yo'q (masalan boshqa /signals chaqirilgan yoki bot qayta ishga
+    tushgan) -- eskirgan xabari, crash yo'q."""
+    monkeypatch.setenv("TELEGRAM_ALLOWED_USER_ID", "111")
+    context = _make_context()
+    add_update = _make_callback_update("sigadd:AAPL")
+
+    _run(handlers.signal_quickadd_start(add_update, context))
+
+    text = add_update.callback_query.edit_message_text.call_args_list[0].args[0]
+    assert "eskirgan" in text
+    assert "pending_quickadd" not in context.user_data
+
+
+def test_signal_quickadd_confirm_saves_full_snapshot_to_journal(monkeypatch, tmp_path) -> None:
+    """Uchidan-uchgacha: /signals -> ➕ tugma -> tasdiqlash -> journal yozuvida
+    BUTUN setup snapshot'i mavjud (score/trend/structure/status/... )."""
+    payload = _with_status(
+        _make_signal_payload("AAPL", score=84.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.ZONE_REACHED,
+    )
+    payload = dataclasses.replace(
+        payload, current_price=100.5, entry_zone=(99.0, 101.0),
+        context=SignalContext(trend="BULLISH", structure="BOS", volume_confirmed=True),
+        score_reasons=("trend: kuchli yuqori", "hajm: tasdiqlangan"),
+    )
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    scan_update, context = _make_update(), _make_context()
+    _run(handlers.signals_scan(scan_update, context))
+    _run(handlers.signal_quickadd_start(_make_callback_update("sigadd:AAPL"), context))
+
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    monkeypatch.setattr(handlers, "TradeJournal", lambda: journal)
+    confirm_update = _make_callback_update("addconfirm")
+
+    _run(handlers.quickadd_confirm(confirm_update, context))
+
+    assert len(journal.entries) == 1
+    entry = journal.entries[0]
+    assert entry.symbol == "AAPL"
+    assert entry.entry_price == pytest.approx(100.5)
+    assert entry.stop_price == pytest.approx(payload.invalidation)
+    assert entry.target_price is None
+    assert entry.reference_target_price == pytest.approx(payload.potential_target)
+    assert entry.setup_type == payload.setup_type
+    assert entry.score == pytest.approx(84.0)
+    assert entry.score_label == payload.score_label
+    assert entry.trend == "BULLISH"
+    assert entry.structure == "BOS"
+    assert entry.volume_confirmed is True
+    assert entry.entry_zone_low == pytest.approx(99.0)
+    assert entry.entry_zone_high == pytest.approx(101.0)
+    assert entry.invalidation == pytest.approx(payload.invalidation)
+    assert entry.target == pytest.approx(payload.potential_target)
+    assert entry.risk_reward == pytest.approx(payload.risk_reward)
+    assert entry.status == "ZONE_REACHED"
+    assert entry.score_reasons == ("trend: kuchli yuqori", "hajm: tasdiqlangan")
+
+
+def test_manual_add_flow_has_no_setup_snapshot(monkeypatch, tmp_path) -> None:
+    """Qo'lda /add oqimi (payload yo'q) -- barcha snapshot maydonlari None/bo'sh,
+    bu NORMAL (backward-compat, requirement 3)."""
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    monkeypatch.setattr(handlers, "TradeJournal", lambda: journal)
+    context = _make_context()
+
+    _run(handlers.add_start(_make_update(), context))
+    _run(handlers.add_symbol(_make_update("AAPL"), context))
+    _run(handlers.add_entry_price(_make_update("100"), context))
+    _run(handlers.add_stop_price(_make_update("90"), context))
+    _run(handlers.add_target_price(_make_update("130"), context))
+    _run(handlers.add_reason(_make_update("qo'lda kiritilgan"), context))
+
+    assert len(journal.entries) == 1
+    entry = journal.entries[0]
+    assert entry.setup_type is None
+    assert entry.score is None
+    assert entry.status is None
+    assert entry.score_reasons == ()
+
+
+def test_signal_quickadd_excludes_bearish_from_summary_keyboard(monkeypatch) -> None:
+    """Bearish (AVOID/EXIT) payload uchun /signals yakuniy xabarida ➕ tugma
+    chiqmasligi kerak -- bot short taklif qilmaydi."""
+    bearish = _make_signal_payload(
+        "MSFT", score=70.0, direction=StructureState.BEARISH, trend="BEARISH", structure="CHoCH",
+    )
+    _patch_signal_scan(monkeypatch, results={"MSFT": [bearish]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    kwargs = update.effective_message.reply_text.call_args_list[-1].kwargs
+    assert kwargs["reply_markup"] is None

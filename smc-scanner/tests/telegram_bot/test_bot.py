@@ -98,6 +98,7 @@ def test_build_application_registers_quickadd_callback_handlers() -> None:
     }
 
     assert r"^add:" in patterns
+    assert r"^sigadd:" in patterns  # TZ: /signals'dan setup snapshot bilan tezkor-qo'shish
     assert f"^{keyboards.CONFIRM_CALLBACK_DATA}$" in patterns
     assert f"^{keyboards.DISCARD_CALLBACK_DATA}$" in patterns
 

@@ -96,6 +96,133 @@ def test_csv_round_trip_preserves_reference_target_price(tmp_path) -> None:
     assert reloaded.entries[0].rr_planned == pytest.approx(2.0)
 
 
+# ======================================================================
+# Setup snapshot (TZ) — trade ochilgan paytdagi to'liq setup konteksti
+# ======================================================================
+
+
+def test_add_entry_stores_snapshot_fields(tmp_path) -> None:
+    """Quickadd-from-signal oqimi kabi -- snapshot kwarg'lar berilsa, JournalEntry'da
+    to'g'ri saqlanadi."""
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+
+    entry = journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=150.0, stop_price=140.0,
+        target_price=None, exit_mode="trailing", reason="breakout_retest",
+        reference_target_price=170.0,
+        setup_type="breakout_retest", score=84.0, score_label="STRONG SETUP",
+        trend="BULLISH", structure="BOS", volume_confirmed=True,
+        entry_zone_low=148.0, entry_zone_high=152.0, invalidation=140.0, target=170.0,
+        risk_reward=2.5, target_source="resistance", status="ZONE_REACHED",
+        score_reasons=("trend: kuchli", "hajm: tasdiqlangan"),
+    )
+
+    assert entry.setup_type == "breakout_retest"
+    assert entry.score == pytest.approx(84.0)
+    assert entry.score_label == "STRONG SETUP"
+    assert entry.trend == "BULLISH"
+    assert entry.structure == "BOS"
+    assert entry.volume_confirmed is True
+    assert entry.entry_zone_low == pytest.approx(148.0)
+    assert entry.entry_zone_high == pytest.approx(152.0)
+    assert entry.invalidation == pytest.approx(140.0)
+    assert entry.target == pytest.approx(170.0)
+    assert entry.risk_reward == pytest.approx(2.5)
+    assert entry.target_source == "resistance"
+    assert entry.status == "ZONE_REACHED"
+    assert entry.score_reasons == ("trend: kuchli", "hajm: tasdiqlangan")
+
+
+def test_add_entry_without_snapshot_defaults_to_none(tmp_path) -> None:
+    """Qo'lda /add oqimi kabi -- snapshot kwarg'lar berilmasa, hammasi None/bo'sh
+    (backward-compat, payload yo'q holat normal)."""
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+
+    entry = journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="qo'lda kiritilgan",
+    )
+
+    assert entry.setup_type is None
+    assert entry.score is None
+    assert entry.score_label is None
+    assert entry.trend is None
+    assert entry.structure is None
+    assert entry.volume_confirmed is None
+    assert entry.entry_zone_low is None
+    assert entry.entry_zone_high is None
+    assert entry.invalidation is None
+    assert entry.target is None
+    assert entry.risk_reward is None
+    assert entry.target_source is None
+    assert entry.status is None
+    assert entry.score_reasons == ()
+
+
+def test_csv_round_trip_preserves_snapshot_fields(tmp_path) -> None:
+    """Snapshot maydonlari (bool va score_reasons tuple'i ham) yozib-o'qishda
+    to'g'ri saqlanishi kerak."""
+    csv_path = tmp_path / "journal.csv"
+    journal = TradeJournal(csv_path=csv_path)
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=150.0, stop_price=140.0,
+        target_price=None, exit_mode="trailing", reason="breakout_retest",
+        reference_target_price=170.0,
+        setup_type="breakout_retest", score=84.0, score_label="STRONG SETUP",
+        trend="BULLISH", structure="BOS", volume_confirmed=True,
+        entry_zone_low=148.0, entry_zone_high=152.0, invalidation=140.0, target=170.0,
+        risk_reward=2.5, target_source="resistance", status="ZONE_REACHED",
+        score_reasons=("trend: kuchli", "hajm: tasdiqlangan"),
+    )
+    journal.add_entry(
+        symbol="MSFT", entry_date=date(2026, 1, 1), entry_price=300.0, stop_price=290.0,
+        target_price=None, exit_mode="trailing", reason="fvg",
+        volume_confirmed=False,  # False ham True kabi to'g'ri saqlanishi kerak (NaN emas)
+    )
+
+    reloaded = TradeJournal(csv_path=csv_path)
+
+    first = next(e for e in reloaded.entries if e.symbol == "AAPL")
+    assert first.setup_type == "breakout_retest"
+    assert first.score == pytest.approx(84.0)
+    assert first.volume_confirmed is True
+    assert first.entry_zone_low == pytest.approx(148.0)
+    assert first.entry_zone_high == pytest.approx(152.0)
+    assert first.status == "ZONE_REACHED"
+    assert first.score_reasons == ("trend: kuchli", "hajm: tasdiqlangan")
+
+    second = next(e for e in reloaded.entries if e.symbol == "MSFT")
+    assert second.volume_confirmed is False
+    assert second.setup_type is None
+    assert second.score is None
+    assert second.score_reasons == ()
+
+
+def test_load_legacy_csv_without_snapshot_columns(tmp_path) -> None:
+    """Snapshot maydonlari qo'shilishidan OLDINGI CSV (bu ustunlar UMUMAN yo'q) —
+    to'liq bir qatorli haqiqiy yozuv bilan yuklansa, o'chib qolmasdan, snapshot
+    maydonlari default (None/bo'sh)ga tushadi."""
+    csv_path = tmp_path / "legacy.csv"
+    csv_path.write_text(
+        "entry_id,symbol,entry_date,entry_price,stop_price,target_price,"
+        "reference_target_price,exit_mode,reason,rr_planned,notes,exit_date,"
+        "exit_price,r_multiple\n"
+        "1,AAPL,2026-01-01,100.0,90.0,130.0,,fixed,FVG,3.0,,,,\n"
+    )
+
+    journal = TradeJournal(csv_path=csv_path)
+
+    assert len(journal.entries) == 1
+    entry = journal.entries[0]
+    assert entry.symbol == "AAPL"
+    assert entry.entry_price == pytest.approx(100.0)
+    assert entry.setup_type is None
+    assert entry.score is None
+    assert entry.volume_confirmed is None
+    assert entry.entry_zone_low is None
+    assert entry.score_reasons == ()
+
+
 def test_close_entry_hand_verified(tmp_path) -> None:
     journal = TradeJournal(csv_path=tmp_path / "journal.csv")
     entry = journal.add_entry(
