@@ -14,14 +14,13 @@ BUTTON_SCAN = "🔍 Skanerlash"
 BUTTON_STATUS = "📂 Holat"
 BUTTON_JOURNAL = "📒 Jurnal"
 BUTTON_STATS = "📈 Statistika"
-BUTTON_WATCHLIST = "📋 Watchlist"
-BUTTON_HELP = "❓ Yordam"
 
+# Watchlist va Yordam menyu tugmasi sifatida YO'Q (menyuni ixcham saqlash uchun) —
+# lekin buyruq sifatida hamon ishlaydi: /watchlist, /watchadd, /watchremove, /help.
 MAIN_MENU_KEYBOARD = ReplyKeyboardMarkup(
     [
         [BUTTON_SCAN, BUTTON_STATUS],
         [BUTTON_JOURNAL, BUTTON_STATS],
-        [BUTTON_WATCHLIST, BUTTON_HELP],
     ],
     resize_keyboard=True,
 )

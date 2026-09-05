@@ -29,7 +29,7 @@ HELP_TEXT = (
     "🤖 *Halal SMC Swing Scanner — buyruqlar*\n\n"
     "/scan [SYMBOLS] — watchlist yoki berilgan ticker(lar)ni skan qiladi (past R:R yashirilgan)\n"
     # `_` legacy Markdown'da kursiv boshlaydi — juftlanmagan `_` butun xabarni
-    # "Can't parse entities" bilan yiqitadi (start/help/❓ tugma hammasi jim qoladi).
+    # "Can't parse entities" bilan yiqitadi (start/help hammasi jim qoladi).
     "/scan\\_all [SYMBOLS] — /scan kabi, lekin past R:R setup'larni ham ko'rsatadi\n"
     "/status — ochiq savdolar + ochiq pozitsiyalar holati\n"
     "/add — yangi savdo qo'shish (interaktiv)\n"
@@ -39,7 +39,10 @@ HELP_TEXT = (
     "/watchlist — taktik watchlist\n"
     "/watchadd — watchlistga yangi aksiya/ETF qo'shish (interaktiv)\n"
     "/watchremove TICKER — watchlistdan belgi o'chirish\n"
-    "/menu — pastki menyuni qayta ko'rsatish\n\n"
+    "/menu — pastki menyuni qayta ko'rsatish\n"
+    # Watchlist/Yordam menyu tugmasi sifatida YO'Q (telegram_bot/keyboards.py) —
+    # foydalanuvchi buyruqni shu matndan bilishi kerak.
+    "/help — shu yordam matnini qayta ko'rsatadi\n\n"
     f"{PAPER_DISCLAIMER}"
 )
 

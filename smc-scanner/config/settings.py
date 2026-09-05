@@ -84,6 +84,14 @@ WATCHLIST_COMPACT_THRESHOLD: int = 40
 # limitidan va uzun xabar oqimidan himoya qiladi.
 MAX_SIGNALS_PER_SCAN: int = 10
 
+# signals/scanner.py::scan_symbol — LIVE skaner faqat SO'NGGI setuplarni ko'rsatishi
+# uchun: entry bari oxirgi bardan shu sondan ko'p bar OLDIN bo'lsa, setup "eskirgan"
+# deb chiqarib tashlanadi (masalan 2020-yildagi tarixiy setup emas — so'nggi
+# ~2 haftalik oyna). Backtest (backtest/) bu qiymatga TA'SIRLANMAYDI — u
+# strategy.breakout_retest.generate_breakout_retest_signals'ga to'g'ridan-to'g'ri
+# murojaat qiladi, scan_symbol'ni umuman chaqirmaydi.
+SIGNAL_RECENCY_BARS: int = 10
+
 
 # ======================================================================
 # V1 breakout+retest strategiyasi (TZ 5-15). Barcha qiymat backtest bilan

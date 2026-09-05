@@ -749,6 +749,15 @@ def test_menu_scan_button_wired_to_signals_scan() -> None:
     assert handlers.MENU_BUTTON_HANDLERS[keyboards.BUTTON_SCAN] is handlers.signals_scan
 
 
+def test_menu_button_handlers_has_exactly_four_entries() -> None:
+    """Watchlist va Yordam tugmalari menyudan olib tashlangan -- ular endi faqat
+    buyruq (/watchlist, /help), MENU_BUTTON_HANDLERS'da yo'q."""
+    assert set(handlers.MENU_BUTTON_HANDLERS) == {
+        keyboards.BUTTON_SCAN, keyboards.BUTTON_STATUS,
+        keyboards.BUTTON_JOURNAL, keyboards.BUTTON_STATS,
+    }
+
+
 def test_menu_button_unknown_text_does_nothing(monkeypatch) -> None:
     update, context = _make_update("random text"), _make_context()
 

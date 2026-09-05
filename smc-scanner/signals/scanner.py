@@ -23,6 +23,7 @@ from config.settings import (
     ATR_PERIOD,
     ENTRY_ZONE_ATR_MULT,
     MIN_BREAKOUT_RR,
+    SIGNAL_RECENCY_BARS,
     SWING_LOOKBACK,
     VOLUME_MA_PERIOD,
 )
@@ -77,6 +78,7 @@ def scan_symbol(
     volume_ma_period: int = VOLUME_MA_PERIOD,
     entry_zone_atr_mult: float = ENTRY_ZONE_ATR_MULT,
     interval: str = "1d",
+    recency_bars: int | None = SIGNAL_RECENCY_BARS,
 ) -> list[SignalPayload]:
     """Bitta symbol uchun: setup topish -> ball berish -> filtrlash -> to'liq kontekstli
     `SignalPayload`larga aylantirish. Tarmoq/IO yo'q — `df` allaqachon yuklangan.
@@ -84,12 +86,20 @@ def scan_symbol(
     Lookahead yo'q: trend/structure/ATR/hajm seriyalari orqaga qarovchi (backward-looking)
     bo'lib, faqat `setup.entry_index_pos`da o'qiladi — kelajak barlarga hech qachon
     murojaat qilinmaydi (bu kafolat strategy/smc qatlamlarining o'zida allaqachon bor).
+
+    `recency_bars`: entry bari oxirgi bardan shu sondan ko'p bar OLDIN bo'lgan
+    setup'lar chiqarib tashlanadi (LIVE skaner faqat SO'NGGI setuplarni ko'rsatishi
+    uchun — butun tarixdagi eski setup'lar emas, TZ). `None` — filtrsiz (masalan
+    tadqiqot kontekstida to'liq ro'yxat kerak bo'lsa).
     """
     setups = generate_breakout_retest_signals(
         df, lookback=lookback, min_rr=min_rr, require_trend=require_trend,
     )
     setups = apply_scores(df, setups, lookback=lookback, min_rr=min_rr)
     setups = filter_by_score(setups, min_score)
+    if recency_bars is not None:
+        cutoff = len(df) - 1 - recency_bars
+        setups = [s for s in setups if s.entry_index_pos >= cutoff]
     if not setups:
         return []
 
@@ -149,6 +159,7 @@ def scan_universe(
     atr_period: int = ATR_PERIOD,
     volume_ma_period: int = VOLUME_MA_PERIOD,
     entry_zone_atr_mult: float = ENTRY_ZONE_ATR_MULT,
+    recency_bars: int | None = SIGNAL_RECENCY_BARS,
 ) -> tuple[dict[str, list[SignalPayload]], list[dict[str, str]]]:
     """Har symbol uchun ma'lumotni `provider` orqali oladi va `scan_symbol`ni chaqiradi.
 
@@ -184,7 +195,7 @@ def scan_universe(
                 df, symbol, mode=mode, min_score=min_score, lookback=lookback, min_rr=min_rr,
                 require_trend=require_trend, atr_period=atr_period,
                 volume_ma_period=volume_ma_period, entry_zone_atr_mult=entry_zone_atr_mult,
-                interval=interval,
+                interval=interval, recency_bars=recency_bars,
             )
         except Exception as exc:  # noqa: BLE001
             reason = f"skan xatosi: {exc}"

@@ -715,7 +715,5 @@ MENU_BUTTON_HANDLERS.update(
         keyboards.BUTTON_STATUS: status,
         keyboards.BUTTON_JOURNAL: journal_command,
         keyboards.BUTTON_STATS: stats_command,
-        keyboards.BUTTON_WATCHLIST: watchlist,
-        keyboards.BUTTON_HELP: help_command,
     }
 )

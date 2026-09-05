@@ -108,6 +108,45 @@ def test_scan_respects_min_score() -> None:
     assert len(below) == 1
 
 
+# ======================================================================
+# recency filtri -- live skaner faqat SO'NGGI setuplarni ko'rsatadi
+# ======================================================================
+
+
+def test_scan_symbol_filters_stale_setup_beyond_recency_window() -> None:
+    """_breakout_rows()dagi setup (entry_index_pos=22) 20 ta qo'shimcha flat bar
+    bilan endi oxirgi bardan 27 bar oldin -- default SIGNAL_RECENCY_BARS (10) bilan
+    "eskirgan" hisoblanadi va chiqarib tashlanadi."""
+    rows = _breakout_rows() + [{"open": 143, "high": 144, "low": 142, "close": 143} for _ in range(20)]
+    df = _make_df(rows)
+
+    payloads = scan_symbol(df, "AAPL", **_SCAN_KW)
+
+    assert payloads == []
+
+
+def test_scan_symbol_recency_bars_none_disables_filter() -> None:
+    """recency_bars=None -- filtr o'chirilgan, eski setup ham qaytadi (test/tadqiqot
+    uchun escape hatch)."""
+    rows = _breakout_rows() + [{"open": 143, "high": 144, "low": 142, "close": 143} for _ in range(20)]
+    df = _make_df(rows)
+
+    payloads = scan_symbol(df, "AAPL", recency_bars=None, **_SCAN_KW)
+
+    assert len(payloads) == 1
+
+
+def test_scan_symbol_recency_boundary_respects_custom_value() -> None:
+    """Asosiy _breakout_rows() df'ida setup oxirgi bardan 7 bar oldin -- default
+    (10) bilan "yangi" (test_scan_symbol_fills_real_context'da tasdiqlangan), lekin
+    recency_bars=5 (7>5) bilan "eskirgan" -- custom qiymat to'g'ri qo'llanadi."""
+    df = _make_df(_breakout_rows())
+
+    payloads = scan_symbol(df, "AAPL", recency_bars=5, **_SCAN_KW)
+
+    assert payloads == []
+
+
 def test_scan_symbol_no_lookahead() -> None:
     df_full = _make_df(_breakout_rows())
     # idx22 (entry) dan keyin bir nechta bar bilan kesamiz -- struktura/ATR/hajm konteksti
