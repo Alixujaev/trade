@@ -214,7 +214,7 @@ def test_format_payload_snapshot() -> None:
         "Invalidation: $90.00\n"
         "Target: $127.00   R:R: 2.7\n"
         "---\n"
-        "Backtest context: expectancy +0.27R, win-rate 41% (2020-2026, Bu kelajak natija kafolati emas.)\n"
+        "Backtest context: expectancy +0.27R, win-rate 41% (2020-2026). Bu kelajak natija kafolati emas.\n"
         "Generated: 2026-08-16 09:30   Data: 2026-08-15"
     )
     assert text == expected

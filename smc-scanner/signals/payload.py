@@ -153,6 +153,7 @@ class SignalPayload:
     generated_at: datetime
     timeframe: str
     data_freshness: date  # oxirgi mavjud bar sanasi
+    entry_ts: date | None = None  # setup.entry_ts sanasi (TZ 18 dedup uchun — signal_id_for_payload)
 
 
 # ======================================================================
@@ -230,6 +231,34 @@ def payload_from_setup(
         generated_at=generated_at or datetime.now(timezone.utc),
         timeframe=timeframe,
         data_freshness=data_freshness,
+        entry_ts=setup.entry_ts.date(),
+    )
+
+
+def signal_id_for_payload(payload: SignalPayload) -> str | None:
+    """`SignalPayload`dan barqaror signal_id (TZ 18) — `signal_id_for_row` (/scan,
+    row-dict oqimi) bilan BIR XIL hash mexanizmi (`compute_signal_id`), lekin
+    `signals/scanner.py`ning yangi, non-directive `SignalPayload` maydonlaridan:
+
+    - entry_price `entry_zone`dan tiklanadi: `(low+high)/2` — `signals/scanner.py::
+      _entry_zone` har doim `entry_price` atrofida SIMMETRIK kengaytiradi (yoki
+      degenerativ holatda `(entry_price, entry_price)`), shu sabab bu qiymat ANIQ,
+      qayta hisoblash emas.
+    - mode sifatida `payload.mode.name` ("SWING") ishlatiladi — `SignalPayload`
+      o'zining skan-rejimini allaqachon saqlaydi, tashqaridan uzatish shart emas
+      (row-dict oqimidan farqli, u yerda exit_mode alohida uzatiladi).
+
+    `payload.entry_ts=None` bo'lsa (masalan eski/test payload, `entry_ts` default'i)
+    — None; chaqiruvchi (`signal_id_for_row` kabi) buni dedup'siz o'tkazish kerakligi
+    sifatida talqin qiladi.
+    """
+    if payload.entry_ts is None:
+        return None
+    low, high = payload.entry_zone
+    return compute_signal_id(
+        symbol=payload.symbol, setup_type=payload.setup_type,
+        entry_ts=payload.entry_ts.isoformat(), entry_price=(low + high) / 2,
+        mode=payload.mode.name,
     )
 
 
@@ -257,7 +286,7 @@ _AVOID_NOTE = (
 _SEPARATOR_LINE = "---"
 _BACKTEST_LINE_TEMPLATE = (
     "Backtest context: expectancy {expectancy:+.2f}R, win-rate {win_rate:.0f}% "
-    "({period}, {disclaimer})"
+    "({period}). {disclaimer}"
 )
 _FOOTER_LINE_TEMPLATE = "Generated: {generated}   Data: {data}"
 

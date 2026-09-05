@@ -742,6 +742,13 @@ def test_menu_button_routes_to_scan(monkeypatch) -> None:
     mock_scan.assert_awaited_once_with(update, context)
 
 
+def test_menu_scan_button_wired_to_signals_scan() -> None:
+    """"🔍 Skanerlash" tugmasi yangi non-directive /signals'ga ulangan bo'lishi kerak —
+    eski direktiv ("LONG" tili) /scan EMAS. /scan buyruq sifatida (CommandHandler)
+    o'zgarishsiz qoladi, faqat default menu tugmasi almashadi."""
+    assert handlers.MENU_BUTTON_HANDLERS[keyboards.BUTTON_SCAN] is handlers.signals_scan
+
+
 def test_menu_button_unknown_text_does_nothing(monkeypatch) -> None:
     update, context = _make_update("random text"), _make_context()
 
@@ -875,8 +882,11 @@ def test_quickadd_cancel_clears_pending_draft() -> None:
 
 def _make_signal_payload(
     symbol: str = "AAPL", *, score: float = 80.0, direction: StructureState = StructureState.BULLISH,
-    trend: str = "BULLISH", structure: str = "BOS",
+    trend: str = "BULLISH", structure: str = "BOS", entry_ts: date | None = None,
 ) -> SignalPayload:
+    """entry_ts default None — mavjud testlar dedup'ga tegmaydi (signal_id_for_payload
+    entry_ts=None bo'lsa None qaytaradi, _dedup_filter_new_payloads buni "har doim
+    yangi" deb hisoblaydi). Dedup testlari entry_ts'ni ANIQ beradi."""
     return SignalPayload(
         symbol=symbol, mode=SignalMode.SWING, setup_type="breakout_retest", score=score,
         score_label="SETUP", direction=direction, entry_zone=(99.0, 101.0), invalidation=90.0,
@@ -884,7 +894,7 @@ def _make_signal_payload(
         context=SignalContext(trend=trend, structure=structure, volume_confirmed=True),
         historical_context=HistoricalContext(expectancy_r=0.6, win_rate_pct=52.8, period_label="2020-2026"),
         generated_at=datetime(2026, 1, 1, 9, 0, tzinfo=timezone.utc), timeframe="1d",
-        data_freshness=date(2026, 1, 1),
+        data_freshness=date(2026, 1, 1), entry_ts=entry_ts,
     )
 
 
@@ -1013,6 +1023,85 @@ def test_scan_handles_error(monkeypatch) -> None:
     texts = _all_reply_texts(update)
     assert "Skanerlashda xatolik, qayta urinib ko'ring." in texts
     assert not any("boom" in t for t in texts)
+
+
+# ---- /signals dedup+cooldown (TZ 18) ----
+
+
+def test_signals_first_call_shows_setup_with_dedup_summary(monkeypatch) -> None:
+    payload = _make_signal_payload("AAPL", score=84.0, entry_ts=date(2026, 1, 1))
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    texts = _all_reply_texts(update)
+    from signals.payload import format_payload
+
+    assert format_payload(payload) in texts
+    summary = texts[-1]
+    assert "1 ta yangi" in summary
+    assert "0 ta o'tkazib yuborildi" in summary
+
+
+def test_signals_second_call_dedups_same_setup(monkeypatch) -> None:
+    """Bir xil setup (bir xil symbol/setup_type/entry_zone/entry_ts) ikkinchi
+    /signals'da qayta yuborilmasligi kerak (cooldown ichida) -- masalan UI'dan
+    ikki marta bosilganda."""
+    payload = _make_signal_payload("AAPL", score=84.0, entry_ts=date(2026, 1, 1))
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    from signals.payload import format_payload
+
+    first_update, context = _make_update(), _make_context()
+    _run(handlers.signals_scan(first_update, context))
+    assert format_payload(payload) in _all_reply_texts(first_update)
+
+    second_update = _make_update()
+    _run(handlers.signals_scan(second_update, context))
+
+    second_texts = _all_reply_texts(second_update)
+    assert format_payload(payload) not in second_texts
+    assert any("oldin yuborilgan" in t for t in second_texts)
+    assert any("cooldown" in t for t in second_texts)
+
+
+def test_signals_dedup_is_per_setup_not_global(monkeypatch) -> None:
+    """Ikki turli setup (turli symbol) -- biri dedup qilingan bo'lsa ham, ikkinchisi
+    (yangi) ko'rsatilishi kerak."""
+    old_payload = _make_signal_payload("AAPL", score=84.0, entry_ts=date(2026, 1, 1))
+    new_payload = _make_signal_payload("MSFT", score=80.0, entry_ts=date(2026, 1, 1))
+    from signals.payload import format_payload
+
+    _patch_signal_scan(monkeypatch, results={"AAPL": [old_payload]}, skipped=[])
+    first_update, context = _make_update(), _make_context()
+    _run(handlers.signals_scan(first_update, context))
+
+    _patch_signal_scan(
+        monkeypatch, results={"AAPL": [old_payload], "MSFT": [new_payload]}, skipped=[],
+    )
+    second_update = _make_update()
+    _run(handlers.signals_scan(second_update, context))
+
+    second_texts = _all_reply_texts(second_update)
+    assert format_payload(new_payload) in second_texts
+    assert format_payload(old_payload) not in second_texts
+
+
+def test_signals_all_setups_deduped_shows_cooldown_message(monkeypatch) -> None:
+    payload = _make_signal_payload("AAPL", score=84.0, entry_ts=date(2026, 1, 1))
+    from signals.payload import format_payload
+
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    first_update, context = _make_update(), _make_context()
+    _run(handlers.signals_scan(first_update, context))
+
+    second_update = _make_update()
+    _run(handlers.signals_scan(second_update, context))
+
+    second_texts = _all_reply_texts(second_update)
+    assert not any(format_payload(payload) in t for t in second_texts)
+    assert any("Yangi setup yo'q" in t and "cooldown" in t for t in second_texts)
+    assert any("1 ta topildi" in t and "1 ta o'tkazib yuborildi" in t for t in second_texts)
 
 
 def test_bearish_does_not_offer_short(monkeypatch) -> None:

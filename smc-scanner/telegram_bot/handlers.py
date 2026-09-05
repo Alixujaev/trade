@@ -26,7 +26,7 @@ from journal.types import JournalEntry
 from risk.rules import check_open_positions
 from scripts.tactical_scan import DEFAULT_EXIT_MODE, filter_quality_setups, run_scan, scan_one_symbol
 from signals.dedup import DedupStore
-from signals.payload import SignalMode, format_payload, signal_id_for_row
+from signals.payload import SignalMode, SignalPayload, format_payload, signal_id_for_payload, signal_id_for_row
 from signals.scanner import scan_universe
 from telegram_bot import keyboards
 from telegram_bot.auth import require_allowed_user
@@ -153,6 +153,29 @@ async def scan_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 # hisoblanishi BU YERDA YO'Q — hammasi signals/scanner.py va signals/payload.py'da (mavjud,
 # sinalgan); bu handler faqat chaqiradi, natijani cheklaydi/formatlaydi, yuboradi.
 
+def _dedup_filter_new_payloads(payloads: list[SignalPayload]) -> tuple[list[SignalPayload], int]:
+    """/signals, /swing uchun dedup+cooldown (TZ 18) — `_dedup_filter_new_setups` (/scan)
+    bilan BIR XIL `DedupStore`/`SIGNAL_COOLDOWN_HOURS` mexanizmi, faqat `SignalPayload`
+    ustida (`signal_id_for_payload`). SKAN MANTIG'INI O'ZGARTIRMAYDI (`scan_universe`
+    allaqachon chaqirilgan) — faqat YUBORISH bosqichida qaysi payload ko'rsatilishini
+    tanlaydi. Bitta umumiy `DedupStore` fayli (/scan bilan) — ID formati boshqacha
+    (`compute_signal_id` kalitlari farqli: row-dict vs payload) bo'lgani uchun
+    to'qnashuv yo'q."""
+    store = DedupStore()
+    new_payloads: list[SignalPayload] = []
+    skipped = 0
+    for payload in payloads:
+        signal_id = signal_id_for_payload(payload)
+        if signal_id is None or store.is_new(signal_id, cooldown_hours=SIGNAL_COOLDOWN_HOURS):
+            new_payloads.append(payload)
+            if signal_id is not None:
+                store.mark_shown(signal_id)
+        else:
+            skipped += 1
+    store.cleanup(older_than_hours=SIGNAL_COOLDOWN_HOURS * SIGNAL_DEDUP_CLEANUP_MULT)
+    return new_payloads, skipped
+
+
 async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *, mode: SignalMode) -> None:
     symbols = [h.ticker for h in get_core_watchlist()]
     min_score = SCORE_THRESHOLDS["watch"]
@@ -172,13 +195,22 @@ async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *
         key=lambda p: p.score, reverse=True,
     )
     total_found = len(all_payloads)
-    shown = all_payloads[:MAX_SIGNALS_PER_SCAN]
 
-    if not shown:
+    if not all_payloads:
         text = f"Skan tugadi. Hozircha setup yo'q (min-score {min_score:.0f})."
         if skipped:
             text += f"\nSkipped: {len(skipped)}"
         await update.effective_message.reply_text(text)
+        return
+
+    new_payloads, dedup_skipped_count = _dedup_filter_new_payloads(all_payloads)
+    shown = new_payloads[:MAX_SIGNALS_PER_SCAN]
+
+    if not shown:
+        await update.effective_message.reply_text(
+            "Yangi setup yo'q — barchasi oldin yuborilgan (cooldown ichida).\n"
+            f"🔁 Dedup: {total_found} ta topildi, {dedup_skipped_count} ta o'tkazib yuborildi."
+        )
         return
 
     cards = [format_payload(p) for p in shown]
@@ -188,7 +220,13 @@ async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     count_line = f"Setups: {total_found}"
     if total_found > len(shown):
         count_line += f" (ko'rsatildi: {len(shown)})"
-    await update.effective_message.reply_text(f"Scan complete.\n{count_line}\nSkipped: {len(skipped)}")
+    dedup_line = (
+        f"🔁 Dedup: {total_found} ta topildi, {len(new_payloads)} ta yangi, "
+        f"{dedup_skipped_count} ta o'tkazib yuborildi."
+    )
+    await update.effective_message.reply_text(
+        f"Scan complete.\n{count_line}\nSkipped: {len(skipped)}\n{dedup_line}"
+    )
 
 
 @require_allowed_user
@@ -648,7 +686,7 @@ async def quickadd_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 MENU_BUTTON_HANDLERS.update(
     {
-        keyboards.BUTTON_SCAN: scan,
+        keyboards.BUTTON_SCAN: signals_scan,
         keyboards.BUTTON_STATUS: status,
         keyboards.BUTTON_JOURNAL: journal_command,
         keyboards.BUTTON_STATS: stats_command,
