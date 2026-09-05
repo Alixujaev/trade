@@ -1,8 +1,14 @@
 """Setup'ni bir xil aniqlaydigan barqaror signal_id (TZ 18 — dedup uchun kalit).
 
-Bir xil setup (symbol + setup turi + entry bar sanasi/narxi + exit mode) qayta
+Bir xil setup (symbol + setup turi + entry bar sanasi + exit/skan rejimi) qayta
 skan qilinganda AYNAN bir xil ID chiqishi kerak (idempotent) — shu orqali
 signals/dedup.py bir xil setup allaqachon ko'rsatilganini biladi.
+
+MUHIM (TZ): entry_price ID kalitiga ATAYLAB KIRMAYDI — bir symbolning bir kunidagi
+bir setup turi, narxi (candidate zonasi) sal farq qilsa ham, BITTA signal hisoblanadi.
+Bitta scan ichida bir nechta nomzod (masalan ikki candidate zona) topilsa — qaysi
+nomzod ko'rsatilishi (eng yuqori score'lisi) telegram_bot/handlers.py::
+_dedup_filter_new_payloads YUBORISH bosqichida hal qiladi, bu yerda emas.
 
 MUHIM: bu modul hech narsani filtrlamaydi/o'zgartirmaydi — faqat mavjud
 tactical_scan.py qatoridan (yoki xom qiymatlardan) sof ID hisoblaydi.
@@ -30,16 +36,14 @@ from __future__ import annotations
 import hashlib
 
 
-def compute_signal_id(
-    *, symbol: str, setup_type: str, entry_ts: str, entry_price: float, mode: str
-) -> str:
-    """symbol+setup_type+entry_ts+entry_price+mode'dan barqaror hash (16 hex belgi).
+def compute_signal_id(*, symbol: str, setup_type: str, entry_ts: str, mode: str) -> str:
+    """symbol+setup_type+entry_ts+mode'dan barqaror hash (16 hex belgi).
 
-    entry_price float sifatida keladi (masalan tactical_scan.py'da round(..., 2))
-    — qat'iy formatlash (`:.6f`) turli float repr'laridan kelib chiqadigan
-    nomuvofiqlikning oldini oladi.
+    entry_price ATAYLAB kalitga KIRITILMAYDI (TZ, modul docstringiga qarang) — bir
+    symbol + bir kun (entry_ts SANA, vaqt emas) + bir setup turi = BITTA signal_id,
+    narx candidate zonalar orasida farq qilishidan qat'i nazar.
     """
-    key = f"{symbol}|{setup_type}|{entry_ts}|{entry_price:.6f}|{mode}"
+    key = f"{symbol}|{setup_type}|{entry_ts}|{mode}"
     return hashlib.sha256(key.encode("utf-8")).hexdigest()[:16]
 
 
@@ -47,8 +51,9 @@ def signal_id_for_row(row: dict, *, mode: str) -> str | None:
     """tactical_scan.py::build_scan_row natijasi (qator)dan signal_id.
 
     Kerakli maydonlar (SYMBOL, SETUP_REASON, SETUP_ENTRY_DATE, SETUP_ENTRY) yo'q
-    bo'lsa (masalan faol setup yo'q) — None. Chaqiruvchi None'ni dedup'siz
-    o'tkazish kerakligi sifatida talqin qiladi.
+    bo'lsa (masalan faol setup yo'q) — None. SETUP_ENTRY (narx) faqat "faol setup
+    bormi" tekshiruvi uchun o'qiladi — ID'ga KIRMAYDI (compute_signal_id'ga qarang).
+    Chaqiruvchi None'ni dedup'siz o'tkazish kerakligi sifatida talqin qiladi.
     """
     symbol = row.get("SYMBOL")
     setup_type = row.get("SETUP_REASON")
@@ -56,10 +61,7 @@ def signal_id_for_row(row: dict, *, mode: str) -> str | None:
     entry_price = row.get("SETUP_ENTRY")
     if not symbol or not setup_type or entry_ts is None or entry_price is None:
         return None
-    return compute_signal_id(
-        symbol=symbol, setup_type=setup_type, entry_ts=entry_ts,
-        entry_price=float(entry_price), mode=mode,
-    )
+    return compute_signal_id(symbol=symbol, setup_type=setup_type, entry_ts=entry_ts, mode=mode)
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from enum import Enum, auto
@@ -237,16 +239,18 @@ def payload_from_setup(
 
 def signal_id_for_payload(payload: SignalPayload) -> str | None:
     """`SignalPayload`dan barqaror signal_id (TZ 18) — `signal_id_for_row` (/scan,
-    row-dict oqimi) bilan BIR XIL hash mexanizmi (`compute_signal_id`), lekin
-    `signals/scanner.py`ning yangi, non-directive `SignalPayload` maydonlaridan:
+    row-dict oqimi) bilan BIR XIL `compute_signal_id` formulasiga tayanadi (ikki
+    oqim izchil, umumiy `DedupStore` fayli ma'noli bo'lishi uchun shart).
 
-    - entry_price `entry_zone`dan tiklanadi: `(low+high)/2` — `signals/scanner.py::
-      _entry_zone` har doim `entry_price` atrofida SIMMETRIK kengaytiradi (yoki
-      degenerativ holatda `(entry_price, entry_price)`), shu sabab bu qiymat ANIQ,
-      qayta hisoblash emas.
-    - mode sifatida `payload.mode.name` ("SWING") ishlatiladi — `SignalPayload`
-      o'zining skan-rejimini allaqachon saqlaydi, tashqaridan uzatish shart emas
-      (row-dict oqimidan farqli, u yerda exit_mode alohida uzatiladi).
+    `entry_zone`/narx ID'ga umuman KIRMAYDI (modul docstringidagi TZ) — bir
+    symbolning bir kunidagi bir setup turi uchun bir nechta nomzod (masalan ikki
+    candidate zona, turli narx) bo'lsa ham BITTA signal_id chiqadi; qaysi nomzod
+    ko'rsatilishi (eng yuqori score'lisi) telegram_bot/handlers.py::
+    _dedup_filter_new_payloads YUBORISH bosqichida hal qiladi.
+
+    mode sifatida `payload.mode.name` ("SWING") ishlatiladi — `SignalPayload`
+    o'zining skan-rejimini allaqachon saqlaydi, tashqaridan uzatish shart emas
+    (row-dict oqimidan farqli, u yerda exit_mode alohida uzatiladi).
 
     `payload.entry_ts=None` bo'lsa (masalan eski/test payload, `entry_ts` default'i)
     — None; chaqiruvchi (`signal_id_for_row` kabi) buni dedup'siz o'tkazish kerakligi
@@ -254,11 +258,9 @@ def signal_id_for_payload(payload: SignalPayload) -> str | None:
     """
     if payload.entry_ts is None:
         return None
-    low, high = payload.entry_zone
     return compute_signal_id(
         symbol=payload.symbol, setup_type=payload.setup_type,
-        entry_ts=payload.entry_ts.isoformat(), entry_price=(low + high) / 2,
-        mode=payload.mode.name,
+        entry_ts=payload.entry_ts.isoformat(), mode=payload.mode.name,
     )
 
 

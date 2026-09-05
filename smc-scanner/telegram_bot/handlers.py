@@ -153,27 +153,52 @@ async def scan_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 # hisoblanishi BU YERDA YO'Q — hammasi signals/scanner.py va signals/payload.py'da (mavjud,
 # sinalgan); bu handler faqat chaqiradi, natijani cheklaydi/formatlaydi, yuboradi.
 
+def _keep_highest_score_per_setup(payloads: list[SignalPayload]) -> list[SignalPayload]:
+    """Bir xil (symbol, setup_type, entry_ts) guruhidan faqat ENG YUQORI score'li
+    payload'ni qoldiradi. `signal_id_for_payload` narxni ID'ga kiritmagani uchun
+    (TZ, signals/payload.py) bitta symbolning bir kunidagi bir setup turi uchun
+    bir nechta nomzod (masalan ikki candidate zona, turli narx) bo'lsa hammasi BIR
+    XIL signal_id oladi — shu sabab qaysi nomzod ko'rsatilishi shu yerda, YUBORISHDAN
+    OLDIN hal qilinadi (aks holda dedup nomzodlar orasida tasodifiy tanlagan bo'lardi).
+    Kirish tartibidan qat'i nazar to'g'ri ishlaydi (score to'g'ridan-to'g'ri solishtiriladi)."""
+    best: dict[tuple[str, str, date | None], SignalPayload] = {}
+    for payload in payloads:
+        key = (payload.symbol, payload.setup_type, payload.entry_ts)
+        current = best.get(key)
+        if current is None or payload.score > current.score:
+            best[key] = payload
+    return list(best.values())
+
+
 def _dedup_filter_new_payloads(payloads: list[SignalPayload]) -> tuple[list[SignalPayload], int]:
     """/signals, /swing uchun dedup+cooldown (TZ 18) — `_dedup_filter_new_setups` (/scan)
     bilan BIR XIL `DedupStore`/`SIGNAL_COOLDOWN_HOURS` mexanizmi, faqat `SignalPayload`
     ustida (`signal_id_for_payload`). SKAN MANTIG'INI O'ZGARTIRMAYDI (`scan_universe`
     allaqachon chaqirilgan) — faqat YUBORISH bosqichida qaysi payload ko'rsatilishini
-    tanlaydi. Bitta umumiy `DedupStore` fayli (/scan bilan) — ID formati boshqacha
-    (`compute_signal_id` kalitlari farqli: row-dict vs payload) bo'lgani uchun
-    to'qnashuv yo'q."""
+    tanlaydi. Bitta umumiy `DedupStore` fayli (/scan bilan) — endi ikkala oqim ham
+    BIR XIL `compute_signal_id` formulasiga tayanadi (izchil).
+
+    Avval `_keep_highest_score_per_setup` bilan bitta scan ichidagi bir-xil-setup
+    nomzodlari bittaga kamaytiriladi, so'ng qolganlar DedupStore/cooldown orqali
+    filtrlanadi. Qaytarilgan `skipped` soni ikkalasini ham qamraydi (guruh-ichi
+    kamaytirilganlar + cooldown'dagilar) — chaqiruvchi kod (xabar formatlash)
+    o'zgarishsiz qoladi."""
+    candidates = _keep_highest_score_per_setup(payloads)
+    collapsed_count = len(payloads) - len(candidates)
+
     store = DedupStore()
     new_payloads: list[SignalPayload] = []
-    skipped = 0
-    for payload in payloads:
+    cooldown_skipped = 0
+    for payload in candidates:
         signal_id = signal_id_for_payload(payload)
         if signal_id is None or store.is_new(signal_id, cooldown_hours=SIGNAL_COOLDOWN_HOURS):
             new_payloads.append(payload)
             if signal_id is not None:
                 store.mark_shown(signal_id)
         else:
-            skipped += 1
+            cooldown_skipped += 1
     store.cleanup(older_than_hours=SIGNAL_COOLDOWN_HOURS * SIGNAL_DEDUP_CLEANUP_MULT)
-    return new_payloads, skipped
+    return new_payloads, collapsed_count + cooldown_skipped
 
 
 async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *, mode: SignalMode) -> None:

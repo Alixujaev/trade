@@ -1104,6 +1104,50 @@ def test_signals_all_setups_deduped_shows_cooldown_message(monkeypatch) -> None:
     assert any("1 ta topildi" in t and "1 ta o'tkazib yuborildi" in t for t in second_texts)
 
 
+def test_dedup_same_symbol_same_day_one_signal(monkeypatch) -> None:
+    """Production bug: bitta symbol (AAPL) bitta scan natijasida IKKI nomzod (turli
+    candidate zona/narx, bir xil symbol/setup_type/kun) qaytarsa -- signal_id endi
+    narxni hisobga olmagani uchun ikkalasi ham BIR XIL ID oladi va guruhlanadi,
+    natijada faqat BITTA karta yuboriladi."""
+    low = _make_signal_payload(
+        "AAPL", score=81.0, entry_ts=date(2026, 1, 5),
+    )
+    low = dataclasses.replace(low, entry_zone=(183.0, 187.0))
+    high = _make_signal_payload(
+        "AAPL", score=83.0, entry_ts=date(2026, 1, 5),
+    )
+    high = dataclasses.replace(high, entry_zone=(189.0, 193.0))
+    from signals.payload import format_payload
+
+    _patch_signal_scan(monkeypatch, results={"AAPL": [low, high]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    texts = _all_reply_texts(update)
+    card_count = sum(1 for t in texts if t.startswith("AAPL"))
+    assert card_count == 1
+
+
+def test_dedup_keeps_highest_score(monkeypatch) -> None:
+    """Yuqoridagi bir xil holatda -- ko'rsatiladigan karta eng YUQORI score'liga
+    (83.0) tegishli bo'lishi kerak, pastroq (81.0) EMAS."""
+    low = _make_signal_payload("AAPL", score=81.0, entry_ts=date(2026, 1, 5))
+    low = dataclasses.replace(low, entry_zone=(183.0, 187.0))
+    high = _make_signal_payload("AAPL", score=83.0, entry_ts=date(2026, 1, 5))
+    high = dataclasses.replace(high, entry_zone=(189.0, 193.0))
+    from signals.payload import format_payload
+
+    _patch_signal_scan(monkeypatch, results={"AAPL": [low, high]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    texts = _all_reply_texts(update)
+    assert format_payload(high) in texts
+    assert format_payload(low) not in texts
+
+
 def test_bearish_does_not_offer_short(monkeypatch) -> None:
     payload = _make_signal_payload(
         "AAPL", score=70.0, direction=StructureState.BEARISH, trend="BEARISH", structure="CHoCH",
