@@ -29,11 +29,12 @@ def _setup(
     reason: str = "BREAKOUT_RETEST@98.50-100.00",
     score: float | None = 84.0,
     score_reasons: tuple[str, ...] = ("trend: kuchli yuqori", "hajm: tasdiqlangan"),
+    target_source: str | None = None,
 ) -> TradeSetup:
     return TradeSetup(
         entry_ts=pd_timestamp(), entry_price=entry, stop_price=stop, target_price=target,
         direction=direction, entry_index_pos=42, reason=reason, score=score,
-        score_reasons=score_reasons,
+        score_reasons=score_reasons, target_source=target_source,
     )
 
 
@@ -124,6 +125,32 @@ def test_payload_from_setup() -> None:
     assert payload.timeframe == "1d"
     assert payload.data_freshness == date(2026, 8, 15)
     assert payload.generated_at == datetime(2026, 8, 16, 9, 30, tzinfo=timezone.utc)
+    assert payload.score_reasons == ("trend: kuchli yuqori", "hajm: tasdiqlangan")
+    assert payload.target_source is None
+
+
+def test_payload_from_setup_maps_score_reasons() -> None:
+    """setup.score_reasons (apply_scores allaqachon to'ldirgan) payload'ga ulanishi
+    kerak -- audit topilmasi: ilgari bu ma'lumot payload_from_setup'da yo'qolar edi."""
+    setup = _setup(score_reasons=("trend: kuchli yuqori", "risk: R:R 2.70"))
+    payload = payload_from_setup(
+        setup, symbol="AAPL", trend="BULLISH", structure="BOS", volume_confirmed=True,
+        historical_expectancy_r=0.0, historical_win_rate_pct=0.0, historical_period_label="-",
+        data_freshness=date(2026, 1, 1),
+    )
+    assert payload.score_reasons == ("trend: kuchli yuqori", "risk: R:R 2.70")
+
+
+def test_payload_from_setup_maps_target_source() -> None:
+    """setup.target_source (resistance | fallback) payload'ga ulanishi kerak — audit:
+    R:R deyarli hamma joyda 2.0 bo'lishining manbasini ochiq qilish uchun."""
+    setup = _setup(target_source="resistance")
+    payload = payload_from_setup(
+        setup, symbol="AAPL", trend="BULLISH", structure="BOS", volume_confirmed=True,
+        historical_expectancy_r=0.0, historical_win_rate_pct=0.0, historical_period_label="-",
+        data_freshness=date(2026, 1, 1),
+    )
+    assert payload.target_source == "resistance"
 
 
 def test_payload_from_setup_maps_reason_variants() -> None:
@@ -213,11 +240,63 @@ def test_format_payload_snapshot() -> None:
         "Entry zone: $100.00 – $100.00\n"
         "Invalidation: $90.00\n"
         "Target: $127.00   R:R: 2.7\n"
+        "Evidence:\n"
+        "- trend: kuchli yuqori\n"
+        "- hajm: tasdiqlangan\n"
         "---\n"
         "Backtest context: expectancy +0.27R, win-rate 41% (2020-2026). Bu kelajak natija kafolati emas.\n"
         "Generated: 2026-08-16 09:30   Data: 2026-08-15"
     )
     assert text == expected
+
+
+# ======================================================================
+# Evidence bloki (score_reasons) — audit topilmasi, mavjud ma'lumot endi ko'rsatiladi
+# ======================================================================
+
+
+def test_format_payload_shows_evidence_block_from_score_reasons() -> None:
+    payload = _payload(setup=_setup(score_reasons=("setup: breakout+retest confirmed", "volume: tasdiqlandi")))
+    text = format_payload(payload)
+
+    assert "Evidence:" in text
+    assert "- setup: breakout+retest confirmed" in text
+    assert "- volume: tasdiqlandi" in text
+
+
+def test_format_payload_omits_evidence_block_when_score_reasons_empty() -> None:
+    payload = _payload(setup=_setup(score_reasons=()))
+    text = format_payload(payload)
+
+    assert "Evidence:" not in text
+
+
+# ======================================================================
+# Target manba yorlig'i (target_source) — audit: R:R deyarli hamma 2.0'ning sababi
+# ======================================================================
+
+
+def test_format_payload_shows_resistance_based_target_label() -> None:
+    payload = _payload(setup=_setup(target_source="resistance"))
+    text = format_payload(payload)
+
+    assert "Target: $127.00   R:R: 2.7 (resistance-based)" in text
+
+
+def test_format_payload_shows_fallback_target_label() -> None:
+    payload = _payload(setup=_setup(target_source="fallback"))
+    text = format_payload(payload)
+
+    assert "Target: $127.00   R:R: 2.7 (fallback geometry)" in text
+
+
+def test_format_payload_omits_target_source_label_when_none() -> None:
+    payload = _payload(setup=_setup(target_source=None))
+    text = format_payload(payload)
+
+    assert "Target: $127.00   R:R: 2.7\n" in text
+    assert "fallback geometry" not in text
+    assert "resistance-based" not in text
 
 
 # ======================================================================

@@ -67,6 +67,7 @@ def test_end_to_end_emits_one_signal() -> None:
     # resistance yuqorida yo'q -> 2R fallback: entry + 2*(entry-stop)
     risk = 107.0 - 92.833333
     assert s.target_price == pytest.approx(107.0 + 2 * risk, abs=1e-3)
+    assert s.target_source == "fallback"
 
 
 def test_no_signal_without_volume_confirmation() -> None:
@@ -163,3 +164,97 @@ def test_no_lookahead_bias() -> None:
 def test_insufficient_data_returns_empty_no_crash() -> None:
     assert generate_breakout_retest_signals(_make_df(_BASE_ROWS[:2]), **_KW) == []
     assert generate_breakout_retest_signals(_make_df([]), **_KW) == []
+
+
+# ======================================================================
+# _build_setup — target_source (audit: R:R deyarli hamma 2.0, sababi shu)
+# ======================================================================
+# nearest_resistance_above real narx harakatidan (detect_sr_zones, SR_MIN_TOUCHES=3)
+# olinishi murakkab bo'lgani uchun, _build_setup shu yerda TO'G'RIDAN-TO'G'RI, qo'lda
+# qurilgan SRZone'lar bilan sinaladi (nearest_resistance_above'ning o'ziga hech qanday
+# aloqasi yo'q — faqat sr_zones ro'yxatidagi RESISTANCE zonalarni filtrlaydi).
+
+
+def test_build_setup_uses_resistance_target_when_available_and_meets_min_rr() -> None:
+    from levels.types import SRZone, SRZoneKind
+    from smc.zones import compute_atr
+    from strategy.breakout_retest import _build_setup
+
+    df = _make_df(_BASE_ROWS)
+    atr = compute_atr(df, period=3)
+    zone = SRZone(
+        kind=SRZoneKind.RESISTANCE, top=100.0, bottom=100.0, touch_count=3,
+        first_touch_index_pos=1, last_touch_index_pos=6, confirmed_index_pos=6,
+        strength=1.0, member_index_pos=(1, 3, 5),
+    )
+    # entry~107, risk~14.17 -> min_rr(1.5) uchun bottom >= 107+1.5*14.17 ~= 128.25
+    far_resistance = SRZone(
+        kind=SRZoneKind.RESISTANCE, top=132.0, bottom=130.0, touch_count=3,
+        first_touch_index_pos=0, last_touch_index_pos=5, confirmed_index_pos=5,
+        strength=1.0, member_index_pos=(0, 2, 5),
+    )
+
+    setup = _build_setup(
+        df, zone, breakout_pos=8, retest_pos=9, entry_pos=10, atr=atr,
+        sr_zones=[zone, far_resistance], sl_atr_mult=1.0, stop_mode="structure",
+        tp_r_multiple=2.0, min_rr=1.5,
+    )
+
+    assert setup is not None
+    assert setup.target_price == pytest.approx(130.0)
+    assert setup.target_source == "resistance"
+
+
+def test_build_setup_uses_fallback_target_when_no_qualifying_resistance() -> None:
+    from levels.types import SRZone, SRZoneKind
+    from smc.zones import compute_atr
+    from strategy.breakout_retest import _build_setup
+
+    df = _make_df(_BASE_ROWS)
+    atr = compute_atr(df, period=3)
+    zone = SRZone(
+        kind=SRZoneKind.RESISTANCE, top=100.0, bottom=100.0, touch_count=3,
+        first_touch_index_pos=1, last_touch_index_pos=6, confirmed_index_pos=6,
+        strength=1.0, member_index_pos=(1, 3, 5),
+    )
+
+    setup = _build_setup(
+        df, zone, breakout_pos=8, retest_pos=9, entry_pos=10, atr=atr,
+        sr_zones=[zone], sl_atr_mult=1.0, stop_mode="structure",
+        tp_r_multiple=2.0, min_rr=1.5,
+    )
+
+    assert setup is not None
+    assert setup.target_source == "fallback"
+
+
+def test_build_setup_falls_back_when_resistance_too_close_for_min_rr() -> None:
+    """Resistance MAVJUD, lekin (bottom-entry)/risk < min_rr -- fallback'ga o'tadi
+    (audit finding: bu ham "resistance topilmadi" holati bilan bir xil natijaga olib
+    keladi, lekin sababi boshqa)."""
+    from levels.types import SRZone, SRZoneKind
+    from smc.zones import compute_atr
+    from strategy.breakout_retest import _build_setup
+
+    df = _make_df(_BASE_ROWS)
+    atr = compute_atr(df, period=3)
+    zone = SRZone(
+        kind=SRZoneKind.RESISTANCE, top=100.0, bottom=100.0, touch_count=3,
+        first_touch_index_pos=1, last_touch_index_pos=6, confirmed_index_pos=6,
+        strength=1.0, member_index_pos=(1, 3, 5),
+    )
+    # entry~107ga juda yaqin -> R:R < 1.5, gate'dan o'tmaydi
+    close_resistance = SRZone(
+        kind=SRZoneKind.RESISTANCE, top=109.0, bottom=108.0, touch_count=3,
+        first_touch_index_pos=0, last_touch_index_pos=5, confirmed_index_pos=5,
+        strength=1.0, member_index_pos=(0, 2, 5),
+    )
+
+    setup = _build_setup(
+        df, zone, breakout_pos=8, retest_pos=9, entry_pos=10, atr=atr,
+        sr_zones=[zone, close_resistance], sl_atr_mult=1.0, stop_mode="structure",
+        tp_r_multiple=2.0, min_rr=1.5,
+    )
+
+    assert setup is not None
+    assert setup.target_source == "fallback"

@@ -74,15 +74,28 @@ def _parse_zone_band(reason: str) -> tuple[float, float] | None:
         return None
 
 
-def _structure_state_at(events, index_pos: int) -> StructureState | None:
-    """`index_pos` bargacha bo'lgan oxirgi struktura hodisasining yo'nalishi."""
-    state: StructureState | None = None
-    for event in events:
-        if event.index_pos <= index_pos:
-            state = event.direction
+def _structure_event_at(events, index_pos: int):
+    """`index_pos` bargacha bo'lgan oxirgi TO'LIQ struktura hodisasi (BOS yoki CHoCH,
+    yo'nalish bilan birga) — `events` xronologik (index_pos o'sish) tartibda deb
+    taxmin qilinadi (`detect_structure_events` shunday qaytaradi).
+
+    `_structure_state_at` (scoring uchun, faqat yo'nalish) shu funksiya ustiga
+    qurilgan; `signals/scanner.py` esa event_type (BOS/CHoCH)ni ham ko'rsatish
+    uchun to'g'ridan-to'g'ri shu funksiyani chaqiradi."""
+    event = None
+    for candidate in events:
+        if candidate.index_pos <= index_pos:
+            event = candidate
         else:
             break
-    return state
+    return event
+
+
+def _structure_state_at(events, index_pos: int) -> StructureState | None:
+    """`index_pos` bargacha bo'lgan oxirgi struktura hodisasining yo'nalishi (scoring
+    uchun — BOS/CHoCH farqi bu yerda ahamiyatsiz, faqat BULLISH/BEARISH kerak)."""
+    event = _structure_event_at(events, index_pos)
+    return event.direction if event is not None else None
 
 
 def _trend_sub_score(

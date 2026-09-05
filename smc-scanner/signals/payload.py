@@ -156,6 +156,10 @@ class SignalPayload:
     timeframe: str
     data_freshness: date  # oxirgi mavjud bar sanasi
     entry_ts: date | None = None  # setup.entry_ts sanasi (TZ 18 dedup uchun — signal_id_for_payload)
+    score_reasons: tuple[str, ...] = ()  # scanner ko'rgan faktlar (setup.score_reasons, audit)
+    # target_price qaysi mantiq bilan tanlangani: "resistance" | "fallback" | None (audit —
+    # R:R deyarli hamma joyda 2.0 bo'lishining sababi, format_payload'da ko'rsatiladi).
+    target_source: str | None = None
 
 
 # ======================================================================
@@ -234,6 +238,8 @@ def payload_from_setup(
         timeframe=timeframe,
         data_freshness=data_freshness,
         entry_ts=setup.entry_ts.date(),
+        score_reasons=setup.score_reasons,
+        target_source=setup.target_source,
     )
 
 
@@ -280,11 +286,16 @@ _SETUP_LINE_TEMPLATE = "Setup: {setup_type}   |   Score: {score:.0f}/100 ({score
 _CONTEXT_LINE_TEMPLATE = "Trend: {trend}   Structure: {structure}   Volume: {volume}"
 _ENTRY_ZONE_LINE_TEMPLATE = "Entry zone: ${low:.2f} – ${high:.2f}"
 _INVALIDATION_LINE_TEMPLATE = "Invalidation: ${invalidation:.2f}"
-_TARGET_LINE_TEMPLATE = "Target: ${target:.2f}   R:R: {rr:.1f}"
+_TARGET_LINE_TEMPLATE = "Target: ${target:.2f}   R:R: {rr:.1f}{source_note}"
+_TARGET_SOURCE_DISPLAY: dict[str, str] = {
+    "resistance": "resistance-based",
+    "fallback": "fallback geometry",
+}
 _AVOID_NOTE = (
     "Bearish bias — yangi LONG entry uchun mos emas; mavjud pozitsiya uchun "
     "kuzatish/chiqish signali."
 )
+_EVIDENCE_HEADER = "Evidence:"
 _SEPARATOR_LINE = "---"
 _BACKTEST_LINE_TEMPLATE = (
     "Backtest context: expectancy {expectancy:+.2f}R, win-rate {win_rate:.0f}% "
@@ -305,6 +316,12 @@ def format_payload(payload: SignalPayload) -> str:
     Emoji yo'q, hech qanday direktiv til ishlatilmaydi. Bearish (`direction=BEARISH`)
     setup'lar uchun entry/target ko'rsatilmaydi — faqat "AVOID / EXIT candidate" holati
     va invalidation darajasi.
+
+    Target qatoriga `target_source` ("resistance"/"fallback") mavjud bo'lsa qavs
+    ichida qo'shiladi — R:R deyarli hamma joyda 2.0 bo'lishining manbasi ochiq
+    bo'lishi uchun (audit topilmasi: bu prediction emas, geometrik fallback).
+    `score_reasons` bo'sh bo'lmasa "Evidence:" bloki qo'shiladi — scanner ko'rgan
+    faktlar, yangi bashorat EMAS.
     """
     is_bearish = payload.direction is StructureState.BEARISH
     header_template = _AVOID_HEADER_TEMPLATE if is_bearish else _LONG_HEADER_TEMPLATE
@@ -326,9 +343,16 @@ def format_payload(payload: SignalPayload) -> str:
         low, high = payload.entry_zone
         lines.append(_ENTRY_ZONE_LINE_TEMPLATE.format(low=low, high=high))
         lines.append(_INVALIDATION_LINE_TEMPLATE.format(invalidation=payload.invalidation))
+        source_label = _TARGET_SOURCE_DISPLAY.get(payload.target_source, "")
+        source_note = f" ({source_label})" if source_label else ""
         lines.append(_TARGET_LINE_TEMPLATE.format(
-            target=payload.potential_target, rr=payload.risk_reward,
+            target=payload.potential_target, rr=payload.risk_reward, source_note=source_note,
         ))
+
+    if payload.score_reasons:
+        lines.append(_EVIDENCE_HEADER)
+        for reason in payload.score_reasons:
+            lines.append(f"- {reason}")
 
     lines.append(_SEPARATOR_LINE)
     lines.append(_BACKTEST_LINE_TEMPLATE.format(

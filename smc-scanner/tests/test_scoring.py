@@ -5,8 +5,9 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from smc.types import StructureState, TradeSetup
+from smc.types import StructureEvent, StructureEventType, StructureState, TradeSetup
 from strategy.scoring import (
+    _structure_event_at,
     apply_scores,
     filter_by_score,
     label_for_score,
@@ -160,3 +161,48 @@ def test_score_no_lookahead_bias() -> None:
     full = apply_scores(df_full, [setup])[0].score
     trunc = apply_scores(df_full.iloc[: i + 1], [setup])[0].score
     assert full == pytest.approx(trunc)
+
+
+# ======================================================================
+# _structure_event_at — to'liq StructureEvent (BOS/CHoCH turi + yo'nalish)
+# ======================================================================
+
+
+def _event(index_pos: int, event_type: StructureEventType, direction: StructureState) -> StructureEvent:
+    return StructureEvent(
+        timestamp=pd.Timestamp("2024-01-01", tz="UTC"), event_type=event_type, direction=direction,
+        broken_level=100.0, broken_swing_ts=pd.Timestamp("2024-01-01", tz="UTC"),
+        broken_swing_index_pos=0, index_pos=index_pos,
+    )
+
+
+def test_structure_event_at_returns_latest_qualifying_event() -> None:
+    events = [
+        _event(3, StructureEventType.BOS, StructureState.BULLISH),
+        _event(7, StructureEventType.CHOCH, StructureState.BEARISH),
+    ]
+    assert _structure_event_at(events, 10) is events[1]
+
+
+def test_structure_event_at_ignores_future_events() -> None:
+    events = [_event(3, StructureEventType.BOS, StructureState.BULLISH), _event(20, StructureEventType.CHOCH, StructureState.BEARISH)]
+    result = _structure_event_at(events, 10)
+    assert result is events[0]  # 20-bardagi event hali "bo'lmagan" (kelajak)
+
+
+def test_structure_event_at_none_when_no_events() -> None:
+    assert _structure_event_at([], 10) is None
+
+
+def test_structure_event_at_none_when_all_events_in_future() -> None:
+    events = [_event(20, StructureEventType.BOS, StructureState.BULLISH)]
+    assert _structure_event_at(events, 10) is None
+
+
+def test_structure_state_at_still_returns_only_direction() -> None:
+    """Scoring uchun ishlatiladigan mavjud funksiya (StructureState, BOS/CHoCH farqisiz)
+    xatti-harakati O'ZGARMAYDI — _structure_event_at ustiga qurilgan bo'lsa ham."""
+    from strategy.scoring import _structure_state_at
+
+    events = [_event(3, StructureEventType.CHOCH, StructureState.BEARISH)]
+    assert _structure_state_at(events, 10) is StructureState.BEARISH

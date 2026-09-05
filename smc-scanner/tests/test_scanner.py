@@ -6,8 +6,8 @@ import pandas as pd
 import pytest
 
 from signals.payload import SignalContext, SignalMode, SignalPayload, HistoricalContext
-from signals.scanner import _entry_zone, scan_symbol, scan_universe
-from smc.types import StructureState, TradeSetup
+from signals.scanner import _entry_zone, _structure_display, scan_symbol, scan_universe
+from smc.types import StructureEvent, StructureEventType, StructureState, TradeSetup
 from smc.zones import compute_atr
 
 _COLUMNS = ["open", "high", "low", "close", "volume"]
@@ -93,6 +93,86 @@ def test_scan_symbol_fills_real_context() -> None:
 
     assert payload.historical_context.expectancy_r != 0.0 or payload.historical_context.win_rate_pct != 0.0
     assert payload.data_freshness == df.index[-1].date()
+
+
+# ======================================================================
+# _structure_display — BOS/CHoCH turi + yo'nalish (audit: "BULLISH" mislabel tuzatildi)
+# ======================================================================
+
+
+def _event(event_type: StructureEventType, direction: StructureState, index_pos: int = 5) -> StructureEvent:
+    return StructureEvent(
+        timestamp=pd.Timestamp("2024-01-01", tz="UTC"), event_type=event_type, direction=direction,
+        broken_level=100.0, broken_swing_ts=pd.Timestamp("2024-01-01", tz="UTC"),
+        broken_swing_index_pos=0, index_pos=index_pos,
+    )
+
+
+def test_structure_display_bos_bullish() -> None:
+    assert _structure_display(_event(StructureEventType.BOS, StructureState.BULLISH)) == "BOS (BULLISH)"
+
+
+def test_structure_display_choch_bearish() -> None:
+    assert _structure_display(_event(StructureEventType.CHOCH, StructureState.BEARISH)) == "CHoCH (BEARISH)"
+
+
+def test_structure_display_none_is_dash() -> None:
+    assert _structure_display(None) == "-"
+
+
+def test_scan_symbol_structure_dash_when_no_structure_event() -> None:
+    """_breakout_rows() ssenariysida struktura holati BOOTSTRAP orqali (jim, event'siz)
+    o'rnatiladi -- entry barigacha haqiqiy BOS/CHoCH event yo'q, shu sabab '-'."""
+    df = _make_df(_breakout_rows())
+    payloads = scan_symbol(df, "AAPL", **_SCAN_KW)
+
+    assert payloads[0].context.structure == "-"
+
+
+def test_scan_symbol_structure_shows_bos_label_when_event_present(monkeypatch) -> None:
+    import signals.scanner as scanner_module
+
+    df = _make_df(_breakout_rows())
+    fake_event = _event(StructureEventType.BOS, StructureState.BULLISH, index_pos=5)
+    monkeypatch.setattr(scanner_module, "detect_structure_events", lambda df, swings: [fake_event])
+
+    payloads = scan_symbol(df, "AAPL", **_SCAN_KW)
+
+    assert payloads[0].context.structure == "BOS (BULLISH)"
+
+
+def test_scan_symbol_structure_shows_choch_label_when_event_present(monkeypatch) -> None:
+    import signals.scanner as scanner_module
+
+    df = _make_df(_breakout_rows())
+    fake_event = _event(StructureEventType.CHOCH, StructureState.BEARISH, index_pos=5)
+    monkeypatch.setattr(scanner_module, "detect_structure_events", lambda df, swings: [fake_event])
+
+    payloads = scan_symbol(df, "AAPL", **_SCAN_KW)
+
+    assert payloads[0].context.structure == "CHoCH (BEARISH)"
+
+
+# ======================================================================
+# score_reasons / target_source — mavjud ma'lumot payload'ga ulanadi (audit topilmasi)
+# ======================================================================
+
+
+def test_scan_symbol_populates_score_reasons_from_setup() -> None:
+    df = _make_df(_breakout_rows())
+    payloads = scan_symbol(df, "AAPL", **_SCAN_KW)
+
+    assert isinstance(payloads[0].score_reasons, tuple) and payloads[0].score_reasons
+    assert any(r.startswith("trend:") for r in payloads[0].score_reasons)
+
+
+def test_scan_symbol_populates_target_source_fallback_for_real_setup() -> None:
+    """_breakout_rows() ssenariysida yuqorida qanday resistance ham yo'q -> fallback
+    (audit finding: R:R deyarli hamma joyda 2.0'ning sababi)."""
+    df = _make_df(_breakout_rows())
+    payloads = scan_symbol(df, "AAPL", **_SCAN_KW)
+
+    assert payloads[0].target_source == "fallback"
 
 
 def test_scan_respects_min_score() -> None:

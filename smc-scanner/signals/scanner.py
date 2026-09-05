@@ -32,10 +32,10 @@ from indicators.volume import is_volume_confirmed
 from signals.payload import SignalMode, SignalPayload, payload_from_setup, setup_type_from_reason
 from smc.market_structure import detect_structure_events
 from smc.structure import detect_swings
-from smc.types import TradeSetup
+from smc.types import StructureEvent, TradeSetup
 from smc.zones import compute_atr
 from strategy.breakout_retest import generate_breakout_retest_signals
-from strategy.scoring import _structure_state_at, apply_scores, filter_by_score
+from strategy.scoring import _structure_event_at, apply_scores, filter_by_score
 from strategy.trend import compute_trend_regime, trend_regime_at
 
 logger = logging.getLogger(__name__)
@@ -49,6 +49,22 @@ HISTORICAL_STATS: dict[str, tuple[float, float, str]] = {
     "breakout_retest": (0.60, 52.8, "2020-2026"),
 }
 _DEFAULT_HISTORICAL_STAT: tuple[float, float, str] = (0.0, 0.0, "N/A")
+
+
+_STRUCTURE_EVENT_TYPE_DISPLAY: dict[str, str] = {"BOS": "BOS", "CHOCH": "CHoCH"}
+
+
+def _structure_display(event: StructureEvent | None) -> str:
+    """`StructureEvent`dan Telegram-friendly yorliq: "BOS (BULLISH)"/"CHoCH (BEARISH)".
+
+    Audit topilmasi: ilgari faqat `event.direction` (BULLISH/BEARISH) ko'rsatilar
+    edi — `event.event_type` (BOS/CHoCH, aynan foydalanuvchi kutgan ma'lumot)
+    yo'qolar edi. Event yo'q bo'lsa (masalan hali hech qanday struktura buzilishi
+    ro'y bermagan) — "-"."""
+    if event is None:
+        return "-"
+    type_label = _STRUCTURE_EVENT_TYPE_DISPLAY.get(event.event_type.name, event.event_type.name)
+    return f"{type_label} ({event.direction.name})"
 
 
 def _entry_zone(setup: TradeSetup, atr: pd.Series, *, mult: float) -> tuple[float, float]:
@@ -113,8 +129,8 @@ def scan_symbol(
     for setup in setups:
         trend = trend_regime_at(regime, setup.entry_index_pos).name
 
-        structure_state = _structure_state_at(events, setup.entry_index_pos)
-        structure = structure_state.name if structure_state is not None else "-"
+        structure_event = _structure_event_at(events, setup.entry_index_pos)
+        structure = _structure_display(structure_event)
 
         breakout_pos = (
             setup.breakout_index_pos if setup.breakout_index_pos is not None

@@ -154,8 +154,10 @@ def _build_setup(
     res = nearest_resistance_above(sr_zones, entry_price, entry_pos)
     if res is not None and (res.bottom - entry_price) / risk >= min_rr:
         target_price = res.bottom
+        target_source = "resistance"
     else:
         target_price = entry_price + tp_r_multiple * risk
+        target_source = "fallback"
 
     setup = TradeSetup(
         entry_ts=df.index[entry_pos],
@@ -167,6 +169,7 @@ def _build_setup(
         reason=f"BREAKOUT_RETEST@{zone.bottom:.2f}-{zone.top:.2f}",
         breakout_index_pos=breakout_pos,
         retest_index_pos=retest_pos,
+        target_source=target_source,
     )
 
     rr = compute_planned_rr(setup)

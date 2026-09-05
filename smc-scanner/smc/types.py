@@ -114,3 +114,9 @@ class TradeSetup:
     score_reasons: tuple[str, ...] = ()  # ball komponentlarining izohlari
     breakout_index_pos: int | None = None  # resistance breakout tasdiqlangan bar
     retest_index_pos: int | None = None  # eski resistance (endi support) retest qilingan bar
+    # target_price qaysi mantiq bilan tanlanganini saqlaydi (audit: R:R deyarli hamma
+    # joyda 2.0 — sababi shu, target ko'pincha fallback geometriyadan, real qarshilik
+    # zonasidan EMAS; strategy/breakout_retest.py::_build_setup to'ldiradi):
+    # "resistance" — keyingi qarshilik zonasining bottom'i, "fallback" — entry + tp_r_multiple*risk.
+    # None — eski (smc/signal.py) pipeline, bu tushunchani bilmaydi.
+    target_source: str | None = None
