@@ -153,20 +153,20 @@ async def scan_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 # hisoblanishi BU YERDA YO'Q — hammasi signals/scanner.py va signals/payload.py'da (mavjud,
 # sinalgan); bu handler faqat chaqiradi, natijani cheklaydi/formatlaydi, yuboradi.
 
-def _keep_highest_score_per_setup(payloads: list[SignalPayload]) -> list[SignalPayload]:
-    """Bir xil (symbol, setup_type, entry_ts) guruhidan faqat ENG YUQORI score'li
-    payload'ni qoldiradi. `signal_id_for_payload` narxni ID'ga kiritmagani uchun
-    (TZ, signals/payload.py) bitta symbolning bir kunidagi bir setup turi uchun
-    bir nechta nomzod (masalan ikki candidate zona, turli narx) bo'lsa hammasi BIR
-    XIL signal_id oladi — shu sabab qaysi nomzod ko'rsatilishi shu yerda, YUBORISHDAN
-    OLDIN hal qilinadi (aks holda dedup nomzodlar orasida tasodifiy tanlagan bo'lardi).
-    Kirish tartibidan qat'i nazar to'g'ri ishlaydi (score to'g'ridan-to'g'ri solishtiriladi)."""
-    best: dict[tuple[str, str, date | None], SignalPayload] = {}
+def _keep_highest_score_per_symbol(payloads: list[SignalPayload]) -> list[SignalPayload]:
+    """Bir symboldan faqat ENG YUQORI score'li payload'ni qoldiradi — foydalanuvchi
+    bir symbolni BIR MARTA, eng yaxshi setup bilan ko'rishi kerak. Bir nechta nomzod
+    turli setup_type/entry_ts olishi mumkin (boshqa-boshqa signal_id — dedup ularni
+    to'g'ri "boshqa signal" deb hisoblaydi, `signals/payload.py::signal_id_for_payload`
+    o'zi TO'G'RI ishlaydi) — lekin bu FAQAT YUBORISH/UX filtri, dedup ID mantig'iga
+    tegmaydi (guruhlash shu yerda, DedupStore tekshiruvidan OLDIN amalga oshadi).
+    Kirish tartibidan qat'i nazar to'g'ri ishlaydi (score to'g'ridan-to'g'ri
+    solishtiriladi)."""
+    best: dict[str, SignalPayload] = {}
     for payload in payloads:
-        key = (payload.symbol, payload.setup_type, payload.entry_ts)
-        current = best.get(key)
+        current = best.get(payload.symbol)
         if current is None or payload.score > current.score:
-            best[key] = payload
+            best[payload.symbol] = payload
     return list(best.values())
 
 
@@ -178,12 +178,12 @@ def _dedup_filter_new_payloads(payloads: list[SignalPayload]) -> tuple[list[Sign
     tanlaydi. Bitta umumiy `DedupStore` fayli (/scan bilan) — endi ikkala oqim ham
     BIR XIL `compute_signal_id` formulasiga tayanadi (izchil).
 
-    Avval `_keep_highest_score_per_setup` bilan bitta scan ichidagi bir-xil-setup
-    nomzodlari bittaga kamaytiriladi, so'ng qolganlar DedupStore/cooldown orqali
-    filtrlanadi. Qaytarilgan `skipped` soni ikkalasini ham qamraydi (guruh-ichi
-    kamaytirilganlar + cooldown'dagilar) — chaqiruvchi kod (xabar formatlash)
-    o'zgarishsiz qoladi."""
-    candidates = _keep_highest_score_per_setup(payloads)
+    Avval `_keep_highest_score_per_symbol` bilan bitta scan ichidagi bir symbolning
+    barcha nomzodlari BITTAGA (eng yuqori score'li) kamaytiriladi, so'ng qolgan
+    (bitta symbol = bitta nomzod) ro'yxat DedupStore/cooldown orqali filtrlanadi.
+    Qaytarilgan `skipped` soni ikkalasini ham qamraydi (guruh-ichi kamaytirilganlar +
+    cooldown'dagilar) — chaqiruvchi kod (xabar formatlash) o'zgarishsiz qoladi."""
+    candidates = _keep_highest_score_per_symbol(payloads)
     collapsed_count = len(payloads) - len(candidates)
 
     store = DedupStore()

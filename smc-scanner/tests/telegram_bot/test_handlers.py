@@ -1148,6 +1148,32 @@ def test_dedup_keeps_highest_score(monkeypatch) -> None:
     assert format_payload(low) not in texts
 
 
+def test_one_card_per_symbol(monkeypatch) -> None:
+    """Ikkinchi bug: ikki nomzod BOSHQA entry_ts'da (masalan boshqa kunda retest)
+    bo'lsa, ular BOSHQA signal_id oladi (dedup TO'G'RI ishlaydi -- ularni haqiqatan
+    boshqa signal deb hisoblaydi) -- lekin UX uchun bitta symboldan faqat ENG YUQORI
+    score'li karta ko'rsatilishi kerak, entry_ts farqidan qat'i nazar. Aynan
+    production holati: $181-185 zona score=83.0 (2026-01-05) va $187-191 zona
+    score=81.0 (2026-01-06)."""
+    high = _make_signal_payload("AAPL", score=83.0, entry_ts=date(2026, 1, 5))
+    high = dataclasses.replace(high, entry_zone=(181.0, 185.0))
+    low = _make_signal_payload("AAPL", score=81.0, entry_ts=date(2026, 1, 6))
+    low = dataclasses.replace(low, entry_zone=(187.0, 191.0))
+    from signals.payload import format_payload
+
+    _patch_signal_scan(monkeypatch, results={"AAPL": [high, low]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    joined = "\n\n".join(_all_reply_texts(update))
+    # chunk_signal_messages bir nechta kartani BITTA xabarga guruhlashi mumkin --
+    # shu sabab "nechta xabar" emas, "sarlavha nechta marta uchraydi"ni sanaymiz.
+    assert joined.count("AAPL — SWING setup") == 1
+    assert format_payload(high) in joined
+    assert format_payload(low) not in joined
+
+
 def test_bearish_does_not_offer_short(monkeypatch) -> None:
     payload = _make_signal_payload(
         "AAPL", score=70.0, direction=StructureState.BEARISH, trend="BEARISH", structure="CHoCH",
