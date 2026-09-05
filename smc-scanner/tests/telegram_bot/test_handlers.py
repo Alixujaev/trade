@@ -14,6 +14,7 @@ from datetime import date, datetime, timezone
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock
 
+import pandas as pd
 from telegram.ext import ConversationHandler
 
 from config.core_watchlist import CoreHolding
@@ -273,6 +274,90 @@ def test_stats_calls_journal_stats(monkeypatch, tmp_path) -> None:
 
     reply_text = update.effective_message.reply_text.call_args_list[0].args[0]
     assert "Profit factor" in reply_text
+
+
+# ---- /stats_bench ----
+
+
+def _bench_df(dates: list[str], closes: list[float]) -> pd.DataFrame:
+    index = pd.DatetimeIndex(pd.to_datetime(dates), tz="UTC", name="datetime")
+    return pd.DataFrame(
+        {"open": closes, "high": closes, "low": closes, "close": closes, "volume": [1000] * len(closes)},
+        index=index,
+    )
+
+
+class _FakeBenchProvider:
+    """journal/benchmark_provider.py::benchmark_result_for_entry chaqiradigan
+    provider.get_ohlcv interfeysini qondiradi (tests/test_benchmark_provider.py bilan
+    bir xil konvensiya)."""
+
+    def __init__(self, dfs: dict[str, pd.DataFrame | Exception]) -> None:
+        self._dfs = dfs
+
+    def get_ohlcv(self, symbol: str, interval: str, *, use_cache: bool = True) -> pd.DataFrame:
+        result = self._dfs[symbol]
+        if isinstance(result, Exception):
+            raise result
+        return result
+
+
+def test_stats_bench_shows_waiting_message_then_three_blocks(monkeypatch, tmp_path) -> None:
+    monkeypatch.setenv("TELEGRAM_ALLOWED_USER_ID", "111")
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+    )
+    journal.close_entry(1, exit_date=date(2026, 1, 10), exit_price=115.0)
+    monkeypatch.setattr(handlers, "TradeJournal", lambda: journal)
+    fake_provider = _FakeBenchProvider({
+        "AAPL": _bench_df(["2026-01-01", "2026-01-10"], [100.0, 108.0]),
+    })
+    monkeypatch.setattr(handlers, "get_provider", lambda: fake_provider)
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.stats_bench_command(update, context))
+
+    texts = _all_reply_texts(update)
+    assert any("⏳" in t and "Benchmark" in t for t in texts)
+    result_text = texts[-1]
+    assert "Profit factor" in result_text  # discretionary blok
+    assert "Buy&hold" in result_text  # buy&hold blok
+    assert "Solishtirish" in result_text  # comparison blok
+
+
+def test_stats_bench_calls_journal_stats_with_include_benchmark(monkeypatch, tmp_path) -> None:
+    monkeypatch.setenv("TELEGRAM_ALLOWED_USER_ID", "111")
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    mock_stats = MagicMock(return_value=journal.stats())
+    monkeypatch.setattr(journal, "stats", mock_stats)
+    monkeypatch.setattr(handlers, "TradeJournal", lambda: journal)
+    fake_provider = _FakeBenchProvider({})
+    monkeypatch.setattr(handlers, "get_provider", lambda: fake_provider)
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.stats_bench_command(update, context))
+
+    mock_stats.assert_called_once_with(include_benchmark=True, provider=fake_provider)
+
+
+def test_stats_bench_handles_provider_error_gracefully(monkeypatch, tmp_path) -> None:
+    monkeypatch.setenv("TELEGRAM_ALLOWED_USER_ID", "111")
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    monkeypatch.setattr(handlers, "TradeJournal", lambda: journal)
+
+    def _broken_provider():
+        raise RuntimeError("provider yiqildi")
+
+    monkeypatch.setattr(handlers, "get_provider", _broken_provider)
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.stats_bench_command(update, context))  # crash bo'lmasligi kerak
+
+    texts = _all_reply_texts(update)
+    assert "Benchmark hisoblashda xatolik, qayta urinib ko'ring." in texts
+    assert not any("provider yiqildi" in t for t in texts)
 
 
 # ---- /watchlist ----

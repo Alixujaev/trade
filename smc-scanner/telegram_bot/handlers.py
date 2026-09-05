@@ -245,6 +245,32 @@ async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     )
 
 
+# ---- /stats_bench ----
+
+@require_allowed_user
+async def stats_bench_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """/stats kabi, lekin discretionary vs buy&hold benchmark bilan (uch blok:
+    discretionary | buy&hold | comparison — journal.trade_journal.TradeJournal.stats
+    (include_benchmark=True)). Har YOPIQ savdo uchun alohida provider so'rovi kerak
+    bo'lgani uchun /stats'dan SEKINROQ — shu sabab ATAYLAB alohida buyruq (oddiy /stats
+    tez/offline qolishi kerak, default include_benchmark=False o'zgarishsiz)."""
+    journal = TradeJournal()
+    await update.effective_message.reply_text("⏳ Benchmark hisoblanmoqda...")
+
+    try:
+        stats = journal.stats(include_benchmark=True, provider=get_provider())
+    except Exception:
+        logger.warning("Benchmark stats xatosi", exc_info=True)
+        await update.effective_message.reply_text(
+            "Benchmark hisoblashda xatolik, qayta urinib ko'ring."
+        )
+        return
+
+    await update.effective_message.reply_text(
+        format_stats_message(stats), parse_mode="Markdown"
+    )
+
+
 # ---- /watchlist ----
 
 @require_allowed_user

@@ -36,6 +36,7 @@ BOT_COMMANDS: list[BotCommand] = [
     BotCommand("close", "Ochiq savdoni yopish"),
     BotCommand("journal", "Oxirgi savdolar"),
     BotCommand("stats", "Statistika"),
+    BotCommand("stats_bench", "Statistika + buy&hold benchmark (sekinroq)"),
     BotCommand("watchlist", "Taktik watchlist"),
     BotCommand("watchadd", "Watchlistga yangi aksiya/ETF qo'shish"),
     BotCommand("watchremove", "Watchlistdan belgi o'chirish"),
@@ -112,6 +113,7 @@ def build_application(token: str) -> Application:
     application.add_handler(CommandHandler("status", handlers.status))
     application.add_handler(CommandHandler("journal", handlers.journal_command))
     application.add_handler(CommandHandler("stats", handlers.stats_command))
+    application.add_handler(CommandHandler("stats_bench", handlers.stats_bench_command))
     application.add_handler(CommandHandler("watchlist", handlers.watchlist))
     application.add_handler(CommandHandler("watchremove", handlers.watchremove_command))
     application.add_handler(add_conversation)

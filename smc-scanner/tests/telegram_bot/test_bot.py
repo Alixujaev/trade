@@ -21,9 +21,24 @@ def test_build_application_registers_all_commands() -> None:
             command_names.update(handler.commands)
 
     expected = {
-        "start", "help", "scan", "scan_all", "status", "journal", "stats", "watchlist", "watchremove",
+        "start", "help", "scan", "scan_all", "status", "journal", "stats", "stats_bench",
+        "watchlist", "watchremove",
     }
     assert expected <= command_names
+
+
+def test_stats_bench_registered_as_separate_command_from_stats() -> None:
+    """/stats_bench (benchmark bilan, sekinroq) /stats'dan (tez, offline) ALOHIDA
+    buyruq -- default /stats o'zgarishsiz qolishi kerak."""
+    app = build_application("123456:fake-token-for-tests")
+
+    command_names: set[str] = set()
+    for handler in app.handlers[0]:
+        if isinstance(handler, CommandHandler):
+            command_names.update(handler.commands)
+
+    assert {"stats", "stats_bench"} <= command_names
+    assert any(c.command == "stats_bench" for c in BOT_COMMANDS)
 
 
 def test_build_application_registers_menu_command() -> None:
