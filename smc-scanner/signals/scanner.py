@@ -148,6 +148,10 @@ def scan_symbol(
     events = detect_structure_events(df, swings)
     atr = compute_atr(df, atr_period)
     data_freshness = df.index[-1].date()
+    # "Observed price" — oxirgi mavjud (tasdiqlangan) bar close'i (data_freshness bilan
+    # bir bar). Lookahead yo'q. payload_from_setup undan distance_to_zone + status
+    # hisoblaydi (observation-only, scoring/target/R:R'ga tegmaydi).
+    current_price = float(df["close"].iloc[-1])
 
     payloads: list[SignalPayload] = []
     for setup in setups:
@@ -183,6 +187,7 @@ def scan_symbol(
             timeframe=interval,
             mode=mode,
             entry_zone=entry_zone,
+            current_price=current_price,
             momentum_warning=momentum_warning,
         ))
     return payloads

@@ -9,17 +9,18 @@ import pytest
 
 from signals.payload import (
     HistoricalContext,
+    SetupStatus,
     SignalContext,
     SignalMode,
     SignalPayload,
+    contains_directive_language,
+    distance_to_zone,
     format_payload,
     payload_from_setup,
     score_label_for,
-    zone_status,
+    setup_status,
 )
 from smc.types import StructureState, TradeSetup
-
-_BANNED_SUBSTRINGS = ["buy", "sell", "short", "🚀", "enter now", "kir", "kirma"]
 
 
 def _setup(
@@ -207,23 +208,17 @@ def test_payload_from_setup_none_score_defaults_to_zero() -> None:
 
 def test_payload_no_directive_language() -> None:
     payload = _payload()
-    formatted = format_payload(payload)
+    text = "\n".join(_all_strings(payload) + [format_payload(payload)])
 
-    haystacks = _all_strings(payload) + [formatted]
-    lowered = "\n".join(haystacks).lower()
-    for banned in _BANNED_SUBSTRINGS:
-        assert banned.lower() not in lowered, f"'{banned}' formatlangan/payload matnida topildi"
+    assert not contains_directive_language(text)
 
 
 def test_payload_no_directive_language_bearish() -> None:
     setup = _setup(direction=StructureState.BEARISH, reason="BREAKOUT_RETEST@98.50-100.00")
     payload = _payload(setup=setup, trend="BEARISH", structure="CHoCH")
-    formatted = format_payload(payload)
+    text = "\n".join(_all_strings(payload) + [format_payload(payload)])
 
-    haystacks = _all_strings(payload) + [formatted]
-    lowered = "\n".join(haystacks).lower()
-    for banned in _BANNED_SUBSTRINGS:
-        assert banned.lower() not in lowered, f"'{banned}' bearish payload/matnida topildi"
+    assert not contains_directive_language(text)
 
 
 # ======================================================================
@@ -232,13 +227,21 @@ def test_payload_no_directive_language_bearish() -> None:
 
 
 def test_format_payload_snapshot() -> None:
-    payload = _payload()
+    # Degenerativ zona (100, 100); observed price 98.50 -> zona ostida -> DETECTED.
+    payload = dataclasses.replace(_payload(), current_price=98.50)
+    payload = dataclasses.replace(
+        payload,
+        distance_to_zone=distance_to_zone(98.50, 100.0, 100.0),
+        status=setup_status(98.50, 100.0, 100.0),
+    )
     text = format_payload(payload)
 
     expected = (
         "AAPL — SWING setup\n"
         "Setup: Breakout + Retest   |   Score: 84/100 (STRONG SETUP)\n"
         "Trend: BULLISH   Structure: BOS   Volume: Confirmed\n"
+        "Observed price: $98.50 (zonagacha -1.50%)\n"
+        "Status: DETECTED (zona ostida)\n"
         "Entry zone: $100.00 – $100.00\n"
         "Invalidation: $90.00\n"
         "Target: $127.00   R:R: 2.7\n"
@@ -302,85 +305,185 @@ def test_format_payload_omits_target_source_label_when_none() -> None:
 
 
 # ======================================================================
-# zone_status — joriy narx entry zonaga nisbatan qayerda (sof funksiya)
+# distance_to_zone — observed price'ning entry zonagacha % masofasi (sof funksiya)
 # ======================================================================
 
 
-def test_zone_status_below() -> None:
-    assert zone_status(57.51, 57.66, 58.60) == "zona ostida ($0.15 past, hali faol emas)"
+def test_distance_to_zone_below_is_negative() -> None:
+    d = distance_to_zone(57.51, 57.66, 58.60)
+    assert d == pytest.approx((57.51 - 57.66) / 57.66 * 100)
+    assert d < 0
+    assert d == pytest.approx(-0.26, abs=0.01)
 
 
-def test_zone_status_inside_middle() -> None:
-    assert zone_status(58.00, 57.66, 58.60) == "zona ichida (faol)"
+def test_distance_to_zone_inside_is_zero() -> None:
+    assert distance_to_zone(58.00, 57.66, 58.60) == 0.0
 
 
-def test_zone_status_inside_at_low_boundary() -> None:
-    assert zone_status(57.66, 57.66, 58.60) == "zona ichida (faol)"
+def test_distance_to_zone_inside_at_boundaries_is_zero() -> None:
+    assert distance_to_zone(57.66, 57.66, 58.60) == 0.0
+    assert distance_to_zone(58.60, 57.66, 58.60) == 0.0
 
 
-def test_zone_status_inside_at_high_boundary() -> None:
-    assert zone_status(58.60, 57.66, 58.60) == "zona ichida (faol)"
+def test_distance_to_zone_above_is_positive() -> None:
+    d = distance_to_zone(60.20, 57.66, 58.60)
+    assert d == pytest.approx((60.20 - 58.60) / 58.60 * 100)
+    assert d > 0
 
 
-def test_zone_status_above() -> None:
-    assert zone_status(58.80, 57.66, 58.60) == "zona ustida ($0.20 yuqori, o'tib ketgan)"
-
-
-def test_zone_status_exact_difference_below() -> None:
-    assert zone_status(99.0, 100.0, 105.0) == "zona ostida ($1.00 past, hali faol emas)"
-
-
-def test_zone_status_exact_difference_above() -> None:
-    assert zone_status(110.0, 100.0, 105.0) == "zona ustida ($5.00 yuqori, o'tib ketgan)"
-
-
-def test_zone_status_no_directive_language() -> None:
-    """Faqat holat tavsifi — "kir"/"kirma"/"buy" kabi direktiv til YO'Q (non-directive
-    guard, signals/payload.py'ning asosiy tamoyili)."""
-    outputs = [
-        zone_status(57.51, 57.66, 58.60),
-        zone_status(58.00, 57.66, 58.60),
-        zone_status(58.80, 57.66, 58.60),
-    ]
-    lowered = "\n".join(outputs).lower()
-    for banned in _BANNED_SUBSTRINGS:
-        assert banned.lower() not in lowered, f"'{banned}' zone_status natijasida topildi"
+def test_distance_to_zone_is_pure() -> None:
+    # Ikki marta chaqiruv bir xil natija (deterministik, global state yo'q).
+    assert distance_to_zone(99.0, 100.0, 105.0) == distance_to_zone(99.0, 100.0, 105.0)
 
 
 # ======================================================================
-# format_payload — "Joriy narx" qatori (entry zonaga nisbatan holat)
+# setup_status — DETECTED / ZONE_REACHED / MOVED_PAST (sof funksiya)
 # ======================================================================
 
 
-def test_format_payload_shows_current_price_line_when_present() -> None:
-    payload = dataclasses.replace(_payload(), entry_zone=(57.66, 58.60), current_price=57.51)
-    text = format_payload(payload)
-
-    assert "Joriy: $57.51 — zona ostida ($0.15 past, hali faol emas)" in text
+def test_setup_status_below_zone_is_detected() -> None:
+    assert setup_status(57.51, 57.66, 58.60) is SetupStatus.DETECTED
 
 
-def test_format_payload_current_price_line_placed_after_entry_zone() -> None:
-    payload = dataclasses.replace(_payload(), current_price=58.00)
-    lines = format_payload(payload).splitlines()
-
-    entry_zone_idx = next(i for i, l in enumerate(lines) if l.startswith("Entry zone:"))
-    assert lines[entry_zone_idx + 1].startswith("Joriy:")
+def test_setup_status_inside_zone_is_zone_reached() -> None:
+    assert setup_status(58.00, 57.66, 58.60) is SetupStatus.ZONE_REACHED
 
 
-def test_format_payload_omits_current_price_line_when_none() -> None:
-    payload = _payload()  # current_price default'i None
-    text = format_payload(payload)
-
-    assert "Joriy:" not in text
+def test_setup_status_at_low_boundary_is_zone_reached() -> None:
+    assert setup_status(57.66, 57.66, 58.60) is SetupStatus.ZONE_REACHED
 
 
-def test_format_payload_current_price_no_directive_language() -> None:
-    payload = dataclasses.replace(_payload(), current_price=58.80)
-    text = format_payload(payload)
+def test_setup_status_at_high_boundary_is_zone_reached() -> None:
+    assert setup_status(58.60, 57.66, 58.60) is SetupStatus.ZONE_REACHED
 
-    lowered = text.lower()
-    for banned in _BANNED_SUBSTRINGS:
-        assert banned.lower() not in lowered, f"'{banned}' formatlangan matnda topildi"
+
+def test_setup_status_above_zone_is_moved_past() -> None:
+    assert setup_status(60.20, 57.66, 58.60) is SetupStatus.MOVED_PAST
+
+
+# ======================================================================
+# contains_directive_language — word-boundary asosidagi non-directive guard
+# ======================================================================
+
+
+def test_contains_directive_language_detects_action_words() -> None:
+    for directive in ("BUY now", "sell", "🚀", "enter now", "strong buy", "kir!", "kirish kerak"):
+        assert contains_directive_language(directive), directive
+
+
+def test_contains_directive_language_allows_neutral_observation_text() -> None:
+    for neutral in (
+        "entry zone",
+        "ZONE REACHED",
+        "kuzatuv — kirish qarori sizniki",
+        "struktura eskirgan bo'lishi mumkin",
+        "MOVED PAST (o'tib ketgan, kirish kech)",
+        "DETECTED (zona ostida)",
+    ):
+        assert not contains_directive_language(neutral), neutral
+
+
+# ======================================================================
+# payload_from_setup — current_price -> distance_to_zone + status propagation
+# ======================================================================
+
+
+def test_payload_from_setup_maps_current_price_distance_and_status() -> None:
+    payload = payload_from_setup(
+        _setup(entry=58.0), symbol="AAPL", trend="BULLISH", structure="BOS", volume_confirmed=True,
+        historical_expectancy_r=0.0, historical_win_rate_pct=0.0, historical_period_label="-",
+        data_freshness=date(2026, 1, 1), entry_zone=(57.66, 58.60), current_price=57.51,
+    )
+    assert payload.current_price == pytest.approx(57.51)
+    assert payload.distance_to_zone == pytest.approx(-0.26, abs=0.01)
+    assert payload.status is SetupStatus.DETECTED
+
+
+def test_payload_from_setup_current_price_none_gives_none_distance_and_status() -> None:
+    payload = payload_from_setup(
+        _setup(), symbol="AAPL", trend="BULLISH", structure="BOS", volume_confirmed=True,
+        historical_expectancy_r=0.0, historical_win_rate_pct=0.0, historical_period_label="-",
+        data_freshness=date(2026, 1, 1),
+    )
+    assert payload.current_price is None
+    assert payload.distance_to_zone is None
+    assert payload.status is None
+
+
+def test_payload_from_setup_does_not_recompute_score_target_rr_with_current_price() -> None:
+    """current_price berilishi scoring/target/R:R'ga TEGMAYDI (observation-only)."""
+    base = payload_from_setup(
+        _setup(entry=100.0, stop=90.0, target=127.0, score=84.0),
+        symbol="AAPL", trend="BULLISH", structure="BOS", volume_confirmed=True,
+        historical_expectancy_r=0.0, historical_win_rate_pct=0.0, historical_period_label="-",
+        data_freshness=date(2026, 1, 1),
+    )
+    with_price = payload_from_setup(
+        _setup(entry=100.0, stop=90.0, target=127.0, score=84.0),
+        symbol="AAPL", trend="BULLISH", structure="BOS", volume_confirmed=True,
+        historical_expectancy_r=0.0, historical_win_rate_pct=0.0, historical_period_label="-",
+        data_freshness=date(2026, 1, 1), current_price=95.0,
+    )
+    assert with_price.score == base.score
+    assert with_price.potential_target == base.potential_target
+    assert with_price.risk_reward == base.risk_reward
+    assert with_price.invalidation == base.invalidation
+
+
+# ======================================================================
+# format_payload — Observed price + Status qatorlari (setup observation)
+# ======================================================================
+
+
+def _payload_with_price(current_price: float, entry_zone: tuple[float, float]) -> SignalPayload:
+    p = dataclasses.replace(_payload(), entry_zone=entry_zone, current_price=current_price)
+    return dataclasses.replace(
+        p,
+        distance_to_zone=distance_to_zone(current_price, *entry_zone),
+        status=setup_status(current_price, *entry_zone),
+    )
+
+
+def test_format_payload_shows_observed_price_and_status_detected() -> None:
+    text = format_payload(_payload_with_price(57.51, (57.66, 58.60)))
+
+    assert "Observed price: $57.51 (zonagacha -0.26%)" in text
+    assert "Status: DETECTED (zona ostida)" in text
+
+
+def test_format_payload_status_zone_reached() -> None:
+    text = format_payload(_payload_with_price(58.00, (57.66, 58.60)))
+
+    assert "Status: ZONE REACHED (kuzatuv — kirish qarori sizniki)" in text
+
+
+def test_format_payload_status_moved_past() -> None:
+    text = format_payload(_payload_with_price(60.20, (57.66, 58.60)))
+
+    assert "Status: MOVED PAST (o'tib ketgan, kirish kech)" in text
+
+
+def test_format_payload_observed_price_placed_after_context_before_entry_zone() -> None:
+    lines = format_payload(_payload_with_price(57.51, (57.66, 58.60))).splitlines()
+
+    ctx_idx = next(i for i, l in enumerate(lines) if l.startswith("Trend:"))
+    entry_idx = next(i for i, l in enumerate(lines) if l.startswith("Entry zone:"))
+    assert lines[ctx_idx + 1].startswith("Observed price:")
+    assert lines[ctx_idx + 2].startswith("Status:")
+    assert entry_idx == ctx_idx + 3
+
+
+def test_format_payload_omits_observed_price_and_status_when_no_current_price() -> None:
+    text = format_payload(_payload())  # current_price default'i None
+
+    assert "Observed price:" not in text
+    assert "Status:" not in text
+
+
+def test_format_payload_observed_status_no_directive_language() -> None:
+    for cp in (57.51, 58.00, 60.20):
+        text = format_payload(_payload_with_price(cp, (57.66, 58.60)))
+        assert not contains_directive_language(text), cp
 
 
 # ======================================================================
@@ -401,12 +504,12 @@ def test_format_payload_omits_momentum_warning_line_when_false() -> None:
     assert "⚠️" not in format_payload(payload)
 
 
-def test_format_payload_momentum_warning_placed_after_current_price_line() -> None:
+def test_format_payload_momentum_warning_placed_after_entry_zone() -> None:
     payload = dataclasses.replace(_payload(), current_price=58.00, momentum_warning=True)
     lines = format_payload(payload).splitlines()
 
-    joriy_idx = next(i for i, l in enumerate(lines) if l.startswith("Joriy:"))
-    assert lines[joriy_idx + 1].startswith("⚠️")
+    entry_zone_idx = next(i for i, l in enumerate(lines) if l.startswith("Entry zone:"))
+    assert lines[entry_zone_idx + 1].startswith("⚠️")
 
 
 def test_format_payload_momentum_warning_placed_after_entry_zone_when_no_current_price() -> None:
@@ -418,17 +521,10 @@ def test_format_payload_momentum_warning_placed_after_entry_zone_when_no_current
 
 
 def test_format_payload_momentum_warning_no_directive_language() -> None:
-    """`_BANNED_SUBSTRINGS`dagi bare "kir" bu yerda o'tkazib yuboriladi -- u neytral
-    so'zlar ichida ham uchraydigan blunt substring ("eskirgan", "tekshiring"), haqiqiy
-    direktiv emas; aniqroq "kirma" baribir tekshiriladi."""
+    """Word-boundary guard: "eskirgan"/"tekshiring" ichidagi "kir" — direktiv EMAS."""
     payload = dataclasses.replace(_payload(), momentum_warning=True)
-    text = format_payload(payload)
 
-    lowered = text.lower()
-    for banned in _BANNED_SUBSTRINGS:
-        if banned == "kir":
-            continue
-        assert banned.lower() not in lowered, f"'{banned}' momentum warning qatorida topildi"
+    assert not contains_directive_language(format_payload(payload))
 
 
 def test_momentum_warning_defaults_to_false() -> None:

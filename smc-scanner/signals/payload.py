@@ -62,6 +62,7 @@ def signal_id_for_row(row: dict, *, mode: str) -> str | None:
     if not symbol or not setup_type or entry_ts is None or entry_price is None:
         return None
     return compute_signal_id(symbol=symbol, setup_type=setup_type, entry_ts=entry_ts, mode=mode)
+import re
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from enum import Enum, auto
@@ -102,6 +103,71 @@ class SignalMode(Enum):
     """Signal rejimi — hozircha faqat SWING (V1 breakout+retest kunlik/haftalik ufqi)."""
 
     SWING = auto()
+
+
+class SetupStatus(Enum):
+    """Setup lifecycle holati — observed price'ning entry zonaga nisbatan joylashuvi.
+
+    FAQAT KUZATUV. Trade tavsiyasi EMAS:
+    - DETECTED     — narx hali entry zonaga yetmagan (zona ostida)
+    - ZONE_REACHED — narx entry zone ICHIDA (chegaralar kiritilgan)
+    - MOVED_PAST   — narx entry zone YUQORISIGA o'tib ketgan
+    """
+
+    DETECTED = auto()
+    ZONE_REACHED = auto()
+    MOVED_PAST = auto()
+
+
+def distance_to_zone(current_price: float, entry_low: float, entry_high: float) -> float:
+    """Observed price'ning entry zonagacha % masofasi — sof, deterministik.
+
+    - current < low  -> (current-low)/low*100   (MANFIY)
+    - low <= current <= high -> 0.0
+    - current > high -> (current-high)/high*100  (MUSBAT)
+
+    Bo'luvchi 0 bo'lsa (nazariy — narx doim >0) 0.0 qaytadi (himoya)."""
+    if current_price < entry_low:
+        return (current_price - entry_low) / entry_low * 100 if entry_low else 0.0
+    if current_price > entry_high:
+        return (current_price - entry_high) / entry_high * 100 if entry_high else 0.0
+    return 0.0
+
+
+def setup_status(current_price: float, entry_low: float, entry_high: float) -> SetupStatus:
+    """Observed price + entry zonadan setup lifecycle holati — sof, deterministik.
+    Chegaralar ZONE_REACHED'ga kiradi (`low <= current <= high`)."""
+    if current_price < entry_low:
+        return SetupStatus.DETECTED
+    if current_price > entry_high:
+        return SetupStatus.MOVED_PAST
+    return SetupStatus.ZONE_REACHED
+
+
+_DIRECTIVE_WORD_PATTERNS = tuple(
+    re.compile(rf"\b{re.escape(word)}\b", re.IGNORECASE)
+    for word in ("buy", "sell", "short", "enter", "kir")
+)
+_DIRECTIVE_PHRASE_PATTERNS = tuple(
+    re.compile(re.escape(phrase), re.IGNORECASE)
+    for phrase in ("strong buy", "buy now", "enter now", "kirish kerak")
+)
+_DIRECTIVE_LITERALS = ("🚀",)
+
+
+def contains_directive_language(text: str) -> bool:
+    """Matnda HARAKATGA CHORLOVCHI (directive) til bormi — WORD-BOUNDARY asosida
+    (oddiy substring EMAS).
+
+    Maqsad: haqiqiy action language'ni (BUY / SELL / ENTER NOW / 🚀 / "kir!" / ...)
+    ushlash, LEKIN neytral status/observation matnini emas:
+    "entry zone" ("enter" alohida so'z emas), "kirish qarori sizniki" ("kir" alohida
+    so'z emas), "ZONE REACHED", "struktura eskirgan" — hech biri ushlanmaydi."""
+    if any(lit in text for lit in _DIRECTIVE_LITERALS):
+        return True
+    if any(p.search(text) for p in _DIRECTIVE_PHRASE_PATTERNS):
+        return True
+    return any(p.search(text) for p in _DIRECTIVE_WORD_PATTERNS)
 
 
 @dataclass(frozen=True)
@@ -160,14 +226,18 @@ class SignalPayload:
     # target_price qaysi mantiq bilan tanlangani: "resistance" | "fallback" | None (audit —
     # R:R deyarli hamma joyda 2.0 bo'lishining sababi, format_payload'da ko'rsatiladi).
     target_source: str | None = None
-    # Oxirgi mavjud (tasdiqlangan) bar close narxi — entry_zone'ga nisbatan qayerda
-    # ekanini ko'rsatish uchun (zone_status). None — noma'lum/berilmagan.
+    # Oxirgi mavjud (tasdiqlangan) bar close narxi — "Observed price". entry_zone'ga
+    # nisbatan qayerda ekanini ko'rsatish uchun. None — noma'lum/berilmagan.
     current_price: float | None = None
     # FAQAT ogohlantirish (filtr EMAS, score'ga ta'sir qilmaydi) — narx entry zonasi
     # ostida VA so'nggi bir necha bar ketma-ket pastroq yopilgan bo'lsa True
     # (signals/scanner.py::recent_momentum_warning). "Falling knife" holatini
     # ushlaydi: entry barida muzlatilgan struktura konteksti eskirgan bo'lishi mumkin.
     momentum_warning: bool = False
+    # current_price'dan hisoblangan (payload_from_setup) — observation-only, scoring
+    # emas. current_price=None bo'lsa ikkovi ham None.
+    distance_to_zone: float | None = None  # % (manfiy=zona ostida, 0=ichida, musbat=ustida)
+    status: SetupStatus | None = None  # DETECTED / ZONE_REACHED / MOVED_PAST
 
 
 # ======================================================================
@@ -227,6 +297,14 @@ def payload_from_setup(
 
     score = setup.score if setup.score is not None else 0.0
 
+    # Observation-only: current_price berilsa entry zonaga nisbatan holat hisoblanadi.
+    # Bu scoring/target/R:R'ga UMUMAN tegmaydi (ular yuqorida allaqachon setup'dan olindi).
+    zone_distance: float | None = None
+    status: SetupStatus | None = None
+    if current_price is not None:
+        zone_distance = distance_to_zone(current_price, entry_zone[0], entry_zone[1])
+        status = setup_status(current_price, entry_zone[0], entry_zone[1])
+
     return SignalPayload(
         symbol=symbol,
         mode=mode,
@@ -253,6 +331,8 @@ def payload_from_setup(
         target_source=setup.target_source,
         current_price=current_price,
         momentum_warning=momentum_warning,
+        distance_to_zone=zone_distance,
+        status=status,
     )
 
 
@@ -298,7 +378,18 @@ _AVOID_HEADER_TEMPLATE = "{symbol} — {mode} setup — AVOID / EXIT candidate"
 _SETUP_LINE_TEMPLATE = "Setup: {setup_type}   |   Score: {score:.0f}/100 ({score_label})"
 _CONTEXT_LINE_TEMPLATE = "Trend: {trend}   Structure: {structure}   Volume: {volume}"
 _ENTRY_ZONE_LINE_TEMPLATE = "Entry zone: ${low:.2f} – ${high:.2f}"
-_CURRENT_PRICE_LINE_TEMPLATE = "Joriy: ${current:.2f} — {status}"
+_OBSERVED_PRICE_LINE_TEMPLATE = "Observed price: ${current:.2f} (zonagacha {distance:+.2f}%)"
+_STATUS_LINE_TEMPLATE = "Status: {label} ({note})"
+_SETUP_STATUS_LABEL: dict[SetupStatus, str] = {
+    SetupStatus.DETECTED: "DETECTED",
+    SetupStatus.ZONE_REACHED: "ZONE REACHED",
+    SetupStatus.MOVED_PAST: "MOVED PAST",
+}
+_SETUP_STATUS_NOTE: dict[SetupStatus, str] = {
+    SetupStatus.DETECTED: "zona ostida",
+    SetupStatus.ZONE_REACHED: "kuzatuv — kirish qarori sizniki",
+    SetupStatus.MOVED_PAST: "o'tib ketgan, kirish kech",
+}
 _INVALIDATION_LINE_TEMPLATE = "Invalidation: ${invalidation:.2f}"
 _TARGET_LINE_TEMPLATE = "Target: ${target:.2f}   R:R: {rr:.1f}{source_note}"
 _TARGET_SOURCE_DISPLAY: dict[str, str] = {
@@ -327,21 +418,6 @@ def _setup_type_display(setup_type: str) -> str:
     return _SETUP_TYPE_DISPLAY.get(setup_type, setup_type.replace("_", " ").title())
 
 
-def zone_status(current_price: float, entry_low: float, entry_high: float) -> str:
-    """Joriy narx entry zonaga nisbatan QAYERDA ekanini tavsiflaydi — FAQAT holat,
-    direktiv EMAS ("kir"/"kirma"/"buy" yo'q; non-directive guard).
-
-    - current < entry_low  -> "zona ostida ($X past, hali faol emas)"
-    - entry_low <= current <= entry_high -> "zona ichida (faol)"
-    - current > entry_high -> "zona ustida ($X yuqori, o'tib ketgan)"
-    """
-    if current_price < entry_low:
-        return f"zona ostida (${entry_low - current_price:.2f} past, hali faol emas)"
-    if current_price > entry_high:
-        return f"zona ustida (${current_price - entry_high:.2f} yuqori, o'tib ketgan)"
-    return "zona ichida (faol)"
-
-
 def format_payload(payload: SignalPayload) -> str:
     """`SignalPayload`ni Telegram-friendly, monospace-mos matnga aylantiradi.
 
@@ -355,8 +431,10 @@ def format_payload(payload: SignalPayload) -> str:
     ichida qo'shiladi — R:R deyarli hamma joyda 2.0 bo'lishining manbasi ochiq
     bo'lishi uchun (audit topilmasi: bu prediction emas, geometrik fallback).
     `score_reasons` bo'sh bo'lmasa "Evidence:" bloki qo'shiladi — scanner ko'rgan
-    faktlar, yangi bashorat EMAS. `current_price` mavjud bo'lsa entry zona qatoridan
-    keyin "Joriy: $X — <zone_status>" qatori qo'shiladi (faqat holat, direktiv EMAS).
+    faktlar, yangi bashorat EMAS. `current_price` mavjud bo'lsa Context qatoridan
+    keyin, "Entry zone:" dan oldin "Observed price: ..." + "Status: ..." qatorlari
+    qo'shiladi — FAQAT KUZATUV (setup observation), trade tavsiyasi EMAS, direktiv til
+    YO'Q (`contains_directive_language` bilan majburlanadi).
     """
     is_bearish = payload.direction is StructureState.BEARISH
     header_template = _AVOID_HEADER_TEMPLATE if is_bearish else _LONG_HEADER_TEMPLATE
@@ -376,12 +454,15 @@ def format_payload(payload: SignalPayload) -> str:
         lines.append(_INVALIDATION_LINE_TEMPLATE.format(invalidation=payload.invalidation))
     else:
         low, high = payload.entry_zone
-        lines.append(_ENTRY_ZONE_LINE_TEMPLATE.format(low=low, high=high))
-        if payload.current_price is not None:
-            lines.append(_CURRENT_PRICE_LINE_TEMPLATE.format(
-                current=payload.current_price,
-                status=zone_status(payload.current_price, low, high),
+        if payload.current_price is not None and payload.status is not None:
+            lines.append(_OBSERVED_PRICE_LINE_TEMPLATE.format(
+                current=payload.current_price, distance=payload.distance_to_zone or 0.0,
             ))
+            lines.append(_STATUS_LINE_TEMPLATE.format(
+                label=_SETUP_STATUS_LABEL[payload.status],
+                note=_SETUP_STATUS_NOTE[payload.status],
+            ))
+        lines.append(_ENTRY_ZONE_LINE_TEMPLATE.format(low=low, high=high))
         if payload.momentum_warning:
             lines.append(_MOMENTUM_WARNING_LINE)
         lines.append(_INVALIDATION_LINE_TEMPLATE.format(invalidation=payload.invalidation))

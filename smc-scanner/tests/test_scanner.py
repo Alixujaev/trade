@@ -101,6 +101,20 @@ def test_scan_symbol_fills_real_context() -> None:
     assert payload.data_freshness == df.index[-1].date()
 
 
+def test_scan_symbol_populates_observed_price_from_last_close() -> None:
+    """scan_symbol df'ning ENG OXIRGI close'ini current_price sifatida uzatadi
+    (data_freshness bilan bir bar, lookahead yo'q); payload_from_setup undan
+    distance_to_zone va status'ni hisoblaydi."""
+    df = _make_df(_breakout_rows())
+    payloads = scan_symbol(df, "AAPL", **_SCAN_KW)
+
+    assert len(payloads) == 1
+    payload = payloads[0]
+    assert payload.current_price == pytest.approx(float(df["close"].iloc[-1]))
+    assert payload.distance_to_zone is not None
+    assert payload.status is not None
+
+
 # ======================================================================
 # _structure_display — BOS/CHoCH turi + yo'nalish (audit: "BULLISH" mislabel tuzatildi)
 # ======================================================================
