@@ -21,7 +21,7 @@ from config.core_watchlist import CoreHolding
 from config.core_watchlist import add_to_core_watchlist as _real_add_to_core_watchlist
 from config.settings import SCORE_THRESHOLDS
 from journal.trade_journal import TradeJournal
-from signals.payload import HistoricalContext, SignalContext, SignalMode, SignalPayload
+from signals.payload import HistoricalContext, SetupStatus, SignalContext, SignalMode, SignalPayload
 from smc.types import StructureState
 from telegram_bot import handlers, keyboards
 
@@ -1211,3 +1211,193 @@ def test_no_directive_language(monkeypatch) -> None:
     joined = "\n".join(_all_reply_texts(update)).lower()
     for banned in ("buy", "sell", "strong buy", "🚀", "enter now"):
         assert banned not in joined, f"'{banned}' Telegram javobida topildi"
+
+
+# ---- /signals MOVED_PAST -> bir qatorli xulosa (setup status ko'rinishi) ----
+
+
+def _with_status(
+    payload: SignalPayload, status: SetupStatus | None, *, distance: float = 0.0,
+) -> SignalPayload:
+    """Test payload'ga status/distance_to_zone'ni to'g'ridan-to'g'ri o'rnatadi —
+    current_price/entry_zone'dan qayta hisoblashga hojat yo'q, handler faqat
+    `.status`/`.distance_to_zone`ga qaraydi (`_split_by_display_status`,
+    `format_moved_past_summary`)."""
+    return dataclasses.replace(payload, status=status, distance_to_zone=distance)
+
+
+def test_moved_past_setup_not_shown_as_full_card(monkeypatch) -> None:
+    payload = _make_signal_payload("NVDA", score=90.0, entry_ts=date(2026, 1, 1))
+    payload = _with_status(payload, SetupStatus.MOVED_PAST, distance=3.5)
+    _patch_signal_scan(monkeypatch, results={"NVDA": [payload]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    from signals.payload import format_payload
+
+    texts = _all_reply_texts(update)
+    assert format_payload(payload) not in texts
+    assert any("O'tib ketgan (kirish kech):" in t and "NVDA" in t and "+3.5%" in t for t in texts)
+
+
+def test_detected_and_zone_reached_still_full_cards(monkeypatch) -> None:
+    detected = _make_signal_payload("AAPL", score=85.0, entry_ts=date(2026, 1, 1))
+    detected = _with_status(detected, SetupStatus.DETECTED, distance=-1.2)
+    zone_reached = _make_signal_payload("MSFT", score=80.0, entry_ts=date(2026, 1, 1))
+    zone_reached = _with_status(zone_reached, SetupStatus.ZONE_REACHED, distance=0.0)
+    _patch_signal_scan(
+        monkeypatch, results={"AAPL": [detected], "MSFT": [zone_reached]}, skipped=[],
+    )
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    from signals.payload import format_payload
+
+    joined = "\n\n".join(_all_reply_texts(update))  # chunk_signal_messages bir nechta kartani birlashtirishi mumkin
+    assert format_payload(detected) in joined
+    assert format_payload(zone_reached) in joined
+
+
+def test_no_moved_past_block_when_none_moved_past(monkeypatch) -> None:
+    payload = _make_signal_payload("AAPL", score=85.0, entry_ts=date(2026, 1, 1))
+    payload = _with_status(payload, SetupStatus.ZONE_REACHED)
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    joined = "\n".join(_all_reply_texts(update))
+    assert "O'tib ketgan" not in joined
+
+
+def test_default_status_none_treated_as_full_card(monkeypatch) -> None:
+    """status=None (masalan current_price berilmagan) -- xavfsiz default, MOVED_PAST
+    bloki EMAS, oddiy to'liq karta sifatida ko'rsatiladi (backward-compat)."""
+    payload = _make_signal_payload("AAPL", score=85.0)  # status default None
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    from signals.payload import format_payload
+
+    texts = _all_reply_texts(update)
+    assert format_payload(payload) in texts
+    assert "O'tib ketgan" not in "\n".join(texts)
+
+
+def test_summary_line_shows_moved_past_count(monkeypatch) -> None:
+    zone_reached = _make_signal_payload("AAPL", score=85.0, entry_ts=date(2026, 1, 1))
+    zone_reached = _with_status(zone_reached, SetupStatus.ZONE_REACHED)
+    moved_1 = _with_status(
+        _make_signal_payload("NVDA", score=90.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.MOVED_PAST, distance=3.5,
+    )
+    moved_2 = _with_status(
+        _make_signal_payload("WSM", score=88.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.MOVED_PAST, distance=1.6,
+    )
+    _patch_signal_scan(
+        monkeypatch,
+        results={"AAPL": [zone_reached], "NVDA": [moved_1], "WSM": [moved_2]},
+        skipped=[],
+    )
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    summary = _all_reply_texts(update)[-1]
+    assert "2 ta o'tib ketgan (bir qatorli xulosada)" in summary
+
+
+def test_mixed_statuses_zone_reached_before_detected_in_output(monkeypatch) -> None:
+    """ZONE_REACHED (chin faol) DETECTED'dan OLDIN chiqishi kerak, score'dan
+    qat'i nazar (DETECTED score yuqoriroq bo'lsa ham)."""
+    detected_high_score = _with_status(
+        _make_signal_payload("AAPL", score=95.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.DETECTED, distance=-1.0,
+    )
+    zone_reached_low_score = _with_status(
+        _make_signal_payload("MSFT", score=70.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.ZONE_REACHED, distance=0.0,
+    )
+    _patch_signal_scan(
+        monkeypatch,
+        results={"AAPL": [detected_high_score], "MSFT": [zone_reached_low_score]},
+        skipped=[],
+    )
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    joined = "\n\n".join(_all_reply_texts(update))
+    assert joined.index("MSFT — SWING setup") < joined.index("AAPL — SWING setup")
+
+
+def test_moved_past_not_counted_against_max_signals_cap(monkeypatch) -> None:
+    """MAX_SIGNALS_PER_SCAN (10) faqat to'liq-karta guruhiga qo'llanadi -- MOVED_PAST
+    payload'lar bu cheklovni band qilmaydi, hammasi bir qatorli xulosada ko'rinadi."""
+    zone_reached_payloads = [
+        _with_status(
+            _make_signal_payload(f"CARD{i}", score=float(90 - i), entry_ts=date(2026, 1, 1)),
+            SetupStatus.ZONE_REACHED,
+        )
+        for i in range(10)
+    ]
+    moved_past_payloads = [
+        _with_status(
+            _make_signal_payload(f"MOVED{i}", score=float(60 - i), entry_ts=date(2026, 1, 1)),
+            SetupStatus.MOVED_PAST, distance=float(i + 1),
+        )
+        for i in range(5)
+    ]
+    results = {p.symbol: [p] for p in zone_reached_payloads + moved_past_payloads}
+    _patch_signal_scan(monkeypatch, results=results, skipped=[])
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    joined = "\n\n".join(_all_reply_texts(update))
+    for i in range(10):
+        assert f"CARD{i} — SWING setup" in joined
+    for i in range(5):
+        assert f"MOVED{i}" in joined  # bir qatorli xulosada, karta emas
+        assert f"MOVED{i} — SWING setup" not in joined
+
+
+def test_mixed_all_three_statuses_sample(monkeypatch) -> None:
+    """Aralash holat: ZONE_REACHED + DETECTED to'liq karta, MOVED_PAST qisqa
+    xulosada -- namunaviy /signals natijasi."""
+    zone_reached = _with_status(
+        _make_signal_payload("MSFT", score=88.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.ZONE_REACHED, distance=0.0,
+    )
+    detected = _with_status(
+        _make_signal_payload("AAPL", score=85.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.DETECTED, distance=-1.2,
+    )
+    moved_past = _with_status(
+        _make_signal_payload("NVDA", score=90.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.MOVED_PAST, distance=3.5,
+    )
+    _patch_signal_scan(
+        monkeypatch,
+        results={"MSFT": [zone_reached], "AAPL": [detected], "NVDA": [moved_past]},
+        skipped=[],
+    )
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    from signals.payload import format_payload
+
+    texts = _all_reply_texts(update)
+    joined = "\n\n".join(texts)
+    assert format_payload(zone_reached) in joined
+    assert format_payload(detected) in joined
+    assert format_payload(moved_past) not in texts
+    assert joined.index("MSFT — SWING setup") < joined.index("AAPL — SWING setup")
+    assert "O'tib ketgan (kirish kech):\n- NVDA: zonadan +3.5% yuqorida" in joined
+    assert "1 ta o'tib ketgan (bir qatorli xulosada)" in texts[-1]

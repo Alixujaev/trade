@@ -15,6 +15,7 @@ from signals.payload import (
     SignalPayload,
     contains_directive_language,
     distance_to_zone,
+    format_moved_past_summary,
     format_payload,
     payload_from_setup,
     score_label_for,
@@ -545,3 +546,55 @@ def test_bearish_is_avoid_not_short() -> None:
     assert "short" not in text.lower()
     assert "sell" not in text.lower()
     assert payload.direction is StructureState.BEARISH
+
+
+# ======================================================================
+# format_moved_past_summary — MOVED_PAST bir qatorli xulosa (to'liq karta EMAS)
+# ======================================================================
+
+
+def test_format_moved_past_summary_empty_list_gives_empty_string() -> None:
+    """MOVED_PAST yo'q bo'lsa bo'sh satr -- chaqiruvchi blokni umuman qo'shmaydi."""
+    assert format_moved_past_summary([]) == ""
+
+
+def test_format_moved_past_summary_single_payload() -> None:
+    payload = _payload_with_price(60.20, (57.66, 58.60))  # MOVED_PAST, +2.73%
+    assert payload.status is SetupStatus.MOVED_PAST
+
+    text = format_moved_past_summary([payload])
+
+    assert text == "O'tib ketgan (kirish kech):\n- AAPL: zonadan +2.7% yuqorida"
+
+
+def test_format_moved_past_summary_multiple_payloads_one_line_each() -> None:
+    nvda = dataclasses.replace(_payload_with_price(103.5, (95.0, 100.0)), symbol="NVDA")
+    wsm = dataclasses.replace(_payload_with_price(101.6, (95.0, 100.0)), symbol="WSM")
+
+    text = format_moved_past_summary([nvda, wsm])
+
+    assert text == (
+        "O'tib ketgan (kirish kech):\n"
+        "- NVDA: zonadan +3.5% yuqorida\n"
+        "- WSM: zonadan +1.6% yuqorida"
+    )
+
+
+def test_format_moved_past_summary_no_score_entry_target_evidence() -> None:
+    """Faqat symbol + distance -- score/entry/target/evidence ko'rsatilmaydi."""
+    payload = _payload_with_price(60.20, (57.66, 58.60))
+    payload = dataclasses.replace(payload, score=99.0, potential_target=9999.0)
+
+    text = format_moved_past_summary([payload])
+
+    assert "99" not in text
+    assert "9999" not in text
+    assert "Score" not in text
+    assert "Target" not in text
+    assert "Evidence" not in text
+    assert "Entry zone" not in text
+
+
+def test_format_moved_past_summary_no_directive_language() -> None:
+    payload = _payload_with_price(60.20, (57.66, 58.60))
+    assert not contains_directive_language(format_moved_past_summary([payload]))
