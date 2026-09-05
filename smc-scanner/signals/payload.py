@@ -6,7 +6,8 @@ signals/dedup.py bir xil setup allaqachon ko'rsatilganini biladi.
 
 MUHIM: bu modul hech narsani filtrlamaydi/o'zgartirmaydi — faqat mavjud
 tactical_scan.py qatoridan (yoki xom qiymatlardan) sof ID hisoblaydi.
-"""Signal payload — "setup intelligence", "BUY signal" EMAS.
+
+Signal payload — "setup intelligence", "BUY signal" EMAS.
 
 Bot endi trading robot emas, decision-support scanner: setup topadi, ma'lumot ustunligi
 beradi, YAKUNIY QARORNI ODAM qiladi. Shu tufayli bu modul ATAYLAB hech qanday direktiv
@@ -22,7 +23,7 @@ Bu modul sof domen ishi: I/O yo'q, tarmoq yo'q, hech narsani qayta hisoblamaydi.
 `payload_from_setup` mavjud `smc.types.TradeSetup`dagi ma'lumotni to'g'ridan-to'g'ri map
 qiladi; trend/structure/volume/tarixiy statistika kabi TradeSetup'da YO'Q kontekst
 chaqiruvchidan (masalan kelajakdagi scanner integratsiyasi) tashqaridan uzatiladi.
-
+"""
 
 from __future__ import annotations
 

@@ -13,8 +13,6 @@ from telegram.ext import ContextTypes, ConversationHandler
 from config.core_watchlist import add_to_core_watchlist, get_core_watchlist, remove_from_core_watchlist
 from config.settings import (
     MAX_OPEN_POSITIONS,
-from config.settings import (
-    MAX_OPEN_POSITIONS,
     MAX_SIGNALS_PER_SCAN,
     PRIMARY_INTERVAL,
     SCORE_THRESHOLDS,
