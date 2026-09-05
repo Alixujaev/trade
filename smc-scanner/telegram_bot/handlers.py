@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from datetime import date
 
@@ -12,21 +13,28 @@ from telegram.ext import ContextTypes, ConversationHandler
 from config.core_watchlist import add_to_core_watchlist, get_core_watchlist, remove_from_core_watchlist
 from config.settings import (
     MAX_OPEN_POSITIONS,
+from config.settings import (
+    MAX_OPEN_POSITIONS,
+    MAX_SIGNALS_PER_SCAN,
     PRIMARY_INTERVAL,
+    SCORE_THRESHOLDS,
     SIGNAL_COOLDOWN_HOURS,
     SIGNAL_DEDUP_CLEANUP_MULT,
     WATCHLIST_COMPACT_THRESHOLD,
 )
+from data.factory import get_provider
 from journal.trade_journal import TradeJournal
 from journal.types import JournalEntry
 from risk.rules import check_open_positions
 from scripts.tactical_scan import DEFAULT_EXIT_MODE, filter_quality_setups, run_scan, scan_one_symbol
 from signals.dedup import DedupStore
-from signals.payload import signal_id_for_row
+from signals.payload import SignalMode, format_payload, signal_id_for_row
+from signals.scanner import scan_universe
 from telegram_bot import keyboards
 from telegram_bot.auth import require_allowed_user
 from telegram_bot.formatting import (
     HELP_TEXT,
+    chunk_signal_messages,
     format_add_confirmation,
     format_journal_entry_line,
     format_scan_summary,
@@ -34,6 +42,8 @@ from telegram_bot.formatting import (
     format_stats_message,
     format_watchlist_message,
 )
+
+logger = logging.getLogger(__name__)
 
 # /add konversatsiya holatlari
 ADD_SYMBOL, ADD_ENTRY, ADD_STOP, ADD_TARGET, ADD_REASON = range(5)
@@ -135,6 +145,62 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def scan_all(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """/scan'ning past R:R setup'larni HAM ko'rsatadigan varianti."""
     await _run_scan(update, context, show_all=True)
+
+
+# ---- /signals, /swing ----
+# Eski /scan (yuqorida) tactical_scan.py'ning direktiv ("LONG") pipeline'idan foydalanadi.
+# Bular signals/scanner.py + signals/payload.py'ga asoslangan — YANGI, NON-DIRECTIVE
+# "setup intelligence" oqimi (research phase yopilgan: market/selection/exit edge topilmadi,
+# bot endi qaror odam qiladigan skaner). Trading/scoring/ATR/entry-zone/backtest-statistika
+# hisoblanishi BU YERDA YO'Q — hammasi signals/scanner.py va signals/payload.py'da (mavjud,
+# sinalgan); bu handler faqat chaqiradi, natijani cheklaydi/formatlaydi, yuboradi.
+
+async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *, mode: SignalMode) -> None:
+    symbols = [h.ticker for h in get_core_watchlist()]
+    min_score = SCORE_THRESHOLDS["watch"]
+    await update.effective_message.reply_text(f"⏳ {len(symbols)} ta belgi skanerlanmoqda...")
+
+    try:
+        results, skipped = scan_universe(
+            symbols, get_provider(), interval=PRIMARY_INTERVAL, mode=mode, min_score=min_score,
+        )
+    except Exception:
+        logger.warning("scan_universe xatosi", exc_info=True)
+        await update.effective_message.reply_text("Skanerlashda xatolik, qayta urinib ko'ring.")
+        return
+
+    all_payloads = sorted(
+        (p for payloads in results.values() for p in payloads),
+        key=lambda p: p.score, reverse=True,
+    )
+    total_found = len(all_payloads)
+    shown = all_payloads[:MAX_SIGNALS_PER_SCAN]
+
+    if not shown:
+        text = f"Skan tugadi. Hozircha setup yo'q (min-score {min_score:.0f})."
+        if skipped:
+            text += f"\nSkipped: {len(skipped)}"
+        await update.effective_message.reply_text(text)
+        return
+
+    cards = [format_payload(p) for p in shown]
+    for message in chunk_signal_messages(cards):
+        await update.effective_message.reply_text(message)
+
+    count_line = f"Setups: {total_found}"
+    if total_found > len(shown):
+        count_line += f" (ko'rsatildi: {len(shown)})"
+    await update.effective_message.reply_text(f"Scan complete.\n{count_line}\nSkipped: {len(skipped)}")
+
+
+@require_allowed_user
+async def signals_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _run_signal_scan(update, context, mode=SignalMode.SWING)
+
+
+@require_allowed_user
+async def swing_scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await _run_signal_scan(update, context, mode=SignalMode.SWING)
 
 
 # ---- /status ----

@@ -29,6 +29,8 @@ _TEXT_NOT_COMMAND = filters.TEXT & ~filters.COMMAND
 BOT_COMMANDS: list[BotCommand] = [
     BotCommand("scan", "Watchlist yoki ticker(lar)ni skanerlash (past R:R yashirilgan)"),
     BotCommand("scan_all", "Barcha setup'larni ko'rsatish (past R:R bilan)"),
+    BotCommand("signals", "Setup skaneri (non-directive setup intelligence)"),
+    BotCommand("swing", "Swing rejimida setup skaneri"),
     BotCommand("status", "Ochiq savdolar + risk holati"),
     BotCommand("add", "Yangi savdo qo'shish"),
     BotCommand("close", "Ochiq savdoni yopish"),
@@ -105,6 +107,8 @@ def build_application(token: str) -> Application:
     application.add_handler(CommandHandler("menu", handlers.menu_command))
     application.add_handler(CommandHandler("scan", handlers.scan))
     application.add_handler(CommandHandler("scan_all", handlers.scan_all))
+    application.add_handler(CommandHandler("signals", handlers.signals_scan))
+    application.add_handler(CommandHandler("swing", handlers.swing_scan))
     application.add_handler(CommandHandler("status", handlers.status))
     application.add_handler(CommandHandler("journal", handlers.journal_command))
     application.add_handler(CommandHandler("stats", handlers.stats_command))

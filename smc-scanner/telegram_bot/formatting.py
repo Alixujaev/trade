@@ -265,3 +265,50 @@ def format_watchlist_message(holdings: list) -> str:
     lines.append("")
     lines.append("O'chirish uchun pastdagi 🗑 tugmani bosing. Qo'shish: /watchadd")
     return "\n".join(lines)
+
+
+# ======================================================================
+# /signals, /swing — setup kartalarini xavfsiz Telegram xabarlariga guruhlash
+# ======================================================================
+
+TELEGRAM_MESSAGE_LIMIT = 4096  # Telegram platforma qattiq limiti (bitta xabar uchun)
+
+
+def chunk_signal_messages(cards: list[str], *, max_length: int = TELEGRAM_MESSAGE_LIMIT) -> list[str]:
+    """`format_payload` natijalarini (bitta setup = bitta karta) xavfsiz Telegram
+    xabarlariga guruhlaydi — hech bir chiquvchi xabar `max_length`dan oshmaydi.
+
+    Kartalar bo'sh qatordan ("\n\n") ajratilib bir xabarga sig'gancha guruhlanadi;
+    keyingi karta sig'masa yangi xabar boshlanadi. Bitta kartaning O'ZI limitdan katta
+    bo'lib qolsa (nazariy holat — payload formatining o'zi HECH QACHON o'zgartirilmaydi,
+    faqat qanday guruhlanishi boshqariladi) — xavfsizlik uchun qattiq bo'laklanadi.
+    """
+    if not cards:
+        return []
+
+    messages: list[str] = []
+    current: list[str] = []
+    current_len = 0
+
+    for card in cards:
+        if len(card) > max_length:
+            if current:
+                messages.append("\n\n".join(current))
+                current, current_len = [], 0
+            for i in range(0, len(card), max_length):
+                messages.append(card[i : i + max_length])
+            continue
+
+        piece_len = len(card) if not current else len(card) + 2  # +2 == "\n\n" ajratuvchi
+        if current and current_len + piece_len > max_length:
+            messages.append("\n\n".join(current))
+            current, current_len = [], 0
+            piece_len = len(card)
+
+        current.append(card)
+        current_len += piece_len
+
+    if current:
+        messages.append("\n\n".join(current))
+
+    return messages

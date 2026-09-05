@@ -1,0 +1,37 @@
+
+=== TRAIN ===
+                  Model  Return  CAGR    DD  Sharpe  Sortino  Calmar  Expectancy  Profit Factor  Avg Hold  Trades Verdict
+        Equal-weight BH   43.09 12.72 35.46   0.579    0.800   0.359         NaN            NaN       NaN     NaN       -
+           Selection-BH    0.72  0.24 21.58   0.087    0.125   0.011         NaN            NaN       NaN   102.0       -
+         Constrained BH   13.38  4.29 35.21   0.294    0.426   0.122         NaN            NaN       NaN     NaN       -
+NoExit-capped (control)   16.87  5.35 32.25   0.346    0.503   0.166      3.2282          2.229    774.62     8.0 CONTROL
+        A (fixed_sl_tp)   34.06 10.29 11.32   1.047    1.501   0.910      0.4390          1.766     45.47    78.0       -
+          B (atr_sl_tp)    3.31  1.10  6.17   0.295    0.415   0.178      0.0476          1.118      8.27    99.0       -
+      C (trailing_stop)    5.35  1.76  8.00   0.321    0.453   0.220      0.0594          1.191     15.22    97.0       -
+    D (structure_break)   25.07  7.76 10.69   0.691    0.972   0.726      0.4670          1.936     58.62    65.0       -
+E (partial_tp_trailing)   15.35  4.89  8.47   0.687    0.958   0.577      0.4920          1.397     28.26    90.0       -
+          F (time_exit)   22.98  7.16 10.21   0.806    1.185   0.701      0.2768          1.640     28.63    83.0       -
+
+=== OOS ===
+                  Model  Return  CAGR    DD  Sharpe  Sortino  Calmar  Expectancy  Profit Factor  Avg Hold  Trades                            Verdict
+        Equal-weight BH  209.96 36.15 25.39   1.456    2.160   1.424         NaN            NaN       NaN     NaN                                  -
+           Selection-BH   34.73  8.47  9.75   0.915    1.360   0.869         NaN            NaN       NaN   182.0                                  -
+         Constrained BH   41.19  9.87 15.61   0.739    1.087   0.632         NaN            NaN       NaN     NaN                                  -
+NoExit-capped (control)   70.35 15.64 15.21   1.044    1.583   1.028     11.4074         50.445   1007.33     6.0                            CONTROL
+        A (fixed_sl_tp)   34.84  8.50 11.92   0.838    1.181   0.713      0.2640          1.486     44.46   122.0 INCONCLUSIVE (baseline low sample)
+          B (atr_sl_tp)   20.02  5.10  6.32   1.011    1.706   0.807      0.1309          1.457      7.98   172.0 INCONCLUSIVE (baseline low sample)
+      C (trailing_stop)   45.51 10.77  8.33   1.335    2.230   1.294      0.2759          1.900     15.61   159.0 INCONCLUSIVE (baseline low sample)
+    D (structure_break)   35.16  8.57 15.58   0.669    0.944   0.550      0.9367          1.623     64.05    99.0 INCONCLUSIVE (baseline low sample)
+E (partial_tp_trailing)   45.51 10.77 11.90   1.247    1.942   0.905      0.6144          1.659     24.65   152.0 INCONCLUSIVE (baseline low sample)
+          F (time_exit)   60.98 13.87 13.13   1.297    1.987   1.057      0.3927          2.035     28.36   134.0 INCONCLUSIVE (baseline low sample)
+
+LEVEL 1 (Selection): NO SELECTION EDGE  (Selection-BH Sharpe=0.915 vs Equal-weight Sharpe=1.456, trades=182)
+LEVEL 2 (Exit): BEST EXIT: None / VERDICT: NO EXIT EDGE FOUND
+Experiment saqlandi: C:\Users\Admin\Desktop\own\trade\smc-scanner\experiments\20260904_110549_fixed_sl_tp_a406a17.json
+Experiment saqlandi: C:\Users\Admin\Desktop\own\trade\smc-scanner\experiments\20260904_110549_atr_sl_tp_a406a17.json
+Experiment saqlandi: C:\Users\Admin\Desktop\own\trade\smc-scanner\experiments\20260904_110549_trailing_stop_a406a17.json
+Experiment saqlandi: C:\Users\Admin\Desktop\own\trade\smc-scanner\experiments\20260904_110549_structure_break_a406a17.json
+Experiment saqlandi: C:\Users\Admin\Desktop\own\trade\smc-scanner\experiments\20260904_110549_partial_tp_trailing_a406a17.json
+Experiment saqlandi: C:\Users\Admin\Desktop\own\trade\smc-scanner\experiments\20260904_110549_time_exit_a406a17.json
+
+CSV saqlandi: C:\Users\Admin\Desktop\own\trade\smc-scanner\reports\exit_research_full.csv
