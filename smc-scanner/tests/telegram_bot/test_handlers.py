@@ -775,6 +775,7 @@ def _make_callback_update(data: str, user_id: int = 111) -> MagicMock:
     update.callback_query.data = data
     update.callback_query.answer = AsyncMock()
     update.callback_query.edit_message_text = AsyncMock()
+    update.callback_query.message.reply_text = AsyncMock()
     return update
 
 
@@ -1430,9 +1431,12 @@ def test_signal_quickadd_start_caches_payload_and_shows_confirmation(monkeypatch
     assert draft["score"] == payload.score
     assert draft["status"] == "ZONE_REACHED"
 
-    text = add_update.callback_query.edit_message_text.call_args_list[0].args[0]
+    # YANGI xabar sifatida (edit EMAS) -- boshqa symbol'larning "➕" tugmalari
+    # turgan umumiy /signals xabari tegilmasligi kerak (regressiya himoyasi).
+    add_update.callback_query.edit_message_text.assert_not_called()
+    text = add_update.callback_query.message.reply_text.call_args_list[0].args[0]
     assert "Jurnalga qo'shilsinmi?" in text
-    assert "reply_markup" in add_update.callback_query.edit_message_text.call_args_list[0].kwargs
+    assert "reply_markup" in add_update.callback_query.message.reply_text.call_args_list[0].kwargs
 
 
 def test_signal_quickadd_start_falls_back_to_zone_midpoint_when_no_current_price(monkeypatch) -> None:
@@ -1459,7 +1463,8 @@ def test_signal_quickadd_start_expired_cache_shows_message(monkeypatch) -> None:
 
     _run(handlers.signal_quickadd_start(add_update, context))
 
-    text = add_update.callback_query.edit_message_text.call_args_list[0].args[0]
+    add_update.callback_query.edit_message_text.assert_not_called()
+    text = add_update.callback_query.message.reply_text.call_args_list[0].args[0]
     assert "eskirgan" in text
     assert "pending_quickadd" not in context.user_data
 
@@ -1544,3 +1549,46 @@ def test_signal_quickadd_excludes_bearish_from_summary_keyboard(monkeypatch) -> 
 
     kwargs = update.effective_message.reply_text.call_args_list[-1].kwargs
     assert kwargs["reply_markup"] is None
+
+
+def test_signal_quickadd_start_does_not_remove_other_symbols_buttons(monkeypatch) -> None:
+    """Regressiya: bir symbol uchun '➕' bosilganda, boshqa symbol'larning
+    tugmalari turgan umumiy /signals xabari TAHRIRLANMASLIGI kerak -- aks holda
+    bitta setup qo'shilgach QOLGAN HAMMASI uchun tugma yo'qolib qoladi
+    (production bug: birinchi setup jurnalga yozilgach, boshqa tugmalar
+    ko'rinmay qoldi)."""
+    aapl = _with_status(
+        _make_signal_payload("AAPL", score=90.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.ZONE_REACHED,
+    )
+    msft = _with_status(
+        _make_signal_payload("MSFT", score=85.0, entry_ts=date(2026, 1, 1)),
+        SetupStatus.ZONE_REACHED,
+    )
+    _patch_signal_scan(monkeypatch, results={"AAPL": [aapl], "MSFT": [msft]}, skipped=[])
+    scan_update, context = _make_update(), _make_context()
+    _run(handlers.signals_scan(scan_update, context))
+
+    summary_kwargs = scan_update.effective_message.reply_text.call_args_list[-1].kwargs
+    original_keyboard = summary_kwargs["reply_markup"]
+    original_buttons = {btn.callback_data for row in original_keyboard.inline_keyboard for btn in row}
+    assert "sigadd:AAPL" in original_buttons
+    assert "sigadd:MSFT" in original_buttons
+
+    # AAPL uchun "➕" bosiladi -- yakuniy /signals xabari (shu keyboard) HECH QACHON
+    # tahrirlanmasligi kerak, shuning uchun MSFT tugmasi ham hamon "mavjud" bo'lib
+    # qoladi (chunki xabarning o'zi o'zgarmagan).
+    aapl_add_update = _make_callback_update("sigadd:AAPL")
+    _run(handlers.signal_quickadd_start(aapl_add_update, context))
+    aapl_add_update.callback_query.edit_message_text.assert_not_called()
+
+    # MSFT ham hali kesh'da bor -- endi uni ham qo'shishga urinish muvaffaqiyatli
+    # bo'lishi kerak (agar yakuniy xabar chindan tahrirlangan bo'lsa, bu keshni
+    # ham buzgan bo'lardi -- lekin biz keshni context.user_data'da alohida
+    # saqlaymiz, shuning uchun ikkalasi ham mustaqil ishlashi kerak).
+    msft_add_update = _make_callback_update("sigadd:MSFT")
+    _run(handlers.signal_quickadd_start(msft_add_update, context))
+    msft_add_update.callback_query.edit_message_text.assert_not_called()
+    msft_text = msft_add_update.callback_query.message.reply_text.call_args_list[0].args[0]
+    assert "MSFT" in msft_text
+    assert "Jurnalga qo'shilsinmi?" in msft_text
