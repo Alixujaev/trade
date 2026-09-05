@@ -771,13 +771,22 @@ async def signal_quickadd_start(update: Update, context: ContextTypes.DEFAULT_TY
     shuning uchun `current_price` (kuzatilgan narx, mavjud bo'lsa) ishlatiladi,
     aks holda zona o'rtachasi (fallback). target_price ATAYLAB None (trailing/
     foydalanuvchi tanlovi) — `potential_target` faqat `reference_target_price`
-    sifatida (baholash uchun, majburiy chiqish EMAS), non-directive tamoyiliga mos."""
+    sifatida (baholash uchun, majburiy chiqish EMAS), non-directive tamoyiliga mos.
+
+    MUHIM: `query.edit_message_text` ISHLATILMAYDI — yakuniy /signals xabarida
+    BIR NECHTA "➕ SYMBOL" tugmasi BITTA umumiy keyboard'da turadi
+    (`build_signals_summary_keyboard`). Shu xabarni tahrirlash BOSHQA barcha
+    symbol'larning tugmalarini ham yo'q qilib yuborardi (production bug: bitta
+    setup qo'shilgach, qolgan hammasi uchun tugma g'oyib bo'lardi). Shuning
+    uchun tasdiqlash/"eskirgan" xabari YANGI xabar sifatida (`query.message.
+    reply_text`) yuboriladi — asl xabar+keyboard TEGILMAY qoladi, qolgan
+    symbol'lar ham qo'shilishi mumkin."""
     query = update.callback_query
     await query.answer()
     symbol = query.data.split(":", 1)[1]
     payload: SignalPayload | None = context.user_data.get("signal_payloads", {}).get(symbol)
     if payload is None:
-        await query.edit_message_text(f"{symbol}: bu so'rov eskirgan, qayta /signals qiling.")
+        await query.message.reply_text(f"{symbol}: bu so'rov eskirgan, qayta /signals qiling.")
         return
 
     entry_low, entry_high = payload.entry_zone
@@ -792,7 +801,7 @@ async def signal_quickadd_start(update: Update, context: ContextTypes.DEFAULT_TY
         "reference_target_price": payload.potential_target,
         **snapshot_kwargs_from_payload(payload),
     }
-    await query.edit_message_text(
+    await query.message.reply_text(
         f"{format_payload(payload)}\n\nJurnalga qo'shilsinmi?",
         reply_markup=keyboards.build_confirm_keyboard(payload.symbol),
     )
