@@ -158,3 +158,14 @@ SCORE_RR_SATURATION: float = 3.0
 # --- Backtest xarajatlari (TZ 15) — brokerga qarab moslanadi ---
 BREAKOUT_COMMISSION_PCT: float = 0.0005
 BREAKOUT_SLIPPAGE_PCT: float = 0.0005
+
+# --- Signal dedup/cooldown (telegram_bot/handlers.py, TZ 18) ---
+# Bir xil setup (signals/payload.py::signal_id_for_row) shu soatlar ichida qayta
+# yuborilmaydi — foydalanuvchi bir xil setup'ga befarq bo'lib qolmasin. Swing
+# setup'lar kunlar/haftalar yashaydi, /scan esa kuniga bir necha marta
+# chaqirilishi mumkin — 24 soat (1 kun) balансли default.
+SIGNAL_COOLDOWN_HOURS: float = 24.0
+# Dedup fayli (signals/dedup.py) tozalash chegarasi = SIGNAL_COOLDOWN_HOURS * shu
+# ko'paytiruvchi — cooldown allaqachon o'tgan (va yangi setup sifatida qayta
+# ko'rsatilgan/ko'rsatilishi mumkin bo'lgan) yozuvlar cheksiz to'planib qolmasin.
+SIGNAL_DEDUP_CLEANUP_MULT: float = 2.0

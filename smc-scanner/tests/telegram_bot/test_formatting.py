@@ -302,6 +302,43 @@ def test_format_scan_summary_show_all_includes_low_rr_setups() -> None:
     assert "sababli yashirildi" not in msg
 
 
+def test_format_scan_summary_dedup_new_overrides_shown_setups() -> None:
+    """dedup_new berilsa, faqat o'sha setup'lar "Faol setup topilgan" bo'limida
+    ko'rsatiladi (filter_quality_setups natijasi to'liq emas)."""
+    kept = _active_setup_row()
+    kept["SYMBOL"] = "AMD"
+    deduped_out = _active_setup_row()
+    deduped_out["SYMBOL"] = "MSFT"
+
+    msg = format_scan_summary(
+        [kept, deduped_out], dedup_new=[kept], dedup_skipped_count=1,
+    )
+
+    assert "AMD" in msg
+    assert "MSFT" not in msg
+    assert "Faol setup topilgan (1 ta)" in msg
+    assert "🔁 Dedup: 2 ta topildi, 1 ta yangi yuborildi, 1 ta oldin yuborilgani uchun o'tkazib yuborildi." in msg
+
+
+def test_format_scan_summary_dedup_all_skipped_shows_no_new_setup_message() -> None:
+    row = _active_setup_row()
+
+    msg = format_scan_summary([row], dedup_new=[], dedup_skipped_count=1)
+
+    assert "Yangi faol setup yo'q — barchasi oldin yuborilgan" in msg
+    assert "Faol setup topilgan" not in msg
+
+
+def test_format_scan_summary_without_dedup_arg_has_no_dedup_line() -> None:
+    """dedup_new berilmasa (default None), eski xatti-harakat — dedup qatori
+    umuman ko'rsatilmaydi (backward-compat)."""
+    row = _active_setup_row()
+
+    msg = format_scan_summary([row])
+
+    assert "🔁 Dedup" not in msg
+
+
 def test_format_stats_message_contains_all_metrics() -> None:
     stats = {
         "num_entries": 10,

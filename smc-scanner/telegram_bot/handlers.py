@@ -13,9 +13,13 @@ from telegram.ext import ContextTypes, ConversationHandler
 from config.core_watchlist import add_to_core_watchlist, get_core_watchlist, remove_from_core_watchlist
 from config.settings import (
     MAX_OPEN_POSITIONS,
+from config.settings import (
+    MAX_OPEN_POSITIONS,
     MAX_SIGNALS_PER_SCAN,
     PRIMARY_INTERVAL,
     SCORE_THRESHOLDS,
+    SIGNAL_COOLDOWN_HOURS,
+    SIGNAL_DEDUP_CLEANUP_MULT,
     WATCHLIST_COMPACT_THRESHOLD,
 )
 from data.factory import get_provider
@@ -23,7 +27,8 @@ from journal.trade_journal import TradeJournal
 from journal.types import JournalEntry
 from risk.rules import check_open_positions
 from scripts.tactical_scan import DEFAULT_EXIT_MODE, filter_quality_setups, run_scan, scan_one_symbol
-from signals.payload import SignalMode, format_payload
+from signals.dedup import DedupStore
+from signals.payload import SignalMode, format_payload, signal_id_for_row
 from signals.scanner import scan_universe
 from telegram_bot import keyboards
 from telegram_bot.auth import require_allowed_user
@@ -86,20 +91,48 @@ async def menu_button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 
 # ---- /scan, /scan_all ----
 
+def _dedup_filter_new_setups(visible: list[dict]) -> tuple[list[dict], int]:
+    """Sifat-filtrdan o'tgan faol setup'larni dedup+cooldown (TZ 18) orqali
+    filtrlaydi — SKAN MANTIG'INI O'ZGARTIRMAYDI (run_scan/filter_quality_setups
+    allaqachon chaqirilgan), faqat YUBORISH bosqichida qaysi setup ko'rsatilishini
+    tanlaydi. Yangi (is_new) setup'lar mark_shown qilinadi; eski (cooldown
+    ichidagi) yozuvlar cleanup bilan tozalanadi — fayl cheksiz o'smasin."""
+    store = DedupStore()
+    new_rows: list[dict] = []
+    skipped = 0
+    for row in visible:
+        signal_id = signal_id_for_row(row, mode=DEFAULT_EXIT_MODE)
+        if signal_id is None or store.is_new(signal_id, cooldown_hours=SIGNAL_COOLDOWN_HOURS):
+            new_rows.append(row)
+            if signal_id is not None:
+                store.mark_shown(signal_id)
+        else:
+            skipped += 1
+    store.cleanup(older_than_hours=SIGNAL_COOLDOWN_HOURS * SIGNAL_DEDUP_CLEANUP_MULT)
+    return new_rows, skipped
+
+
 async def _run_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *, show_all: bool) -> None:
     """Har belgi uchun alohida xabar YO'Q — bitta "ishlayapti" xabari, keyin
     skanerlash tugagach bitta yakuniy xabar. show_all=False (default /scan) bo'lsa
     past R:R (< MIN_PLANNED_RR) setup'lar yashiriladi — /scan_all (show_all=True)
     bilan hammasi ko'rsatiladi. Auth-decorator'siz — chaqiruvchi handler'lar
-    (scan/scan_all) allaqachon himoyalangan (menu_button konvensiyasiga mos)."""
+    (scan/scan_all) allaqachon himoyalangan (menu_button konvensiyasiga mos).
+
+    Dedup+cooldown (TZ 18): sifatli faol setup'lar ORASIDAN oldin ko'rsatilgan
+    (cooldown ichidagi) setup'lar bu yerda chiqarib tashlanadi — foydalanuvchi
+    bir xil setup'ni har /scan'da qayta ko'rmaydi."""
     symbols = list(context.args) if context.args else [h.ticker for h in get_core_watchlist()]
     suffix = " (hammasi)" if show_all else ""
     await update.effective_message.reply_text(f"⏳ {len(symbols)} ta belgi skanerlanmoqda{suffix}...")
     rows = run_scan(symbols, PRIMARY_INTERVAL, None, exit_mode=DEFAULT_EXIT_MODE)
     visible, _ = filter_quality_setups(rows, show_all=show_all)
+    new_visible, dedup_skipped_count = _dedup_filter_new_setups(visible)
     await update.effective_message.reply_text(
-        format_scan_summary(rows, show_all=show_all),
-        reply_markup=keyboards.build_scan_summary_keyboard(visible),
+        format_scan_summary(
+            rows, show_all=show_all, dedup_new=new_visible, dedup_skipped_count=dedup_skipped_count,
+        ),
+        reply_markup=keyboards.build_scan_summary_keyboard(new_visible),
     )
 
 
