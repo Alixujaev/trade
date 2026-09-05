@@ -32,3 +32,27 @@ class JournalEntry:
     exit_date: date | None = None
     exit_price: float | None = None
     r_multiple: float | None = None  # yopilgach: (exit-entry)/(entry-stop)
+
+    # ------------------------------------------------------------------
+    # Setup snapshot (TZ) — trade ochilgan PAYTDAGI to'liq setup konteksti
+    # (signals.payload.SignalPayload'dan, mavjud bo'lsa). Barchasi Optional/
+    # default'li — /add (qo'lda, payload'siz) yozuvlarda bo'sh qoladi, ESKI
+    # (bu maydonlar qo'shilishidan oldingi) yozuvlar buzilmaydi. Bu — TAHLIL
+    # uchun muzlatilgan tarixiy yozuv: keyinchalik stop/target ko'chsa ham
+    # (savdo boshqaruvi), shu yerdagi qiymatlar entry paytidagi holatni
+    # saqlaydi ("nega kirilgan edi" degan savolga bias'siz javob).
+    # ------------------------------------------------------------------
+    setup_type: str | None = None  # masalan "breakout_retest", "fvg"
+    score: float | None = None  # 0..100
+    score_label: str | None = None  # STRONG SETUP / SETUP / WATCH / WEAK
+    trend: str | None = None
+    structure: str | None = None
+    volume_confirmed: bool | None = None
+    entry_zone_low: float | None = None
+    entry_zone_high: float | None = None
+    invalidation: float | None = None  # setup'ning structural stop darajasi (entry paytida)
+    target: float | None = None  # setup'ning potential_target'i (entry paytida, target_price'dan MUSTAQIL)
+    risk_reward: float | None = None  # setup'ning o'z R:R'i (entry paytida)
+    target_source: str | None = None  # "resistance" | "fallback" | None
+    status: str | None = None  # SetupStatus.name (masalan "ZONE_REACHED") — entry paytida
+    score_reasons: tuple[str, ...] = ()  # scanner ko'rgan faktlar (audit)

@@ -21,6 +21,7 @@ from config.settings import (
     WATCHLIST_COMPACT_THRESHOLD,
 )
 from data.factory import get_provider
+from journal.snapshot import snapshot_kwargs_from_payload
 from journal.trade_journal import TradeJournal
 from journal.types import JournalEntry
 from risk.rules import check_open_positions
@@ -275,6 +276,11 @@ async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     card_payloads, moved_past_payloads = _split_by_display_status(new_payloads)
     shown = card_payloads[:MAX_SIGNALS_PER_SCAN]
 
+    # signal_quickadd_start uchun kesh — "➕ Jurnalga qo'sh" tugmasi shu scan
+    # doirasida bosilganda universe'ni qayta skanerlash shart bo'lmasin (TZ:
+    # setup snapshot allaqachon shu SignalPayload'da qo'lda bor).
+    context.user_data["signal_payloads"] = {p.symbol: p for p in shown}
+
     if shown:
         cards = [format_payload(p) for p in shown]
         for message in chunk_signal_messages(cards):
@@ -294,7 +300,9 @@ async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     summary = f"Scan complete.\n{count_line}\nSkipped: {len(skipped)}\n{dedup_line}"
     if moved_past_payloads:
         summary += f"\n{len(moved_past_payloads)} ta o'tib ketgan (bir qatorli xulosada)."
-    await update.effective_message.reply_text(summary)
+    await update.effective_message.reply_text(
+        summary, reply_markup=keyboards.build_signals_summary_keyboard(shown),
+    )
 
 
 @require_allowed_user
@@ -495,12 +503,21 @@ async def watchremove_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE)
 def _finalize_trade(
     *, symbol: str, entry_price: float, stop_price: float, target_price: float | None, reason: str,
     reference_target_price: float | None = None,
+    # Setup snapshot (TZ) — /add (qo'lda) chaqirmaydi (payload yo'q, hammasi
+    # default None/() qoladi); signal_quickadd_start SignalPayload'dan
+    # journal/snapshot.py::snapshot_kwargs_from_payload orqali to'ldiradi.
+    setup_type: str | None = None, score: float | None = None, score_label: str | None = None,
+    trend: str | None = None, structure: str | None = None, volume_confirmed: bool | None = None,
+    entry_zone_low: float | None = None, entry_zone_high: float | None = None,
+    invalidation: float | None = None, target: float | None = None, risk_reward: float | None = None,
+    target_source: str | None = None, status: str | None = None,
+    score_reasons: tuple[str, ...] = (),
 ) -> tuple[JournalEntry, str]:
     """Jurnalga yozish + risk tekshiruvi + tasdiqlash matni — /add (qo'lda kiritish,
-    add_reason) va tezkor-qo'shish (quickadd_confirm, /scan'dan) ikkalasi ham shu
-    orqali saqlaydi, saqlash mantig'i bir joyda takrorlanmaydi. Pozitsiya
-    hajmi/kapital bu yerda hisoblanmaydi — savdo boshqa platformada (masalan
-    TradingView) qilinadi, bot faqat narx/sabab ma'lumotini saqlaydi."""
+    add_reason) va tezkor-qo'shish (quickadd_confirm, /scan yoki /signals'dan)
+    barchasi shu orqali saqlaydi, saqlash mantig'i bir joyda takrorlanmaydi.
+    Pozitsiya hajmi/kapital bu yerda hisoblanmaydi — savdo boshqa platformada
+    (masalan TradingView) qilinadi, bot faqat narx/sabab ma'lumotini saqlaydi."""
     exit_mode = "fixed" if target_price is not None else "trailing"
 
     journal = TradeJournal()
@@ -513,6 +530,11 @@ def _finalize_trade(
         exit_mode=exit_mode,
         reason=reason,
         reference_target_price=reference_target_price,
+        setup_type=setup_type, score=score, score_label=score_label, trend=trend,
+        structure=structure, volume_confirmed=volume_confirmed, entry_zone_low=entry_zone_low,
+        entry_zone_high=entry_zone_high, invalidation=invalidation, target=target,
+        risk_reward=risk_reward, target_source=target_source, status=status,
+        score_reasons=score_reasons,
     )
     risk_result = check_open_positions(journal, MAX_OPEN_POSITIONS)
 
@@ -732,13 +754,57 @@ async def quickadd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     )
 
 
+# ---- /signals'dan tezkor-qo'shish (setup snapshot bilan, TZ) ----
+
+
+@require_allowed_user
+async def signal_quickadd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """`quickadd_start` (yuqorida)ning /signals varianti — lekin qayta scan_universe
+    chaqirmaydi: `_run_signal_scan` shu scan natijasidagi `SignalPayload`larni
+    `context.user_data["signal_payloads"]`ga keshlagan (butun universe'ni qayta
+    skanerlash tarmoq/IO jihatidan qimmat, va setup allaqachon qo'lda bor).
+    Kesh topilmasa (masalan bot qayta ishga tushgan yoki boshqa /signals chaqirilgan)
+    — "eskirgan" xabari (qayta scan_one_symbol bilan tiklash query.data'da
+    setup_type/mode kabi kontekst yo'qligi sabab ishonchli emas).
+
+    entry_price — SignalPayload bitta narx EMAS, ZONA saqlaydi (non-directive) —
+    shuning uchun `current_price` (kuzatilgan narx, mavjud bo'lsa) ishlatiladi,
+    aks holda zona o'rtachasi (fallback). target_price ATAYLAB None (trailing/
+    foydalanuvchi tanlovi) — `potential_target` faqat `reference_target_price`
+    sifatida (baholash uchun, majburiy chiqish EMAS), non-directive tamoyiliga mos."""
+    query = update.callback_query
+    await query.answer()
+    symbol = query.data.split(":", 1)[1]
+    payload: SignalPayload | None = context.user_data.get("signal_payloads", {}).get(symbol)
+    if payload is None:
+        await query.edit_message_text(f"{symbol}: bu so'rov eskirgan, qayta /signals qiling.")
+        return
+
+    entry_low, entry_high = payload.entry_zone
+    entry_price = payload.current_price if payload.current_price is not None else (entry_low + entry_high) / 2
+
+    context.user_data["pending_quickadd"] = {
+        "symbol": payload.symbol,
+        "entry_price": round(entry_price, 2),
+        "stop_price": payload.invalidation,
+        "target_price": None,
+        "reason": payload.setup_type,
+        "reference_target_price": payload.potential_target,
+        **snapshot_kwargs_from_payload(payload),
+    }
+    await query.edit_message_text(
+        f"{format_payload(payload)}\n\nJurnalga qo'shilsinmi?",
+        reply_markup=keyboards.build_confirm_keyboard(payload.symbol),
+    )
+
+
 @require_allowed_user
 async def quickadd_confirm(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
     draft = context.user_data.pop("pending_quickadd", None)
     if draft is None:
-        await query.edit_message_text("Bu so'rov eskirgan, qayta /scan qiling.")
+        await query.edit_message_text("Bu so'rov eskirgan, qayta skanerlang.")
         return
 
     entry, confirmation = _finalize_trade(**draft)

@@ -10,6 +10,7 @@ yaxshi/yomon" degan qarorni ham kod o'zi chiqarmaydi).
 
 from __future__ import annotations
 
+import json
 from dataclasses import asdict, replace
 from datetime import date
 from pathlib import Path
@@ -27,6 +28,12 @@ _COLUMNS = [
     "entry_id", "symbol", "entry_date", "entry_price", "stop_price", "target_price",
     "reference_target_price", "exit_mode", "reason", "rr_planned", "notes", "exit_date",
     "exit_price", "r_multiple",
+    # Setup snapshot (TZ) — barchasi eski CSV'larda YO'Q bo'lishi mumkin, _load
+    # har birini "col" in df.columns bilan tekshiradi (reference_target_price
+    # konvensiyasi bilan bir xil, backward-compat).
+    "setup_type", "score", "score_label", "trend", "structure", "volume_confirmed",
+    "entry_zone_low", "entry_zone_high", "invalidation", "target", "risk_reward",
+    "target_source", "status", "score_reasons",
 ]
 
 
@@ -35,6 +42,38 @@ def _none_if_nan(value: object) -> float | None:
     if pd.isna(value):
         return None
     return float(value)
+
+
+def _float_col(df: pd.DataFrame, row: pd.Series, col: str) -> float | None:
+    """Ustun eski CSV'da umuman yo'q (backward-compat) yoki katak NaN -> None."""
+    if col not in df.columns:
+        return None
+    return _none_if_nan(row[col])
+
+
+def _str_col(df: pd.DataFrame, row: pd.Series, col: str) -> str | None:
+    if col not in df.columns or pd.isna(row[col]):
+        return None
+    return str(row[col])
+
+
+def _bool_col(df: pd.DataFrame, row: pd.Series, col: str) -> bool | None:
+    """CSV yozgan "True"/"False" matnini (yoki pandas allaqachon bool'ga
+    parslagan bo'lsa o'sha qiymatni) qayta bool'ga aylantiradi."""
+    if col not in df.columns or pd.isna(row[col]):
+        return None
+    value = row[col]
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() == "true"
+
+
+def _score_reasons_col(df: pd.DataFrame, row: pd.Series, col: str = "score_reasons") -> tuple[str, ...]:
+    """JSON-string sifatida saqlangan score_reasons'ni tuple'ga qaytaradi. Ustun
+    yo'q/katak bo'sh -> () (bo'sh, direktiv EMAS default)."""
+    if col not in df.columns or pd.isna(row[col]):
+        return ()
+    return tuple(json.loads(row[col]))
 
 
 class TradeJournal:
@@ -55,6 +94,23 @@ class TradeJournal:
         reason: str,
         notes: str = "",
         reference_target_price: float | None = None,
+        # Setup snapshot (TZ) — barchasi ixtiyoriy, default None/(). Qo'lda /add
+        # oqimida (payload yo'q) berilmaydi, quickadd-from-signal oqimida
+        # journal/snapshot.py::snapshot_kwargs_from_payload orqali to'ldiriladi.
+        setup_type: str | None = None,
+        score: float | None = None,
+        score_label: str | None = None,
+        trend: str | None = None,
+        structure: str | None = None,
+        volume_confirmed: bool | None = None,
+        entry_zone_low: float | None = None,
+        entry_zone_high: float | None = None,
+        invalidation: float | None = None,
+        target: float | None = None,
+        risk_reward: float | None = None,
+        target_source: str | None = None,
+        status: str | None = None,
+        score_reasons: tuple[str, ...] = (),
     ) -> JournalEntry:
         """Yangi savdo yozuvini qo'shadi va CSV'ga saqlaydi. rr_planned avtomatik hisoblanadi:
         avval target_price (mavjud, fixed-mode uchun), target_price=None bo'lsa
@@ -80,6 +136,20 @@ class TradeJournal:
             reason=reason,
             rr_planned=rr_planned,
             notes=notes,
+            setup_type=setup_type,
+            score=score,
+            score_label=score_label,
+            trend=trend,
+            structure=structure,
+            volume_confirmed=volume_confirmed,
+            entry_zone_low=entry_zone_low,
+            entry_zone_high=entry_zone_high,
+            invalidation=invalidation,
+            target=target,
+            risk_reward=risk_reward,
+            target_source=target_source,
+            status=status,
+            score_reasons=tuple(score_reasons) if score_reasons else (),
         )
         self.entries.append(entry)
         self._save()
@@ -262,6 +332,20 @@ class TradeJournal:
                     exit_date=None if pd.isna(row["exit_date"]) else date.fromisoformat(row["exit_date"]),
                     exit_price=_none_if_nan(row["exit_price"]),
                     r_multiple=_none_if_nan(row["r_multiple"]),
+                    setup_type=_str_col(df, row, "setup_type"),
+                    score=_float_col(df, row, "score"),
+                    score_label=_str_col(df, row, "score_label"),
+                    trend=_str_col(df, row, "trend"),
+                    structure=_str_col(df, row, "structure"),
+                    volume_confirmed=_bool_col(df, row, "volume_confirmed"),
+                    entry_zone_low=_float_col(df, row, "entry_zone_low"),
+                    entry_zone_high=_float_col(df, row, "entry_zone_high"),
+                    invalidation=_float_col(df, row, "invalidation"),
+                    target=_float_col(df, row, "target"),
+                    risk_reward=_float_col(df, row, "risk_reward"),
+                    target_source=_str_col(df, row, "target_source"),
+                    status=_str_col(df, row, "status"),
+                    score_reasons=_score_reasons_col(df, row),
                 )
             )
         return entries
@@ -272,6 +356,11 @@ class TradeJournal:
             d = asdict(e)
             d["entry_date"] = e.entry_date.isoformat()
             d["exit_date"] = e.exit_date.isoformat() if e.exit_date else None
+            # score_reasons — tuple to'g'ridan-to'g'ri CSV katakka yozilsa
+            # str(tuple) ("('a', 'b')") sifatida saqlanib, qayta o'qib bo'lmaydi
+            # -- shuning uchun JSON-string (bo'sh tuple -> None, "reference_target_price"
+            # konvensiyasidagi kabi "yo'q" = None).
+            d["score_reasons"] = json.dumps(list(e.score_reasons)) if e.score_reasons else None
             rows.append(d)
         df = pd.DataFrame(rows, columns=_COLUMNS)
         self.csv_path.parent.mkdir(parents=True, exist_ok=True)

@@ -123,6 +123,7 @@ def build_application(token: str) -> Application:
         MessageHandler(filters.Text(list(handlers.MENU_BUTTON_HANDLERS)), handlers.menu_button)
     )
     application.add_handler(CallbackQueryHandler(handlers.quickadd_start, pattern=r"^add:"))
+    application.add_handler(CallbackQueryHandler(handlers.signal_quickadd_start, pattern=r"^sigadd:"))
     application.add_handler(
         CallbackQueryHandler(handlers.quickadd_confirm, pattern=f"^{keyboards.CONFIRM_CALLBACK_DATA}$")
     )

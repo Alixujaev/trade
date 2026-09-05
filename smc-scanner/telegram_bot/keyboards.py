@@ -9,6 +9,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMa
 
 from config.core_watchlist import CoreHolding
 from journal.types import JournalEntry
+from signals.payload import SignalPayload
+from smc.types import StructureState
 
 BUTTON_SCAN = "🔍 Skanerlash"
 BUTTON_STATUS = "📂 Holat"
@@ -58,6 +60,24 @@ def build_scan_summary_keyboard(rows: list[dict]) -> InlineKeyboardMarkup | None
         [
             [InlineKeyboardButton(f"➕ {symbol}", callback_data=f"add:{symbol}"), _tradingview_button(symbol)]
             for symbol in active_symbols
+        ]
+    )
+
+
+def build_signals_summary_keyboard(payloads: list[SignalPayload]) -> InlineKeyboardMarkup | None:
+    """/signals'ning YAKUNIY xabariga qo'shiladigan tugmalar — har BULLISH (yangi LONG
+    kuzatuv kandidati) setup uchun bitta qator: jurnalga tezkor qo'shish (snapshot
+    bilan, TZ) + TradingView havolasi. Bearish (AVOID/EXIT candidate) payload'lar
+    uchun tugma YO'Q — bot short taklif qilmaydi (signals/payload.py tamoyili),
+    "jurnalga qo'shish" faqat yangi LONG kuzatuvi uchun ma'noli. Bullish setup
+    bo'lmasa None (`build_scan_summary_keyboard`ning /signals varianti)."""
+    bullish_symbols = [p.symbol for p in payloads if p.direction is StructureState.BULLISH]
+    if not bullish_symbols:
+        return None
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton(f"➕ {symbol}", callback_data=f"sigadd:{symbol}"), _tradingview_button(symbol)]
+            for symbol in bullish_symbols
         ]
     )
 
