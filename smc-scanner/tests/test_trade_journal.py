@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 
+import pandas as pd
 import pytest
 
 from journal.trade_journal import TradeJournal
@@ -295,3 +296,127 @@ def test_stats_profit_factor_none_when_no_closed_trades(tmp_path) -> None:
     journal = TradeJournal(csv_path=tmp_path / "journal.csv")
 
     assert journal.stats()["profit_factor"] is None
+
+
+# ======================================================================
+# stats(include_benchmark=True) -- buy&hold benchmark bloki (TZ: discretionary vs market)
+# ======================================================================
+
+
+def _make_df(dates: list[str], closes: list[float]) -> pd.DataFrame:
+    index = pd.DatetimeIndex(pd.to_datetime(dates), tz="UTC", name="datetime")
+    return pd.DataFrame(
+        {"open": closes, "high": closes, "low": closes, "close": closes, "volume": [1000] * len(closes)},
+        index=index,
+    )
+
+
+class _FakeProvider:
+    """tests/test_scanner.py::_FakeProvider bilan bir xil konvensiya (mock provider)."""
+
+    def __init__(self, dfs: dict[str, pd.DataFrame | Exception]) -> None:
+        self._dfs = dfs
+
+    def get_ohlcv(self, symbol: str, interval: str, *, use_cache: bool = True) -> pd.DataFrame:
+        result = self._dfs[symbol]
+        if isinstance(result, Exception):
+            raise result
+        return result
+
+
+def test_stats_default_has_no_benchmark_key(tmp_path) -> None:
+    """include_benchmark default False -- mavjud chaqiruvchilar (provider yo'q holatda ham)
+    o'zgarishsiz ishlashda davom etadi, tarmoqqa chiqmaydi."""
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+    )
+    journal.close_entry(1, exit_date=date(2026, 1, 10), exit_price=115.0)
+
+    assert "benchmark" not in journal.stats()
+
+
+def test_stats_benchmark_computes_avg_return_and_comparison(tmp_path) -> None:
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    # Savdo 1: entry=100 -> exit=115 (+15% price return). Benchmark (same-window,
+    # 2026-01-01 -> 2026-01-10): 100 -> 108 (+8%) -- discretionary yaxshiroq.
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+    )
+    journal.close_entry(1, exit_date=date(2026, 1, 10), exit_price=115.0)
+    # Savdo 2: entry=50 -> exit=52 (+4% price return, R past bo'lsa ham baland ko'rinishi
+    # mumkin edi -- lekin bu yerda R umuman ishlatilmaydi). Benchmark: 50 -> 60 (+20%) --
+    # benchmark yaxshiroq.
+    journal.add_entry(
+        symbol="AMD", entry_date=date(2026, 2, 1), entry_price=50.0, stop_price=49.0,
+        target_price=None, exit_mode="trailing", reason="ORDER_BLOCK",
+    )
+    journal.close_entry(2, exit_date=date(2026, 2, 20), exit_price=52.0)
+
+    provider = _FakeProvider({
+        "AAPL": _make_df(["2026-01-01", "2026-01-10"], [100.0, 108.0]),
+        "AMD": _make_df(["2026-02-01", "2026-02-20"], [50.0, 60.0]),
+    })
+
+    stats = journal.stats(include_benchmark=True, provider=provider)
+    benchmark = stats["benchmark"]
+
+    assert benchmark["num_benchmarked"] == 2
+    assert benchmark["num_benchmark_skipped"] == 0
+    # avg((108-100)/100, (60-50)/50) = avg(0.08, 0.20) = 0.14 -> 14%
+    assert benchmark["avg_benchmark_return_pct"] == pytest.approx(14.0)
+    assert benchmark["benchmark_positive_count"] == 2  # ikkalasi ham musbat
+    assert benchmark["discretionary_outperformed_count"] == 1  # faqat AAPL (0.15 > 0.08)
+
+
+def test_stats_benchmark_open_entries_are_excluded(tmp_path) -> None:
+    """Ochiq savdo (exit_date yo'q) benchmark'ga umuman kirmaydi."""
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+    )  # yopilmagan
+
+    provider = _FakeProvider({"AAPL": _make_df(["2026-01-01"], [100.0])})
+    stats = journal.stats(include_benchmark=True, provider=provider)
+
+    assert stats["benchmark"]["num_benchmarked"] == 0
+    assert stats["benchmark"]["avg_benchmark_return_pct"] is None
+
+
+def test_stats_benchmark_provider_error_skips_gracefully(tmp_path) -> None:
+    """Provider xatosi bitta savdoni SKIP qiladi, butun stats() yiqilmaydi."""
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+    )
+    journal.close_entry(1, exit_date=date(2026, 1, 10), exit_price=115.0)
+
+    provider = _FakeProvider({"AAPL": ConnectionError("network down")})
+    stats = journal.stats(include_benchmark=True, provider=provider)
+
+    assert stats["benchmark"]["num_benchmarked"] == 0
+    assert stats["benchmark"]["num_benchmark_skipped"] == 1
+    assert stats["num_closed"] == 1  # discretionary blok o'zgarmagan, yiqilmadi
+
+
+def test_stats_benchmark_r_and_price_return_not_conflated(tmp_path) -> None:
+    """MUHIM metodologiya regressiyasi: R baland (tor stop) bo'lsa ham, price return
+    benchmark'dan past bo'lsa outperform hisoblanmaydi."""
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    # entry=100, stop=99 (tor) -> R=+2.0 lekin price return atigi +2%
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=99.0,
+        target_price=102.0, exit_mode="fixed", reason="FVG",
+    )
+    journal.close_entry(1, exit_date=date(2026, 1, 10), exit_price=102.0)
+
+    # Benchmark shu oynada +8% -- price return bo'yicha benchmark yutadi
+    provider = _FakeProvider({"AAPL": _make_df(["2026-01-01", "2026-01-10"], [100.0, 108.0])})
+    stats = journal.stats(include_benchmark=True, provider=provider)
+
+    assert stats["avg_r_realized"] == pytest.approx(2.0)  # R o'zgarishsiz baland
+    assert stats["benchmark"]["discretionary_outperformed_count"] == 0  # lekin outperform EMAS

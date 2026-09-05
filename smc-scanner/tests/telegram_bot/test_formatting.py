@@ -374,6 +374,65 @@ def test_format_stats_message_handles_none_profit_factor() -> None:
     assert "N/A" in msg or "yo'q" in msg.lower()
 
 
+def test_format_stats_message_without_benchmark_key_has_no_benchmark_blocks() -> None:
+    """"benchmark" kaliti yo'q bo'lsa (mavjud chaqiruvchilar, include_benchmark=False) —
+    xabar avvalgidek, buy&hold/comparison bo'limlarsiz."""
+    stats = {
+        "num_entries": 1, "num_open": 0, "num_closed": 1, "avg_rr_planned": 3.0,
+        "avg_r_realized": 1.5, "win_rate": 1.0, "avg_win_r": 1.5, "avg_loss_r": None,
+        "expectancy_r": 1.5, "profit_factor": None,
+    }
+
+    msg = format_stats_message(stats)
+
+    assert "buy&hold" not in msg.lower()
+    assert "solishtirish" not in msg.lower()
+
+
+def test_format_stats_message_with_benchmark_shows_three_blocks() -> None:
+    """"benchmark" kaliti mavjud bo'lsa — uchta ALOHIDA bo'lim: discretionary | buy&hold |
+    comparison. R (%) va buy&hold return (%) bir qatorga aralashtirilmaydi."""
+    stats = {
+        "num_entries": 2, "num_open": 0, "num_closed": 2, "avg_rr_planned": 2.5,
+        "avg_r_realized": 1.2, "win_rate": 1.0, "avg_win_r": 1.2, "avg_loss_r": None,
+        "expectancy_r": 1.2, "profit_factor": None,
+        "benchmark": {
+            "num_benchmarked": 2, "num_benchmark_skipped": 0,
+            "avg_benchmark_return_pct": 14.0, "benchmark_positive_count": 2,
+            "discretionary_outperformed_count": 1,
+        },
+    }
+
+    msg = format_stats_message(stats)
+
+    # discretionary blok (mavjud)
+    assert "Expectancy: 1.20R" in msg
+    # buy&hold blok
+    assert "14.00%" in msg
+    assert "2" in msg  # num_benchmarked
+    # comparison blok (raqam, verdikt so'zlar yo'q)
+    assert "1" in msg  # discretionary_outperformed_count
+    for verdict_word in ("yutdi", "yutqazdi", "yaxshi natija", "yomon natija"):
+        assert verdict_word not in msg.lower()
+
+
+def test_format_stats_message_benchmark_zero_benchmarked_shows_no_data_note() -> None:
+    stats = {
+        "num_entries": 1, "num_open": 0, "num_closed": 1, "avg_rr_planned": None,
+        "avg_r_realized": 1.0, "win_rate": 1.0, "avg_win_r": 1.0, "avg_loss_r": None,
+        "expectancy_r": 1.0, "profit_factor": None,
+        "benchmark": {
+            "num_benchmarked": 0, "num_benchmark_skipped": 1,
+            "avg_benchmark_return_pct": None, "benchmark_positive_count": 0,
+            "discretionary_outperformed_count": 0,
+        },
+    }
+
+    msg = format_stats_message(stats)
+
+    assert "ma'lumot yo'q" in msg.lower() or "hisoblab bo'lmadi" in msg.lower()
+
+
 def test_format_journal_entry_line_shows_symbol_and_prices() -> None:
     entry = JournalEntry(
         entry_id=1, symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0,

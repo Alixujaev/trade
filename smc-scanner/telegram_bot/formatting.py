@@ -191,18 +191,50 @@ def format_scan_summary(
 
 
 def format_stats_message(stats: dict) -> str:
-    """journal.stats() dict'ini o'qiladigan xabarga aylantiradi."""
+    """journal.stats() dict'ini o'qiladigan xabarga aylantiradi.
+
+    `stats["benchmark"]` mavjud bo'lsa (journal.TradeJournal.stats(include_benchmark=True)
+    bilan chaqirilgan) — uchta ALOHIDA bo'lim ko'rsatiladi: discretionary (mavjud, R
+    birligida) | buy&hold (price-return %, journal/benchmark.py) | comparison (raqam,
+    xulossiz). R va buy&hold % HECH QACHON bitta qatorga aralashtirilmaydi — framing
+    "discretionary performance vs market benchmark", "robot g'olib/mag'lub" EMAS."""
     profit_factor = f"{stats['profit_factor']:.2f}" if stats["profit_factor"] is not None else "N/A"
     avg_rr_planned = f"{stats['avg_rr_planned']:.2f}" if stats["avg_rr_planned"] is not None else "N/A"
 
-    return (
-        "📈 *Statistika*\n"
-        f"Jami: {stats['num_entries']} (ochiq: {stats['num_open']}, yopiq: {stats['num_closed']})\n"
-        f"Win rate: {stats['win_rate'] * 100:.1f}%\n"
-        f"O'rtacha rejalashtirilgan R:R: {avg_rr_planned}\n"
-        f"Expectancy: {stats['expectancy_r']:.2f}R\n"
-        f"Profit factor: {profit_factor}"
-    )
+    lines = [
+        "📈 *Statistika*",
+        f"Jami: {stats['num_entries']} (ochiq: {stats['num_open']}, yopiq: {stats['num_closed']})",
+        f"Win rate: {stats['win_rate'] * 100:.1f}%",
+        f"O'rtacha rejalashtirilgan R:R: {avg_rr_planned}",
+        f"Expectancy: {stats['expectancy_r']:.2f}R",
+        f"Profit factor: {profit_factor}",
+    ]
+
+    benchmark = stats.get("benchmark")
+    if benchmark is not None:
+        lines.append("")
+        lines.append("📊 *Buy&hold benchmark* (discretionary performance vs market benchmark)")
+        if benchmark["num_benchmarked"] > 0:
+            lines.append(
+                f"O'rtacha buy&hold return: {benchmark['avg_benchmark_return_pct']:.2f}% "
+                f"({benchmark['num_benchmarked']} ta savdo, same-window: entry->exit sana)"
+            )
+        else:
+            lines.append("Buy&hold hisoblab bo'lmadi (ma'lumot yo'q).")
+        if benchmark["num_benchmark_skipped"]:
+            lines.append(
+                f"O'tkazib yuborildi (narx ma'lumoti yo'q): {benchmark['num_benchmark_skipped']} ta"
+            )
+
+        lines.append("")
+        lines.append("🔍 *Solishtirish* (raqam, xulosa emas)")
+        lines.append(f"Buy&hold musbat bo'lgan savdolar: {benchmark['benchmark_positive_count']}")
+        lines.append(
+            "Discretionary buy&hold'dan yaxshiroq (price-return bo'yicha, R emas): "
+            f"{benchmark['discretionary_outperformed_count']}"
+        )
+
+    return "\n".join(lines)
 
 
 def format_journal_entry_line(entry: JournalEntry) -> str:

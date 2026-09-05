@@ -16,6 +16,9 @@ from pathlib import Path
 
 import pandas as pd
 
+from data.provider import DataProvider
+from journal.benchmark import outperformed_benchmark
+from journal.benchmark_provider import benchmark_result_for_entry
 from journal.types import JournalEntry
 
 DEFAULT_JOURNAL_PATH: Path = Path(__file__).resolve().parent.parent / "trade_journal.csv"
@@ -116,20 +119,31 @@ class TradeJournal:
         """Oxirgi N yozuv, qo'shilgan tartibida (eskisi oldin)."""
         return self.entries[-n:]
 
-    def stats(self) -> dict:
+    def stats(
+        self, *, include_benchmark: bool = False, provider: DataProvider | None = None,
+    ) -> dict:
         """Rejalashtirilgan R:R vs amalga oshgan expectancy — raqamlar, sharh emas.
 
         avg_rr_planned barcha (ochiq+yopiq) rr_planned NOT None yozuvlar bo'yicha —
         bu REJALASHTIRILGAN qiymat, natijani bilish shart emas. Qolgan hammasi
         FAQAT yopilgan yozuvlar bo'yicha (hali natija yo'q ochiq savdolar
         statistikaga kiritilmaydi).
+
+        include_benchmark=True bo'lsa, natijaga "benchmark" kaliti qo'shiladi —
+        discretionary metriklardan ALOHIDA blok (journal/benchmark.py::BenchmarkResult
+        asosida, journal/benchmark_provider.py orqali HAQIQIY narx bilan hisoblangan;
+        default False — provider chaqiruvi (tarmoq/IO) faqat aniq so'ralganda amalga
+        oshadi, mavjud chaqiruvchilar o'zgarishsiz qoladi). Framing: "discretionary
+        performance vs market benchmark" — "robotni baholash" EMAS; bu yerda ham
+        (asosiy tamoyil bilan bir xil) hech qanday "yaxshi/yomon" xulosa CHIQARILMAYDI,
+        faqat raqamlar.
         """
         closed = [e for e in self.entries if e.exit_price is not None]
         rr_values = [e.rr_planned for e in self.entries if e.rr_planned is not None]
         avg_rr_planned = sum(rr_values) / len(rr_values) if rr_values else None
 
         if not closed:
-            return {
+            result = {
                 "num_entries": len(self.entries),
                 "num_open": len(self.entries),
                 "num_closed": 0,
@@ -141,37 +155,82 @@ class TradeJournal:
                 "expectancy_r": 0.0,
                 "profit_factor": None,
             }
+        else:
+            r_values = [e.r_multiple for e in closed]
+            wins = [r for r in r_values if r > 0]
+            losses = [r for r in r_values if r <= 0]
 
-        r_values = [e.r_multiple for e in closed]
-        wins = [r for r in r_values if r > 0]
-        losses = [r for r in r_values if r <= 0]
+            win_rate = len(wins) / len(closed)
+            avg_win_r = sum(wins) / len(wins) if wins else None
+            avg_loss_r = sum(losses) / len(losses) if losses else None
 
-        win_rate = len(wins) / len(closed)
-        avg_win_r = sum(wins) / len(wins) if wins else None
-        avg_loss_r = sum(losses) / len(losses) if losses else None
+            # expectancy_r = win_rate*avg_win_r + loss_rate*avg_loss_r — backtest/metrics.py::
+            # expectancy_r bilan BIR XIL dekompozitsiya formulasi, shu yerda JournalEntry ustida.
+            win_component = win_rate * (avg_win_r or 0.0)
+            loss_component = (len(losses) / len(closed)) * (avg_loss_r or 0.0)
+            expectancy_r = win_component + loss_component
 
-        # expectancy_r = win_rate*avg_win_r + loss_rate*avg_loss_r — backtest/metrics.py::
-        # expectancy_r bilan BIR XIL dekompozitsiya formulasi, shu yerda JournalEntry ustida.
-        win_component = win_rate * (avg_win_r or 0.0)
-        loss_component = (len(losses) / len(closed)) * (avg_loss_r or 0.0)
-        expectancy_r = win_component + loss_component
+            # profit_factor = yutuqlar yig'indisi / mag'lubiyatlar yig'indisining moduli.
+            # Mag'lubiyat bo'lmasa (bo'lish nolga) — None (cheksizlik emas, "hali ma'lumot yo'q").
+            loss_sum = abs(sum(losses))
+            profit_factor = sum(wins) / loss_sum if loss_sum > 0 else None
 
-        # profit_factor = yutuqlar yig'indisi / mag'lubiyatlar yig'indisining moduli.
-        # Mag'lubiyat bo'lmasa (bo'lish nolga) — None (cheksizlik emas, "hali ma'lumot yo'q").
-        loss_sum = abs(sum(losses))
-        profit_factor = sum(wins) / loss_sum if loss_sum > 0 else None
+            result = {
+                "num_entries": len(self.entries),
+                "num_open": len(self.entries) - len(closed),
+                "num_closed": len(closed),
+                "avg_rr_planned": avg_rr_planned,
+                "avg_r_realized": sum(r_values) / len(r_values),
+                "win_rate": win_rate,
+                "avg_win_r": avg_win_r,
+                "avg_loss_r": avg_loss_r,
+                "expectancy_r": expectancy_r,
+                "profit_factor": profit_factor,
+            }
+
+        if include_benchmark:
+            result["benchmark"] = self._benchmark_stats(closed, provider=provider)
+        return result
+
+    def _benchmark_stats(
+        self, closed: list[JournalEntry], *, provider: DataProvider | None,
+    ) -> dict:
+        """`closed` yozuvlar uchun buy&hold benchmark blokini hisoblaydi (I/O —
+        `benchmark_result_for_entry` orqali, har savdo o'z symbolining exit_date'dagi
+        close narxini oladi). Provider xatosi/ma'lumot yo'qligi — o'sha ALOHIDA savdo
+        SKIP qilinadi (None), butun blok yiqilmaydi.
+
+        "outperform" — `journal.benchmark.outperformed_benchmark` orqali, FAQAT
+        price-return birlikda (R-multiple EMAS) hisoblanadi; ta'rif shu funksiyaning
+        docstringida (metodologik yurak)."""
+        benchmarked: list[tuple[JournalEntry, object]] = []
+        for entry in closed:
+            benchmark = benchmark_result_for_entry(entry, provider=provider)
+            if benchmark is not None:
+                benchmarked.append((entry, benchmark))
+
+        num_benchmarked = len(benchmarked)
+        if num_benchmarked == 0:
+            return {
+                "num_benchmarked": 0,
+                "num_benchmark_skipped": len(closed),
+                "avg_benchmark_return_pct": None,
+                "benchmark_positive_count": 0,
+                "discretionary_outperformed_count": 0,
+            }
+
+        avg_benchmark_return = sum(b.benchmark_return for _, b in benchmarked) / num_benchmarked
+        benchmark_positive_count = sum(1 for _, b in benchmarked if b.benchmark_return > 0)
+        discretionary_outperformed_count = sum(
+            1 for e, b in benchmarked if outperformed_benchmark(e.entry_price, e.exit_price, b)
+        )
 
         return {
-            "num_entries": len(self.entries),
-            "num_open": len(self.entries) - len(closed),
-            "num_closed": len(closed),
-            "avg_rr_planned": avg_rr_planned,
-            "avg_r_realized": sum(r_values) / len(r_values),
-            "win_rate": win_rate,
-            "avg_win_r": avg_win_r,
-            "avg_loss_r": avg_loss_r,
-            "expectancy_r": expectancy_r,
-            "profit_factor": profit_factor,
+            "num_benchmarked": num_benchmarked,
+            "num_benchmark_skipped": len(closed) - num_benchmarked,
+            "avg_benchmark_return_pct": avg_benchmark_return * 100,
+            "benchmark_positive_count": benchmark_positive_count,
+            "discretionary_outperformed_count": discretionary_outperformed_count,
         }
 
     def _load(self) -> list[JournalEntry]:
