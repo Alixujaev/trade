@@ -179,6 +179,22 @@ def _keep_highest_score_per_symbol(payloads: list[SignalPayload]) -> list[Signal
     return list(best.values())
 
 
+def _filter_out_open_position_symbols(
+    payloads: list[SignalPayload],
+) -> tuple[list[SignalPayload], int]:
+    """Journalda OCHIQ pozitsiyasi bor symbol uchun setup ko'rsatilmaydi — foydalanuvchi
+    allaqachon ichida, bu yangi imkoniyat emas, faqat ro'yxatni band qiladi. YOPILGAN
+    savdolar bu filtrga kirmaydi (open_entries() allaqachon faqat ochiqlarni qaytaradi) —
+    yopilgandan keyin xuddi shu symbol qaytadan chin yangi setup berishi mumkin va
+    ko'rsatiladi. Dedup/cooldowndan OLDIN qo'llanadi, shunda ochiq pozitsiyali symbol
+    ularning hisobiga umuman kirmaydi."""
+    open_symbols = {e.symbol for e in TradeJournal().open_entries()}
+    if not open_symbols:
+        return payloads, 0
+    kept = [p for p in payloads if p.symbol not in open_symbols]
+    return kept, len(payloads) - len(kept)
+
+
 def _dedup_filter_new_payloads(payloads: list[SignalPayload]) -> tuple[list[SignalPayload], int]:
     """/signals, /swing uchun dedup+cooldown (TZ 18) — `_dedup_filter_new_setups` (/scan)
     bilan BIR XIL `DedupStore`/`SIGNAL_COOLDOWN_HOURS` mexanizmi, faqat `SignalPayload`
@@ -264,13 +280,30 @@ async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *
         await update.effective_message.reply_text(text)
         return
 
+    all_payloads, open_position_skipped_count = _filter_out_open_position_symbols(all_payloads)
+    open_position_line = (
+        f"📂 {open_position_skipped_count} ta ochiq pozitsiya skanerlashdan chiqarildi."
+        if open_position_skipped_count
+        else ""
+    )
+
+    if not all_payloads:
+        text = "Skan tugadi. Barcha topilgan setuplar ochiq pozitsiyaga tegishli."
+        if open_position_line:
+            text += f"\n{open_position_line}"
+        await update.effective_message.reply_text(text)
+        return
+
     new_payloads, dedup_skipped_count = _dedup_filter_new_payloads(all_payloads)
 
     if not new_payloads:
-        await update.effective_message.reply_text(
+        text = (
             "Yangi setup yo'q — barchasi oldin yuborilgan (cooldown ichida).\n"
             f"🔁 Dedup: {total_found} ta topildi, {dedup_skipped_count} ta o'tkazib yuborildi."
         )
+        if open_position_line:
+            text += f"\n{open_position_line}"
+        await update.effective_message.reply_text(text)
         return
 
     card_payloads, moved_past_payloads = _split_by_display_status(new_payloads)
@@ -300,6 +333,8 @@ async def _run_signal_scan(update: Update, context: ContextTypes.DEFAULT_TYPE, *
     summary = f"Scan complete.\n{count_line}\nSkipped: {len(skipped)}\n{dedup_line}"
     if moved_past_payloads:
         summary += f"\n{len(moved_past_payloads)} ta o'tib ketgan (bir qatorli xulosada)."
+    if open_position_line:
+        summary += f"\n{open_position_line}"
     await update.effective_message.reply_text(
         summary, reply_markup=keyboards.build_signals_summary_keyboard(shown),
     )

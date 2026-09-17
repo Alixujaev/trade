@@ -1592,3 +1592,74 @@ def test_signal_quickadd_start_does_not_remove_other_symbols_buttons(monkeypatch
     msft_text = msft_add_update.callback_query.message.reply_text.call_args_list[0].args[0]
     assert "MSFT" in msft_text
     assert "Jurnalga qo'shilsinmi?" in msft_text
+
+
+# ---- /signals ochiq pozitsiya filtri ----
+
+
+def test_signals_excludes_symbol_with_open_position(monkeypatch, tmp_path) -> None:
+    """Journalda OCHIQ pozitsiyasi bor symbol uchun setup ko'rsatilmasligi kerak --
+    foydalanuvchi allaqachon ichida, bu yangi imkoniyat emas."""
+    open_payload = _make_signal_payload("AAPL", score=84.0)
+    other_payload = _make_signal_payload("MSFT", score=80.0)
+    from signals.payload import format_payload
+
+    _patch_signal_scan(
+        monkeypatch, results={"AAPL": [open_payload], "MSFT": [other_payload]}, skipped=[],
+    )
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+    )
+    monkeypatch.setattr(handlers, "TradeJournal", lambda: journal)
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    texts = _all_reply_texts(update)
+    joined = "\n\n".join(texts)
+    assert format_payload(open_payload) not in joined
+    assert format_payload(other_payload) in joined
+    assert any("1 ta ochiq pozitsiya" in t for t in texts)
+
+
+def test_signals_shows_setup_for_symbol_with_closed_trade(monkeypatch, tmp_path) -> None:
+    """YOPILGAN savdo symboli filtrga kirmaydi -- qaytadan setup bersa ko'rsatilishi
+    kerak, chunki bu chin yangi imkoniyat."""
+    payload = _make_signal_payload("AAPL", score=84.0)
+    from signals.payload import format_payload
+
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    journal.add_entry(
+        symbol="AAPL", entry_date=date(2026, 1, 1), entry_price=100.0, stop_price=90.0,
+        target_price=130.0, exit_mode="fixed", reason="FVG",
+    )
+    journal.close_entry(1, exit_date=date(2026, 1, 5), exit_price=110.0)
+    monkeypatch.setattr(handlers, "TradeJournal", lambda: journal)
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    texts = _all_reply_texts(update)
+    assert format_payload(payload) in "\n\n".join(texts)
+    assert not any("ochiq pozitsiya" in t for t in texts)
+
+
+def test_signals_no_open_positions_shows_all_setups(monkeypatch, tmp_path) -> None:
+    """Bo'sh journal holatida hech narsa o'zgarmasligi kerak (backward-compat) --
+    "ochiq pozitsiya" qatori umuman ko'rinmasligi kerak."""
+    payload = _make_signal_payload("AAPL", score=84.0)
+    from signals.payload import format_payload
+
+    _patch_signal_scan(monkeypatch, results={"AAPL": [payload]}, skipped=[])
+    journal = TradeJournal(csv_path=tmp_path / "journal.csv")
+    monkeypatch.setattr(handlers, "TradeJournal", lambda: journal)
+    update, context = _make_update(), _make_context()
+
+    _run(handlers.signals_scan(update, context))
+
+    texts = _all_reply_texts(update)
+    assert format_payload(payload) in "\n\n".join(texts)
+    assert not any("ochiq pozitsiya" in t for t in texts)
