@@ -1,0 +1,65 @@
+=====================================================================================
+DAY-06 — STOCK-IN-PLAY CONTEXT HYPOTHESIS: COMPARATIVE RESEARCH REPORT
+=====================================================================================
+Study Period:   2026-07-02 13:30:00+00:00 to 2026-09-25 19:55:00+00:00 (60 RTH sessions)
+Universe:       25 liquid US equities
+Gap Threshold:  abs(gap) >= 2.0% (Research assumption)
+Premarket RVOL: >= 2.0x (Research assumption)
+Catalyst Data:  False (Marked unavailable, zero fabrication)
+Strategy:       FROZEN DAY-01 VWAP Momentum (Rules, indicators, stops 100% untouched)
+
+-------------------------------------------------------------------------------------
+1. CORE METRICS COMPARISON (Baseline vs H1 Variants)
+-------------------------------------------------------------------------------------
+Variant                      Trades   Reduct   WinRate   PF     Exp(Avg)   Total_R   Avg_R    Slippage 0/5/10bps
+Baseline (Unfiltered)        5691     0.0    % 30.4    % 0.94   -0.0083  % -739.0    -0.13    -41% / -100% / -100%
+H1 Variant A (Gap >= 2.0%)   840      85.2   % 29.6    % 1.01   0.0014   % -131.2    -0.16    -0% / -57% / -81%
+H1 Subset: Positive Gap (>= +2.0%) 575      89.9   % 31.5    % 1.14   0.0277   % -48.4     -0.08    16% / -35% / -63%
+H1 Subset: Negative Gap (<= -2.0%) 265      95.3   % 25.7    % 0.73   -0.0555  % -82.8     -0.31    -14% / -34% / -49%
+H1 Variant B (Premarket RVOL >= 2.0x) 0        100.0  % 0.0     % 0.00   0.0000   % 0.0       0.00     0% / 0% / 0%
+H1 Variant C (Combined Gap + Premarket RVOL) 0        100.0  % 0.0     % 0.00   0.0000   % 0.0       0.00     0% / 0% / 0%
+
+-------------------------------------------------------------------------------------
+2. TRADE POPULATION & SESSION CHURN DYNAMICS
+-------------------------------------------------------------------------------------
+Variant                      Elig.Sess   Trades/Sess(Avg)   Sess>=2Tr    Sess>=5Tr    AvgStopDist   AvgHold
+Baseline (Unfiltered)        1500        3.79               822          464          0.221       % 24.8  m
+H1 Variant A (Gap >= 2.0%)   286         2.94               142          67           0.333       % 26.3  m
+H1 Subset: Positive Gap (>= +2.0%) 152         3.78               96           48           0.344       % 29.5  m
+H1 Subset: Negative Gap (<= -2.0%) 134         1.98               46           19           0.308       % 19.3  m
+H1 Variant B (Premarket RVOL >= 2.0x) 0           0.00               0            0            0.000       % 0.0   m
+H1 Variant C (Combined Gap + Premarket RVOL) 0           0.00               0            0            0.000       % 0.0   m
+
+-------------------------------------------------------------------------------------
+3. FAILURE-MODE COMPARISON (DAY-05 Diagnostics Across Variants)
+-------------------------------------------------------------------------------------
+Variant                      0-5m Stops    Stop<0.25%    MFE>=1.0R    MFE>=2.0R    Loss>=1R then lost
+Baseline (Unfiltered)        2706 (47.55%) 4175 (73.36%) 3259 (57.27%) 2209 (38.82%) 1604 (40.53%)
+H1 Variant A (Gap >= 2.0%)   414 (49.29%)  488 (58.1%)   498 (59.29%) 349 (41.55%) 257 (43.49%)
+H1 Subset: Positive Gap (>= +2.0%) 266 (46.26%)  314 (54.61%)  347 (60.35%) 242 (42.09%) 171 (43.4%)
+H1 Subset: Negative Gap (<= -2.0%) 148 (55.85%)  174 (65.66%)  151 (56.98%) 107 (40.38%) 86 (43.65%)
+H1 Variant B (Premarket RVOL >= 2.0x) 0 (0%)        0 (0%)        0 (0%)       0 (0%)       0 (0%)
+H1 Variant C (Combined Gap + Premarket RVOL) 0 (0%)        0 (0%)        0 (0%)       0 (0%)       0 (0%)
+
+-------------------------------------------------------------------------------------
+4. SYMBOL-LEVEL DISTRIBUTION & BUY-AND-HOLD COMPARISON
+-------------------------------------------------------------------------------------
+Variant                      Mean Sym Ret    Med Sym Ret     Pos/Neg Syms    Beat B&H   Mean B&H
+Baseline (Unfiltered)        -1.86         % -1.27         % 11 / 14         9          5.05%
+H1 Variant A (Gap >= 2.0%)   0.10          % 0.92          % 15 / 9          11         5.05%
+H1 Subset: Positive Gap (>= +2.0%) 0.65          % 0.03          % 13 / 9          11         5.05%
+H1 Subset: Negative Gap (<= -2.0%) -0.57         % 0.00          % 8 / 12          11         5.05%
+H1 Variant B (Premarket RVOL >= 2.0x) 0.00          % 0.00          % 0 / 0           11         5.05%
+H1 Variant C (Combined Gap + Premarket RVOL) 0.00          % 0.00          % 0 / 0           11         5.05%
+
+-------------------------------------------------------------------------------------
+5. DATA LIMITATIONS & METHODOLOGY NOTES
+-------------------------------------------------------------------------------------
+• Catalyst data unavailable: No historical point-in-time structured news/catalyst feed exists in the dataset. catalyst_available=False.
+• Premarket volume limitation: yfinance historical extended-hours 5m dataset provides premarket OHLC prices but records volume as 0.0 for premarket bars. Premarket RVOL evaluates to None/False on historical yfinance data.
+• Exploratory assumptions: The gap threshold of 2.0% is an explicit research assumption, not an optimized parameter.
+• Long-only execution: Both positive and negative gaps were evaluated as long-only context; negative gaps were not treated as short setups.
+
+=====================================================================================
+END OF DAY-06 RESEARCH REPORT
+=====================================================================================

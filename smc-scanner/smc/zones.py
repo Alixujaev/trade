@@ -19,28 +19,8 @@ from __future__ import annotations
 import pandas as pd
 
 from config.settings import ATR_PERIOD, DISPLACEMENT_ATR_MULT
+from indicators.atr import compute_atr
 from smc.types import StructureState, Zone, ZoneType
-
-
-def compute_atr(df: pd.DataFrame, period: int = ATR_PERIOD) -> pd.Series:
-    """Sodda ATR — True Range'ning rolling mean'i (Wilder smoothing EMAS).
-
-    Sodda variant tanlandi: tushunarli, hisoblash oson, va bu loyihaning
-    qisqa-swing maqsadlari uchun Wilder smoothing keltiradigan farq muhim emas.
-    Birinchi `period-1` bar uchun NaN (yetarli tarix yo'q — sun'iy to'ldirilmaydi,
-    aks holda lookahead/soxta signal xavfi bo'lardi). 0-bar'da prev_close yo'qligi
-    sababli True Range high-low'ga tushadi (NaN'li had'lar .max()da avtomatik
-    tashlab ketiladi) — bu standart konvensiya, faqat shu sabab ATR birinchi
-    tasdiqlangan qiymatida (bar `period-1`da) ozgina past baholanishi mumkin;
-    keyingi bar'da bu ta'sir oynadan chiqib ketadi.
-    """
-    high = df["high"]
-    low = df["low"]
-    prev_close = df["close"].shift(1)
-    true_range = pd.concat(
-        [high - low, (high - prev_close).abs(), (low - prev_close).abs()], axis=1
-    ).max(axis=1)
-    return true_range.rolling(window=period, min_periods=period).mean().rename("atr")
 
 
 def detect_displacement(

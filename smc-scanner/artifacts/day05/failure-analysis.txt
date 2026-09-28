@@ -1,0 +1,187 @@
+================================================================================
+DAY-05 — FAILURE ANALYSIS OF THE FROZEN DAY STRATEGY
+================================================================================
+Study Period:       2026-07-02 13:30:00+00:00 to 2026-09-25 19:55:00+00:00 (60 RTH sessions)
+Universe:           25 liquid US equities
+Total Trades:       5,691
+Strategy:           FROZEN DAY-01 (VWAP Reclaim, RSI>50, RVOL>=2.0x, 5m trigger)
+Execution:          FROZEN DAY-02 (Next bar open, 2.0R target, SIGNAL_LOW stop, STOP_FIRST)
+
+--------------------------------------------------------------------------------
+1. TIME-OF-DAY FAILURE ANALYSIS
+--------------------------------------------------------------------------------
+Time Bucket     Trades   % All    WinRate    AvgRet     MedRet     Total_R    PF       AvgHold
+09:30–10:00     838      14.7    % 34.0     % -0.00    % -0.27    % -47.6      0.99     83.5  m
+10:00–11:00     728      12.8    % 29.1     % -0.01    % -0.10    % -101.7     0.95     24.6  m
+11:00–12:00     633      11.1    % 26.2     % -0.03    % -0.06    % -140.2     0.72     20.0  m
+12:00–14:00     1545     27.1    % 31.5     % 0.00     % -0.03    % -106.5     1.03     15.3  m
+14:00–15:00     864      15.2    % 28.7     % -0.01    % -0.04    % -144.1     0.85     12.4  m
+15:00–15:55     1083     19.0    % 30.8     % -0.01    % -0.03    % -198.8     0.85     5.7   m
+
+--------------------------------------------------------------------------------
+2. EXIT REASON ANALYSIS
+--------------------------------------------------------------------------------
+Exit Reason     Trades   % All    WinRate    AvgRet     Avg_R      Total_R    AvgHold
+STOP            3784     66.5    % 0.0      % -0.19    % -1.00      -3784.0    12.3  m
+TARGET          1458     25.6    % 100.0    % 0.42     % 2.00       2916.0     24.4  m
+FORCED_EXIT     449      7.9     % 60.8     % 0.18     % 0.29       129.0      131.3 m
+
+--------------------------------------------------------------------------------
+3. SETUP COMPONENT DISTRIBUTIONS
+--------------------------------------------------------------------------------
+A. 5m Trigger Type:
+  Trigger                        Trades   WinRate    AvgRet     Total_R
+  none                           2955     29.4     % -0.01    % -452.8    
+  bullish CHoCH                  816      32.4     % -0.00    % -63.1     
+  previous candle high break     944      31.7     % -0.02    % -92.4     
+  bullish BOS                    976      30.5     % -0.01    % -130.7    
+
+B. 15m MTF Structure Context:
+  15m Context                    Trades   WinRate    AvgRet     Total_R
+  NEUTRAL                        41       36.6     % 0.07     % 2.1       
+  BULLISH                        5650     30.4     % -0.01    % -741.1    
+
+C. RSI Descriptive Bins:
+  RSI Range                      Trades   WinRate    AvgRet     Total_R
+  <50                            1561     28.7     % -0.01    % -291.7    
+  50–55                          1142     30.2     % -0.01    % -146.9    
+  55–60                          1144     30.2     % -0.02    % -148.0    
+  60–70                          1260     32.0     % 0.00     % -98.8     
+  70+                            584      32.5     % 0.01     % -53.6     
+
+D. RVOL Descriptive Bins:
+  RVOL Range                     Trades   WinRate    AvgRet     Total_R
+  <1.0                           3760     30.0     % -0.02    % -516.4    
+  1.0–2.0                        1646     32.1     % 0.01     % -127.4    
+  2.0–3.0                        189      24.3     % -0.06    % -79.7     
+  3.0–5.0                        66       22.7     % -0.00    % -20.0     
+  5.0+                           30       40.0     % 0.22     % 4.4       
+
+--------------------------------------------------------------------------------
+4. REPEATED-ENTRY ANALYSIS (Same symbol/session trade clustering)
+--------------------------------------------------------------------------------
+Total Traded Symbol-Sessions: 1,168
+  1_trade        :   346 sessions (29.62%)
+  2_trades       :   148 sessions (12.67%)
+  3_trades       :   122 sessions (10.45%)
+  4_trades       :    88 sessions (7.53%)
+  5plus_trades   :   464 sessions (39.73%)
+Multi-Trade Sessions Summary:
+  sessions_ge_2_trades     :   822 sessions (70.38%)
+  sessions_ge_3_trades     :   674 sessions (57.71%)
+  sessions_ge_5_trades     :   464 sessions (39.73%)
+
+--------------------------------------------------------------------------------
+5. CONSECUTIVE-LOSS ANALYSIS
+--------------------------------------------------------------------------------
+Global Maximum Consecutive Losses: 19
+Average Loss Streak Length:        3.44 trades
+Streak Length Distribution:
+  1_loss              :   345 occurrences
+  3_losses            :   170 occurrences
+  2_losses            :   236 occurrences
+  4_losses            :   114 occurrences
+  6_to_10_losses      :   172 occurrences
+  5_losses            :    70 occurrences
+  10plus_losses       :    42 occurrences
+
+--------------------------------------------------------------------------------
+6. HOLDING DURATION ANALYSIS
+--------------------------------------------------------------------------------
+Duration        Trades   % All    WinRate    AvgRet     Avg_R      Total_R    Exits (Stop/Tgt/Forced)
+0–5 min         2869     50.4    % 20.7     % -0.05    % -0.40      -1140.4    S:2207 / T:534 / F:128
+5–10 min        755      13.3    % 32.5     % -0.05    % -0.04      -28.2      S:499 / T:231 / F:25
+10–20 min       713      12.5    % 37.3     % -0.04    % 0.10       67.7       S:432 / T:242 / F:39
+20–30 min       350      6.2     % 41.7     % 0.01     % 0.20       71.5       S:195 / T:126 / F:29
+30–60 min       442      7.8     % 40.3     % 0.01     % 0.17       75.6       S:254 / T:158 / F:30
+60–120 min      261      4.6     % 45.6     % 0.14     % 0.28       71.9       S:128 / T:94 / F:39
+120+ min        301      5.3     % 60.5     % 0.40     % 0.47       142.9      S:69 / T:73 / F:159
+
+--------------------------------------------------------------------------------
+7. MFE / MAE POST-HOC EXCURSION ANALYSIS
+--------------------------------------------------------------------------------
+All Trades   : Mean MFE: +0.27% (+2.92R) | Mean MAE: -0.24% (-2.46R)
+Winners Only : Mean MFE: +4.31R | Mean MAE: -0.42R
+Losers Only  : Mean MFE: +2.31R | Mean MAE: -3.36R
+
+--------------------------------------------------------------------------------
+8. TARGET EXCURSION & PRE-EXIT REACH
+--------------------------------------------------------------------------------
+All Trades Excursion Thresholds Reached Before Exit:
+  reached_0_5R        :  4147 trades (72.87%)
+  reached_1_0R        :  3259 trades (57.27%)
+  reached_1_5R        :  2659 trades (46.72%)
+  reached_2_0R        :  2209 trades (38.82%)
+
+Losing Trades Favorable Movement (Nearly Winning Then Reversing):
+  reached_0_5R_then_lost        :  2434 trades (61.5%)
+  reached_1_0R_then_lost        :  1604 trades (40.53%)
+  reached_1_5R_then_lost        :  1075 trades (27.16%)
+
+--------------------------------------------------------------------------------
+9. STOP-LOSS DISTANCE ANALYSIS
+--------------------------------------------------------------------------------
+Stop Distance      Trades   WinRate    AvgRet     Avg_R      Total_R
+<0.25%             4175     29.1     % -0.00    % -0.15      -616.0    
+0.25–0.50%         887      32.1     % -0.04    % -0.11      -99.2     
+0.50–1.00%         458      33.0     % -0.09    % -0.12      -54.2     
+1.00–2.00%         160      44.4     % 0.24     % 0.19       30.5      
+2.00%+             11       63.6     % 0.17     % 0.00       0.0       
+
+--------------------------------------------------------------------------------
+10. SIGNAL-TO-ENTRY GAP ANALYSIS (Signal Bar Close → Next Bar Open)
+--------------------------------------------------------------------------------
+Gap Type                            Trades   WinRate    AvgRet     Total_R
+negative gap (<-0.05%)              101      31.7     % -0.04    % -11.6     
+near-zero gap (-0.05% to +0.05%)    5493     30.5     % -0.01    % -705.0    
+positive gap (>+0.05%)              97       25.8     % -0.15    % -22.4     
+
+--------------------------------------------------------------------------------
+11. SLIPPAGE & EXECUTION FRICTION DIAGNOSIS
+--------------------------------------------------------------------------------
+Average Gross Edge per Trade:   -0.0083%
+Median Gross Edge per Trade:    -0.0504%
+Average Net Edge (0 bps):       -0.0083%
+Friction Drag Diagnosis:
+  With an average gross edge near zero (-0.01%), incurring 10 bps round-trip friction across ~228 trades per symbol creates an inescapable ~22.8% drag per symbol, which compounds geometrically to -99.8% portfolio decay.
+
+--------------------------------------------------------------------------------
+12. SYMBOL CONCENTRATION ANALYSIS
+--------------------------------------------------------------------------------
+Top 5 Symbols by Trade Volume: PEP, JPM, XOM, WMT, AAPL
+  Volume: 1507 trades (26.48%)
+Top 5 Symbols by Negative R:   AMZN, NFLX, GOOGL, COST, AMAT
+  Loss:   -275.96R (36.86% of all negative R)
+
+--------------------------------------------------------------------------------
+13. DAILY OUTCOME DISTRIBUTION (Symbol-Sessions)
+--------------------------------------------------------------------------------
+Total Symbol-Sessions Traded: 1,168
+  Positive Days: 495 (42.38%)
+  Negative Days: 673 (57.62%)
+  Flat Days:     0 (0.0%)
+  Mean Daily Return:   -0.04%
+  Median Daily Return: -0.17%
+  Max Daily Gain:      +5.77%
+  Max Daily Loss:      -4.24%
+
+--------------------------------------------------------------------------------
+14. FACTUAL FAILURE TAXONOMY
+--------------------------------------------------------------------------------
+Failure Category          Trades   % All    WinRate    Avg_R      Total_R
+EARLY_STOP                3138     55.1    % 0.0      % -1.00      -3138.0   
+EXTENDED_HOLD             562      9.9     % 53.6     % 0.38       214.8     
+FORCED_EXIT               449      7.9     % 60.8     % 0.29       129.0     
+REPEATED_ENTRY            5049     88.7    % 30.1     % -0.13      -633.7    
+LOW_RVOL                  5350     94.0    % 30.6     % -0.12      -644.7    
+HIGH_RVOL                 96       1.7     % 28.1     % -0.16      -15.6     
+LOW_RSI                   2703     47.5    % 29.3     % -0.16      -438.6    
+HIGH_RSI                  1022     18.0    % 33.3     % -0.06      -59.2     
+BEARISH_15M_CONTEXT       0        0.0     % 0.0      % 0.00       0.0       
+VWAP_RECLAIM_FAILURE      1524     26.8    % 0.0      % -0.99      -1512.5   
+ENTRY_GAP                 34       0.6     % 23.5     % -0.27      -9.2      
+FRICTION_SENSITIVE        0        0.0     % 0.0      % 0.00       0.0       
+
+================================================================================
+END OF DAY-05 FAILURE ANALYSIS REPORT
+================================================================================

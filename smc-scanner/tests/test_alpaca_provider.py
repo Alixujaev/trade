@@ -104,12 +104,14 @@ def test_get_ohlcv_invalid_interval_raises() -> None:
     # __init__ kredensial talab qilmaydi (lazy client) — .env bo'lmasa ham bu test ishlaydi
     provider = AlpacaProvider()
     with pytest.raises(ValueError):
-        provider.get_ohlcv("SPUS", "5m")
+        provider.get_ohlcv("SPUS", "1m")
 
 
 def test_get_ohlcv_4h_now_supported() -> None:
     """Alpaca 4H'ni qo'llab-quvvatlaydi — bu yfinance'dan farqli (asosiy sabab)."""
     assert "4h" in alpaca_module.SUPPORTED_INTERVALS
+    assert "5m" in alpaca_module.SUPPORTED_INTERVALS
+    assert "15m" in alpaca_module.SUPPORTED_INTERVALS
 
 
 # --- get_ohlcv() / cache testlari (tarmoq monkeypatch qilinadi) ---
