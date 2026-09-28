@@ -31,6 +31,7 @@ from data.session import (
 
 # Tadqiqot farazlari (Research Assumptions — optimallashtirilmagan):
 DEFAULT_GAP_THRESHOLD_PCT: float = 0.02          # 2.0% mutlaq gap (abs(gap_pct) >= 0.02)
+DEFAULT_GAP_THRESHOLDS_PCT: tuple[float, ...] = (0.01, 0.02, 0.03, 0.04)  # DAY-06A qat'iy chegaralar to'plami
 DEFAULT_PREMARKET_RVOL_THRESHOLD: float = 2.0    # 2.0x premarket RVOL
 MIN_PREMARKET_LOOKBACK_SESSIONS: int = 5         # RVOL hisoblash uchun minimal o'tmish sessiyalar
 MAX_PREMARKET_LOOKBACK_SESSIONS: int = 20        # RVOL lookback oynasi
@@ -62,6 +63,29 @@ class StockInPlayContext:
 
     is_positive_gap: bool = False
     is_negative_gap: bool = False
+
+    gap_data_sufficient: bool = True
+
+    def is_gap_eligible_at(self, threshold_pct: float) -> bool:
+        """abs(gap_pct) >= threshold_pct tekshiruvi (point-in-time)."""
+        if not self.gap_data_sufficient or math.isnan(self.gap_pct):
+            return False
+        t = threshold_pct / 100.0 if threshold_pct >= 0.50 else threshold_pct
+        return abs(self.gap_pct) >= t
+
+    def is_positive_gap_at(self, threshold_pct: float) -> bool:
+        """gap_pct >= threshold_pct tekshiruvi."""
+        if not self.gap_data_sufficient or math.isnan(self.gap_pct):
+            return False
+        t = threshold_pct / 100.0 if threshold_pct >= 0.50 else threshold_pct
+        return self.gap_pct >= t
+
+    def is_negative_gap_at(self, threshold_pct: float) -> bool:
+        """gap_pct <= -threshold_pct tekshiruvi."""
+        if not self.gap_data_sufficient or math.isnan(self.gap_pct):
+            return False
+        t = threshold_pct / 100.0 if threshold_pct >= 0.50 else threshold_pct
+        return self.gap_pct <= -t
 
     def to_dict(self) -> dict[str, Any]:
         """JSON serializatsiya uchun dict."""
@@ -136,19 +160,22 @@ def compute_stock_in_play_contexts(
             gap_eligible = False
             is_pos_gap = False
             is_neg_gap = False
+            gap_data_sufficient = False
         else:
             prev_date = sorted_unique_dates[i - 1]
             _, prev_close = daily_rth_prices[prev_date]
-            if prev_close > 0:
+            if not math.isnan(prev_close) and not math.isnan(curr_open) and prev_close > 0:
                 gap_pct = (curr_open - prev_close) / prev_close
                 gap_eligible = abs(gap_pct) >= gap_threshold_pct
                 is_pos_gap = gap_pct > 0.0
                 is_neg_gap = gap_pct < 0.0
+                gap_data_sufficient = True
             else:
                 gap_pct = float("nan")
                 gap_eligible = False
                 is_pos_gap = False
                 is_neg_gap = False
+                gap_data_sufficient = False
 
         # Premarket hajm va Premarket RVOL hisobi
         curr_pm_vol = pm_volume_by_date.get(curr_date, 0.0)
@@ -196,6 +223,7 @@ def compute_stock_in_play_contexts(
             combined_eligible=combined_eligible,
             is_positive_gap=is_pos_gap,
             is_negative_gap=is_neg_gap,
+            gap_data_sufficient=gap_data_sufficient,
         )
 
     return contexts
