@@ -1,0 +1,1668 @@
+{
+  "metadata": {
+    "experiment": "DAY-07A",
+    "title": "H2 Stop Management Robustness (0.75R, 1.00R, 1.25R)",
+    "universe_size": 25,
+    "universe": [
+      "AAPL",
+      "MSFT",
+      "NVDA",
+      "AMZN",
+      "META",
+      "GOOGL",
+      "TSLA",
+      "AVGO",
+      "AMD",
+      "QCOM",
+      "INTC",
+      "MU",
+      "AMAT",
+      "ADBE",
+      "CRM",
+      "ORCL",
+      "CSCO",
+      "COST",
+      "WMT",
+      "KO",
+      "PEP",
+      "NFLX",
+      "JNJ",
+      "JPM",
+      "XOM"
+    ],
+    "predeclared_thresholds": [
+      0.75,
+      1.0,
+      1.25
+    ],
+    "entry_rule": "next 5m OPEN",
+    "initial_stop": "SIGNAL_LOW",
+    "target": "2.0R",
+    "study_period_start": "2026-07-02",
+    "study_period_end": "2026-09-25",
+    "sessions": 60
+  },
+  "thresholds": [
+    0.75,
+    1.0,
+    1.25
+  ],
+  "baseline": {
+    "threshold_r": null,
+    "variant_name": "BASELINE",
+    "metrics": {
+      "variant_name": "BASELINE",
+      "total_trades": 5691,
+      "wins": 1731,
+      "losses": 3958,
+      "breakevens": 2,
+      "win_rate": 0.3042,
+      "profit_factor": 0.9388,
+      "expectancy": -0.0083,
+      "total_R": -738.98,
+      "avg_R": -0.1299,
+      "median_R": -1.0,
+      "r_std": 1.4304,
+      "gross_return_compounded": -41.19,
+      "gross_return_mean_symbol": -1.86,
+      "avg_trade_return_pct": -0.0083,
+      "median_trade_return_pct": -0.0504,
+      "max_drawdown_pct": -58.65,
+      "avg_hold_duration_mins": 24.8,
+      "slippage_0bps": -41.19,
+      "slippage_5bps": -99.8,
+      "slippage_10bps": -100.0,
+      "exit_counts": {
+        "TARGET": 1458,
+        "STOP": 3784,
+        "FORCED_EXIT": 449,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -6.91
+    },
+    "be_diagnostics": null,
+    "counterfactual": null,
+    "giveback": {
+      "threshold_r": 1.0,
+      "mfe_ge_threshold_total": 3259,
+      "mfe_ge_threshold_pct": 57.27,
+      "baseline_stop_count": 1546,
+      "baseline_stop_pct": 47.44,
+      "baseline_target_count": 1458,
+      "baseline_target_pct": 44.74,
+      "baseline_forced_count": 255,
+      "baseline_forced_pct": 7.82,
+      "h2_stop_count": 1546,
+      "h2_stop_pct": 47.44,
+      "h2_be_count": 0,
+      "h2_be_pct": 0.0,
+      "h2_target_count": 1458,
+      "h2_target_pct": 44.74,
+      "h2_forced_count": 255,
+      "h2_forced_pct": 7.82
+    },
+    "stop_geometry": {
+      "avg_stop_distance_pct": 0.2214,
+      "median_stop_distance_pct": 0.1179,
+      "micro_stop_share_lt_025_pct": 73.36,
+      "stops_0_to_5m_count": 2706,
+      "stops_0_to_5m_pct_of_stops": 71.51,
+      "avg_hold_duration_mins": 24.8
+    },
+    "symbol_distribution": {
+      "mean_symbol_return": -1.86,
+      "median_symbol_return": -1.27,
+      "positive_symbols_count": 11,
+      "negative_symbols_count": 14,
+      "outperformed_bnh_count": 9,
+      "per_symbol_data": {
+        "AAPL": {
+          "trades": 281,
+          "wins": 102,
+          "breakevens": 0,
+          "win_rate": 0.363,
+          "total_R": -2.25,
+          "strategy_return": 9.69,
+          "bnh_return": 15.97,
+          "outperformed_bnh": false
+        },
+        "MSFT": {
+          "trades": 252,
+          "wins": 75,
+          "breakevens": 0,
+          "win_rate": 0.2976,
+          "total_R": -43.27,
+          "strategy_return": 0.38,
+          "bnh_return": 34.23,
+          "outperformed_bnh": false
+        },
+        "NVDA": {
+          "trades": 204,
+          "wins": 57,
+          "breakevens": 0,
+          "win_rate": 0.2794,
+          "total_R": -40.35,
+          "strategy_return": -1.18,
+          "bnh_return": 14.17,
+          "outperformed_bnh": false
+        },
+        "AMZN": {
+          "trades": 274,
+          "wins": 75,
+          "breakevens": 0,
+          "win_rate": 0.2737,
+          "total_R": -68.97,
+          "strategy_return": -10.43,
+          "bnh_return": 3.37,
+          "outperformed_bnh": false
+        },
+        "META": {
+          "trades": 157,
+          "wins": 48,
+          "breakevens": 0,
+          "win_rate": 0.3057,
+          "total_R": -12.07,
+          "strategy_return": -7.73,
+          "bnh_return": 23.69,
+          "outperformed_bnh": false
+        },
+        "GOOGL": {
+          "trades": 246,
+          "wins": 68,
+          "breakevens": 0,
+          "win_rate": 0.2764,
+          "total_R": -50.6,
+          "strategy_return": -1.27,
+          "bnh_return": -4.35,
+          "outperformed_bnh": true
+        },
+        "TSLA": {
+          "trades": 162,
+          "wins": 44,
+          "breakevens": 0,
+          "win_rate": 0.2716,
+          "total_R": -7.58,
+          "strategy_return": 3.84,
+          "bnh_return": -13.11,
+          "outperformed_bnh": true
+        },
+        "AVGO": {
+          "trades": 230,
+          "wins": 66,
+          "breakevens": 1,
+          "win_rate": 0.287,
+          "total_R": -45.67,
+          "strategy_return": -6.74,
+          "bnh_return": -3.53,
+          "outperformed_bnh": false
+        },
+        "AMD": {
+          "trades": 149,
+          "wins": 54,
+          "breakevens": 0,
+          "win_rate": 0.3624,
+          "total_R": 9.67,
+          "strategy_return": 3.02,
+          "bnh_return": 17.12,
+          "outperformed_bnh": false
+        },
+        "QCOM": {
+          "trades": 233,
+          "wins": 69,
+          "breakevens": 0,
+          "win_rate": 0.2961,
+          "total_R": -25.69,
+          "strategy_return": -8.76,
+          "bnh_return": 10.86,
+          "outperformed_bnh": false
+        },
+        "INTC": {
+          "trades": 160,
+          "wins": 51,
+          "breakevens": 0,
+          "win_rate": 0.3187,
+          "total_R": -9.3,
+          "strategy_return": -3.65,
+          "bnh_return": -4.62,
+          "outperformed_bnh": true
+        },
+        "MU": {
+          "trades": 182,
+          "wins": 57,
+          "breakevens": 0,
+          "win_rate": 0.3132,
+          "total_R": -29.4,
+          "strategy_return": 1.97,
+          "bnh_return": 3.86,
+          "outperformed_bnh": false
+        },
+        "AMAT": {
+          "trades": 189,
+          "wins": 47,
+          "breakevens": 0,
+          "win_rate": 0.2487,
+          "total_R": -50.11,
+          "strategy_return": -17.54,
+          "bnh_return": -26.14,
+          "outperformed_bnh": true
+        },
+        "ADBE": {
+          "trades": 206,
+          "wins": 70,
+          "breakevens": 0,
+          "win_rate": 0.3398,
+          "total_R": -6.59,
+          "strategy_return": 11.27,
+          "bnh_return": 9.26,
+          "outperformed_bnh": true
+        },
+        "CRM": {
+          "trades": 162,
+          "wins": 55,
+          "breakevens": 0,
+          "win_rate": 0.3395,
+          "total_R": -4.93,
+          "strategy_return": 11.0,
+          "bnh_return": 43.6,
+          "outperformed_bnh": false
+        },
+        "ORCL": {
+          "trades": 205,
+          "wins": 56,
+          "breakevens": 0,
+          "win_rate": 0.2732,
+          "total_R": -38.64,
+          "strategy_return": -11.02,
+          "bnh_return": -4.34,
+          "outperformed_bnh": false
+        },
+        "CSCO": {
+          "trades": 203,
+          "wins": 57,
+          "breakevens": 0,
+          "win_rate": 0.2808,
+          "total_R": -43.16,
+          "strategy_return": -6.35,
+          "bnh_return": -8.84,
+          "outperformed_bnh": true
+        },
+        "COST": {
+          "trades": 244,
+          "wins": 69,
+          "breakevens": 0,
+          "win_rate": 0.2828,
+          "total_R": -50.2,
+          "strategy_return": -7.69,
+          "bnh_return": -0.44,
+          "outperformed_bnh": false
+        },
+        "WMT": {
+          "trades": 285,
+          "wins": 90,
+          "breakevens": 0,
+          "win_rate": 0.3158,
+          "total_R": -23.48,
+          "strategy_return": 2.42,
+          "bnh_return": -1.23,
+          "outperformed_bnh": true
+        },
+        "KO": {
+          "trades": 254,
+          "wins": 77,
+          "breakevens": 0,
+          "win_rate": 0.3031,
+          "total_R": -32.88,
+          "strategy_return": 2.46,
+          "bnh_return": 7.58,
+          "outperformed_bnh": false
+        },
+        "PEP": {
+          "trades": 351,
+          "wins": 116,
+          "breakevens": 1,
+          "win_rate": 0.3305,
+          "total_R": -16.91,
+          "strategy_return": -2.35,
+          "bnh_return": -10.06,
+          "outperformed_bnh": true
+        },
+        "NFLX": {
+          "trades": 232,
+          "wins": 62,
+          "breakevens": 0,
+          "win_rate": 0.2672,
+          "total_R": -56.08,
+          "strategy_return": -2.14,
+          "bnh_return": -5.35,
+          "outperformed_bnh": true
+        },
+        "JNJ": {
+          "trades": 240,
+          "wins": 78,
+          "breakevens": 0,
+          "win_rate": 0.325,
+          "total_R": -24.55,
+          "strategy_return": 0.46,
+          "bnh_return": 6.02,
+          "outperformed_bnh": false
+        },
+        "JPM": {
+          "trades": 296,
+          "wins": 91,
+          "breakevens": 0,
+          "win_rate": 0.3074,
+          "total_R": -41.34,
+          "strategy_return": -6.62,
+          "bnh_return": 1.45,
+          "outperformed_bnh": false
+        },
+        "XOM": {
+          "trades": 294,
+          "wins": 97,
+          "breakevens": 0,
+          "win_rate": 0.3299,
+          "total_R": -24.65,
+          "strategy_return": 0.53,
+          "bnh_return": 17.07,
+          "outperformed_bnh": false
+        }
+      }
+    }
+  },
+  "threshold_variants": {
+    "0.75R": {
+      "threshold_r": 0.75,
+      "variant_name": "H2-0.75R",
+      "metrics": {
+        "variant_name": "H2-0.75R",
+        "total_trades": 5691,
+        "wins": 1363,
+        "losses": 3186,
+        "breakevens": 1142,
+        "win_rate": 0.2395,
+        "profit_factor": 0.9258,
+        "expectancy": -0.0076,
+        "total_R": -645.11,
+        "avg_R": -0.1134,
+        "median_R": -1.0,
+        "r_std": 1.3012,
+        "gross_return_compounded": -37.71,
+        "gross_return_mean_symbol": -1.63,
+        "avg_trade_return_pct": -0.0076,
+        "median_trade_return_pct": -0.0152,
+        "max_drawdown_pct": -49.0,
+        "avg_hold_duration_mins": 16.4,
+        "slippage_0bps": -37.71,
+        "slippage_5bps": -99.79,
+        "slippage_10bps": -100.0,
+        "exit_counts": {
+          "TARGET": 1167,
+          "STOP": 3061,
+          "BREAKEVEN": 1140,
+          "FORCED_EXIT": 323
+        },
+        "mean_bnh_return": 5.05,
+        "strategy_vs_bnh_diff": -6.68
+      },
+      "be_diagnostics": {
+        "total_trades": 5691,
+        "be_triggered_trades": 1841,
+        "be_trigger_rate": 0.3235,
+        "exited_at_be": 1140,
+        "be_exit_rate": 0.6192,
+        "reached_target_after_be": 599,
+        "be_target_rate": 0.3254,
+        "forced_exit_after_be": 102,
+        "be_forced_rate": 0.0554,
+        "losses_after_be": 13,
+        "be_loss_rate": 0.0071
+      },
+      "counterfactual": {
+        "transition_matrix": {
+          "STOP": {
+            "STOP": 3061,
+            "BREAKEVEN": 723,
+            "TARGET": 0,
+            "FORCED_EXIT": 0
+          },
+          "BREAKEVEN": {
+            "STOP": 0,
+            "BREAKEVEN": 0,
+            "TARGET": 0,
+            "FORCED_EXIT": 0
+          },
+          "TARGET": {
+            "STOP": 0,
+            "BREAKEVEN": 291,
+            "TARGET": 1167,
+            "FORCED_EXIT": 0
+          },
+          "FORCED_EXIT": {
+            "STOP": 0,
+            "BREAKEVEN": 126,
+            "TARGET": 0,
+            "FORCED_EXIT": 323
+          }
+        },
+        "baseline_stop_to_h2_be": 723,
+        "baseline_stop_to_h2_target": 0,
+        "baseline_target_to_h2_be": 291,
+        "baseline_target_to_h2_target": 1167,
+        "baseline_forced_to_h2_be": 126,
+        "baseline_forced_to_h2_forced": 323,
+        "total_r_delta": 93.87,
+        "avg_r_delta": 0.0165
+      },
+      "giveback": {
+        "threshold_r": 0.75,
+        "mfe_ge_threshold_total": 3635,
+        "mfe_ge_threshold_pct": 63.87,
+        "baseline_stop_count": 1867,
+        "baseline_stop_pct": 51.36,
+        "baseline_target_count": 1458,
+        "baseline_target_pct": 40.11,
+        "baseline_forced_count": 310,
+        "baseline_forced_pct": 8.53,
+        "h2_stop_count": 1144,
+        "h2_stop_pct": 31.47,
+        "h2_be_count": 1140,
+        "h2_be_pct": 31.36,
+        "h2_target_count": 1167,
+        "h2_target_pct": 32.1,
+        "h2_forced_count": 184,
+        "h2_forced_pct": 5.06
+      },
+      "stop_geometry": {
+        "avg_stop_distance_pct": 0.2214,
+        "median_stop_distance_pct": 0.1179,
+        "micro_stop_share_lt_025_pct": 73.36,
+        "stops_0_to_5m_count": 2534,
+        "stops_0_to_5m_pct_of_stops": 82.78,
+        "avg_hold_duration_mins": 16.4
+      },
+      "symbol_distribution": {
+        "mean_symbol_return": -1.63,
+        "median_symbol_return": -2.07,
+        "positive_symbols_count": 10,
+        "negative_symbols_count": 15,
+        "outperformed_bnh_count": 9,
+        "per_symbol_data": {
+          "AAPL": {
+            "trades": 281,
+            "wins": 83,
+            "breakevens": 49,
+            "win_rate": 0.2954,
+            "total_R": -4.45,
+            "strategy_return": 6.43,
+            "bnh_return": 15.97,
+            "outperformed_bnh": false
+          },
+          "MSFT": {
+            "trades": 252,
+            "wins": 58,
+            "breakevens": 63,
+            "win_rate": 0.2302,
+            "total_R": -28.47,
+            "strategy_return": 1.54,
+            "bnh_return": 34.23,
+            "outperformed_bnh": false
+          },
+          "NVDA": {
+            "trades": 204,
+            "wins": 42,
+            "breakevens": 46,
+            "win_rate": 0.2059,
+            "total_R": -34.32,
+            "strategy_return": -3.65,
+            "bnh_return": 14.17,
+            "outperformed_bnh": false
+          },
+          "AMZN": {
+            "trades": 274,
+            "wins": 49,
+            "breakevens": 59,
+            "win_rate": 0.1788,
+            "total_R": -81.23,
+            "strategy_return": -14.35,
+            "bnh_return": 3.37,
+            "outperformed_bnh": false
+          },
+          "META": {
+            "trades": 157,
+            "wins": 38,
+            "breakevens": 31,
+            "win_rate": 0.242,
+            "total_R": -13.12,
+            "strategy_return": -7.25,
+            "bnh_return": 23.69,
+            "outperformed_bnh": false
+          },
+          "GOOGL": {
+            "trades": 246,
+            "wins": 53,
+            "breakevens": 49,
+            "win_rate": 0.2154,
+            "total_R": -45.77,
+            "strategy_return": -2.07,
+            "bnh_return": -4.35,
+            "outperformed_bnh": true
+          },
+          "TSLA": {
+            "trades": 162,
+            "wins": 34,
+            "breakevens": 40,
+            "win_rate": 0.2099,
+            "total_R": 4.42,
+            "strategy_return": 3.16,
+            "bnh_return": -13.11,
+            "outperformed_bnh": true
+          },
+          "AVGO": {
+            "trades": 230,
+            "wins": 51,
+            "breakevens": 47,
+            "win_rate": 0.2217,
+            "total_R": -41.66,
+            "strategy_return": -7.15,
+            "bnh_return": -3.53,
+            "outperformed_bnh": false
+          },
+          "AMD": {
+            "trades": 149,
+            "wins": 42,
+            "breakevens": 35,
+            "win_rate": 0.2819,
+            "total_R": 7.62,
+            "strategy_return": 0.53,
+            "bnh_return": 17.12,
+            "outperformed_bnh": false
+          },
+          "QCOM": {
+            "trades": 233,
+            "wins": 58,
+            "breakevens": 41,
+            "win_rate": 0.2489,
+            "total_R": -18.09,
+            "strategy_return": -7.75,
+            "bnh_return": 10.86,
+            "outperformed_bnh": false
+          },
+          "INTC": {
+            "trades": 160,
+            "wins": 44,
+            "breakevens": 19,
+            "win_rate": 0.275,
+            "total_R": -11.86,
+            "strategy_return": -3.62,
+            "bnh_return": -4.62,
+            "outperformed_bnh": true
+          },
+          "MU": {
+            "trades": 182,
+            "wins": 44,
+            "breakevens": 37,
+            "win_rate": 0.2418,
+            "total_R": -29.44,
+            "strategy_return": -1.3,
+            "bnh_return": 3.86,
+            "outperformed_bnh": false
+          },
+          "AMAT": {
+            "trades": 189,
+            "wins": 37,
+            "breakevens": 47,
+            "win_rate": 0.1958,
+            "total_R": -30.51,
+            "strategy_return": -12.43,
+            "bnh_return": -26.14,
+            "outperformed_bnh": true
+          },
+          "ADBE": {
+            "trades": 206,
+            "wins": 56,
+            "breakevens": 35,
+            "win_rate": 0.2718,
+            "total_R": -10.76,
+            "strategy_return": 11.09,
+            "bnh_return": 9.26,
+            "outperformed_bnh": true
+          },
+          "CRM": {
+            "trades": 162,
+            "wins": 43,
+            "breakevens": 33,
+            "win_rate": 0.2654,
+            "total_R": -3.32,
+            "strategy_return": 15.95,
+            "bnh_return": 43.6,
+            "outperformed_bnh": false
+          },
+          "ORCL": {
+            "trades": 205,
+            "wins": 42,
+            "breakevens": 41,
+            "win_rate": 0.2049,
+            "total_R": -36.73,
+            "strategy_return": -10.6,
+            "bnh_return": -4.34,
+            "outperformed_bnh": false
+          },
+          "CSCO": {
+            "trades": 203,
+            "wins": 41,
+            "breakevens": 40,
+            "win_rate": 0.202,
+            "total_R": -51.89,
+            "strategy_return": -7.91,
+            "bnh_return": -8.84,
+            "outperformed_bnh": true
+          },
+          "COST": {
+            "trades": 244,
+            "wins": 55,
+            "breakevens": 43,
+            "win_rate": 0.2254,
+            "total_R": -45.12,
+            "strategy_return": -6.26,
+            "bnh_return": -0.44,
+            "outperformed_bnh": false
+          },
+          "WMT": {
+            "trades": 285,
+            "wins": 80,
+            "breakevens": 49,
+            "win_rate": 0.2807,
+            "total_R": -5.26,
+            "strategy_return": 4.45,
+            "bnh_return": -1.23,
+            "outperformed_bnh": true
+          },
+          "KO": {
+            "trades": 254,
+            "wins": 62,
+            "breakevens": 54,
+            "win_rate": 0.2441,
+            "total_R": -18.85,
+            "strategy_return": 3.22,
+            "bnh_return": 7.58,
+            "outperformed_bnh": false
+          },
+          "PEP": {
+            "trades": 351,
+            "wins": 93,
+            "breakevens": 69,
+            "win_rate": 0.265,
+            "total_R": -18.13,
+            "strategy_return": -2.5,
+            "bnh_return": -10.06,
+            "outperformed_bnh": true
+          },
+          "NFLX": {
+            "trades": 232,
+            "wins": 51,
+            "breakevens": 45,
+            "win_rate": 0.2198,
+            "total_R": -42.2,
+            "strategy_return": 0.89,
+            "bnh_return": -5.35,
+            "outperformed_bnh": true
+          },
+          "JNJ": {
+            "trades": 240,
+            "wins": 64,
+            "breakevens": 52,
+            "win_rate": 0.2667,
+            "total_R": -14.18,
+            "strategy_return": 4.79,
+            "bnh_return": 6.02,
+            "outperformed_bnh": false
+          },
+          "JPM": {
+            "trades": 296,
+            "wins": 71,
+            "breakevens": 62,
+            "win_rate": 0.2399,
+            "total_R": -33.33,
+            "strategy_return": -4.52,
+            "bnh_return": 1.45,
+            "outperformed_bnh": false
+          },
+          "XOM": {
+            "trades": 294,
+            "wins": 72,
+            "breakevens": 56,
+            "win_rate": 0.2449,
+            "total_R": -38.45,
+            "strategy_return": -1.47,
+            "bnh_return": 17.07,
+            "outperformed_bnh": false
+          }
+        }
+      }
+    },
+    "1.00R": {
+      "threshold_r": 1.0,
+      "variant_name": "H2-1.00R",
+      "metrics": {
+        "variant_name": "H2-1.00R",
+        "total_trades": 5691,
+        "wins": 1457,
+        "losses": 3402,
+        "breakevens": 832,
+        "win_rate": 0.256,
+        "profit_factor": 0.9168,
+        "expectancy": -0.0094,
+        "total_R": -691.07,
+        "avg_R": -0.1214,
+        "median_R": -1.0,
+        "r_std": 1.3356,
+        "gross_return_compounded": -44.25,
+        "gross_return_mean_symbol": -2.07,
+        "avg_trade_return_pct": -0.0094,
+        "median_trade_return_pct": -0.024,
+        "max_drawdown_pct": -56.05,
+        "avg_hold_duration_mins": 19.0,
+        "slippage_0bps": -44.25,
+        "slippage_5bps": -99.81,
+        "slippage_10bps": -100.0,
+        "exit_counts": {
+          "TARGET": 1236,
+          "STOP": 3261,
+          "BREAKEVEN": 830,
+          "FORCED_EXIT": 364
+        },
+        "mean_bnh_return": 5.05,
+        "strategy_vs_bnh_diff": -7.12
+      },
+      "be_diagnostics": {
+        "total_trades": 5691,
+        "be_triggered_trades": 1545,
+        "be_trigger_rate": 0.2715,
+        "exited_at_be": 830,
+        "be_exit_rate": 0.5372,
+        "reached_target_after_be": 623,
+        "be_target_rate": 0.4032,
+        "forced_exit_after_be": 92,
+        "be_forced_rate": 0.0595,
+        "losses_after_be": 9,
+        "be_loss_rate": 0.0058
+      },
+      "counterfactual": {
+        "transition_matrix": {
+          "STOP": {
+            "STOP": 3261,
+            "BREAKEVEN": 523,
+            "TARGET": 0,
+            "FORCED_EXIT": 0
+          },
+          "BREAKEVEN": {
+            "STOP": 0,
+            "BREAKEVEN": 0,
+            "TARGET": 0,
+            "FORCED_EXIT": 0
+          },
+          "TARGET": {
+            "STOP": 0,
+            "BREAKEVEN": 222,
+            "TARGET": 1236,
+            "FORCED_EXIT": 0
+          },
+          "FORCED_EXIT": {
+            "STOP": 0,
+            "BREAKEVEN": 85,
+            "TARGET": 0,
+            "FORCED_EXIT": 364
+          }
+        },
+        "baseline_stop_to_h2_be": 523,
+        "baseline_stop_to_h2_target": 0,
+        "baseline_target_to_h2_be": 222,
+        "baseline_target_to_h2_target": 1236,
+        "baseline_forced_to_h2_be": 85,
+        "baseline_forced_to_h2_forced": 364,
+        "total_r_delta": 47.91,
+        "avg_r_delta": 0.0085
+      },
+      "giveback": {
+        "threshold_r": 1.0,
+        "mfe_ge_threshold_total": 3259,
+        "mfe_ge_threshold_pct": 57.27,
+        "baseline_stop_count": 1546,
+        "baseline_stop_pct": 47.44,
+        "baseline_target_count": 1458,
+        "baseline_target_pct": 44.74,
+        "baseline_forced_count": 255,
+        "baseline_forced_pct": 7.82,
+        "h2_stop_count": 1023,
+        "h2_stop_pct": 31.39,
+        "h2_be_count": 830,
+        "h2_be_pct": 25.47,
+        "h2_target_count": 1236,
+        "h2_target_pct": 37.93,
+        "h2_forced_count": 170,
+        "h2_forced_pct": 5.22
+      },
+      "stop_geometry": {
+        "avg_stop_distance_pct": 0.2214,
+        "median_stop_distance_pct": 0.1179,
+        "micro_stop_share_lt_025_pct": 73.36,
+        "stops_0_to_5m_count": 2596,
+        "stops_0_to_5m_pct_of_stops": 79.61,
+        "avg_hold_duration_mins": 19.0
+      },
+      "symbol_distribution": {
+        "mean_symbol_return": -2.07,
+        "median_symbol_return": -2.46,
+        "positive_symbols_count": 9,
+        "negative_symbols_count": 16,
+        "outperformed_bnh_count": 9,
+        "per_symbol_data": {
+          "AAPL": {
+            "trades": 281,
+            "wins": 86,
+            "breakevens": 38,
+            "win_rate": 0.306,
+            "total_R": -7.88,
+            "strategy_return": 6.76,
+            "bnh_return": 15.97,
+            "outperformed_bnh": false
+          },
+          "MSFT": {
+            "trades": 252,
+            "wins": 65,
+            "breakevens": 44,
+            "win_rate": 0.2579,
+            "total_R": -27.1,
+            "strategy_return": 1.44,
+            "bnh_return": 34.23,
+            "outperformed_bnh": false
+          },
+          "NVDA": {
+            "trades": 204,
+            "wins": 45,
+            "breakevens": 35,
+            "win_rate": 0.2206,
+            "total_R": -37.88,
+            "strategy_return": -3.16,
+            "bnh_return": 14.17,
+            "outperformed_bnh": false
+          },
+          "AMZN": {
+            "trades": 274,
+            "wins": 55,
+            "breakevens": 43,
+            "win_rate": 0.2007,
+            "total_R": -81.62,
+            "strategy_return": -14.18,
+            "bnh_return": 3.37,
+            "outperformed_bnh": false
+          },
+          "META": {
+            "trades": 157,
+            "wins": 41,
+            "breakevens": 26,
+            "win_rate": 0.2611,
+            "total_R": -8.99,
+            "strategy_return": -6.11,
+            "bnh_return": 23.69,
+            "outperformed_bnh": false
+          },
+          "GOOGL": {
+            "trades": 246,
+            "wins": 59,
+            "breakevens": 34,
+            "win_rate": 0.2398,
+            "total_R": -42.19,
+            "strategy_return": -2.46,
+            "bnh_return": -4.35,
+            "outperformed_bnh": true
+          },
+          "TSLA": {
+            "trades": 162,
+            "wins": 37,
+            "breakevens": 33,
+            "win_rate": 0.2284,
+            "total_R": 5.2,
+            "strategy_return": 3.88,
+            "bnh_return": -13.11,
+            "outperformed_bnh": true
+          },
+          "AVGO": {
+            "trades": 230,
+            "wins": 54,
+            "breakevens": 33,
+            "win_rate": 0.2348,
+            "total_R": -46.66,
+            "strategy_return": -7.16,
+            "bnh_return": -3.53,
+            "outperformed_bnh": false
+          },
+          "AMD": {
+            "trades": 149,
+            "wins": 47,
+            "breakevens": 20,
+            "win_rate": 0.3154,
+            "total_R": 8.88,
+            "strategy_return": 1.05,
+            "bnh_return": 17.12,
+            "outperformed_bnh": false
+          },
+          "QCOM": {
+            "trades": 233,
+            "wins": 61,
+            "breakevens": 29,
+            "win_rate": 0.2618,
+            "total_R": -21.27,
+            "strategy_return": -7.87,
+            "bnh_return": 10.86,
+            "outperformed_bnh": false
+          },
+          "INTC": {
+            "trades": 160,
+            "wins": 46,
+            "breakevens": 11,
+            "win_rate": 0.2875,
+            "total_R": -13.86,
+            "strategy_return": -4.39,
+            "bnh_return": -4.62,
+            "outperformed_bnh": true
+          },
+          "MU": {
+            "trades": 182,
+            "wins": 46,
+            "breakevens": 29,
+            "win_rate": 0.2527,
+            "total_R": -31.56,
+            "strategy_return": -1.64,
+            "bnh_return": 3.86,
+            "outperformed_bnh": false
+          },
+          "AMAT": {
+            "trades": 189,
+            "wins": 38,
+            "breakevens": 36,
+            "win_rate": 0.2011,
+            "total_R": -38.51,
+            "strategy_return": -14.79,
+            "bnh_return": -26.14,
+            "outperformed_bnh": true
+          },
+          "ADBE": {
+            "trades": 206,
+            "wins": 64,
+            "breakevens": 19,
+            "win_rate": 0.3107,
+            "total_R": -5.47,
+            "strategy_return": 12.92,
+            "bnh_return": 9.26,
+            "outperformed_bnh": true
+          },
+          "CRM": {
+            "trades": 162,
+            "wins": 44,
+            "breakevens": 27,
+            "win_rate": 0.2716,
+            "total_R": -5.4,
+            "strategy_return": 12.68,
+            "bnh_return": 43.6,
+            "outperformed_bnh": false
+          },
+          "ORCL": {
+            "trades": 205,
+            "wins": 44,
+            "breakevens": 30,
+            "win_rate": 0.2146,
+            "total_R": -41.73,
+            "strategy_return": -12.35,
+            "bnh_return": -4.34,
+            "outperformed_bnh": false
+          },
+          "CSCO": {
+            "trades": 203,
+            "wins": 48,
+            "breakevens": 24,
+            "win_rate": 0.2365,
+            "total_R": -46.86,
+            "strategy_return": -6.6,
+            "bnh_return": -8.84,
+            "outperformed_bnh": true
+          },
+          "COST": {
+            "trades": 244,
+            "wins": 57,
+            "breakevens": 36,
+            "win_rate": 0.2336,
+            "total_R": -48.06,
+            "strategy_return": -6.5,
+            "bnh_return": -0.44,
+            "outperformed_bnh": false
+          },
+          "WMT": {
+            "trades": 285,
+            "wins": 85,
+            "breakevens": 38,
+            "win_rate": 0.2982,
+            "total_R": -1.26,
+            "strategy_return": 4.79,
+            "bnh_return": -1.23,
+            "outperformed_bnh": true
+          },
+          "KO": {
+            "trades": 254,
+            "wins": 64,
+            "breakevens": 44,
+            "win_rate": 0.252,
+            "total_R": -25.95,
+            "strategy_return": 2.69,
+            "bnh_return": 7.58,
+            "outperformed_bnh": false
+          },
+          "PEP": {
+            "trades": 351,
+            "wins": 96,
+            "breakevens": 56,
+            "win_rate": 0.2735,
+            "total_R": -21.38,
+            "strategy_return": -1.92,
+            "bnh_return": -10.06,
+            "outperformed_bnh": true
+          },
+          "NFLX": {
+            "trades": 232,
+            "wins": 52,
+            "breakevens": 31,
+            "win_rate": 0.2241,
+            "total_R": -53.49,
+            "strategy_return": -2.1,
+            "bnh_return": -5.35,
+            "outperformed_bnh": true
+          },
+          "JNJ": {
+            "trades": 240,
+            "wins": 69,
+            "breakevens": 35,
+            "win_rate": 0.2875,
+            "total_R": -18.63,
+            "strategy_return": 1.57,
+            "bnh_return": 6.02,
+            "outperformed_bnh": false
+          },
+          "JPM": {
+            "trades": 296,
+            "wins": 78,
+            "breakevens": 40,
+            "win_rate": 0.2635,
+            "total_R": -36.9,
+            "strategy_return": -5.22,
+            "bnh_return": 1.45,
+            "outperformed_bnh": false
+          },
+          "XOM": {
+            "trades": 294,
+            "wins": 76,
+            "breakevens": 41,
+            "win_rate": 0.2585,
+            "total_R": -42.5,
+            "strategy_return": -2.97,
+            "bnh_return": 17.07,
+            "outperformed_bnh": false
+          }
+        }
+      }
+    },
+    "1.25R": {
+      "threshold_r": 1.25,
+      "variant_name": "H2-1.25R",
+      "metrics": {
+        "variant_name": "H2-1.25R",
+        "total_trades": 5691,
+        "wins": 1533,
+        "losses": 3586,
+        "breakevens": 572,
+        "win_rate": 0.2694,
+        "profit_factor": 0.9229,
+        "expectancy": -0.0093,
+        "total_R": -730.47,
+        "avg_R": -0.1284,
+        "median_R": -1.0,
+        "r_std": 1.3642,
+        "gross_return_compounded": -44.03,
+        "gross_return_mean_symbol": -2.05,
+        "avg_trade_return_pct": -0.0093,
+        "median_trade_return_pct": -0.0325,
+        "max_drawdown_pct": -57.77,
+        "avg_hold_duration_mins": 21.2,
+        "slippage_0bps": -44.03,
+        "slippage_5bps": -99.81,
+        "slippage_10bps": -100.0,
+        "exit_counts": {
+          "TARGET": 1297,
+          "STOP": 3432,
+          "BREAKEVEN": 570,
+          "FORCED_EXIT": 392
+        },
+        "mean_bnh_return": 5.05,
+        "strategy_vs_bnh_diff": -7.1
+      },
+      "be_diagnostics": {
+        "total_trades": 5691,
+        "be_triggered_trades": 1259,
+        "be_trigger_rate": 0.2212,
+        "exited_at_be": 570,
+        "be_exit_rate": 0.4527,
+        "reached_target_after_be": 612,
+        "be_target_rate": 0.4861,
+        "forced_exit_after_be": 77,
+        "be_forced_rate": 0.0612,
+        "losses_after_be": 6,
+        "be_loss_rate": 0.0048
+      },
+      "counterfactual": {
+        "transition_matrix": {
+          "STOP": {
+            "STOP": 3432,
+            "BREAKEVEN": 352,
+            "TARGET": 0,
+            "FORCED_EXIT": 0
+          },
+          "BREAKEVEN": {
+            "STOP": 0,
+            "BREAKEVEN": 0,
+            "TARGET": 0,
+            "FORCED_EXIT": 0
+          },
+          "TARGET": {
+            "STOP": 0,
+            "BREAKEVEN": 161,
+            "TARGET": 1297,
+            "FORCED_EXIT": 0
+          },
+          "FORCED_EXIT": {
+            "STOP": 0,
+            "BREAKEVEN": 57,
+            "TARGET": 0,
+            "FORCED_EXIT": 392
+          }
+        },
+        "baseline_stop_to_h2_be": 352,
+        "baseline_stop_to_h2_target": 0,
+        "baseline_target_to_h2_be": 161,
+        "baseline_target_to_h2_target": 1297,
+        "baseline_forced_to_h2_be": 57,
+        "baseline_forced_to_h2_forced": 392,
+        "total_r_delta": 8.51,
+        "avg_r_delta": 0.0015
+      },
+      "giveback": {
+        "threshold_r": 1.25,
+        "mfe_ge_threshold_total": 2929,
+        "mfe_ge_threshold_pct": 51.47,
+        "baseline_stop_count": 1263,
+        "baseline_stop_pct": 43.12,
+        "baseline_target_count": 1458,
+        "baseline_target_pct": 49.78,
+        "baseline_forced_count": 208,
+        "baseline_forced_pct": 7.1,
+        "h2_stop_count": 911,
+        "h2_stop_pct": 31.1,
+        "h2_be_count": 570,
+        "h2_be_pct": 19.46,
+        "h2_target_count": 1297,
+        "h2_target_pct": 44.28,
+        "h2_forced_count": 151,
+        "h2_forced_pct": 5.16
+      },
+      "stop_geometry": {
+        "avg_stop_distance_pct": 0.2214,
+        "median_stop_distance_pct": 0.1179,
+        "micro_stop_share_lt_025_pct": 73.36,
+        "stops_0_to_5m_count": 2634,
+        "stops_0_to_5m_pct_of_stops": 76.75,
+        "avg_hold_duration_mins": 21.2
+      },
+      "symbol_distribution": {
+        "mean_symbol_return": -2.05,
+        "median_symbol_return": -3.2,
+        "positive_symbols_count": 9,
+        "negative_symbols_count": 16,
+        "outperformed_bnh_count": 8,
+        "per_symbol_data": {
+          "AAPL": {
+            "trades": 281,
+            "wins": 93,
+            "breakevens": 25,
+            "win_rate": 0.331,
+            "total_R": -1.11,
+            "strategy_return": 8.72,
+            "bnh_return": 15.97,
+            "outperformed_bnh": false
+          },
+          "MSFT": {
+            "trades": 252,
+            "wins": 66,
+            "breakevens": 31,
+            "win_rate": 0.2619,
+            "total_R": -36.93,
+            "strategy_return": -0.92,
+            "bnh_return": 34.23,
+            "outperformed_bnh": false
+          },
+          "NVDA": {
+            "trades": 204,
+            "wins": 46,
+            "breakevens": 26,
+            "win_rate": 0.2255,
+            "total_R": -43.88,
+            "strategy_return": -3.2,
+            "bnh_return": 14.17,
+            "outperformed_bnh": false
+          },
+          "AMZN": {
+            "trades": 274,
+            "wins": 59,
+            "breakevens": 32,
+            "win_rate": 0.2153,
+            "total_R": -80.62,
+            "strategy_return": -13.4,
+            "bnh_return": 3.37,
+            "outperformed_bnh": false
+          },
+          "META": {
+            "trades": 157,
+            "wins": 42,
+            "breakevens": 20,
+            "win_rate": 0.2675,
+            "total_R": -10.51,
+            "strategy_return": -7.1,
+            "bnh_return": 23.69,
+            "outperformed_bnh": false
+          },
+          "GOOGL": {
+            "trades": 246,
+            "wins": 63,
+            "breakevens": 16,
+            "win_rate": 0.2561,
+            "total_R": -48.67,
+            "strategy_return": -3.48,
+            "bnh_return": -4.35,
+            "outperformed_bnh": true
+          },
+          "TSLA": {
+            "trades": 162,
+            "wins": 39,
+            "breakevens": 25,
+            "win_rate": 0.2407,
+            "total_R": 3.2,
+            "strategy_return": 3.8,
+            "bnh_return": -13.11,
+            "outperformed_bnh": true
+          },
+          "AVGO": {
+            "trades": 230,
+            "wins": 58,
+            "breakevens": 23,
+            "win_rate": 0.2522,
+            "total_R": -44.66,
+            "strategy_return": -7.98,
+            "bnh_return": -3.53,
+            "outperformed_bnh": false
+          },
+          "AMD": {
+            "trades": 149,
+            "wins": 49,
+            "breakevens": 16,
+            "win_rate": 0.3289,
+            "total_R": 13.19,
+            "strategy_return": 2.51,
+            "bnh_return": 17.12,
+            "outperformed_bnh": false
+          },
+          "QCOM": {
+            "trades": 233,
+            "wins": 64,
+            "breakevens": 21,
+            "win_rate": 0.2747,
+            "total_R": -20.27,
+            "strategy_return": -6.54,
+            "bnh_return": 10.86,
+            "outperformed_bnh": false
+          },
+          "INTC": {
+            "trades": 160,
+            "wins": 46,
+            "breakevens": 7,
+            "win_rate": 0.2875,
+            "total_R": -17.86,
+            "strategy_return": -5.85,
+            "bnh_return": -4.62,
+            "outperformed_bnh": false
+          },
+          "MU": {
+            "trades": 182,
+            "wins": 49,
+            "breakevens": 25,
+            "win_rate": 0.2692,
+            "total_R": -27.62,
+            "strategy_return": 2.15,
+            "bnh_return": 3.86,
+            "outperformed_bnh": false
+          },
+          "AMAT": {
+            "trades": 189,
+            "wins": 41,
+            "breakevens": 24,
+            "win_rate": 0.2169,
+            "total_R": -42.49,
+            "strategy_return": -16.11,
+            "bnh_return": -26.14,
+            "outperformed_bnh": true
+          },
+          "ADBE": {
+            "trades": 206,
+            "wins": 66,
+            "breakevens": 13,
+            "win_rate": 0.3204,
+            "total_R": -5.47,
+            "strategy_return": 12.65,
+            "bnh_return": 9.26,
+            "outperformed_bnh": true
+          },
+          "CRM": {
+            "trades": 162,
+            "wins": 45,
+            "breakevens": 19,
+            "win_rate": 0.2778,
+            "total_R": -10.4,
+            "strategy_return": 11.1,
+            "bnh_return": 43.6,
+            "outperformed_bnh": false
+          },
+          "ORCL": {
+            "trades": 205,
+            "wins": 49,
+            "breakevens": 19,
+            "win_rate": 0.239,
+            "total_R": -39.38,
+            "strategy_return": -10.95,
+            "bnh_return": -4.34,
+            "outperformed_bnh": false
+          },
+          "CSCO": {
+            "trades": 203,
+            "wins": 50,
+            "breakevens": 18,
+            "win_rate": 0.2463,
+            "total_R": -46.0,
+            "strategy_return": -6.16,
+            "bnh_return": -8.84,
+            "outperformed_bnh": true
+          },
+          "COST": {
+            "trades": 244,
+            "wins": 60,
+            "breakevens": 27,
+            "win_rate": 0.2459,
+            "total_R": -48.06,
+            "strategy_return": -5.62,
+            "bnh_return": -0.44,
+            "outperformed_bnh": false
+          },
+          "WMT": {
+            "trades": 285,
+            "wins": 86,
+            "breakevens": 22,
+            "win_rate": 0.3018,
+            "total_R": -14.26,
+            "strategy_return": 2.96,
+            "bnh_return": -1.23,
+            "outperformed_bnh": true
+          },
+          "KO": {
+            "trades": 254,
+            "wins": 71,
+            "breakevens": 27,
+            "win_rate": 0.2795,
+            "total_R": -23.22,
+            "strategy_return": 4.01,
+            "bnh_return": 7.58,
+            "outperformed_bnh": false
+          },
+          "PEP": {
+            "trades": 351,
+            "wins": 101,
+            "breakevens": 35,
+            "win_rate": 0.2877,
+            "total_R": -27.91,
+            "strategy_return": -3.33,
+            "bnh_return": -10.06,
+            "outperformed_bnh": true
+          },
+          "NFLX": {
+            "trades": 232,
+            "wins": 55,
+            "breakevens": 21,
+            "win_rate": 0.2371,
+            "total_R": -55.58,
+            "strategy_return": -3.05,
+            "bnh_return": -5.35,
+            "outperformed_bnh": true
+          },
+          "JNJ": {
+            "trades": 240,
+            "wins": 69,
+            "breakevens": 26,
+            "win_rate": 0.2875,
+            "total_R": -26.19,
+            "strategy_return": 0.27,
+            "bnh_return": 6.02,
+            "outperformed_bnh": false
+          },
+          "JPM": {
+            "trades": 296,
+            "wins": 83,
+            "breakevens": 26,
+            "win_rate": 0.2804,
+            "total_R": -38.55,
+            "strategy_return": -5.37,
+            "bnh_return": 1.45,
+            "outperformed_bnh": false
+          },
+          "XOM": {
+            "trades": 294,
+            "wins": 83,
+            "breakevens": 28,
+            "win_rate": 0.2823,
+            "total_R": -37.24,
+            "strategy_return": -0.38,
+            "bnh_return": 17.07,
+            "outperformed_bnh": false
+          }
+        }
+      }
+    }
+  },
+  "cross_threshold_stability": [
+    {
+      "metric_name": "Win Rate (%)",
+      "baseline_val": 30.42,
+      "val_075": 23.95,
+      "val_100": 25.6,
+      "val_125": 26.94,
+      "delta_075": -6.47,
+      "delta_100": -4.82,
+      "delta_125": -3.48,
+      "direction": "Decreased vs Baseline (-)",
+      "stability_class": "Stable"
+    },
+    {
+      "metric_name": "Profit Factor",
+      "baseline_val": 0.9388,
+      "val_075": 0.9258,
+      "val_100": 0.9168,
+      "val_125": 0.9229,
+      "delta_075": -0.013,
+      "delta_100": -0.022,
+      "delta_125": -0.0159,
+      "direction": "Decreased vs Baseline (-)",
+      "stability_class": "Stable"
+    },
+    {
+      "metric_name": "Expectancy (%)",
+      "baseline_val": -0.0083,
+      "val_075": -0.0076,
+      "val_100": -0.0094,
+      "val_125": -0.0093,
+      "delta_075": 0.0007,
+      "delta_100": -0.0011,
+      "delta_125": -0.001,
+      "direction": "Mixed / Sign change",
+      "stability_class": "Not robust"
+    },
+    {
+      "metric_name": "Total R",
+      "baseline_val": -738.98,
+      "val_075": -645.11,
+      "val_100": -691.07,
+      "val_125": -730.47,
+      "delta_075": 93.87,
+      "delta_100": 47.91,
+      "delta_125": 8.51,
+      "direction": "Increased vs Baseline (+)",
+      "stability_class": "Stable"
+    },
+    {
+      "metric_name": "Avg R",
+      "baseline_val": -0.1299,
+      "val_075": -0.1134,
+      "val_100": -0.1214,
+      "val_125": -0.1284,
+      "delta_075": 0.0165,
+      "delta_100": 0.0085,
+      "delta_125": 0.0015,
+      "direction": "Increased vs Baseline (+)",
+      "stability_class": "Stable"
+    },
+    {
+      "metric_name": "Max Drawdown (%)",
+      "baseline_val": -58.65,
+      "val_075": -49.0,
+      "val_100": -56.05,
+      "val_125": -57.77,
+      "delta_075": 9.65,
+      "delta_100": 2.6,
+      "delta_125": 0.88,
+      "direction": "Increased vs Baseline (+)",
+      "stability_class": "Stable"
+    },
+    {
+      "metric_name": "Gross Return Comp (%)",
+      "baseline_val": -41.19,
+      "val_075": -37.71,
+      "val_100": -44.25,
+      "val_125": -44.03,
+      "delta_075": 3.48,
+      "delta_100": -3.06,
+      "delta_125": -2.84,
+      "direction": "Mixed / Sign change",
+      "stability_class": "Not robust"
+    },
+    {
+      "metric_name": "5bps Return Comp (%)",
+      "baseline_val": -99.8,
+      "val_075": -99.79,
+      "val_100": -99.81,
+      "val_125": -99.81,
+      "delta_075": 0.01,
+      "delta_100": -0.01,
+      "delta_125": -0.01,
+      "direction": "Mixed / Sign change",
+      "stability_class": "Not robust"
+    },
+    {
+      "metric_name": "10bps Return Comp (%)",
+      "baseline_val": -100.0,
+      "val_075": -100.0,
+      "val_100": -100.0,
+      "val_125": -100.0,
+      "delta_075": 0.0,
+      "delta_100": 0.0,
+      "delta_125": 0.0,
+      "direction": "Mixed / Sign change",
+      "stability_class": "Not robust"
+    },
+    {
+      "metric_name": "BE Trigger Rate (%)",
+      "baseline_val": 0.0,
+      "val_075": 32.35,
+      "val_100": 27.15,
+      "val_125": 22.12,
+      "delta_075": 32.35,
+      "delta_100": 27.15,
+      "delta_125": 22.12,
+      "direction": "Increased vs Baseline (+)",
+      "stability_class": "Stable"
+    },
+    {
+      "metric_name": "BE Exit Rate (% all)",
+      "baseline_val": 0.0,
+      "val_075": 20.0316,
+      "val_100": 14.5844,
+      "val_125": 10.0158,
+      "delta_075": 20.0316,
+      "delta_100": 14.5844,
+      "delta_125": 10.0158,
+      "direction": "Increased vs Baseline (+)",
+      "stability_class": "Stable"
+    },
+    {
+      "metric_name": "STOP Rate (% all)",
+      "baseline_val": 66.491,
+      "val_075": 53.7867,
+      "val_100": 57.301,
+      "val_125": 60.3057,
+      "delta_075": -12.7043,
+      "delta_100": -9.1899,
+      "delta_125": -6.1852,
+      "direction": "Decreased vs Baseline (-)",
+      "stability_class": "Stable"
+    },
+    {
+      "metric_name": "TARGET Rate (% all)",
+      "baseline_val": 25.6194,
+      "val_075": 20.5061,
+      "val_100": 21.7185,
+      "val_125": 22.7904,
+      "delta_075": -5.1133,
+      "delta_100": -3.9009,
+      "delta_125": -2.829,
+      "direction": "Decreased vs Baseline (-)",
+      "stability_class": "Stable"
+    }
+  ],
+  "monotonicity_checks": {
+    "trigger_eligibility_monotonic": true,
+    "trigger_timing_monotonic": true,
+    "trade_count_invariant": true
+  },
+  "pit_summary": {
+    "future_price_mutation_tested": true,
+    "future_volume_mutation_tested": true,
+    "future_structure_mutation_tested": true,
+    "same_bar_safety_tested": true,
+    "session_safety_tested": true,
+    "symbol_isolation_tested": true,
+    "order_independence_tested": true,
+    "all_pit_checks_passed": true
+  },
+  "regression_validation": {
+    "trades_match_5691": true,
+    "baseline_total_r_matches": true,
+    "h2_100_total_r_matches": true,
+    "total_r_delta_matches": true,
+    "be_exits_match_830": true,
+    "stop_to_be_matches_523": true,
+    "target_to_be_matches_222": true,
+    "exact_day07_reproduced": true
+  }
+}

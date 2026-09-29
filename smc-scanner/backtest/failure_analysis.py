@@ -97,12 +97,22 @@ class DiagnosticTradeRecord:
     is_loser: bool
     is_breakeven: bool
 
+    # DAY-07 H2 Dynamic Stop (1R -> Breakeven) fields
+    initial_stop_price: float | None = None
+    initial_risk_per_share: float | None = None
+    breakeven_price: float | None = None
+    be_triggered: bool = False
+    be_trigger_time: pd.Timestamp | None = None
+    effective_exit_stop_price: float | None = None
+
     def to_dict(self) -> dict[str, Any]:
         """JSON serializatsiya uchun toza dict."""
         d = asdict(self)
         d["setup_time"] = str(self.setup_time)
         d["entry_time"] = str(self.entry_time)
         d["exit_time"] = str(self.exit_time)
+        if self.be_trigger_time is not None:
+            d["be_trigger_time"] = str(self.be_trigger_time)
         for k, v in d.items():
             if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
                 d[k] = None
@@ -116,6 +126,8 @@ class DiagnosticTradeRecord:
 def map_exit_reason(raw_reason: str) -> str:
     """Mavjud exit sabablarini standart kategoriya nomlariga xaritalaydi."""
     r = raw_reason.lower()
+    if "breakeven" in r:
+        return "BREAKEVEN"
     if "stop" in r:
         return "STOP"
     if "target" in r:
@@ -352,9 +364,9 @@ def enrich_trade_record(
         stop_dist_pct = None
 
     std_exit_reason = map_exit_reason(trade.exit_reason)
-    is_win = trade.net_return > 0.0
-    is_loss = trade.net_return < 0.0
-    is_be = trade.net_return == 0.0
+    is_be = (std_exit_reason == "BREAKEVEN") or (trade.net_return == 0.0)
+    is_win = trade.net_return > 0.0 and not is_be
+    is_loss = trade.net_return < 0.0 and not is_be
 
     return DiagnosticTradeRecord(
         symbol=trade.symbol,
@@ -400,6 +412,12 @@ def enrich_trade_record(
         is_winner=is_win,
         is_loser=is_loss,
         is_breakeven=is_be,
+        initial_stop_price=getattr(trade, "initial_stop_price", trade.stop_price),
+        initial_risk_per_share=getattr(trade, "initial_risk_per_share", trade.risk_per_share),
+        breakeven_price=getattr(trade, "breakeven_price", None),
+        be_triggered=getattr(trade, "be_triggered", False),
+        be_trigger_time=getattr(trade, "be_trigger_time", None),
+        effective_exit_stop_price=getattr(trade, "effective_exit_stop_price", trade.stop_price),
     )
 
 

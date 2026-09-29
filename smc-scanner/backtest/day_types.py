@@ -39,6 +39,7 @@ class ExecutionConfig:
         DaySetupStatus.DETECTED,
         DaySetupStatus.CONFIRMED,
     )
+    breakeven_trigger_r: float | None = None  # DAY-07 H2: +1R ga yetganda breakeven stopga ko'chirish (masalan 1.0)
 
 
 @dataclass(frozen=True)
@@ -52,7 +53,7 @@ class DayBacktestTrade:
 
     exit_time: pd.Timestamp                # Chiqish vaqti
     exit_price: float                      # Chiqish narxi
-    exit_reason: str                       # "target" | "stop" | "vwap_loss" | "forced_eod" | "end_of_data"
+    exit_reason: str                       # "target" | "stop" | "breakeven" | "vwap_loss" | "forced_eod" | "end_of_data"
 
     stop_price: float | None = None        # Belgilangan stop narxi (mavjud bo'lsa)
     target_price: float | None = None      # Belgilangan target narxi (mavjud bo'lsa)
@@ -77,6 +78,14 @@ class DayBacktestTrade:
     vwap_relation: str = "NO_RECLAIM"
     setup_status: str = "CONFIRMED"
     observed_price_at_setup: float = float("nan")
+
+    # DAY-07 H2 Dynamic Stop (1R -> Breakeven) maydonlari
+    initial_stop_price: float | None = None
+    initial_risk_per_share: float | None = None
+    breakeven_price: float | None = None
+    be_triggered: bool = False
+    be_trigger_time: pd.Timestamp | None = None
+    effective_exit_stop_price: float | None = None
 
 
 @dataclass(frozen=True)

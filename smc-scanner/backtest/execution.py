@@ -107,6 +107,20 @@ def simulate_trade_execution(
     ):
         target_price = raw_entry + config.target_multiple * risk_per_share
 
+    # DAY-07 H2 Dynamic Stop (1R -> Breakeven) holatlari
+    initial_stop_price = stop_price
+    initial_risk_per_share = risk_per_share
+    breakeven_price = raw_entry if config.breakeven_trigger_r is not None else None
+    effective_stop = stop_price
+    be_trigger_price = (
+        raw_entry + config.breakeven_trigger_r * risk_per_share
+        if config.breakeven_trigger_r is not None and risk_per_share is not None and risk_per_share > 0
+        else None
+    )
+    be_armed = False
+    be_active = False
+    be_trigger_time: pd.Timestamp | None = None
+
     # 4. Pozitsiyani entry_idx dan boshlab har bir bar bo'ylab kuzatish
     exit_idx: int = entry_idx
     exit_time: pd.Timestamp = entry_time
@@ -142,8 +156,10 @@ def simulate_trade_execution(
             break
 
         # 4b. Stop va Target tekshiruvi
+        active_stop = effective_stop
+
         hit_target = target_price is not None and bar_high >= target_price
-        hit_stop = stop_price is not None and bar_low <= stop_price
+        hit_stop = active_stop is not None and bar_low <= active_stop
 
         if hit_target and hit_stop:
             # SAME-BAR AMBIGUITY!
@@ -151,24 +167,24 @@ def simulate_trade_execution(
             exit_idx = j
             exit_time = bar_ts
             if config.same_bar_rule == "STOP_FIRST":
-                raw_exit = stop_price  # type: ignore[assignment]
-                exit_reason = "stop"
+                raw_exit = active_stop
+                exit_reason = "breakeven" if be_active else "stop"
             else:
-                raw_exit = target_price  # type: ignore[assignment]
+                raw_exit = target_price
                 exit_reason = "target"
             break
 
         if hit_stop:
             exit_idx = j
             exit_time = bar_ts
-            raw_exit = stop_price  # type: ignore[assignment]
-            exit_reason = "stop"
+            raw_exit = active_stop
+            exit_reason = "breakeven" if be_active else "stop"
             break
 
         if hit_target:
             exit_idx = j
             exit_time = bar_ts
-            raw_exit = target_price  # type: ignore[assignment]
+            raw_exit = target_price
             exit_reason = "target"
             break
 
@@ -190,6 +206,16 @@ def simulate_trade_execution(
             raw_exit = bar_close
             exit_reason = "max_time"
             break
+
+        # 4e. H2 Stop Management: Agar bar j da chiqish bo'lmagan bo'lsa,
+        # yopilgan bar j dagi High >= +1R ekanligini tekshiramiz.
+        # Agar True bo'lsa, BE qurollanadi va KEYINGI barda (j+1) faollashadi.
+        if config.breakeven_trigger_r is not None and not be_armed:
+            if be_trigger_price is not None and bar_high >= be_trigger_price:
+                be_armed = True
+                be_trigger_time = bar_ts
+                be_active = True
+                effective_stop = raw_entry
     else:
         # Ma'lumot tugadi
         exit_idx = n - 1
@@ -244,6 +270,12 @@ def simulate_trade_execution(
             else str(setup.status)
         ),
         observed_price_at_setup=setup.price,
+        initial_stop_price=initial_stop_price,
+        initial_risk_per_share=initial_risk_per_share,
+        breakeven_price=breakeven_price,
+        be_triggered=be_armed,
+        be_trigger_time=be_trigger_time,
+        effective_exit_stop_price=effective_stop,
     )
 
     return ExecutionSimulation(
