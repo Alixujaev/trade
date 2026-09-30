@@ -1,0 +1,1370 @@
+{
+  "metadata": {
+    "description": "DAY-05 Failure Analysis of Frozen DAY-01/DAY-02 Strategy",
+    "execution_model": "Frozen DAY-02 (Next bar open, STOP_FIRST, 2.0R target, SIGNAL_LOW stop)"
+  },
+  "study_period": {
+    "start": "2026-07-02 13:30:00+00:00",
+    "end": "2026-09-25 19:55:00+00:00",
+    "sessions": 60
+  },
+  "universe": [
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "AMZN",
+    "META",
+    "GOOGL",
+    "TSLA",
+    "AVGO",
+    "AMD",
+    "QCOM",
+    "INTC",
+    "MU",
+    "AMAT",
+    "ADBE",
+    "CRM",
+    "ORCL",
+    "CSCO",
+    "COST",
+    "WMT",
+    "KO",
+    "PEP",
+    "NFLX",
+    "JNJ",
+    "JPM",
+    "XOM"
+  ],
+  "total_trades_analyzed": 5691,
+  "time_of_day_analysis": {
+    "09:30–10:00": {
+      "trade_count": 838,
+      "wins": 285,
+      "losses": 553,
+      "breakevens": 0,
+      "win_rate": 34.01,
+      "avg_return": -0.0026,
+      "median_return": -0.2745,
+      "avg_R": -0.0568,
+      "median_R": -1.0,
+      "total_R": -47.59,
+      "profit_factor": 0.99,
+      "expectancy": -0.0026,
+      "avg_hold_duration": 83.5,
+      "percentage_of_all_trades": 14.73
+    },
+    "10:00–11:00": {
+      "trade_count": 728,
+      "wins": 212,
+      "losses": 516,
+      "breakevens": 0,
+      "win_rate": 29.12,
+      "avg_return": -0.0077,
+      "median_return": -0.1046,
+      "avg_R": -0.1397,
+      "median_R": -1.0,
+      "total_R": -101.73,
+      "profit_factor": 0.95,
+      "expectancy": -0.0077,
+      "avg_hold_duration": 24.6,
+      "percentage_of_all_trades": 12.79
+    },
+    "11:00–12:00": {
+      "trade_count": 633,
+      "wins": 166,
+      "losses": 467,
+      "breakevens": 0,
+      "win_rate": 26.22,
+      "avg_return": -0.0346,
+      "median_return": -0.0643,
+      "avg_R": -0.2215,
+      "median_R": -1.0,
+      "total_R": -140.22,
+      "profit_factor": 0.72,
+      "expectancy": -0.0346,
+      "avg_hold_duration": 20.0,
+      "percentage_of_all_trades": 11.12
+    },
+    "12:00–14:00": {
+      "trade_count": 1545,
+      "wins": 487,
+      "losses": 1058,
+      "breakevens": 0,
+      "win_rate": 31.52,
+      "avg_return": 0.0021,
+      "median_return": -0.0346,
+      "avg_R": -0.069,
+      "median_R": -1.0,
+      "total_R": -106.55,
+      "profit_factor": 1.03,
+      "expectancy": 0.0021,
+      "avg_hold_duration": 15.3,
+      "percentage_of_all_trades": 27.15
+    },
+    "14:00–15:00": {
+      "trade_count": 864,
+      "wins": 248,
+      "losses": 616,
+      "breakevens": 0,
+      "win_rate": 28.7,
+      "avg_return": -0.011,
+      "median_return": -0.0383,
+      "avg_R": -0.1667,
+      "median_R": -1.0,
+      "total_R": -144.07,
+      "profit_factor": 0.85,
+      "expectancy": -0.011,
+      "avg_hold_duration": 12.4,
+      "percentage_of_all_trades": 15.18
+    },
+    "15:00–15:55": {
+      "trade_count": 1083,
+      "wins": 333,
+      "losses": 748,
+      "breakevens": 2,
+      "win_rate": 30.75,
+      "avg_return": -0.0105,
+      "median_return": -0.0349,
+      "avg_R": -0.1836,
+      "median_R": -1.0,
+      "total_R": -198.83,
+      "profit_factor": 0.85,
+      "expectancy": -0.0105,
+      "avg_hold_duration": 5.7,
+      "percentage_of_all_trades": 19.03
+    }
+  },
+  "exit_reason_analysis": {
+    "STOP": {
+      "trade_count": 3784,
+      "wins": 0,
+      "losses": 3784,
+      "breakevens": 0,
+      "win_rate": 0.0,
+      "avg_return": -0.1939,
+      "median_return": -0.1033,
+      "avg_R": -1.0,
+      "median_R": -1.0,
+      "total_R": -3784.0,
+      "profit_factor": 0.0,
+      "expectancy": -0.1939,
+      "avg_hold_duration": 12.3,
+      "percentage_of_trades": 66.49
+    },
+    "TARGET": {
+      "trade_count": 1458,
+      "wins": 1458,
+      "losses": 0,
+      "breakevens": 0,
+      "win_rate": 100.0,
+      "avg_return": 0.4164,
+      "median_return": 0.2392,
+      "avg_R": 2.0,
+      "median_R": 2.0,
+      "total_R": 2916.0,
+      "profit_factor": 999.0,
+      "expectancy": 0.4164,
+      "avg_hold_duration": 24.4,
+      "percentage_of_trades": 25.62
+    },
+    "FORCED_EXIT": {
+      "trade_count": 449,
+      "wins": 273,
+      "losses": 174,
+      "breakevens": 2,
+      "win_rate": 60.8,
+      "avg_return": 0.177,
+      "median_return": 0.067,
+      "avg_R": 0.2873,
+      "median_R": 0.2504,
+      "total_R": 129.02,
+      "profit_factor": 3.04,
+      "expectancy": 0.177,
+      "avg_hold_duration": 131.3,
+      "percentage_of_trades": 7.89
+    }
+  },
+  "setup_components": {
+    "vwap_relation": {
+      "VWAP_HOLD": {
+        "trade_count": 4246,
+        "wins": 1257,
+        "losses": 2987,
+        "breakevens": 2,
+        "win_rate": 29.6,
+        "avg_return": -0.0062,
+        "median_return": -0.0388,
+        "avg_R": -0.152,
+        "median_R": -1.0,
+        "total_R": -645.25,
+        "profit_factor": 0.94,
+        "expectancy": -0.0062,
+        "avg_hold_duration": 17.3
+      },
+      "VWAP_RECLAIM": {
+        "trade_count": 1445,
+        "wins": 474,
+        "losses": 971,
+        "breakevens": 0,
+        "win_rate": 32.8,
+        "avg_return": -0.0146,
+        "median_return": -0.1396,
+        "avg_R": -0.0649,
+        "median_R": -1.0,
+        "total_R": -93.74,
+        "profit_factor": 0.94,
+        "expectancy": -0.0146,
+        "avg_hold_duration": 46.8
+      }
+    },
+    "rsi_bins": {
+      "<50": {
+        "trade_count": 1561,
+        "wins": 448,
+        "losses": 1112,
+        "breakevens": 1,
+        "win_rate": 28.7,
+        "avg_return": -0.0141,
+        "median_return": -0.0349,
+        "avg_R": -0.1869,
+        "median_R": -1.0,
+        "total_R": -291.71,
+        "profit_factor": 0.88,
+        "expectancy": -0.0141,
+        "avg_hold_duration": 19.7
+      },
+      "50–55": {
+        "trade_count": 1142,
+        "wins": 345,
+        "losses": 797,
+        "breakevens": 0,
+        "win_rate": 30.21,
+        "avg_return": -0.0137,
+        "median_return": -0.0386,
+        "avg_R": -0.1286,
+        "median_R": -1.0,
+        "total_R": -146.86,
+        "profit_factor": 0.86,
+        "expectancy": -0.0137,
+        "avg_hold_duration": 16.4
+      },
+      "55–60": {
+        "trade_count": 1144,
+        "wins": 345,
+        "losses": 798,
+        "breakevens": 1,
+        "win_rate": 30.16,
+        "avg_return": -0.0194,
+        "median_return": -0.0527,
+        "avg_R": -0.1294,
+        "median_R": -1.0,
+        "total_R": -148.02,
+        "profit_factor": 0.83,
+        "expectancy": -0.0194,
+        "avg_hold_duration": 18.4
+      },
+      "60–70": {
+        "trade_count": 1260,
+        "wins": 403,
+        "losses": 857,
+        "breakevens": 0,
+        "win_rate": 31.98,
+        "avg_return": 0.0042,
+        "median_return": -0.071,
+        "avg_R": -0.0784,
+        "median_R": -1.0,
+        "total_R": -98.81,
+        "profit_factor": 1.03,
+        "expectancy": 0.0042,
+        "avg_hold_duration": 26.5
+      },
+      "70+": {
+        "trade_count": 584,
+        "wins": 190,
+        "losses": 394,
+        "breakevens": 0,
+        "win_rate": 32.53,
+        "avg_return": 0.0123,
+        "median_return": -0.1478,
+        "avg_R": -0.0918,
+        "median_R": -1.0,
+        "total_R": -53.59,
+        "profit_factor": 1.04,
+        "expectancy": 0.0123,
+        "avg_hold_duration": 63.5
+      }
+    },
+    "rvol_bins": {
+      "<1.0": {
+        "trade_count": 3760,
+        "wins": 1129,
+        "losses": 2630,
+        "breakevens": 1,
+        "win_rate": 30.03,
+        "avg_return": -0.0167,
+        "median_return": -0.0498,
+        "avg_R": -0.1373,
+        "median_R": -1.0,
+        "total_R": -516.37,
+        "profit_factor": 0.87,
+        "expectancy": -0.0167,
+        "avg_hold_duration": 23.0
+      },
+      "1.0–2.0": {
+        "trade_count": 1646,
+        "wins": 529,
+        "losses": 1116,
+        "breakevens": 1,
+        "win_rate": 32.14,
+        "avg_return": 0.013,
+        "median_return": -0.0468,
+        "avg_R": -0.0774,
+        "median_R": -1.0,
+        "total_R": -127.37,
+        "profit_factor": 1.09,
+        "expectancy": 0.013,
+        "avg_hold_duration": 27.4
+      },
+      "2.0–3.0": {
+        "trade_count": 189,
+        "wins": 46,
+        "losses": 143,
+        "breakevens": 0,
+        "win_rate": 24.34,
+        "avg_return": -0.0648,
+        "median_return": -0.0983,
+        "avg_R": -0.4215,
+        "median_R": -1.0,
+        "total_R": -79.67,
+        "profit_factor": 0.67,
+        "expectancy": -0.0648,
+        "avg_hold_duration": 32.8
+      },
+      "3.0–5.0": {
+        "trade_count": 66,
+        "wins": 15,
+        "losses": 51,
+        "breakevens": 0,
+        "win_rate": 22.73,
+        "avg_return": -0.0005,
+        "median_return": -0.0678,
+        "avg_R": -0.3032,
+        "median_R": -1.0,
+        "total_R": -20.01,
+        "profit_factor": 1.0,
+        "expectancy": -0.0005,
+        "avg_hold_duration": 35.5
+      },
+      "5.0+": {
+        "trade_count": 30,
+        "wins": 12,
+        "losses": 18,
+        "breakevens": 0,
+        "win_rate": 40.0,
+        "avg_return": 0.2171,
+        "median_return": -0.0333,
+        "avg_R": 0.1479,
+        "median_R": -1.0,
+        "total_R": 4.44,
+        "profit_factor": 3.86,
+        "expectancy": 0.2171,
+        "avg_hold_duration": 33.3
+      }
+    },
+    "trigger_type": {
+      "none": {
+        "trade_count": 2955,
+        "wins": 870,
+        "losses": 2084,
+        "breakevens": 1,
+        "win_rate": 29.44,
+        "avg_return": -0.0055,
+        "median_return": -0.0359,
+        "avg_R": -0.1532,
+        "median_R": -1.0,
+        "total_R": -452.81,
+        "profit_factor": 0.94,
+        "expectancy": -0.0055,
+        "avg_hold_duration": 14.8
+      },
+      "bullish CHoCH": {
+        "trade_count": 816,
+        "wins": 264,
+        "losses": 551,
+        "breakevens": 1,
+        "win_rate": 32.35,
+        "avg_return": -0.0011,
+        "median_return": -0.0782,
+        "avg_R": -0.0773,
+        "median_R": -1.0,
+        "total_R": -63.09,
+        "profit_factor": 0.99,
+        "expectancy": -0.0011,
+        "avg_hold_duration": 39.4
+      },
+      "previous candle high break": {
+        "trade_count": 944,
+        "wins": 299,
+        "losses": 645,
+        "breakevens": 0,
+        "win_rate": 31.67,
+        "avg_return": -0.0235,
+        "median_return": -0.1107,
+        "avg_R": -0.0979,
+        "median_R": -1.0,
+        "total_R": -92.38,
+        "profit_factor": 0.88,
+        "expectancy": -0.0235,
+        "avg_hold_duration": 37.2
+      },
+      "bullish BOS": {
+        "trade_count": 976,
+        "wins": 298,
+        "losses": 678,
+        "breakevens": 0,
+        "win_rate": 30.53,
+        "avg_return": -0.0082,
+        "median_return": -0.0523,
+        "avg_R": -0.1339,
+        "median_R": -1.0,
+        "total_R": -130.71,
+        "profit_factor": 0.95,
+        "expectancy": -0.0082,
+        "avg_hold_duration": 30.7
+      }
+    },
+    "mtf_structure": {
+      "NEUTRAL": {
+        "trade_count": 41,
+        "wins": 15,
+        "losses": 26,
+        "breakevens": 0,
+        "win_rate": 36.59,
+        "avg_return": 0.0717,
+        "median_return": -0.027,
+        "avg_R": 0.0514,
+        "median_R": -1.0,
+        "total_R": 2.11,
+        "profit_factor": 1.75,
+        "expectancy": 0.0717,
+        "avg_hold_duration": 24.8
+      },
+      "BULLISH": {
+        "trade_count": 5650,
+        "wins": 1716,
+        "losses": 3932,
+        "breakevens": 2,
+        "win_rate": 30.37,
+        "avg_return": -0.0089,
+        "median_return": -0.0507,
+        "avg_R": -0.1312,
+        "median_R": -1.0,
+        "total_R": -741.09,
+        "profit_factor": 0.93,
+        "expectancy": -0.0089,
+        "avg_hold_duration": 24.8
+      }
+    }
+  },
+  "repeated_entry_analysis": {
+    "total_traded_symbol_sessions": 1168,
+    "frequency_distribution": {
+      "1_trade": {
+        "sessions": 346,
+        "pct": 29.62
+      },
+      "2_trades": {
+        "sessions": 148,
+        "pct": 12.67
+      },
+      "3_trades": {
+        "sessions": 122,
+        "pct": 10.45
+      },
+      "4_trades": {
+        "sessions": 88,
+        "pct": 7.53
+      },
+      "5plus_trades": {
+        "sessions": 464,
+        "pct": 39.73
+      }
+    },
+    "threshold_summary": {
+      "sessions_ge_2_trades": {
+        "count": 822,
+        "pct": 70.38
+      },
+      "sessions_ge_3_trades": {
+        "count": 674,
+        "pct": 57.71
+      },
+      "sessions_ge_5_trades": {
+        "count": 464,
+        "pct": 39.73
+      }
+    }
+  },
+  "consecutive_loss_analysis": {
+    "max_consecutive_losses_global": 19,
+    "avg_loss_streak_length": 3.44,
+    "total_loss_sequences": 1149,
+    "streak_length_distribution": {
+      "1_loss": 345,
+      "3_losses": 170,
+      "2_losses": 236,
+      "4_losses": 114,
+      "6_to_10_losses": 172,
+      "5_losses": 70,
+      "10plus_losses": 42
+    },
+    "max_streak_by_symbol": {
+      "AAPL": 9,
+      "MSFT": 15,
+      "NVDA": 19,
+      "AMZN": 11,
+      "META": 13,
+      "GOOGL": 16,
+      "TSLA": 12,
+      "AVGO": 17,
+      "AMD": 7,
+      "QCOM": 12,
+      "INTC": 13,
+      "MU": 9,
+      "AMAT": 11,
+      "ADBE": 12,
+      "CRM": 11,
+      "ORCL": 15,
+      "CSCO": 14,
+      "COST": 15,
+      "WMT": 13,
+      "KO": 10,
+      "PEP": 17,
+      "NFLX": 15,
+      "JNJ": 10,
+      "JPM": 10,
+      "XOM": 11
+    }
+  },
+  "holding_duration_analysis": {
+    "0–5 min": {
+      "trade_count": 2869,
+      "wins": 595,
+      "losses": 2273,
+      "breakevens": 1,
+      "win_rate": 20.74,
+      "avg_return": -0.0502,
+      "median_return": -0.0375,
+      "avg_R": -0.3975,
+      "median_R": -1.0,
+      "total_R": -1140.43,
+      "profit_factor": 0.41,
+      "expectancy": -0.0502,
+      "avg_hold_duration": 0.0,
+      "percentage_of_trades": 50.41,
+      "exit_reasons": {
+        "STOP": 2207,
+        "TARGET": 534,
+        "FORCED_EXIT": 128
+      }
+    },
+    "5–10 min": {
+      "trade_count": 755,
+      "wins": 245,
+      "losses": 509,
+      "breakevens": 1,
+      "win_rate": 32.45,
+      "avg_return": -0.0518,
+      "median_return": -0.0848,
+      "avg_R": -0.0373,
+      "median_R": -1.0,
+      "total_R": -28.2,
+      "profit_factor": 0.66,
+      "expectancy": -0.0518,
+      "avg_hold_duration": 5.0,
+      "percentage_of_trades": 13.27,
+      "exit_reasons": {
+        "TARGET": 231,
+        "STOP": 499,
+        "FORCED_EXIT": 25
+      }
+    },
+    "10–20 min": {
+      "trade_count": 713,
+      "wins": 266,
+      "losses": 447,
+      "breakevens": 0,
+      "win_rate": 37.31,
+      "avg_return": -0.0424,
+      "median_return": -0.0955,
+      "avg_R": 0.095,
+      "median_R": -1.0,
+      "total_R": 67.7,
+      "profit_factor": 0.77,
+      "expectancy": -0.0424,
+      "avg_hold_duration": 11.8,
+      "percentage_of_trades": 12.53,
+      "exit_reasons": {
+        "TARGET": 242,
+        "STOP": 432,
+        "FORCED_EXIT": 39
+      }
+    },
+    "20–30 min": {
+      "trade_count": 350,
+      "wins": 146,
+      "losses": 204,
+      "breakevens": 0,
+      "win_rate": 41.71,
+      "avg_return": 0.009,
+      "median_return": -0.0982,
+      "avg_R": 0.2042,
+      "median_R": -1.0,
+      "total_R": 71.49,
+      "profit_factor": 1.05,
+      "expectancy": 0.009,
+      "avg_hold_duration": 22.1,
+      "percentage_of_trades": 6.15,
+      "exit_reasons": {
+        "FORCED_EXIT": 29,
+        "TARGET": 126,
+        "STOP": 195
+      }
+    },
+    "30–60 min": {
+      "trade_count": 442,
+      "wins": 178,
+      "losses": 264,
+      "breakevens": 0,
+      "win_rate": 40.27,
+      "avg_return": 0.0143,
+      "median_return": -0.1302,
+      "avg_R": 0.1711,
+      "median_R": -1.0,
+      "total_R": 75.61,
+      "profit_factor": 1.06,
+      "expectancy": 0.0143,
+      "avg_hold_duration": 39.9,
+      "percentage_of_trades": 7.77,
+      "exit_reasons": {
+        "STOP": 254,
+        "TARGET": 158,
+        "FORCED_EXIT": 30
+      }
+    },
+    "60–120 min": {
+      "trade_count": 261,
+      "wins": 119,
+      "losses": 142,
+      "breakevens": 0,
+      "win_rate": 45.59,
+      "avg_return": 0.1407,
+      "median_return": -0.1322,
+      "avg_R": 0.2756,
+      "median_R": -1.0,
+      "total_R": 71.93,
+      "profit_factor": 1.61,
+      "expectancy": 0.1407,
+      "avg_hold_duration": 82.0,
+      "percentage_of_trades": 4.59,
+      "exit_reasons": {
+        "STOP": 128,
+        "TARGET": 94,
+        "FORCED_EXIT": 39
+      }
+    },
+    "120+ min": {
+      "trade_count": 301,
+      "wins": 182,
+      "losses": 119,
+      "breakevens": 0,
+      "win_rate": 60.47,
+      "avg_return": 0.398,
+      "median_return": 0.2959,
+      "avg_R": 0.4748,
+      "median_R": 0.4213,
+      "total_R": 142.92,
+      "profit_factor": 3.04,
+      "expectancy": 0.398,
+      "avg_hold_duration": 272.4,
+      "percentage_of_trades": 5.29,
+      "exit_reasons": {
+        "FORCED_EXIT": 159,
+        "TARGET": 73,
+        "STOP": 69
+      }
+    }
+  },
+  "mfe_mae_analysis": {
+    "all_trades": {
+      "mean_mfe_pct": 0.2698,
+      "median_mfe_pct": 0.1305,
+      "mean_mae_pct": -0.2449,
+      "median_mae_pct": -0.1459,
+      "mean_mfe_r": 2.9195,
+      "median_mfe_r": 1.3201,
+      "mean_mae_r": -2.4638,
+      "median_mae_r": -1.2002
+    },
+    "winners": {
+      "mean_mfe_r": 4.306,
+      "median_mfe_r": 2.389,
+      "mean_mae_r": -0.4157,
+      "median_mae_r": -0.3676
+    },
+    "losers": {
+      "mean_mfe_r": 2.3142,
+      "median_mfe_r": 0.731,
+      "mean_mae_r": -3.3605,
+      "median_mae_r": -1.521
+    }
+  },
+  "target_excursion_analysis": {
+    "all_trades_reach": {
+      "reached_0_5R": {
+        "count": 4147,
+        "pct": 72.87
+      },
+      "reached_1_0R": {
+        "count": 3259,
+        "pct": 57.27
+      },
+      "reached_1_5R": {
+        "count": 2659,
+        "pct": 46.72
+      },
+      "reached_2_0R": {
+        "count": 2209,
+        "pct": 38.82
+      }
+    },
+    "losers_that_moved_favorably": {
+      "losing_trades_count": 3958,
+      "reached_0_5R_then_lost": {
+        "count": 2434,
+        "pct": 61.5
+      },
+      "reached_1_0R_then_lost": {
+        "count": 1604,
+        "pct": 40.53
+      },
+      "reached_1_5R_then_lost": {
+        "count": 1075,
+        "pct": 27.16
+      }
+    }
+  },
+  "stop_distance_analysis": {
+    "<0.25%": {
+      "trade_count": 4175,
+      "wins": 1217,
+      "losses": 2957,
+      "breakevens": 1,
+      "win_rate": 29.15,
+      "avg_return": -0.0038,
+      "median_return": -0.038,
+      "avg_R": -0.1476,
+      "median_R": -1.0,
+      "total_R": -616.05,
+      "profit_factor": 0.94,
+      "expectancy": -0.0038,
+      "avg_hold_duration": 7.5
+    },
+    "0.25–0.50%": {
+      "trade_count": 887,
+      "wins": 285,
+      "losses": 601,
+      "breakevens": 1,
+      "win_rate": 32.13,
+      "avg_return": -0.0365,
+      "median_return": -0.2815,
+      "avg_R": -0.1119,
+      "median_R": -1.0,
+      "total_R": -99.22,
+      "profit_factor": 0.84,
+      "expectancy": -0.0365,
+      "avg_hold_duration": 42.6
+    },
+    "0.50–1.00%": {
+      "trade_count": 458,
+      "wins": 151,
+      "losses": 307,
+      "breakevens": 0,
+      "win_rate": 32.97,
+      "avg_return": -0.0868,
+      "median_return": -0.5523,
+      "avg_R": -0.1184,
+      "median_R": -1.0,
+      "total_R": -54.21,
+      "profit_factor": 0.81,
+      "expectancy": -0.0868,
+      "avg_hold_duration": 97.0
+    },
+    "1.00–2.00%": {
+      "trade_count": 160,
+      "wins": 71,
+      "losses": 89,
+      "breakevens": 0,
+      "win_rate": 44.38,
+      "avg_return": 0.241,
+      "median_return": -0.392,
+      "avg_R": 0.1904,
+      "median_R": -0.268,
+      "total_R": 30.46,
+      "profit_factor": 1.38,
+      "expectancy": 0.241,
+      "avg_hold_duration": 153.8
+    },
+    "2.00%+": {
+      "trade_count": 11,
+      "wins": 7,
+      "losses": 4,
+      "breakevens": 0,
+      "win_rate": 63.64,
+      "avg_return": 0.1736,
+      "median_return": 0.6643,
+      "avg_R": 0.0028,
+      "median_R": 0.2977,
+      "total_R": 0.03,
+      "profit_factor": 1.27,
+      "expectancy": 0.1736,
+      "avg_hold_duration": 256.8
+    }
+  },
+  "signal_entry_gap_analysis": {
+    "negative gap (<-0.05%)": {
+      "trade_count": 101,
+      "wins": 32,
+      "losses": 69,
+      "breakevens": 0,
+      "win_rate": 31.68,
+      "avg_return": -0.0435,
+      "median_return": -0.1962,
+      "avg_R": -0.1146,
+      "median_R": -1.0,
+      "total_R": -11.57,
+      "profit_factor": 0.85,
+      "expectancy": -0.0435,
+      "avg_hold_duration": 37.2
+    },
+    "near-zero gap (-0.05% to +0.05%)": {
+      "trade_count": 5493,
+      "wins": 1674,
+      "losses": 3817,
+      "breakevens": 2,
+      "win_rate": 30.48,
+      "avg_return": -0.0051,
+      "median_return": -0.0484,
+      "avg_R": -0.1284,
+      "median_R": -1.0,
+      "total_R": -705.05,
+      "profit_factor": 0.96,
+      "expectancy": -0.0051,
+      "avg_hold_duration": 24.0
+    },
+    "positive gap (>+0.05%)": {
+      "trade_count": 97,
+      "wins": 25,
+      "losses": 72,
+      "breakevens": 0,
+      "win_rate": 25.77,
+      "avg_return": -0.1517,
+      "median_return": -0.263,
+      "avg_R": -0.2305,
+      "median_R": -1.0,
+      "total_R": -22.36,
+      "profit_factor": 0.66,
+      "expectancy": -0.1517,
+      "avg_hold_duration": 55.8
+    }
+  },
+  "slippage_diagnosis": {
+    "avg_gross_edge_pct": -0.0083,
+    "median_gross_edge_pct": -0.0504,
+    "avg_net_edge_0bps_pct": -0.0083,
+    "slippage_sensitivity_summary": {
+      "0 bps": {
+        "compounded_return_pct": -41.186892698336564,
+        "avg_trade_return_pct": -0.00831719344746732,
+        "win_rate": 0.30416447021613074
+      },
+      "5 bps": {
+        "compounded_return_pct": -99.80143439524063,
+        "avg_trade_return_pct": -0.10825890539803355,
+        "win_rate": 0.24125812686698295
+      },
+      "10 bps": {
+        "compounded_return_pct": -99.99932960203925,
+        "avg_trade_return_pct": -0.20810077547853056,
+        "win_rate": 0.17694605517483747
+      }
+    },
+    "per_trade_friction_analysis": {
+      "round_trip_friction_5bps_pct": 0.1,
+      "round_trip_friction_10bps_pct": 0.2,
+      "average_trades_per_symbol": 227.6,
+      "friction_drag_mechanism": "With an average gross edge near zero (-0.01%), incurring 10 bps round-trip friction across ~228 trades per symbol creates an inescapable ~22.8% drag per symbol, which compounds geometrically to -99.8% portfolio decay."
+    }
+  },
+  "market_context_analysis": {
+    "SPY_positive_days": {
+      "trades": 2617,
+      "win_rate": 0.32823844096293464,
+      "avg_return": 0.028107394441894855
+    },
+    "SPY_negative_days": {
+      "trades": 3074,
+      "win_rate": 0.2836694860117111,
+      "avg_return": -0.039326675069608116
+    },
+    "QQQ_positive_days": {
+      "trades": 2486,
+      "win_rate": 0.3242156074014481,
+      "avg_return": 0.02469873401062724
+    },
+    "QQQ_negative_days": {
+      "trades": 3205,
+      "win_rate": 0.28861154446177845,
+      "avg_return": -0.03392642766301275
+    }
+  },
+  "symbol_concentration": {
+    "per_symbol_breakdown": [
+      {
+        "symbol": "AAPL",
+        "trades": 281,
+        "pct_of_all_trades": 4.94,
+        "total_R": -2.25,
+        "win_rate": 36.3,
+        "avg_return": 0.0336
+      },
+      {
+        "symbol": "MSFT",
+        "trades": 252,
+        "pct_of_all_trades": 4.43,
+        "total_R": -43.27,
+        "win_rate": 29.76,
+        "avg_return": 0.002
+      },
+      {
+        "symbol": "NVDA",
+        "trades": 204,
+        "pct_of_all_trades": 3.58,
+        "total_R": -40.35,
+        "win_rate": 27.94,
+        "avg_return": -0.0048
+      },
+      {
+        "symbol": "AMZN",
+        "trades": 274,
+        "pct_of_all_trades": 4.81,
+        "total_R": -68.97,
+        "win_rate": 27.37,
+        "avg_return": -0.0398
+      },
+      {
+        "symbol": "META",
+        "trades": 157,
+        "pct_of_all_trades": 2.76,
+        "total_R": -12.07,
+        "win_rate": 30.57,
+        "avg_return": -0.0503
+      },
+      {
+        "symbol": "GOOGL",
+        "trades": 246,
+        "pct_of_all_trades": 4.32,
+        "total_R": -50.6,
+        "win_rate": 27.64,
+        "avg_return": -0.0044
+      },
+      {
+        "symbol": "TSLA",
+        "trades": 162,
+        "pct_of_all_trades": 2.85,
+        "total_R": -7.58,
+        "win_rate": 27.16,
+        "avg_return": 0.0255
+      },
+      {
+        "symbol": "AVGO",
+        "trades": 230,
+        "pct_of_all_trades": 4.04,
+        "total_R": -45.67,
+        "win_rate": 28.7,
+        "avg_return": -0.0293
+      },
+      {
+        "symbol": "AMD",
+        "trades": 149,
+        "pct_of_all_trades": 2.62,
+        "total_R": 9.67,
+        "win_rate": 36.24,
+        "avg_return": 0.0223
+      },
+      {
+        "symbol": "QCOM",
+        "trades": 233,
+        "pct_of_all_trades": 4.09,
+        "total_R": -25.69,
+        "win_rate": 29.61,
+        "avg_return": -0.0379
+      },
+      {
+        "symbol": "INTC",
+        "trades": 160,
+        "pct_of_all_trades": 2.81,
+        "total_R": -9.3,
+        "win_rate": 31.87,
+        "avg_return": -0.02
+      },
+      {
+        "symbol": "MU",
+        "trades": 182,
+        "pct_of_all_trades": 3.2,
+        "total_R": -29.4,
+        "win_rate": 31.32,
+        "avg_return": 0.0136
+      },
+      {
+        "symbol": "AMAT",
+        "trades": 189,
+        "pct_of_all_trades": 3.32,
+        "total_R": -50.11,
+        "win_rate": 24.87,
+        "avg_return": -0.1002
+      },
+      {
+        "symbol": "ADBE",
+        "trades": 206,
+        "pct_of_all_trades": 3.62,
+        "total_R": -6.59,
+        "win_rate": 33.98,
+        "avg_return": 0.0539
+      },
+      {
+        "symbol": "CRM",
+        "trades": 162,
+        "pct_of_all_trades": 2.85,
+        "total_R": -4.93,
+        "win_rate": 33.95,
+        "avg_return": 0.0664
+      },
+      {
+        "symbol": "ORCL",
+        "trades": 205,
+        "pct_of_all_trades": 3.6,
+        "total_R": -38.64,
+        "win_rate": 27.32,
+        "avg_return": -0.0556
+      },
+      {
+        "symbol": "CSCO",
+        "trades": 203,
+        "pct_of_all_trades": 3.57,
+        "total_R": -43.16,
+        "win_rate": 28.08,
+        "avg_return": -0.0314
+      },
+      {
+        "symbol": "COST",
+        "trades": 244,
+        "pct_of_all_trades": 4.29,
+        "total_R": -50.2,
+        "win_rate": 28.28,
+        "avg_return": -0.0325
+      },
+      {
+        "symbol": "WMT",
+        "trades": 285,
+        "pct_of_all_trades": 5.01,
+        "total_R": -23.48,
+        "win_rate": 31.58,
+        "avg_return": 0.0088
+      },
+      {
+        "symbol": "KO",
+        "trades": 254,
+        "pct_of_all_trades": 4.46,
+        "total_R": -32.88,
+        "win_rate": 30.31,
+        "avg_return": 0.0099
+      },
+      {
+        "symbol": "PEP",
+        "trades": 351,
+        "pct_of_all_trades": 6.17,
+        "total_R": -16.91,
+        "win_rate": 33.05,
+        "avg_return": -0.0065
+      },
+      {
+        "symbol": "NFLX",
+        "trades": 232,
+        "pct_of_all_trades": 4.08,
+        "total_R": -56.08,
+        "win_rate": 26.72,
+        "avg_return": -0.0085
+      },
+      {
+        "symbol": "JNJ",
+        "trades": 240,
+        "pct_of_all_trades": 4.22,
+        "total_R": -24.55,
+        "win_rate": 32.5,
+        "avg_return": 0.0024
+      },
+      {
+        "symbol": "JPM",
+        "trades": 296,
+        "pct_of_all_trades": 5.2,
+        "total_R": -41.34,
+        "win_rate": 30.74,
+        "avg_return": -0.0229
+      },
+      {
+        "symbol": "XOM",
+        "trades": 294,
+        "pct_of_all_trades": 5.17,
+        "total_R": -24.65,
+        "win_rate": 32.99,
+        "avg_return": 0.0022
+      }
+    ],
+    "top5_by_trade_volume": {
+      "symbols": [
+        "PEP",
+        "JPM",
+        "XOM",
+        "WMT",
+        "AAPL"
+      ],
+      "total_trades": 1507,
+      "pct_of_all_trades": 26.48
+    },
+    "top5_by_negative_R": {
+      "symbols": [
+        "AMZN",
+        "NFLX",
+        "GOOGL",
+        "COST",
+        "AMAT"
+      ],
+      "total_R": -275.96,
+      "pct_of_all_negative_R": 36.86
+    }
+  },
+  "daily_distribution": {
+    "total_symbol_sessions": 1168,
+    "positive_symbol_days": {
+      "count": 495,
+      "pct": 42.38
+    },
+    "negative_symbol_days": {
+      "count": 673,
+      "pct": 57.62
+    },
+    "flat_symbol_days": {
+      "count": 0,
+      "pct": 0.0
+    },
+    "mean_daily_return_pct": -0.0405,
+    "median_daily_return_pct": -0.1698,
+    "max_daily_gain_pct": 5.7722,
+    "max_daily_loss_pct": -4.2438
+  },
+  "failure_taxonomy": {
+    "EARLY_STOP": {
+      "trade_count": 3138,
+      "wins": 0,
+      "losses": 3138,
+      "breakevens": 0,
+      "win_rate": 0.0,
+      "avg_return": -0.1515,
+      "median_return": -0.0815,
+      "avg_R": -1.0,
+      "median_R": -1.0,
+      "total_R": -3138.0,
+      "profit_factor": 0.0,
+      "expectancy": -0.1515,
+      "avg_hold_duration": 2.4,
+      "percentage_of_all_trades": 55.14
+    },
+    "EXTENDED_HOLD": {
+      "trade_count": 562,
+      "wins": 301,
+      "losses": 261,
+      "breakevens": 0,
+      "win_rate": 53.56,
+      "avg_return": 0.2785,
+      "median_return": 0.1161,
+      "avg_R": 0.3823,
+      "median_R": 0.2228,
+      "total_R": 214.85,
+      "profit_factor": 2.32,
+      "expectancy": 0.2785,
+      "avg_hold_duration": 184.0,
+      "percentage_of_all_trades": 9.88
+    },
+    "FORCED_EXIT": {
+      "trade_count": 449,
+      "wins": 273,
+      "losses": 174,
+      "breakevens": 2,
+      "win_rate": 60.8,
+      "avg_return": 0.177,
+      "median_return": 0.067,
+      "avg_R": 0.2873,
+      "median_R": 0.2504,
+      "total_R": 129.02,
+      "profit_factor": 3.04,
+      "expectancy": 0.177,
+      "avg_hold_duration": 131.3,
+      "percentage_of_all_trades": 7.89
+    },
+    "REPEATED_ENTRY": {
+      "trade_count": 5049,
+      "wins": 1517,
+      "losses": 3530,
+      "breakevens": 2,
+      "win_rate": 30.05,
+      "avg_return": -0.0091,
+      "median_return": -0.047,
+      "avg_R": -0.1255,
+      "median_R": -1.0,
+      "total_R": -633.68,
+      "profit_factor": 0.92,
+      "expectancy": -0.0091,
+      "avg_hold_duration": 13.9,
+      "percentage_of_all_trades": 88.72
+    },
+    "LOW_RVOL": {
+      "trade_count": 5350,
+      "wins": 1639,
+      "losses": 3709,
+      "breakevens": 2,
+      "win_rate": 30.64,
+      "avg_return": -0.0085,
+      "median_return": -0.0497,
+      "avg_R": -0.1205,
+      "median_R": -1.0,
+      "total_R": -644.74,
+      "profit_factor": 0.94,
+      "expectancy": -0.0085,
+      "avg_hold_duration": 24.3,
+      "percentage_of_all_trades": 94.01
+    },
+    "HIGH_RVOL": {
+      "trade_count": 96,
+      "wins": 27,
+      "losses": 69,
+      "breakevens": 0,
+      "win_rate": 28.12,
+      "avg_return": 0.0675,
+      "median_return": -0.0511,
+      "avg_R": -0.1623,
+      "median_R": -1.0,
+      "total_R": -15.58,
+      "profit_factor": 1.44,
+      "expectancy": 0.0675,
+      "avg_hold_duration": 34.8,
+      "percentage_of_all_trades": 1.69
+    },
+    "LOW_RSI": {
+      "trade_count": 2703,
+      "wins": 793,
+      "losses": 1909,
+      "breakevens": 1,
+      "win_rate": 29.34,
+      "avg_return": -0.0139,
+      "median_return": -0.0362,
+      "avg_R": -0.1623,
+      "median_R": -1.0,
+      "total_R": -438.56,
+      "profit_factor": 0.87,
+      "expectancy": -0.0139,
+      "avg_hold_duration": 18.3,
+      "percentage_of_all_trades": 47.5
+    },
+    "HIGH_RSI": {
+      "trade_count": 1022,
+      "wins": 340,
+      "losses": 682,
+      "breakevens": 0,
+      "win_rate": 33.27,
+      "avg_return": 0.0191,
+      "median_return": -0.0977,
+      "avg_R": -0.0579,
+      "median_R": -1.0,
+      "total_R": -59.22,
+      "profit_factor": 1.08,
+      "expectancy": 0.0191,
+      "avg_hold_duration": 49.3,
+      "percentage_of_all_trades": 17.96
+    },
+    "BEARISH_15M_CONTEXT": {
+      "trade_count": 0,
+      "wins": 0,
+      "losses": 0,
+      "breakevens": 0,
+      "win_rate": 0.0,
+      "avg_return": 0.0,
+      "median_return": 0.0,
+      "avg_R": 0.0,
+      "median_R": 0.0,
+      "total_R": 0.0,
+      "profit_factor": 0.0,
+      "expectancy": 0.0,
+      "avg_hold_duration": 0.0,
+      "percentage_of_all_trades": 0.0
+    },
+    "VWAP_RECLAIM_FAILURE": {
+      "trade_count": 1524,
+      "wins": 0,
+      "losses": 1524,
+      "breakevens": 0,
+      "win_rate": 0.0,
+      "avg_return": -0.2656,
+      "median_return": -0.1552,
+      "avg_R": -0.9925,
+      "median_R": -1.0,
+      "total_R": -1512.51,
+      "profit_factor": 0.0,
+      "expectancy": -0.2656,
+      "avg_hold_duration": 9.1,
+      "percentage_of_all_trades": 26.78
+    },
+    "ENTRY_GAP": {
+      "trade_count": 34,
+      "wins": 8,
+      "losses": 26,
+      "breakevens": 0,
+      "win_rate": 23.53,
+      "avg_return": -0.277,
+      "median_return": -0.3197,
+      "avg_R": -0.2708,
+      "median_R": -1.0,
+      "total_R": -9.21,
+      "profit_factor": 0.49,
+      "expectancy": -0.277,
+      "avg_hold_duration": 79.1,
+      "percentage_of_all_trades": 0.6
+    },
+    "FRICTION_SENSITIVE": {
+      "trade_count": 0,
+      "wins": 0,
+      "losses": 0,
+      "breakevens": 0,
+      "win_rate": 0.0,
+      "avg_return": 0.0,
+      "median_return": 0.0,
+      "avg_R": 0.0,
+      "median_R": 0.0,
+      "total_R": 0.0,
+      "profit_factor": 0.0,
+      "expectancy": 0.0,
+      "avg_hold_duration": 0.0,
+      "percentage_of_all_trades": 0.0
+    }
+  }
+}

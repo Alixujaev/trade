@@ -1,0 +1,150 @@
+=====================================================================================
+DAY-07 — H2 Dynamic Stop Management
+Hypothesis: 1R → Breakeven
+Universe: 25 equities
+Period: 2026-07-02 → 2026-09-25
+Sessions: 60
+Entry: next 5m OPEN
+Initial Stop: SIGNAL_LOW
+Target: 2.0R
+BE Trigger: closed 5m HIGH >= entry + 1R
+BE Activation: next 5m bar onward (effective_stop = entry)
+Forced Exit: 15:55 ET
+Slippage: 0 / 5 / 10 bps
+=====================================================================================
+
+-------------------------------------------------------------------------------------
+1. STRATEGY COMPARISON TABLE (Frozen Baseline vs H2-01)
+-------------------------------------------------------------------------------------
+Metric                    |     Baseline |     H2 1R→BE |        Delta
+---------------------------------------------------------------------
+Trades                    |         5691 |         5691 |            0
+Win rate                  |       30.42% |       25.60% |       -4.82%
+PF                        |         0.94 |         0.92 |        -0.02
+Expectancy (%)            |     -0.0083% |     -0.0094% |     -0.0011%
+Total R                   |      -739.0R |      -691.1R |       +47.9R
+Avg R                     |     -0.1299R |     -0.1214R |     +0.0085R
+Median R                  |     -1.0000R |     -1.0000R |     +0.0000R
+R Std                     |       1.4304 |       1.3356 |      -0.0948
+Max DD (%)                |      -58.65% |      -56.05% |       +2.60%
+Gross return (comp)       |      -41.19% |      -44.25% |       -3.06%
+Gross return (mean sym)   |       -1.86% |       -2.07% |       -0.21%
+5bps return (comp)        |      -99.80% |      -99.81% |       -0.01%
+10bps return (comp)       |     -100.00% |     -100.00% |       +0.00%
+Avg Hold (mins)           |         24.8 |         19.0 |         -5.8
+---------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+2. EXIT REASON DISTRIBUTION
+-------------------------------------------------------------------------------------
+Exit Reason        |     Baseline |     H2 1R→BE |   Baseline % |         H2 %
+---------------------------------------------------------------------------
+STOP               |         3784 |         3261 |       66.49% |       57.30%
+BREAKEVEN          |            0 |          830 |        0.00% |       14.58%
+TARGET             |         1458 |         1236 |       25.62% |       21.72%
+FORCED_EXIT        |          449 |          364 |        7.89% |        6.40%
+---------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+3. BREAKEVEN MANAGEMENT DIAGNOSTICS
+-------------------------------------------------------------------------------------
+Total trades evaluated         : 5,691
+BE-triggered trades (High>=1R) : 1,545 (27.15%)
+Follow-through among BE-triggered trades:
+  - Exited at BREAKEVEN        : 830 (53.72%)
+  - Reached TARGET (+2R)       : 623 (40.32%)
+  - Forced Exit (15:55 ET)     : 92 (5.95%)
+  - Exited at Loss (<0.0)      : 9 (0.58%)
+
+-------------------------------------------------------------------------------------
+4. PAIRED COUNTERFACTUAL TRANSITION MATRIX
+-------------------------------------------------------------------------------------
+How individual trades transformed from Baseline -> H2:
+  Baseline STOP        -> H2 BREAKEVEN   : 523 trades (losses successfully neutralized)
+  Baseline STOP        -> H2 TARGET      : 0 trades
+  Baseline TARGET      -> H2 BREAKEVEN   : 222 trades (winners cut prematurely!)
+  Baseline TARGET      -> H2 TARGET      : 1,236 trades (full target preserved)
+  Baseline FORCED_EXIT -> H2 BREAKEVEN   : 85 trades
+  Baseline FORCED_EXIT -> H2 FORCED_EXIT : 364 trades
+  Total R Delta (H2 - Baseline)          : +47.91R
+
+-------------------------------------------------------------------------------------
+5. GIVE-BACK DIAGNOSTIC (Trades reaching MFE >= 1.0R)
+-------------------------------------------------------------------------------------
+Total trades with MFE >= 1.0R : 3,259 (57.27% of all trades)
+
+Baseline outcome distribution (MFE >= 1R):
+  - STOP (Gave back >=1R to full loss) : 1,546 (47.44%)
+  - TARGET (Reached 2.0R target)       : 1,458 (44.74%)
+  - FORCED_EXIT (Timed out at EOD)     : 255 (7.82%)
+
+H2 outcome distribution (MFE >= 1R):
+  - STOP (Unarmed or pre-BE stop)      : 1,023 (31.39%)
+  - BREAKEVEN (Protected capital)      : 830 (25.47%)
+  - TARGET (Reached 2.0R target)       : 1,236 (37.93%)
+  - FORCED_EXIT (Timed out at EOD)     : 170 (5.22%)
+
+-------------------------------------------------------------------------------------
+6. SLIPPAGE SENSITIVITY (Compounded Portfolio Return)
+-------------------------------------------------------------------------------------
+Slippage Level       |    Baseline Return |          H2 Return |           Delta
+-----------------------------------------------------------------------------
+0 bps (Gross)        |            -41.19% |            -44.25% |          -3.06%
+5 bps                |            -99.80% |            -99.81% |          -0.01%
+10 bps               |           -100.00% |           -100.00% |          +0.00%
+-----------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+7. PER-SYMBOL DISTRIBUTION (Sample)
+-------------------------------------------------------------------------------------
+Symbol | Trades |  Base WR |    Base R |    H2 WR |  H2 BE |      H2 R |   Delta R
+--------------------------------------------------------------------------------
+AAPL   |    281 |    36.3% |     -2.2R |    30.6% |     38 |     -7.9R |     -5.6R
+ADBE   |    206 |    34.0% |     -6.6R |    31.1% |     19 |     -5.5R |     +1.1R
+AMAT   |    189 |    24.9% |    -50.1R |    20.1% |     36 |    -38.5R |    +11.6R
+AMD    |    149 |    36.2% |      9.7R |    31.5% |     20 |      8.9R |     -0.8R
+AMZN   |    274 |    27.4% |    -69.0R |    20.1% |     43 |    -81.6R |    -12.7R
+AVGO   |    230 |    28.7% |    -45.7R |    23.5% |     33 |    -46.7R |     -1.0R
+COST   |    244 |    28.3% |    -50.2R |    23.4% |     36 |    -48.1R |     +2.1R
+CRM    |    162 |    34.0% |     -4.9R |    27.2% |     27 |     -5.4R |     -0.5R
+CSCO   |    203 |    28.1% |    -43.2R |    23.6% |     24 |    -46.9R |     -3.7R
+GOOGL  |    246 |    27.6% |    -50.6R |    24.0% |     34 |    -42.2R |     +8.4R
+INTC   |    160 |    31.9% |     -9.3R |    28.7% |     11 |    -13.9R |     -4.6R
+JNJ    |    240 |    32.5% |    -24.6R |    28.7% |     35 |    -18.6R |     +5.9R
+JPM    |    296 |    30.7% |    -41.3R |    26.4% |     40 |    -36.9R |     +4.4R
+KO     |    254 |    30.3% |    -32.9R |    25.2% |     44 |    -25.9R |     +6.9R
+META   |    157 |    30.6% |    -12.1R |    26.1% |     26 |     -9.0R |     +3.1R
+MSFT   |    252 |    29.8% |    -43.3R |    25.8% |     44 |    -27.1R |    +16.2R
+MU     |    182 |    31.3% |    -29.4R |    25.3% |     29 |    -31.6R |     -2.2R
+NFLX   |    232 |    26.7% |    -56.1R |    22.4% |     31 |    -53.5R |     +2.6R
+NVDA   |    204 |    27.9% |    -40.4R |    22.1% |     35 |    -37.9R |     +2.5R
+ORCL   |    205 |    27.3% |    -38.6R |    21.5% |     30 |    -41.7R |     -3.1R
+PEP    |    351 |    33.1% |    -16.9R |    27.4% |     56 |    -21.4R |     -4.5R
+QCOM   |    233 |    29.6% |    -25.7R |    26.2% |     29 |    -21.3R |     +4.4R
+TSLA   |    162 |    27.2% |     -7.6R |    22.8% |     33 |      5.2R |    +12.8R
+WMT    |    285 |    31.6% |    -23.5R |    29.8% |     38 |     -1.3R |    +22.2R
+XOM    |    294 |    33.0% |    -24.6R |    25.9% |     41 |    -42.5R |    -17.9R
+--------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------
+8. POINT-IN-TIME VALIDATION & VERIFICATION
+-------------------------------------------------------------------------------------
+  [x] Future 5m price mutation: Verified zero impact on prior BE arming.
+  [x] Future volume mutation: Verified zero impact on prior BE arming.
+  [x] Future 15m structure mutation: Verified zero impact on prior BE arming.
+  [x] Same-bar safety: High >= +1R & Low <= Entry preserves STOP_FIRST; BE becomes active only next bar.
+  [x] Target precedence: Target touched on trigger candle executes normally at +2R.
+  [x] Session isolation: No BE state leaks across trading sessions.
+  [x] Symbol isolation: No cross-contamination between symbol position states.
+  [x] Regression equivalence: Exact signal timestamps, entries, initial stops, and targets match baseline.
+
+-------------------------------------------------------------------------------------
+9. LIMITATIONS & RESEARCH INTERPRETATION
+-------------------------------------------------------------------------------------
+Methodological boundaries:
+  - Factual Measurement: Results represent historical observations on 25 liquid US equities (60 sessions).
+  - No Strategy Optimization: The 1.0R threshold was pre-declared; no tuning against results was performed.
+  - Lookahead Safeguard: Breakeven movement is strictly next-bar only.
+  - Frictional Drag: Breakeven exits incur round-trip slippage/commissions, producing small net drag under cost.
+  - No Edge Claim: This experiment does NOT claim a validated edge or recommend live deployment.
+=====================================================================================

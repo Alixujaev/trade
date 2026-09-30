@@ -1,8 +1,17 @@
 """Alpaca Market Data API orqali OHLCV ma'lumot olib beruvchi konkret provayder.
 
-FREE tier (IEX feed) ishlatiladi — paper trading uchun yetarli. Kredensiallar
-.env fayldan (ALPACA_API_KEY, ALPACA_SECRET_KEY) o'qiladi, hech qachon kodda
-hardcode qilinmaydi.
+Qo'llab-quvvatlanadigan intervallar:
+- '1d', '1wk': Kunlik va haftalik barlar (~10 yil)
+- '1h', '4h': Soatlik va 4-soatlik swing barlar (60 kun)
+- '5m', '15m': 5 daqiqalik va 15 daqiqalik intraday barlar (60 kun)
+
+MUHIM CHEKLOV (Alpaca Free Tier):
+- FREE tier (DataFeed.IEX) ishlatiladi: bu faqat bitta birja (IEX) savdolarini
+  qamrab oladi (umumiy AQSH birjalari hajmining ~2-3% qismi).
+- Bepul IEX feed'i consolidated tape (SIP) hajmini bermaydi — shuning uchun Day Trading
+  uchun RVOL va hajm tasdig'i bu provayderda to'liq ishonchli bo'lmasligi mumkin.
+- Bepul tierda oxirgi 15 daqiqalik barlar kechikish bilan yetib kelishi mumkin.
+- Kredensiallar .env fayldan (ALPACA_API_KEY, ALPACA_SECRET_KEY) o'qiladi.
 """
 
 from __future__ import annotations
@@ -25,25 +34,28 @@ from config.settings import (
     ALPACA_LOOKBACK_DAYS_INTRADAY,
     CACHE_DIR,
     CACHE_TTL_HOURS,
+    CACHE_TTL_INTRADAY_MINUTES,
 )
+from data.bars import filter_closed_bars
 from data.provider import DataProvider
+from data.session import filter_rth
+from data.validation import validate_ohlcv
 
 logger = logging.getLogger(__name__)
 
-REQUIRED_COLUMNS = ["open", "high", "low", "close", "volume"]
-
-# Bizning standart interval string -> Alpaca TimeFrame mapping.
-# Alpaca 4H'ni ham to'g'ri beradi (yfinance esa yo'q) — shu provider'ning
-# asosiy sababi ham shu.
+# Standart interval string -> Alpaca TimeFrame mapping.
 _INTERVAL_TO_TIMEFRAME: dict[str, TimeFrame] = {
     "1d": TimeFrame.Day,
     "4h": TimeFrame(4, TimeFrameUnit.Hour),
     "1h": TimeFrame.Hour,
     "1wk": TimeFrame.Week,
+    "5m": TimeFrame(5, TimeFrameUnit.Minute),
+    "15m": TimeFrame(15, TimeFrameUnit.Minute),
 }
 
 SUPPORTED_INTERVALS: set[str] = set(_INTERVAL_TO_TIMEFRAME)
-_INTRADAY_INTERVALS = {"1h", "4h"}
+_INTRADAY_INTERVALS: set[str] = {"1h", "4h", "5m", "15m"}
+_INTRADAY_FAST_INTERVALS: set[str] = {"5m", "15m"}
 
 
 class AlpacaProvider(DataProvider):
@@ -51,9 +63,19 @@ class AlpacaProvider(DataProvider):
 
     def __init__(self) -> None:
         load_dotenv()
-        self._client: StockHistoricalDataClient | None = None  # kerak bo'lgandagina yaratiladi
+        self._client: StockHistoricalDataClient | None = None
 
-    def get_ohlcv(self, symbol: str, interval: str, *, use_cache: bool = True) -> pd.DataFrame:
+    def get_ohlcv(
+        self,
+        symbol: str,
+        interval: str,
+        *,
+        use_cache: bool = True,
+        include_extended_hours: bool = False,
+        closed_only: bool = False,
+        as_of: datetime | None = None,
+        **kwargs,
+    ) -> pd.DataFrame:
         symbol = symbol.upper()
         if interval not in SUPPORTED_INTERVALS:
             raise ValueError(
@@ -61,26 +83,38 @@ class AlpacaProvider(DataProvider):
                 f"Qo'llab-quvvatlanadiganlar: {sorted(SUPPORTED_INTERVALS)}"
             )
 
-        cache_path = self._cache_path(symbol, interval)
-        if use_cache and self._is_cache_fresh(cache_path):
-            return pd.read_parquet(cache_path)
+        cache_path = self._cache_path(
+            symbol, interval, include_extended_hours=include_extended_hours
+        )
+        if use_cache and self._is_cache_fresh(cache_path, interval):
+            cached = pd.read_parquet(cache_path)
+            if closed_only:
+                return filter_closed_bars(cached, interval, as_of=as_of)
+            return cached
 
         lookback_days = (
-            ALPACA_LOOKBACK_DAYS_INTRADAY if interval in _INTRADAY_INTERVALS else ALPACA_LOOKBACK_DAYS_DEFAULT
+            ALPACA_LOOKBACK_DAYS_INTRADAY
+            if interval in _INTRADAY_INTERVALS
+            else ALPACA_LOOKBACK_DAYS_DEFAULT
         )
         raw = self._fetch_raw(symbol, interval, lookback_days)
         if raw is None or raw.empty:
             raise ValueError(f"{symbol} ({interval}) uchun Alpaca'dan bo'sh ma'lumot qaytdi")
 
         clean = self._clean(raw, symbol)
+
+        # Standart holatda (include_extended_hours=False) intraday ma'lumotlardan faqat RTH barlari saqlanadi
+        if not include_extended_hours and interval in _INTRADAY_INTERVALS:
+            clean = filter_rth(clean)
+
         self._write_cache(clean, cache_path)
+
+        if closed_only:
+            return filter_closed_bars(clean, interval, as_of=as_of)
         return clean
 
     def _fetch_raw(self, symbol: str, interval: str, lookback_days: int) -> pd.DataFrame:
-        """Alpaca API'ga murojaat qilib xom bars DataFrame'ni qaytaradi.
-
-        Bu metod tarmoqqa chiqadigan yagona joy — testlarda monkeypatch qilinadi.
-        """
+        """Alpaca API'ga murojaat qilib xom bars DataFrame'ni qaytaradi."""
         client = self._get_client()
         start = datetime.now(timezone.utc) - timedelta(days=lookback_days)
         request = StockBarsRequest(
@@ -93,7 +127,7 @@ class AlpacaProvider(DataProvider):
         return bars.df
 
     def _get_client(self) -> StockHistoricalDataClient:
-        """Alpaca client'ni faqat haqiqatan kerak bo'lganda (birinchi tarmoq chaqiruvida) yaratadi."""
+        """Alpaca client'ni faqat kerak bo'lganda (birinchi tarmoq chaqiruvida) yaratadi."""
         if self._client is None:
             api_key = os.getenv("ALPACA_API_KEY")
             secret_key = os.getenv("ALPACA_SECRET_KEY")
@@ -107,41 +141,31 @@ class AlpacaProvider(DataProvider):
 
     @staticmethod
     def _clean(df: pd.DataFrame, symbol: str) -> pd.DataFrame:
-        """Xom Alpaca DataFrame'ni standart OHLCV formatiga keltiradi."""
+        """Xom Alpaca DataFrame'ni standart OHLCV formatiga keltiradi va validatsiya qiladi."""
         df = df.copy()
 
-        # Alpaca ko'p-symbol so'ralganda (symbol, timestamp) MultiIndex qaytaradi —
-        # bitta symbol'ni ajratib, faqat timestamp'ni index qilib qoldiramiz
+        # Ko'p symbolli MultiIndex holatida bitta symbolni ajratish
         if isinstance(df.index, pd.MultiIndex):
             df = df.xs(symbol, level="symbol")
 
-        df.columns = [str(c).lower() for c in df.columns]
-        missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
-        if missing:
-            raise ValueError(f"Kerakli ustunlar yo'q: {missing}")
-        df = df[REQUIRED_COLUMNS]  # trade_count/vwap kabi qo'shimcha ustunlar tashlanadi
-
-        df.index = pd.to_datetime(df.index)
-        if df.index.tz is None:
-            df.index = df.index.tz_localize("UTC")
-        else:
-            df.index = df.index.tz_convert("UTC")
-        df.index.name = "datetime"
-
-        df = df.dropna()
-        df = df[~df.index.duplicated(keep="last")]
-        df = df.sort_index()
-        return df
+        return validate_ohlcv(df, symbol=symbol)
 
     @staticmethod
-    def _cache_path(symbol: str, interval: str) -> Path:
-        # "alpaca_" prefiksi — yfinance kesh fayllari bilan aralashmasligi uchun
-        return CACHE_DIR / f"alpaca_{symbol}_{interval}.parquet"
+    def _cache_path(
+        symbol: str, interval: str, include_extended_hours: bool = False
+    ) -> Path:
+        suffix = "_ext" if include_extended_hours else ""
+        return CACHE_DIR / f"alpaca_{symbol}_{interval}{suffix}.parquet"
 
     @staticmethod
-    def _is_cache_fresh(path: Path) -> bool:
+    def _is_cache_fresh(path: Path, interval: str = "1d") -> bool:
         if not path.exists():
             return False
+
+        if interval in _INTRADAY_FAST_INTERVALS:
+            age_minutes = (time.time() - path.stat().st_mtime) / 60
+            return age_minutes < CACHE_TTL_INTRADAY_MINUTES
+
         age_hours = (time.time() - path.stat().st_mtime) / 3600
         return age_hours < CACHE_TTL_HOURS
 

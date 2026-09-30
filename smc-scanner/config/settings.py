@@ -14,7 +14,7 @@ ENTRY_INTERVAL: str = "4h"  # entry-timing qatlami (Alpaca orqali — yfinance 4
 # yfinance "4h"ni toza bermaydi. Har provider o'zining qo'llab-quvvatlaydigan
 # subset'ini o'zida (masalan yfinance_provider.py/alpaca_provider.py) belgilaydi
 # va shunga qarab validatsiya qiladi.
-VALID_INTERVALS: set[str] = {"1d", "1wk", "1h", "4h"}
+VALID_INTERVALS: set[str] = {"1d", "1wk", "1h", "4h", "5m", "15m"}
 
 # Parquet kesh papkasi — CWD'ga emas, paket ildiziga nisbatan aniqlanadi
 CACHE_DIR: Path = Path(__file__).resolve().parent.parent / "data" / "cache"
@@ -24,10 +24,13 @@ CACHE_DIR: Path = Path(__file__).resolve().parent.parent / "data" / "cache"
 # kesh "eski" hisoblanadi. TTL bu yerda faqat "bugungi to'lmagan barni qayta
 # tortish" oralig'i (kunlik bot uchun 12h juda katta edi -> 4h).
 CACHE_TTL_HOURS: int = 4
+# Intraday (5m, 15m) kesh yoshi chegarasi (daqiqa hisobida). Jonli sessiyada tez-tez yangilanishi uchun.
+CACHE_TTL_INTRADAY_MINUTES: int = 5
 
 # yf.download uchun davr (period) parametrlari
 PERIOD_1H: str = "730d"
 PERIOD_DEFAULT: str = "10y"
+PERIOD_INTRADAY_FAST: str = "60d"  # 5m va 15m uchun yfinance cheklovi (maksimal 60 kun)
 
 # Swing detection uchun default lookback — vizual tekshiruvda eng toza struktura berdi
 SWING_LOOKBACK: int = 5

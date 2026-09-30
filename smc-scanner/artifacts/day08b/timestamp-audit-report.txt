@@ -1,0 +1,139 @@
+=====================================================================================
+DAY-08B — SIGNAL TIMESTAMP SEMANTICS AUDIT
+=====================================================================================
+
+1. RESEARCH QUESTION
+-------------------------------------------------------------------------------------
+Does the DAY-08 H6 index-regime context use the moment the DAY-01 signal becomes
+observable (signal bar END), or the OPENING timestamp of the signal candle?
+This is a timestamp-semantics audit/correction, not a new experiment. No variants,
+thresholds, DAY-01 logic or execution rules were changed.
+
+2. EXISTING TIMESTAMP FLOW (traced in code, commit 1451a57 + working tree)
+-------------------------------------------------------------------------------------
+  Provider bars          : index timestamp = bar OPEN (data/bars.py docstring;
+                           filter_closed_bars uses bar_end = ts + interval).
+  backtest/day_engine.py : for i in range(14, n_bars):
+                             setup = evaluate_vwap_momentum_at_index(..., idx=i)
+                             simulate_trade_execution(df_5m, setup_bar_idx=i, ...)
+  strategy/day/vwap_momentum.py::evaluate_vwap_momentum_at_index
+                         : last_ts = df_5m.index[idx]           (bar OPEN)
+                           DaySetup.timestamp = last_ts          (bar OPEN)
+                           own 15m context: curr_5m_end = last_ts + 5m,
+                           searchsorted(end_15m, curr_5m_end, "right") - 1
+                           -> DAY-01 itself uses the signal bar END as boundary.
+  backtest/execution.py  : setup_time = df.index[setup_bar_idx]  (bar OPEN)
+                           entry_time = df.index[setup_bar_idx + 1] (next bar OPEN)
+                           entry price = open of next bar
+  backtest/day_types.py  : DayBacktestTrade.setup_time = signal bar OPEN
+  backtest/index_regime.py (1451a57):
+                           detector.get_context_at(t.setup_time)  -> bar OPEN
+  strategy/day/index_regime.py::IndexRegimeDetector
+                           end_5m  = index_5m  + 5m ; end_15m = index_15m + 15m
+                           k = end.searchsorted(as_of, "right") - 1
+                           -> index bars selected by END time: index_bar_end <= as_of.
+
+3. SIGNAL BAR SEMANTICS
+-------------------------------------------------------------------------------------
+  Example signal bar 10:20–10:25:
+    DaySetup.timestamp / DayBacktestTrade.setup_time = 10:20 (bar OPEN)
+    Signal fully observable (bar closed)             = 10:25 (bar END)
+
+4. ENTRY SEMANTICS (unchanged)
+-------------------------------------------------------------------------------------
+  entry_time = 10:25 (next 5m bar OPEN), entry price = open of 10:25 bar.
+  No same-bar execution. Execution model not modified.
+
+5. INDEX CONTEXT SEMANTICS
+-------------------------------------------------------------------------------------
+  Old (1451a57 artifact) : as_of = setup_time = 10:20
+                           SPY/QQQ 5m used : 10:15–10:20 (10:20–10:25 excluded)
+                           SPY/QQQ 15m used: bars ending <= 10:20
+  Corrected (DAY-08B)    : as_of = signal_time = setup_time + 5m = 10:25
+                           SPY/QQQ 5m used : 10:20–10:25
+                           SPY/QQQ 15m used: 10:00–10:15 ; 10:15–10:30 NOT used
+  Index bar selection by END time was already correct and is unchanged.
+
+6. INFORMATION BOUNDARY
+-------------------------------------------------------------------------------------
+  Allowed : index_bar_end <= signal_time   (SPY 5m, SPY 15m, QQQ 5m, QQQ 15m)
+  Forbidden: index_bar_end >  signal_time  (forming and future bars)
+
+7. FINDINGS
+-------------------------------------------------------------------------------------
+  1. The 1451a57 H6 implementation looked up index context at the signal bar OPEN.
+  2. This is NOT lookahead: it used strictly less information than was available
+     (conservative one-5m-bar lag).
+  3. It is a genuine information-boundary difference, not cosmetic:
+     - the concurrent index 5m bar (e.g. 10:20–10:25) was always excluded;
+     - when the signal bar ends on a 15m boundary (e.g. 10:25–10:30), the just-closed
+       15m index bar (10:15–10:30) was excluded although it is known at 10:30.
+  4. It was inconsistent with DAY-01's own 15m context, which already uses the
+     signal bar END (vwap_momentum.py: curr_5m_end = last_ts + 5m).
+  5. Therefore the old artifact answers "index context at the START of the signal
+     candle", not "index context when the signal becomes observable".
+
+8. REQUIRED CORRECTION (applied, minimal, backwards-compatible)
+-------------------------------------------------------------------------------------
+  backtest/index_regime.py:
+    - new helper signal_time_for(setup_time) = setup_time + 5m
+    - H6 lookup: detector.get_context_at(signal_time_for(t.setup_time))
+    - metadata["h6_context_timestamp"] documents the semantics
+  NOT changed: DayBacktestTrade.setup_time meaning, DAY-01 signal logic,
+  strategy/day/vwap_momentum.py, strategy/day/index_regime.py, execution,
+  entry timing, stops, targets, variants, thresholds.
+
+9. REGRESSION RESULTS
+-------------------------------------------------------------------------------------
+  DAY-08 could NOT be rerun in this environment: outbound access to Yahoo Finance
+  (query2.finance.yahoo.com) is denied by the environment network policy (HTTP 403
+  on CONNECT) and no market-data cache exists in the repository.
+  Baseline regression (5691 trades / 30.42% / PF 0.9388 / -738.98R) was therefore
+  NOT re-verified here. The correction does not touch any code path used by the
+  baseline (it only changes the H6 context lookup timestamp), so baseline trades
+  are expected to be identical — this is an inference from the code, not a rerun.
+
+10. PIT TESTS
+-------------------------------------------------------------------------------------
+  tests/test_day08_timestamp_semantics.py (offline, synthetic): 17 passed.
+    T1 signal_time(10:20 bar) = 10:25, not 10:20
+    T2 entry = 10:25 bar OPEN (execution unchanged)
+    T3 5m boundary @10:25: 10:20–10:25 used, 10:25–10:30 not used      (SPY, QQQ)
+    T4 15m boundary @10:25: 10:00–10:15 used, 10:15–10:30 not used     (SPY, QQQ)
+    T5 QQQ equivalents (parametrized with T3/T4/T6/T8)
+    T6 exact boundary @10:30: 10:15–10:30 15m bar becomes used         (SPY, QQQ)
+    T7 all index data with bar_end > signal_time mutated (x5 / x0.2 price,
+       x1000 volume): context unchanged
+    T8 forming 15m bar mutation: context unchanged                     (SPY, QQQ)
+    + runner integration: run_day08_index_regime_experiment queries 10:25 for a
+      10:20 setup_time. Verified this test FAILS if the old semantics
+      (context at setup_time) are restored.
+  "Used / not used" is checked behaviourally (mutating the bar x5 / x0.2 changes /
+  does not change the context), not only via index positions.
+  Previous-audit offline PIT tests (bar_end > T mutation) preserved and passing.
+  Full pytest: 832 passed, 1 skipped, 12 failed, 7 errors — all 19 failures are
+  network/data-dependent tests (Yahoo Finance 403), identical to the pre-change set.
+
+11. H6 RESULT IMPACT
+-------------------------------------------------------------------------------------
+  UNKNOWN. H6 metrics were not recomputed (no market data). The historical artifact
+  artifacts/day08/index-regime-results.json / -report.txt was produced with the OLD
+  semantics (context at signal bar open) and is preserved unchanged as a historical
+  record. It must not be read as "context at signal time" results.
+  No corrected H6 metrics are claimed.
+
+12. LIMITATIONS
+-------------------------------------------------------------------------------------
+  - No rerun: corrected H6 eligibility / PF / expectancy / friction unknown.
+  - Baseline invariance is argued from code, not measured.
+  - signal_time assumes the DAY-01 signal bar interval is exactly 5m (true for the
+    frozen DAY-01 engine, which only evaluates 5m bars).
+
+13. FINAL FACTUAL CONCLUSION
+-------------------------------------------------------------------------------------
+  A correction WAS required. The old H6 lookup used the signal bar OPEN (conservative
+  lag, not lookahead). The lookup now uses the signal bar END (signal_time), matching
+  the moment the DAY-01 signal is observable and DAY-01's own 15m boundary.
+  The DAY-08 experiment must be rerun with market-data access before any corrected
+  H6 result can be reported.
+=====================================================================================

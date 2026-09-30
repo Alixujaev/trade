@@ -1,0 +1,50 @@
+{
+  "experiment": "DAY-08B Signal Timestamp Semantics Audit",
+  "audited_commit": "1451a57",
+  "temporal_model": {
+    "provider_bar_timestamp": "bar OPEN",
+    "example_signal_bar": "10:20-10:25",
+    "setup_time": "10:20 (signal bar open; DayBacktestTrade.setup_time, DaySetup.timestamp)",
+    "signal_time": "10:25 (signal bar end; first moment the signal is observable)",
+    "entry_time": "10:25 (next 5m bar OPEN; unchanged)",
+    "index_bar_selection": "by bar END: index_bar_end <= as_of (unchanged, already correct)"
+  },
+  "old_h6_semantics": {
+    "context_lookup_timestamp": "setup_time (signal bar open)",
+    "lookahead": false,
+    "effect": "conservative one-5m-bar lag; concurrent index 5m bar always excluded; just-closed 15m index bar excluded when the signal bar ends on a 15m boundary",
+    "consistent_with_day01_own_15m_context": false
+  },
+  "corrected_h6_semantics": {
+    "context_lookup_timestamp": "signal_time = setup_time + 5m (signal bar end)",
+    "consistent_with_day01_own_15m_context": true
+  },
+  "correction_required": true,
+  "files_changed": [
+    "backtest/index_regime.py"
+  ],
+  "unchanged": [
+    "strategy/day/vwap_momentum.py",
+    "strategy/day/index_regime.py",
+    "backtest/execution.py",
+    "backtest/day_types.py",
+    "backtest/day_engine.py",
+    "variants, thresholds, execution rules, universe, period"
+  ],
+  "day08_rerun": {
+    "performed": false,
+    "reason": "Yahoo Finance access denied by environment network policy (HTTP 403 on CONNECT); no market-data cache in repository",
+    "corrected_h6_metrics": null,
+    "baseline_regression_reverified": false
+  },
+  "historical_artifact": {
+    "path": "artifacts/day08/index-regime-results.json",
+    "semantics": "old (context at signal bar open)",
+    "modified": false
+  },
+  "tests": {
+    "timestamp_semantics_offline": {"file": "tests/test_day08_timestamp_semantics.py", "passed": 17, "failed": 0},
+    "old_semantics_detected_by_runner_test": true,
+    "full_pytest": {"passed": 832, "skipped": 1, "failed": 12, "errors": 7, "failures_network_dependent_only": true}
+  }
+}
