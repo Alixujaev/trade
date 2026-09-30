@@ -43,6 +43,21 @@ from strategy.day.index_regime import (
 
 logger = logging.getLogger(__name__)
 
+# DAY-01 signal bari intervali. Provider bar timestamp'i = barning OCHILISH vaqti.
+SIGNAL_BAR_INTERVAL: pd.Timedelta = pd.Timedelta(minutes=5)
+
+
+def signal_time_for(setup_time: pd.Timestamp) -> pd.Timestamp:
+    """DAY-08B: DAY-01 signali to'liq kuzatiladigan (observable) vaqt = signal bari TUGASHI.
+
+    `DayBacktestTrade.setup_time` — signal barining OCHILISH vaqti (masalan 10:20 → bar 10:20–10:25).
+    Signal faqat bar yopilganda (10:25) ma'lum bo'ladi; entry shu vaqtdagi keyingi bar OPEN'i.
+    H6 index konteksti shu vaqtda qidiriladi: faqat index_bar_end <= signal_time barlar ishlatiladi.
+    (DAY-01 ning o'z 15m konteksti ham xuddi shu `last_ts + 5m` chegarasidan foydalanadi —
+    strategy/day/vwap_momentum.py::evaluate_vwap_momentum_at_index.)
+    """
+    return setup_time + SIGNAL_BAR_INTERVAL
+
 
 # =====================================================================
 # 1. Data Structures for H6 Experiment
@@ -640,7 +655,8 @@ def run_day08_index_regime_experiment(
     excluded_missing_count = 0
 
     for t in all_baseline_trades:
-        ctx = detector.get_context_at(t.setup_time)
+        # DAY-08B: bar OCHILISHI (setup_time) emas, signal kuzatiladigan vaqt (bar tugashi)
+        ctx = detector.get_context_at(signal_time_for(t.setup_time))
         trade_contexts.append((t, ctx))
 
         if ctx.spy_bullish is not None:
@@ -784,6 +800,8 @@ def run_day08_index_regime_experiment(
             "direction": "long-only",
         },
         "variants_evaluated": ["Baseline", "H6-A SPY", "H6-B QQQ", "H6-C SPY+QQQ"],
+        # DAY-08B: H6 kontekst qaysi vaqtda qidirilgani (1451a57 dagi artifact: setup_time = bar open)
+        "h6_context_timestamp": "signal_time = setup_time (signal bar open) + 5m (signal bar end)",
     }
 
     pit_summary = {
@@ -1052,7 +1070,11 @@ def format_index_regime_report(result: H6ExperimentResult) -> str:
     p("  4. Opposed regime (aligned bearish): Signals generated when both indices are bearish")
     p(f"     produced {regimes['aligned bearish'].trades} trades with WR={regimes['aligned bearish'].win_rate*100:.2f}%, PF={regimes['aligned bearish'].profit_factor:.4f}, Total R={regimes['aligned bearish'].total_R:.2f}R.")
     p("  5. Execution friction: All variants collapse into severe negative portfolio returns under realistic")
-    p(f"     5 bps (-49% to -78%) and 10 bps (-75% to -95%) slippage.")
+    # Diapazonlar hardcode qilinmaydi — Section 8 jadvalidagi haqiqiy qiymatlardan olinadi
+    variants_all = (base, h6a, h6b, h6c)
+    s5 = [v.slippage_5bps for v in variants_all]
+    s10 = [v.slippage_10bps for v in variants_all]
+    p(f"     5 bps ({max(s5):.2f}% to {min(s5):.2f}%) and 10 bps ({max(s10):.2f}% to {min(s10):.2f}%) slippage.")
     p("  6. Churn remains elevated: Even in H6-C, symbol-sessions with >=2 trades account for")
     p(f"     {c_c.sessions_with_ge_2_pct}% of traded sessions, and {c_c.sessions_with_ge_5_pct}% have >=5 trades.")
     p()

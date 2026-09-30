@@ -216,7 +216,7 @@ Avg Holding Time (minutes)          24.8             23.6           25.0        
   4. Opposed regime (aligned bearish): Signals generated when both indices are bearish
      produced 1257 trades with WR=29.75%, PF=0.8769, Total R=-187.83R.
   5. Execution friction: All variants collapse into severe negative portfolio returns under realistic
-     5 bps (-49% to -78%) and 10 bps (-75% to -95%) slippage.
+     5 bps (-84.96% to -99.80%) and 10 bps (-97.56% to -100.00%) slippage.
   6. Churn remains elevated: Even in H6-C, symbol-sessions with >=2 trades account for
      57.63% of traded sessions, and 28.44% have >=5 trades.
 

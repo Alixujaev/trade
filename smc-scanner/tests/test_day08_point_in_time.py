@@ -230,3 +230,128 @@ def test_order_independence(shared_provider):
 
     assert res_forward.h6_c_metrics.total_R == res_reverse.h6_c_metrics.total_R
     assert res_forward.h6_c_metrics.win_rate == res_reverse.h6_c_metrics.win_rate
+
+
+# ======================================================================
+# Offline (sintetik) PIT testlari — tarmoqqa bog'liq emas.
+# Yuqoridagi testlardan farqi: mutatsiya `bar_open > T` bo'yicha emas, balki
+# `bar_end > T` bo'yicha qilinadi — ya'ni T da hali SHAKLLANAYOTGAN (forming)
+# 5m va 15m shamlar ham buziladi. Grid'ga to'g'ri kelmaydigan T (10:25) tanlanadi.
+# ======================================================================
+
+_SYN_SESSIONS = ("2026-07-06", "2026-07-07", "2026-07-08")
+
+
+def _synthetic_rth(freq_minutes: int, seed: int) -> pd.DataFrame:
+    """Bir necha RTH sessiyasi uchun deterministik OHLCV (provider kabi UTC index)."""
+    rng = np.random.default_rng(seed)
+    frames = []
+    price = 500.0
+    for day in _SYN_SESSIONS:
+        idx = pd.date_range(
+            f"{day} 09:30", f"{day} 15:59", freq=f"{freq_minutes}min", tz="America/New_York"
+        )
+        # Tebranuvchi trend — swing'lar va BOS/CHoCH hosil bo'lishi uchun
+        steps = np.sin(np.arange(len(idx)) / 3.0) * 1.5 + rng.normal(0.05, 0.4, len(idx))
+        closes = price + np.cumsum(steps)
+        opens = np.concatenate([[price], closes[:-1]])
+        highs = np.maximum(opens, closes) + rng.uniform(0.05, 0.5, len(idx))
+        lows = np.minimum(opens, closes) - rng.uniform(0.05, 0.5, len(idx))
+        vols = rng.uniform(1e5, 5e5, len(idx))
+        frames.append(
+            pd.DataFrame(
+                {"open": opens, "high": highs, "low": lows, "close": closes, "volume": vols},
+                index=idx.tz_convert("UTC"),
+            )
+        )
+        price = float(closes[-1])
+    return pd.concat(frames)
+
+
+def _mutate_unclosed(
+    df: pd.DataFrame, freq_minutes: int, t: pd.Timestamp, factor: float
+) -> pd.DataFrame:
+    """T da hali yopilmagan (bar_end > T) barcha barlarni ekstremal buzadi: narx x factor, hajm x1000."""
+    out = df.copy()
+    unclosed = (out.index + pd.Timedelta(minutes=freq_minutes)) > t
+    out.loc[unclosed, ["open", "high", "low", "close"]] *= factor
+    out.loc[unclosed, "volume"] *= 1000.0
+    return out
+
+
+@pytest.fixture(scope="module")
+def synthetic_index_data():
+    return {
+        "spy_5m": _synthetic_rth(5, seed=1),
+        "spy_15m": _synthetic_rth(15, seed=2),
+        "qqq_5m": _synthetic_rth(5, seed=3),
+        "qqq_15m": _synthetic_rth(15, seed=4),
+    }
+
+
+# Ikki yo'nalish: x5 (bullish break) va x0.2 (bearish break) — struktura qaysi holatda
+# bo'lmasin, forming bar ishlatilsa kamida bittasi natijani o'zgartiradi.
+@pytest.mark.parametrize("factor", [5.0, 0.2])
+@pytest.mark.parametrize(
+    "t_str",
+    ["2026-07-07 10:25", "2026-07-07 10:40", "2026-07-07 13:05", "2026-07-08 09:55"],
+)
+def test_offline_forming_and_future_bars_mutation_has_no_effect(synthetic_index_data, t_str, factor):
+    """T da forming 5m/15m shamlar va barcha kelajak barlar buzilsa ham kontekst o'zgarmaydi."""
+    d = synthetic_index_data
+    t = pd.Timestamp(t_str, tz="America/New_York")
+
+    clean = IndexRegimeDetector(d["spy_5m"], d["spy_15m"], d["qqq_5m"], d["qqq_15m"])
+    mutated = IndexRegimeDetector(
+        _mutate_unclosed(d["spy_5m"], 5, t, factor),
+        _mutate_unclosed(d["spy_15m"], 15, t, factor),
+        _mutate_unclosed(d["qqq_5m"], 5, t, factor),
+        _mutate_unclosed(d["qqq_15m"], 15, t, factor),
+    )
+
+    ctx_clean = clean.get_context_at(t)
+    assert ctx_clean.data_sufficient, "Sintetik data kontekst hosil qilishi kerak"
+    assert ctx_clean == mutated.get_context_at(t)
+
+
+@pytest.mark.parametrize("factor", [5.0, 0.2])
+def test_offline_forming_15m_candle_mutation_at_1025(synthetic_index_data, factor):
+    """10:25 ET: faqat 10:15–10:30 15m sham (forming) buzilsa — natija o'zgarmasligi shart.
+
+    Bu sham'ning o'zi ishlatilganda (lookahead) 5x narx 15m strukturani albatta o'zgartirardi.
+    """
+    d = synthetic_index_data
+    t = pd.Timestamp("2026-07-07 10:25", tz="America/New_York")
+    forming_open = pd.Timestamp("2026-07-07 10:15", tz="America/New_York")
+
+    spy_15m_mut = d["spy_15m"].copy()
+    qqq_15m_mut = d["qqq_15m"].copy()
+    for df in (spy_15m_mut, qqq_15m_mut):
+        assert forming_open in df.index
+        df.loc[forming_open, ["open", "high", "low", "close"]] *= factor
+
+    clean = IndexRegimeDetector(d["spy_5m"], d["spy_15m"], d["qqq_5m"], d["qqq_15m"])
+    mutated = IndexRegimeDetector(d["spy_5m"], spy_15m_mut, d["qqq_5m"], qqq_15m_mut)
+    assert clean.get_context_at(t) == mutated.get_context_at(t)
+
+
+def test_offline_next_session_mutation_does_not_leak_back(synthetic_index_data):
+    """Keyingi sessiya (07-08) to'liq buzilsa ham oldingi sessiyadagi kontekst o'zgarmaydi."""
+    d = synthetic_index_data
+    cut = pd.Timestamp("2026-07-08 00:00", tz="America/New_York")
+
+    def mutate_next(df: pd.DataFrame) -> pd.DataFrame:
+        out = df.copy()
+        mask = out.index >= cut
+        out.loc[mask, ["open", "high", "low", "close"]] *= 0.2
+        out.loc[mask, "volume"] *= 1000.0
+        return out
+
+    clean = IndexRegimeDetector(d["spy_5m"], d["spy_15m"], d["qqq_5m"], d["qqq_15m"])
+    mutated = IndexRegimeDetector(
+        mutate_next(d["spy_5m"]), mutate_next(d["spy_15m"]),
+        mutate_next(d["qqq_5m"]), mutate_next(d["qqq_15m"]),
+    )
+    for t_str in ("2026-07-07 10:25", "2026-07-07 12:10", "2026-07-07 15:55"):
+        t = pd.Timestamp(t_str, tz="America/New_York")
+        assert clean.get_context_at(t) == mutated.get_context_at(t)
