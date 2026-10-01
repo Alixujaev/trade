@@ -1,0 +1,162 @@
+===================================================================================================================
+DAY-11 — H5 TIME-OF-DAY EXECUTION WINDOW — RESEARCH EXPERIMENT REPORT
+===================================================================================================================
+
+1. RESEARCH QUESTION
+-------------------------------------------------------------------------------------------------------------------
+  Does restricting the time of day during which NEW entries are allowed improve gross and transaction-cost-adjusted performance?
+  Tested in isolation: no frequency cap, no ATR stop, no BE, no gap/index filter.
+
+2. FROZEN BASELINE & DATA
+-------------------------------------------------------------------------------------------------------------------
+  Universe     : 25 symbols (AAPL, MSFT, NVDA, AMZN, META, GOOGL, TSLA, AVGO, AMD, QCOM, INTC, MU, AMAT, ADBE, CRM, ORCL, CSCO, COST, WMT, KO, PEP, NFLX, JNJ, JPM, XOM)
+  Period       : 2026-07-02 13:30:00+00:00 -> 2026-09-25 19:55:00+00:00 (60 RTH sessions, 1500 symbol-sessions)
+  Benchmark    : per-symbol buy & hold: first RTH open -> last RTH close over the same period (mean across symbols), unchanged and independent of the entry window
+
+3. WINDOW DEFINITIONS & SEMANTICS
+-------------------------------------------------------------------------------------------------------------------
+  FULL        : [09:30, 16:00) ET
+  MORNING     : [09:30, 11:00) ET
+  MORNING_EXT : [09:30, 12:00) ET
+  EARLY_DAY   : [09:30, 13:00) ET
+  NO_LATE     : [09:30, 14:00) ET
+  Semantics    : Half-open ET interval [start, end) applied to the ACTUAL entry bar open timestamp (T+1 5m OPEN). Gate order: candidate -> position-open skip -> (cap, unused) -> window gate -> simulate_trade_execution. A signal with no same-session entry bar is simulation_none, not window-rejected. The window never closes or modifies an open position.
+  Timestamps   : 5m bar timestamp = bar OPEN; signal observable at bar END; entry at next bar OPEN.
+  FULL note    : FULL = [09:30, 16:00) = existing semantics; chosen over a literal '< 15:55' because 128 baseline trades enter at the 15:55 bar open (15:50 signal) and are forced out at that bar's close. Decision confirmed by the user before implementation.
+
+4. EXECUTION ASSUMPTIONS
+-------------------------------------------------------------------------------------------------------------------
+  entry             : T + 1 5m OPEN
+  initial_stop      : SIGNAL_LOW
+  target            : 2.0R
+  same_bar_ambiguity: STOP_FIRST
+  forced_exit       : 15:55 ET
+  direction         : long-only
+  frequency_cap     : none
+  costs             : 0 bps simulated; 5/10 bps applied post-hoc (DAY-07 compounded model)
+
+5. REGRESSION (no-gate run and FULL vs frozen DAY-10 NO CAP anchors)
+-------------------------------------------------------------------------------------------------------------------
+  Anchors source: artifacts\day10\frequency-cap-results.json
+  total_trades        : anchor=5691  no-gate=OK  FULL=OK
+  win_rate            : anchor=0.3042  no-gate=OK  FULL=OK
+  profit_factor       : anchor=0.9388  no-gate=OK  FULL=OK
+  total_R             : anchor=-738.98  no-gate=OK  FULL=OK
+  avg_R               : anchor=-0.1299  no-gate=OK  FULL=OK
+  max_drawdown_pct    : anchor=-58.65  no-gate=OK  FULL=OK
+  slippage_0bps       : anchor=-41.19  no-gate=OK  FULL=OK
+  slippage_5bps       : anchor=-99.8  no-gate=OK  FULL=OK
+  slippage_10bps      : anchor=-100.0  no-gate=OK  FULL=OK
+  FULL trades identical to no-gate baseline: True
+  Regression verified: True
+
+6. SIGNAL vs TRADE POPULATION (candidate invariance)
+-------------------------------------------------------------------------------------------------------------------
+                                             FULL        MORNING    MORNING_EXT      EARLY_DAY        NO_LATE
+Candidate signals                           21087          21087          21087          21087          21087
+Actual entries                               5691           1566           2199           2994           3744
+Window-rejected                                 0          11951           9594           7039           4587
+Position-open skips                         15057           7231           8955          10715          12417
+Cap-rejected                                    0              0              0              0              0
+Simulation none                               339            339            339            339            339
+Baseline entries not taken                      0           4125           3492           2697           1947
+Identity holds                                  1              1              1              1              1
+
+  Identity: candidates = entries + position_open_skips + cap_rejected + window_rejected + simulation_none
+
+7. RESULTS (0 bps unless stated)
+-------------------------------------------------------------------------------------------------------------------
+                                             FULL        MORNING    MORNING_EXT      EARLY_DAY        NO_LATE
+Trades                                       5691           1566           2199           2994           3744
+Avg trades / active session                 4.872          1.827          2.403          3.071          3.642
+Wins / Losses / BE                    1731/3958/2     497/1069/0     663/1536/0     917/2077/0    1150/2594/0
+Win rate                                   30.42%         31.74%         30.15%         30.63%         30.72%
+Profit factor                              0.9388         0.9820         0.9421         0.9586         0.9581
+Total R                                   -738.98        -149.32        -289.54        -336.29        -396.08
+Average R                                 -0.1299        -0.0954        -0.1317        -0.1123        -0.1058
+Median R                                  -1.0000        -1.0000        -1.0000        -1.0000        -1.0000
+R std                                      1.4304         1.3272         1.3230         1.3393         1.3469
+Max drawdown                              -58.65%        -38.26%        -47.83%        -51.31%        -50.99%
+Avg hold (min)                               24.8           56.1           45.7           37.7           33.2
+Median hold (min)                             0.0           10.0            5.0            5.0            5.0
+Exit STOP                                    3784           1032           1494           2032           2544
+Exit TARGET                                  1458            410            571            816           1041
+Exit FORCED_EXIT                              449            124            134            146            159
+Same-bar ambiguity                            693            114            200            323            421
+Benchmark mean B&H %                         5.05           5.05           5.05           5.05           5.05
+
+8. TRANSACTION COSTS (compounded, 1 unit/trade, by entry_time)
+-------------------------------------------------------------------------------------------------------------------
+                                             FULL        MORNING    MORNING_EXT      EARLY_DAY        NO_LATE
+0 bps                                     -41.19%        -11.68%        -29.30%        -25.22%        -27.22%
+5 bps                                     -99.80%        -81.55%        -92.16%        -96.25%        -98.28%
+10 bps                                   -100.00%        -96.15%        -99.13%        -99.81%        -99.96%
+
+9. ACCEPTED ENTRIES BY DAY-05 TIME BIN
+-------------------------------------------------------------------------------------------------------------------
+                                             FULL        MORNING    MORNING_EXT      EARLY_DAY        NO_LATE
+09:30–10:00                                   838            838            838            838            838
+10:00–11:00                                   728            728            728            728            728
+11:00–12:00                                   633              0            633            633            633
+12:00–14:00                                  1545              0              0            795           1545
+14:00–15:00                                   864              0              0              0              0
+15:00–15:55                                  1083              0              0              0              0
+
+10. WINDOW-REJECTED CANDIDATE ENTRIES BY TIME BIN (bin of the would-be entry bar)
+-------------------------------------------------------------------------------------------------------------------
+                                             FULL        MORNING    MORNING_EXT      EARLY_DAY        NO_LATE
+09:30–10:00                                     0              0              0              0              0
+10:00–11:00                                     0              0              0              0              0
+11:00–12:00                                     0           1311              0              0              0
+12:00–14:00                                     0           4751           3909           1644              0
+14:00–15:00                                     0           2792           2674           2471           1817
+15:00–15:55                                     0           3097           3011           2924           2770
+
+11. BASELINE TRADE QUALITY BY ENTRY BIN (explanatory only — NOT used to select a window)
+-------------------------------------------------------------------------------------------------------------------
+Bin               Count       WR       PF    Avg R   Total R   STOP   TGT   FRC   Hold
+09:30–10:00         838   34.01%   0.9931  -0.0568    -47.59    521   210   107   83.5
+10:00–11:00         728   29.12%   0.9523  -0.1397   -101.73    511   200    17   24.6
+11:00–12:00         633   26.22%   0.7232  -0.2215   -140.22    462   161    10   20.0
+12:00–14:00        1545   31.52%   1.0283  -0.0690   -106.55   1050   470    25   15.3
+14:00–15:00         864   28.70%   0.8523  -0.1667   -144.07    602   223    39   12.4
+15:00–15:55        1083   30.75%   0.8533  -0.1836   -198.83    638   194   251    5.7
+  Baseline 15:55-entry trades (enter and forced-exit on the same bar): 128, total R -1.43, avg R -0.0112
+  Baseline entries exactly at window boundaries: {'11:00': 52, '12:00': 64, '13:00': 64, '14:00': 66, '15:55': 128}
+
+12. SYMBOL SPREAD
+-------------------------------------------------------------------------------------------------------------------
+                                             FULL        MORNING    MORNING_EXT      EARLY_DAY        NO_LATE
+Symbols with positive R                      1/25           8/25           3/25           3/25           6/25
+Top-2 |R| symbols                       AMZN,NFLX       NVDA,JPM      NVDA,ORCL      COST,CSCO      AMZN,COST
+
+13. INTEGRITY
+-------------------------------------------------------------------------------------------------------------------
+  FULL        : candidate_signals_equal_baseline=True, trades_equal_baseline_filtered_by_window=True, all_entries_inside_window=True, no_cap_applied=True, stop_mode_signal_low_target_2r=True
+  MORNING     : candidate_signals_equal_baseline=True, trades_equal_baseline_filtered_by_window=True, all_entries_inside_window=True, no_cap_applied=True, stop_mode_signal_low_target_2r=True
+  MORNING_EXT : candidate_signals_equal_baseline=True, trades_equal_baseline_filtered_by_window=True, all_entries_inside_window=True, no_cap_applied=True, stop_mode_signal_low_target_2r=True
+  EARLY_DAY   : candidate_signals_equal_baseline=True, trades_equal_baseline_filtered_by_window=True, all_entries_inside_window=True, no_cap_applied=True, stop_mode_signal_low_target_2r=True
+  NO_LATE     : candidate_signals_equal_baseline=True, trades_equal_baseline_filtered_by_window=True, all_entries_inside_window=True, no_cap_applied=True, stop_mode_signal_low_target_2r=True
+
+14. TESTS, PIT, BOUNDARIES & CACHE VERIFICATION
+-------------------------------------------------------------------------------------------------------------------
+  h5_tests: tests/test_day11_time_window.py: 111 passed (boundary 18 times x 5 windows + UTC input, DST, synthetic engine, fast/reference synthetic x5 + frozen AAPL subset x3, frozen-data invariants, PIT mutation, symbol isolation)
+  targeted_regression_before_change: 167 passed (DAY-02, DAY-05, DAY-07, DAY-08, DAY-09, DAY-10, cache immutability)
+  targeted_regression_after_change_incl_h5: 278 passed, 0 failed
+  full_pytest: 1031 tests, 1031 passed, 0 failures, 0 errors, 0 skipped (network blocked by tests/conftest.py guard)
+  pit: future-session mutation (AAPL, sessions >= 2026-08-14, x1.07 price, x3 volume): earlier trades and window-rejection decisions identical for MORNING and NO_LATE; gate depends only on entry timestamp + fixed config
+  boundaries: 09:29,09:30,09:35,10:59,11:00,11:01,11:55,12:00,12:01,12:55,13:00,13:01,13:55,14:00,14:01,15:50,15:55,16:00 checked for every window (half-open [start,end) on the ENTRY bar open); signal 10:55 -> entry 11:00 rejected by MORNING; signal 10:50 -> entry 10:55 accepted; 15:50 signal -> 15:55 entry accepted by FULL; 15:55 signal -> simulation_none
+  fast_reference_equivalence: identical trades, candidates, skips, window rejections, metrics (synthetic all windows; frozen AAPL first 312 bars for FULL/MORNING/NO_LATE)
+  cache_and_artifact_hashes_before_after: {'data/cache (305 files)': 'UNCHANGED manifest f5d45ba3c615cbc6', 'artifacts/day08 (2 files)': 'UNCHANGED manifest cccbf4270ad0ff8a', 'artifacts/day08b (6 files)': 'UNCHANGED manifest cc47befd5083ce75', 'artifacts/day09 (2 files)': 'UNCHANGED manifest 2e68d85871b3dee8', 'artifacts/day10 (2 files)': 'UNCHANGED manifest 53f2a1294b5cc73e'}
+
+15. FACTUAL INTERPRETATION & H5 STATUS
+-------------------------------------------------------------------------------------------------------------------
+  MORNING produced the highest gross (0 bps) compounded return among the tested pre-declared restricted variants (-11.68%); at 5 bps it is -81.55% and at 10 bps -96.15%. This is not a selection.
+  MORNING     : pf_and_avg_r_above_full=True, pf_above_1=False, five_bps_non_negative=False, ten_bps_non_negative=False, majority_symbols_positive_R=False
+  MORNING_EXT : pf_and_avg_r_above_full=False, pf_above_1=False, five_bps_non_negative=False, ten_bps_non_negative=False, majority_symbols_positive_R=False
+  EARLY_DAY   : pf_and_avg_r_above_full=True, pf_above_1=False, five_bps_non_negative=False, ten_bps_non_negative=False, majority_symbols_positive_R=False
+  NO_LATE     : pf_and_avg_r_above_full=True, pf_above_1=False, five_bps_non_negative=False, ten_bps_non_negative=False, majority_symbols_positive_R=False
+  Status criterion: Analyst criterion defined before DAY-11 results were viewed (not a protocol-predeclared rule). SUPPORTED: at least one restricted window has profit_factor > 1, a non-negative 5 bps compounded return, AND positive total R in a majority of symbols. NOT VALIDATED: no restricted window improves both profit_factor and avg_R over FULL. INCONCLUSIVE: anything else.
+  H5 STATUS: INCONCLUSIVE
+  No window is declared best, optimal or production-ready.
+===================================================================================================================

@@ -11,6 +11,7 @@ METODOLOGIK QOIDA:
 
 from __future__ import annotations
 
+import math
 from typing import NamedTuple
 import pandas as pd
 
@@ -34,6 +35,7 @@ def simulate_trade_execution(
     config: ExecutionConfig,
     *,
     vwap_series: pd.Series | None = None,
+    atr_value: float | None = None,
 ) -> ExecutionSimulation | None:
     """Signal baridan keyingi barlar bo'ylab pozitsiyani simulyatsiya qiladi.
 
@@ -49,6 +51,9 @@ def simulate_trade_execution(
         Execution parametrlari.
     vwap_series : pd.Series | None, optional
         VWAP qiymatlari seriyasi.
+    atr_value : float | None, optional
+        DAY-09 H4: stop_mode="ATR" uchun signal vaqtidagi (point-in-time) 5m ATR.
+        Boshqa stop_mode'larda e'tiborga olinmaydi.
 
     Returns
     -------
@@ -98,6 +103,16 @@ def simulate_trade_execution(
         else:
             stop_price = raw_entry * 0.99
             risk_per_share = raw_entry - stop_price
+    elif config.stop_mode == "ATR":
+        # DAY-09 H4: risk = ATR_5m(signal_time) * multiplier; stop = entry - risk.
+        # ATR yo'q/noto'g'ri bo'lsa jim fallback yo'q — chaqiruvchi alohida hisoblashi shart.
+        mult = config.atr_stop_multiplier
+        if atr_value is None or not math.isfinite(atr_value) or atr_value <= 0.0:
+            raise ValueError(f"ATR stop uchun yaroqli atr_value kerak, berilgan: {atr_value!r}")
+        if mult is None or not math.isfinite(mult) or mult <= 0.0:
+            raise ValueError(f"ATR stop uchun yaroqli atr_stop_multiplier kerak, berilgan: {mult!r}")
+        risk_per_share = atr_value * mult
+        stop_price = raw_entry - risk_per_share
 
     target_price: float | None = None
     if (

@@ -10,10 +10,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import time
-from typing import Any
+from typing import TYPE_CHECKING, Any
 import pandas as pd
 
 from strategy.day.types import DaySetupStatus
+
+if TYPE_CHECKING:
+    from backtest.session_gate import EntryWindow
 
 
 @dataclass(frozen=True)
@@ -32,7 +35,7 @@ class ExecutionConfig:
     # Stop va Target parametrlari (BACKTEST ASSUMPTION):
     # DAY-01 strategiyasida stop/target qoidalari aniqlanmagan.
     # Shuning uchun bu parametrlar faqat o'lchov gipotezasi hisoblanadi.
-    stop_mode: str = "SIGNAL_LOW"          # "SIGNAL_LOW" | "VWAP" | "NONE"
+    stop_mode: str = "SIGNAL_LOW"          # "SIGNAL_LOW" | "VWAP" | "ATR" | "NONE"
     target_multiple: float | None = 2.0    # 2.0R yoki None (agar None bo'lsa faqat time/vwap/eod exit)
     exit_on_vwap_cross: bool = False       # Narx VWAP ostida yopilganda chiqish (ixtiyoriy)
     valid_statuses: tuple[DaySetupStatus, ...] = (
@@ -40,6 +43,9 @@ class ExecutionConfig:
         DaySetupStatus.CONFIRMED,
     )
     breakeven_trigger_r: float | None = None  # DAY-07 H2: +1R ga yetganda breakeven stopga ko'chirish (masalan 1.0)
+    atr_stop_multiplier: float | None = None  # DAY-09 H4: stop_mode="ATR" da risk = ATR_5m(signal) * multiplier
+    max_trades_per_session: int | None = None  # DAY-10 H3: symbol+RTH session bo'yicha haqiqiy entry'lar chegarasi (None = cap yo'q)
+    entry_window: EntryWindow | None = None    # DAY-11 H5: yangi entry faqat [start, end) ET oynasida (None = gate yo'q)
 
 
 @dataclass(frozen=True)
@@ -111,3 +117,12 @@ class DayBacktestResult:
     same_bar_ambiguity_count: int = 0      # Bir barda SL va TP to'qnash kelgan holatlar soni
 
     execution_config: ExecutionConfig = field(default_factory=ExecutionConfig)
+
+    # DAY-10 H3: signal populyatsiyasi hisobi
+    # candidate_signals = len(trades) + skipped_signals + cap_rejected_signals
+    #                     + window_rejected_signals + simulation_none_count
+    candidate_signals: int = 0             # valid_statuses ichidagi barcha setup'lar
+    cap_rejected_signals: int = 0          # session frequency cap sabab ochilmagan entry'lar
+    simulation_none_count: int = 0         # simulate_trade_execution None qaytargan (kun oxiri / data tugadi)
+    window_rejected_signals: int = 0       # DAY-11 H5: entry vaqti oynadan tashqarida bo'lgani sabab ochilmagan
+    window_rejected_entry_times: list[pd.Timestamp] = field(default_factory=list)  # rad etilgan entry bar vaqtlari

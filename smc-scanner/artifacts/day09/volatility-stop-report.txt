@@ -1,0 +1,157 @@
+====================================================================================================
+DAY-09 — H4 VOLATILITY-SCALED (ATR) STOP DISTANCE — RESEARCH EXPERIMENT REPORT
+====================================================================================================
+
+1. HYPOTHESIS & DESIGN
+----------------------------------------------------------------------------------------------------
+H4: Tight SIGNAL_LOW stops may be hit by intraday noise. How does a 5m ATR-scaled stop geometry
+change outcomes? Pre-declared multipliers only; no variant is selected or called 'best'.
+  Stop formula   : risk = ATR_5m(signal_time) * multiplier; stop = entry - risk; target = entry + 2 * risk
+  ATR            : 5m ATR(14) = simple rolling mean of True Range (indicators/atr.py), continuous RTH series
+  Baseline stop  : SIGNAL_LOW (DAY-02, unchanged)
+  Multipliers    : 0.50, 0.75, 1.00, 1.25
+  signal         : closed 5m bar T
+  entry          : T + 1 5m OPEN
+  target         : 2.0R
+  same_bar_ambiguity: STOP_FIRST
+  forced_exit    : 15:55 ET
+  direction      : long-only
+  costs          : 0 bps in simulation; 5/10 bps applied post-hoc to compounded return
+  Population     : H4 re-simulates every baseline trade 1:1 (same setup bar, same entry bar). Baseline open-position skip decisions are frozen and not re-evaluated under H4 exit times.
+
+2. FROZEN DATA & COVERAGE
+----------------------------------------------------------------------------------------------------
+  Universe       : 25 symbols
+  Study window   : 2026-07-02 13:30:00+00:00 -> 2026-09-25 19:55:00+00:00 (60 RTH sessions)
+  Baseline trades            : 5691
+  H4-evaluable trades        : 5691 (100.00%)
+  H4 insufficient (excluded) : 0
+    by reason  : {}
+    by session : {}
+    by symbol  : {}
+  Reference-engine re-sim of baseline (SIGNAL_LOW) exit match: 5691/5691
+
+3. BASELINE REGRESSION (DAY-02/DAY-04 frozen invariants)
+----------------------------------------------------------------------------------------------------
+  total_trades              : actual=5691  expected=5691  OK
+  win_rate                  : actual=0.3042  expected=0.3042  OK
+  profit_factor             : actual=0.9388  expected=0.9388  OK
+  total_R                   : actual=-738.98  expected=-738.98  OK
+  gross_return_compounded   : actual=-41.19  expected=-41.19  OK
+  Regression verified : True   -> H4 status: EVALUATED
+
+4. AGGREGATE METRICS (0 bps gross; trade-level R and compounded return are reported separately)
+----------------------------------------------------------------------------------------------------
+Metric                               BASELINE BASELINE_EVALUABLE        H4 ATRx0.50        H4 ATRx0.75        H4 ATRx1.00        H4 ATRx1.25
+--------------------------------------------------------------------------------------------------------------------------------------------
+Trades (denominator)                     5691               5691               5691               5691               5691               5691
+Wins / Losses / BE                1731/3958/2        1731/3958/2        1865/3825/1        1879/3811/1        1936/3752/3        1978/3709/4
+Win rate                               30.42%             30.42%             32.77%             33.02%             34.02%             34.76%
+Profit factor                          0.9388             0.9388             0.9624             0.9874             1.0075             0.9809
+Expectancy (%/trade)                 -0.0083%           -0.0083%           -0.0035%           -0.0017%            0.0013%           -0.0041%
+Total R                              -738.98R           -738.98R           -147.46R           -149.42R            -89.07R           -180.45R
+Average R                            -0.1299R           -0.1299R           -0.0259R           -0.0263R           -0.0157R           -0.0317R
+Median R                             -1.0000R           -1.0000R           -1.0000R           -1.0000R           -1.0000R           -1.0000R
+Compounded return (0bps)              -41.19%            -41.19%            -19.53%            -12.69%              1.34%            -27.24%
+Max drawdown (0bps)                   -58.65%            -58.65%            -28.42%            -33.23%            -42.44%            -63.70%
+Avg hold (min)                           24.8               24.8                5.8               17.9               35.4               54.5
+Exit: STOP                               3784               3784               3755               3711               3582               3412
+Exit: TARGET                             1458               1458               1796               1751               1662               1472
+Exit: FORCED_EXIT                         449                449                140                229                447                807
+
+5. FRICTION SENSITIVITY (compounded portfolio return, 1 unit per trade, by entry_time)
+----------------------------------------------------------------------------------------------------
+Variant                                                    0 bps         5 bps        10 bps
+BASELINE (SIGNAL_LOW, all trades)                        -41.19%       -99.80%      -100.00%
+BASELINE (SIGNAL_LOW, H4-evaluable population)           -41.19%       -99.80%      -100.00%
+H4 ATRx0.50                                              -19.53%       -99.73%      -100.00%
+H4 ATRx0.75                                              -12.69%       -99.71%      -100.00%
+H4 ATRx1.00                                                1.34%       -99.66%      -100.00%
+H4 ATRx1.25                                              -27.24%       -99.75%      -100.00%
+
+6. RISK GEOMETRY DISTRIBUTIONS (median [p10 .. p90])
+----------------------------------------------------------------------------------------------------
+Variant                              Stop dist %                Risk / ATR                Hold min   Ambig
+BASELINE_EVALUABLE       0.1179 [0.0217..0.5375]   0.5664 [0.1112..1.8095]         0.0 [0.0..55.0]     693
+H4 ATRx0.50              0.1087 [0.0528..0.2631]            0.5 [0.5..0.5]         0.0 [0.0..15.0]     175
+H4 ATRx0.75               0.163 [0.0791..0.3947]         0.75 [0.75..0.75]         5.0 [0.0..40.0]      61
+H4 ATRx1.00              0.2174 [0.1055..0.5263]            1.0 [1.0..1.0]        15.0 [0.0..85.0]      16
+H4 ATRx1.25              0.2717 [0.1319..0.6578]         1.25 [1.25..1.25]       25.0 [0.0..155.0]       6
+  Note: BASELINE_EVALUABLE 'Risk / ATR' = SIGNAL_LOW risk expressed in ATR multiples (same ATR at signal).
+  Note: BASELINE_EVALUABLE ambiguity = baseline engine count over all trades.
+
+7. PAIRED COMPARISON VS BASELINE (same setup, same entry bar)
+----------------------------------------------------------------------------------------------------
+  H4 ATRx0.50: entry_time match 5691/5691, entry_price match 5691/5691, total dR +591.53, mean dR +0.1039
+    baseline exit -> H4 exit: STOP->STOP:3211,TARGET:569,FORCED_EXIT:4; TARGET->STOP:361,TARGET:1094,FORCED_EXIT:3; FORCED_EXIT->STOP:183,TARGET:133,FORCED_EXIT:133
+  H4 ATRx0.75: entry_time match 5691/5691, entry_price match 5691/5691, total dR +589.57, mean dR +0.1036
+    baseline exit -> H4 exit: STOP->STOP:3165,TARGET:584,FORCED_EXIT:35; TARGET->STOP:384,TARGET:1055,FORCED_EXIT:19; FORCED_EXIT->STOP:162,TARGET:112,FORCED_EXIT:175
+  H4 ATRx1.00: entry_time match 5691/5691, entry_price match 5691/5691, total dR +649.92, mean dR +0.1142
+    baseline exit -> H4 exit: STOP->STOP:3038,TARGET:591,FORCED_EXIT:155; TARGET->STOP:411,TARGET:975,FORCED_EXIT:72; FORCED_EXIT->STOP:133,TARGET:96,FORCED_EXIT:220
+  H4 ATRx1.25: entry_time match 5691/5691, entry_price match 5691/5691, total dR +558.54, mean dR +0.0981
+    baseline exit -> H4 exit: STOP->STOP:2902,TARGET:534,FORCED_EXIT:348; TARGET->STOP:403,TARGET:862,FORCED_EXIT:193; FORCED_EXIT->STOP:107,TARGET:76,FORCED_EXIT:266
+
+8. SYMBOL CONCENTRATION (does 1-2 symbols drive the aggregate?)
+----------------------------------------------------------------------------------------------------
+Variant                                              Total R      Top-2 syms   Top-2 R  Ex-top2 R Ex-top2 PF  Sym R>0
+BASELINE (SIGNAL_LOW, all trades)                    -738.98       AMZN,NFLX   -125.05    -613.93     0.9517    1/25
+BASELINE (SIGNAL_LOW, H4-evaluable population)       -738.98       AMZN,NFLX   -125.05    -613.93     0.9517    1/25
+H4 ATRx0.50                                          -147.46      GOOGL,CSCO    -89.56     -57.90     0.9801   10/25
+H4 ATRx0.75                                          -149.42      GOOGL,ADBE    -19.44    -129.98     0.9839   10/25
+H4 ATRx1.00                                           -89.07       JPM,GOOGL   -132.77      43.71     1.0421   14/25
+H4 ATRx1.25                                          -180.45        JPM,AMZN   -149.19     -31.26     1.0128   12/25
+
+9. PER-SYMBOL TOTAL R
+----------------------------------------------------------------------------------------------------
+Symbol             BASELINE BASELINE_EVALUABLE        H4 ATRx0.50        H4 ATRx0.75        H4 ATRx1.00        H4 ATRx1.25
+AAPL                  -2.25              -2.25              18.24              33.56              21.22              15.91
+MSFT                 -43.27             -43.27             -17.33             -12.12             -17.36             -23.10
+NVDA                 -40.35             -40.35              -1.73             -22.74              -9.35               8.37
+AMZN                 -68.97             -68.97             -20.75             -41.14             -48.92             -71.59
+META                 -12.07             -12.07              11.15              14.07               8.23              13.83
+GOOGL                -50.60             -50.60             -45.32             -60.63             -58.59             -70.80
+TSLA                  -7.58              -7.58             -10.43              -6.95               3.12               1.82
+AVGO                 -45.67             -45.67             -18.01             -14.43             -45.49             -53.88
+AMD                    9.67               9.67              20.60              17.12              13.78               9.04
+QCOM                 -25.69             -25.69             -20.96             -22.87             -19.65              -9.56
+INTC                  -9.30              -9.30             -11.26              15.51              17.29              21.22
+MU                   -29.40             -29.40              -9.08             -31.95             -39.41             -45.18
+AMAT                 -50.11             -50.11             -15.44              11.85              35.53              30.46
+ADBE                  -6.59              -6.59              28.53              41.19              58.14              63.34
+CRM                   -4.93              -4.93             -11.67              26.40              17.93              -3.85
+ORCL                 -38.64             -38.64               0.23              15.95              25.50              32.91
+CSCO                 -43.16             -43.16             -44.24             -39.95             -16.91             -18.62
+COST                 -50.20             -50.20               3.12             -20.94             -22.59             -29.00
+WMT                  -23.48             -23.48              12.41              -8.09              15.42              23.17
+KO                   -32.88             -32.88             -29.95              -2.60              28.77              28.97
+PEP                  -16.91             -16.91              29.70              28.51              34.79              14.74
+NFLX                 -56.08             -56.08             -19.87             -30.30             -26.66             -23.67
+JNJ                  -24.55             -24.55               6.83             -10.69               4.50              -6.79
+JPM                  -41.34             -41.34             -11.22             -36.69             -74.18             -77.60
+XOM                  -24.65             -24.65               8.99               8.53               5.82             -10.61
+
+10. POINT-IN-TIME STATUS
+----------------------------------------------------------------------------------------------------
+  atr_bars_used                   : bars [0 .. setup_bar] only (bar_end <= signal_time = setup_time + 5m)
+  forming_entry_bar_excluded      : True
+  future_bars_excluded            : True
+  stop_and_target_fixed_at_entry  : True
+  intrabar_engine                 : backtest.execution.simulate_trade_execution (same as DAY-07 reference engine)
+
+11. DENOMINATORS
+----------------------------------------------------------------------------------------------------
+  win_rate                    : trades in the variant population
+  profit_factor               : sum of positive gross returns / |sum of negative gross returns| (trade level)
+  total_R / avg_R / median_R  : trade-level R multiples of the variant's own initial risk
+  compounded_return           : product of (1 + gross_return) over trades sorted by entry_time (1 unit, no sizing)
+
+12. INTERPRETATION RULES
+----------------------------------------------------------------------------------------------------
+  - H4 variants do NOT share the baseline risk geometry: 1R means a different dollar/percent risk per
+    variant (see section 6). Compare R-multiples together with stop distance %, not in isolation.
+  - Compounded return is 1 unit per trade with no position sizing; it is not a portfolio simulation.
+  - No multiplier is declared best or production-ready. Results must be read with friction (sec. 5),
+    symbol concentration (sec. 8), drawdown and sample size.
+  - This experiment tests stop geometry only; it does not establish that the DAY-01 signal has an edge.
+  - If H4 does not help, parameters are NOT searched further.
+====================================================================================================

@@ -1,0 +1,946 @@
+{
+  "metadata": {
+    "experiment": "DAY-11 H5 Time-of-Day Execution Window",
+    "research_question": "Does restricting the time of day during which NEW entries are allowed improve gross and transaction-cost-adjusted performance?",
+    "windows": {
+      "FULL": "[09:30, 16:00) ET",
+      "MORNING": "[09:30, 11:00) ET",
+      "MORNING_EXT": "[09:30, 12:00) ET",
+      "EARLY_DAY": "[09:30, 13:00) ET",
+      "NO_LATE": "[09:30, 14:00) ET"
+    },
+    "window_semantics": "Half-open ET interval [start, end) applied to the ACTUAL entry bar open timestamp (T+1 5m OPEN). Gate order: candidate -> position-open skip -> (cap, unused) -> window gate -> simulate_trade_execution. A signal with no same-session entry bar is simulation_none, not window-rejected. The window never closes or modifies an open position.",
+    "full_definition_note": "FULL = [09:30, 16:00) = existing semantics; chosen over a literal '< 15:55' because 128 baseline trades enter at the 15:55 bar open (15:50 signal) and are forced out at that bar's close. Decision confirmed by the user before implementation.",
+    "timestamp_semantics": "5m bar timestamp = bar OPEN; signal observable at bar END; entry at next bar OPEN.",
+    "execution_rules": {
+      "entry": "T + 1 5m OPEN",
+      "initial_stop": "SIGNAL_LOW",
+      "target": "2.0R",
+      "same_bar_ambiguity": "STOP_FIRST",
+      "forced_exit": "15:55 ET",
+      "direction": "long-only",
+      "frequency_cap": "none",
+      "costs": "0 bps simulated; 5/10 bps applied post-hoc (DAY-07 compounded model)"
+    },
+    "benchmark": "per-symbol buy & hold: first RTH open -> last RTH close over the same period (mean across symbols), unchanged and independent of the entry window",
+    "status_criterion": "Analyst criterion defined before DAY-11 results were viewed (not a protocol-predeclared rule). SUPPORTED: at least one restricted window has profit_factor > 1, a non-negative 5 bps compounded return, AND positive total R in a majority of symbols. NOT VALIDATED: no restricted window improves both profit_factor and avg_R over FULL. INCONCLUSIVE: anything else."
+  },
+  "frozen_dataset": {
+    "universe_size": 25,
+    "universe_symbols": [
+      "AAPL",
+      "MSFT",
+      "NVDA",
+      "AMZN",
+      "META",
+      "GOOGL",
+      "TSLA",
+      "AVGO",
+      "AMD",
+      "QCOM",
+      "INTC",
+      "MU",
+      "AMAT",
+      "ADBE",
+      "CRM",
+      "ORCL",
+      "CSCO",
+      "COST",
+      "WMT",
+      "KO",
+      "PEP",
+      "NFLX",
+      "JNJ",
+      "JPM",
+      "XOM"
+    ],
+    "period_start": "2026-07-02 13:30:00+00:00",
+    "period_end": "2026-09-25 19:55:00+00:00",
+    "rth_sessions": 60,
+    "symbol_sessions_total": 1500
+  },
+  "baseline_regression": {
+    "anchors_source": "artifacts\\day10\\frequency-cap-results.json",
+    "no_gate_matches_anchors": {
+      "total_trades": true,
+      "win_rate": true,
+      "profit_factor": true,
+      "total_R": true,
+      "avg_R": true,
+      "max_drawdown_pct": true,
+      "slippage_0bps": true,
+      "slippage_5bps": true,
+      "slippage_10bps": true
+    },
+    "full_matches_anchors": {
+      "total_trades": true,
+      "win_rate": true,
+      "profit_factor": true,
+      "total_R": true,
+      "avg_R": true,
+      "max_drawdown_pct": true,
+      "slippage_0bps": true,
+      "slippage_5bps": true,
+      "slippage_10bps": true
+    },
+    "full_trades_identical_to_no_gate": true,
+    "anchors": {
+      "total_trades": 5691,
+      "win_rate": 0.3042,
+      "profit_factor": 0.9388,
+      "total_R": -738.98,
+      "avg_R": -0.1299,
+      "max_drawdown_pct": -58.65,
+      "slippage_0bps": -41.19,
+      "slippage_5bps": -99.8,
+      "slippage_10bps": -100.0
+    },
+    "regression_verified": true
+  },
+  "metrics": {
+    "FULL": {
+      "variant_name": "FULL",
+      "total_trades": 5691,
+      "wins": 1731,
+      "losses": 3958,
+      "breakevens": 2,
+      "win_rate": 0.3042,
+      "profit_factor": 0.9388,
+      "expectancy": -0.0083,
+      "total_R": -738.98,
+      "avg_R": -0.1299,
+      "median_R": -1.0,
+      "r_std": 1.4304,
+      "gross_return_compounded": -41.19,
+      "gross_return_mean_symbol": -1.86,
+      "avg_trade_return_pct": -0.0083,
+      "median_trade_return_pct": -0.0504,
+      "max_drawdown_pct": -58.65,
+      "avg_hold_duration_mins": 24.8,
+      "slippage_0bps": -41.19,
+      "slippage_5bps": -99.8,
+      "slippage_10bps": -100.0,
+      "exit_counts": {
+        "TARGET": 1458,
+        "STOP": 3784,
+        "FORCED_EXIT": 449,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -6.91
+    },
+    "MORNING": {
+      "variant_name": "MORNING",
+      "total_trades": 1566,
+      "wins": 497,
+      "losses": 1069,
+      "breakevens": 0,
+      "win_rate": 0.3174,
+      "profit_factor": 0.982,
+      "expectancy": -0.005,
+      "total_R": -149.32,
+      "avg_R": -0.0954,
+      "median_R": -1.0,
+      "r_std": 1.3272,
+      "gross_return_compounded": -11.68,
+      "gross_return_mean_symbol": -0.3,
+      "avg_trade_return_pct": -0.005,
+      "median_trade_return_pct": -0.1519,
+      "max_drawdown_pct": -38.26,
+      "avg_hold_duration_mins": 56.1,
+      "slippage_0bps": -11.68,
+      "slippage_5bps": -81.55,
+      "slippage_10bps": -96.15,
+      "exit_counts": {
+        "TARGET": 410,
+        "STOP": 1032,
+        "FORCED_EXIT": 124,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -5.35
+    },
+    "MORNING_EXT": {
+      "variant_name": "MORNING_EXT",
+      "total_trades": 2199,
+      "wins": 663,
+      "losses": 1536,
+      "breakevens": 0,
+      "win_rate": 0.3015,
+      "profit_factor": 0.9421,
+      "expectancy": -0.0135,
+      "total_R": -289.54,
+      "avg_R": -0.1317,
+      "median_R": -1.0,
+      "r_std": 1.323,
+      "gross_return_compounded": -29.3,
+      "gross_return_mean_symbol": -1.18,
+      "avg_trade_return_pct": -0.0135,
+      "median_trade_return_pct": -0.1093,
+      "max_drawdown_pct": -47.83,
+      "avg_hold_duration_mins": 45.7,
+      "slippage_0bps": -29.3,
+      "slippage_5bps": -92.16,
+      "slippage_10bps": -99.13,
+      "exit_counts": {
+        "TARGET": 571,
+        "STOP": 1494,
+        "FORCED_EXIT": 134,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -6.22
+    },
+    "EARLY_DAY": {
+      "variant_name": "EARLY_DAY",
+      "total_trades": 2994,
+      "wins": 917,
+      "losses": 2077,
+      "breakevens": 0,
+      "win_rate": 0.3063,
+      "profit_factor": 0.9586,
+      "expectancy": -0.008,
+      "total_R": -336.29,
+      "avg_R": -0.1123,
+      "median_R": -1.0,
+      "r_std": 1.3393,
+      "gross_return_compounded": -25.22,
+      "gross_return_mean_symbol": -0.95,
+      "avg_trade_return_pct": -0.008,
+      "median_trade_return_pct": -0.0761,
+      "max_drawdown_pct": -51.31,
+      "avg_hold_duration_mins": 37.7,
+      "slippage_0bps": -25.22,
+      "slippage_5bps": -96.25,
+      "slippage_10bps": -99.81,
+      "exit_counts": {
+        "TARGET": 816,
+        "STOP": 2032,
+        "FORCED_EXIT": 146,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -6.0
+    },
+    "NO_LATE": {
+      "variant_name": "NO_LATE",
+      "total_trades": 3744,
+      "wins": 1150,
+      "losses": 2594,
+      "breakevens": 0,
+      "win_rate": 0.3072,
+      "profit_factor": 0.9581,
+      "expectancy": -0.0071,
+      "total_R": -396.08,
+      "avg_R": -0.1058,
+      "median_R": -1.0,
+      "r_std": 1.3469,
+      "gross_return_compounded": -27.22,
+      "gross_return_mean_symbol": -1.04,
+      "avg_trade_return_pct": -0.0071,
+      "median_trade_return_pct": -0.0643,
+      "max_drawdown_pct": -50.99,
+      "avg_hold_duration_mins": 33.2,
+      "slippage_0bps": -27.22,
+      "slippage_5bps": -98.28,
+      "slippage_10bps": -99.96,
+      "exit_counts": {
+        "TARGET": 1041,
+        "STOP": 2544,
+        "FORCED_EXIT": 159,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -6.09
+    }
+  },
+  "extra_metrics": {
+    "FULL": {
+      "median_hold_minutes": 0.0,
+      "benchmark_mean_bnh_return_pct": 5.05
+    },
+    "MORNING": {
+      "median_hold_minutes": 10.0,
+      "benchmark_mean_bnh_return_pct": 5.05
+    },
+    "MORNING_EXT": {
+      "median_hold_minutes": 5.0,
+      "benchmark_mean_bnh_return_pct": 5.05
+    },
+    "EARLY_DAY": {
+      "median_hold_minutes": 5.0,
+      "benchmark_mean_bnh_return_pct": 5.05
+    },
+    "NO_LATE": {
+      "median_hold_minutes": 5.0,
+      "benchmark_mean_bnh_return_pct": 5.05
+    }
+  },
+  "accounting": {
+    "FULL": {
+      "candidate_signals": 21087,
+      "actual_entries": 5691,
+      "window_rejected": 0,
+      "position_open_skips": 15057,
+      "cap_rejected": 0,
+      "simulation_none": 339,
+      "same_bar_ambiguity": 693,
+      "baseline_entries_not_taken": 0,
+      "identity": "candidates = entries + position_open_skips + cap_rejected + window_rejected + simulation_none",
+      "identity_holds": true
+    },
+    "MORNING": {
+      "candidate_signals": 21087,
+      "actual_entries": 1566,
+      "window_rejected": 11951,
+      "position_open_skips": 7231,
+      "cap_rejected": 0,
+      "simulation_none": 339,
+      "same_bar_ambiguity": 114,
+      "baseline_entries_not_taken": 4125,
+      "identity": "candidates = entries + position_open_skips + cap_rejected + window_rejected + simulation_none",
+      "identity_holds": true
+    },
+    "MORNING_EXT": {
+      "candidate_signals": 21087,
+      "actual_entries": 2199,
+      "window_rejected": 9594,
+      "position_open_skips": 8955,
+      "cap_rejected": 0,
+      "simulation_none": 339,
+      "same_bar_ambiguity": 200,
+      "baseline_entries_not_taken": 3492,
+      "identity": "candidates = entries + position_open_skips + cap_rejected + window_rejected + simulation_none",
+      "identity_holds": true
+    },
+    "EARLY_DAY": {
+      "candidate_signals": 21087,
+      "actual_entries": 2994,
+      "window_rejected": 7039,
+      "position_open_skips": 10715,
+      "cap_rejected": 0,
+      "simulation_none": 339,
+      "same_bar_ambiguity": 323,
+      "baseline_entries_not_taken": 2697,
+      "identity": "candidates = entries + position_open_skips + cap_rejected + window_rejected + simulation_none",
+      "identity_holds": true
+    },
+    "NO_LATE": {
+      "candidate_signals": 21087,
+      "actual_entries": 3744,
+      "window_rejected": 4587,
+      "position_open_skips": 12417,
+      "cap_rejected": 0,
+      "simulation_none": 339,
+      "same_bar_ambiguity": 421,
+      "baseline_entries_not_taken": 1947,
+      "identity": "candidates = entries + position_open_skips + cap_rejected + window_rejected + simulation_none",
+      "identity_holds": true
+    }
+  },
+  "frequency_distribution": {
+    "FULL": {
+      "symbol_sessions_with_entries": 1168,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 346,
+          "pct": 29.62
+        },
+        "2": {
+          "sessions": 148,
+          "pct": 12.67
+        },
+        "3": {
+          "sessions": 122,
+          "pct": 10.45
+        },
+        "4": {
+          "sessions": 88,
+          "pct": 7.53
+        },
+        "5+": {
+          "sessions": 464,
+          "pct": 39.73
+        }
+      },
+      "mean_per_active_session": 4.872,
+      "median_per_active_session": 3.0,
+      "max_per_session": 28,
+      "mean_per_all_symbol_sessions": 3.794
+    },
+    "MORNING": {
+      "symbol_sessions_with_entries": 857,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 499,
+          "pct": 58.23
+        },
+        "2": {
+          "sessions": 181,
+          "pct": 21.12
+        },
+        "3": {
+          "sessions": 85,
+          "pct": 9.92
+        },
+        "4": {
+          "sessions": 45,
+          "pct": 5.25
+        },
+        "5+": {
+          "sessions": 47,
+          "pct": 5.48
+        }
+      },
+      "mean_per_active_session": 1.827,
+      "median_per_active_session": 1.0,
+      "max_per_session": 10,
+      "mean_per_all_symbol_sessions": 1.044
+    },
+    "MORNING_EXT": {
+      "symbol_sessions_with_entries": 915,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 455,
+          "pct": 49.73
+        },
+        "2": {
+          "sessions": 157,
+          "pct": 17.16
+        },
+        "3": {
+          "sessions": 103,
+          "pct": 11.26
+        },
+        "4": {
+          "sessions": 69,
+          "pct": 7.54
+        },
+        "5+": {
+          "sessions": 131,
+          "pct": 14.32
+        }
+      },
+      "mean_per_active_session": 2.403,
+      "median_per_active_session": 2.0,
+      "max_per_session": 13,
+      "mean_per_all_symbol_sessions": 1.466
+    },
+    "EARLY_DAY": {
+      "symbol_sessions_with_entries": 975,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 424,
+          "pct": 43.49
+        },
+        "2": {
+          "sessions": 147,
+          "pct": 15.08
+        },
+        "3": {
+          "sessions": 99,
+          "pct": 10.15
+        },
+        "4": {
+          "sessions": 82,
+          "pct": 8.41
+        },
+        "5+": {
+          "sessions": 223,
+          "pct": 22.87
+        }
+      },
+      "mean_per_active_session": 3.071,
+      "median_per_active_session": 2.0,
+      "max_per_session": 16,
+      "mean_per_all_symbol_sessions": 1.996
+    },
+    "NO_LATE": {
+      "symbol_sessions_with_entries": 1028,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 401,
+          "pct": 39.01
+        },
+        "2": {
+          "sessions": 144,
+          "pct": 14.01
+        },
+        "3": {
+          "sessions": 102,
+          "pct": 9.92
+        },
+        "4": {
+          "sessions": 80,
+          "pct": 7.78
+        },
+        "5+": {
+          "sessions": 301,
+          "pct": 29.28
+        }
+      },
+      "mean_per_active_session": 3.642,
+      "median_per_active_session": 2.0,
+      "max_per_session": 20,
+      "mean_per_all_symbol_sessions": 2.496
+    }
+  },
+  "integrity": {
+    "FULL": {
+      "candidate_signals_equal_baseline": true,
+      "trades_equal_baseline_filtered_by_window": true,
+      "all_entries_inside_window": true,
+      "no_cap_applied": true,
+      "stop_mode_signal_low_target_2r": true
+    },
+    "MORNING": {
+      "candidate_signals_equal_baseline": true,
+      "trades_equal_baseline_filtered_by_window": true,
+      "all_entries_inside_window": true,
+      "no_cap_applied": true,
+      "stop_mode_signal_low_target_2r": true
+    },
+    "MORNING_EXT": {
+      "candidate_signals_equal_baseline": true,
+      "trades_equal_baseline_filtered_by_window": true,
+      "all_entries_inside_window": true,
+      "no_cap_applied": true,
+      "stop_mode_signal_low_target_2r": true
+    },
+    "EARLY_DAY": {
+      "candidate_signals_equal_baseline": true,
+      "trades_equal_baseline_filtered_by_window": true,
+      "all_entries_inside_window": true,
+      "no_cap_applied": true,
+      "stop_mode_signal_low_target_2r": true
+    },
+    "NO_LATE": {
+      "candidate_signals_equal_baseline": true,
+      "trades_equal_baseline_filtered_by_window": true,
+      "all_entries_inside_window": true,
+      "no_cap_applied": true,
+      "stop_mode_signal_low_target_2r": true
+    }
+  },
+  "accepted_entries_by_bin": {
+    "FULL": {
+      "09:30\u201310:00": 838,
+      "10:00\u201311:00": 728,
+      "11:00\u201312:00": 633,
+      "12:00\u201314:00": 1545,
+      "14:00\u201315:00": 864,
+      "15:00\u201315:55": 1083
+    },
+    "MORNING": {
+      "09:30\u201310:00": 838,
+      "10:00\u201311:00": 728,
+      "11:00\u201312:00": 0,
+      "12:00\u201314:00": 0,
+      "14:00\u201315:00": 0,
+      "15:00\u201315:55": 0
+    },
+    "MORNING_EXT": {
+      "09:30\u201310:00": 838,
+      "10:00\u201311:00": 728,
+      "11:00\u201312:00": 633,
+      "12:00\u201314:00": 0,
+      "14:00\u201315:00": 0,
+      "15:00\u201315:55": 0
+    },
+    "EARLY_DAY": {
+      "09:30\u201310:00": 838,
+      "10:00\u201311:00": 728,
+      "11:00\u201312:00": 633,
+      "12:00\u201314:00": 795,
+      "14:00\u201315:00": 0,
+      "15:00\u201315:55": 0
+    },
+    "NO_LATE": {
+      "09:30\u201310:00": 838,
+      "10:00\u201311:00": 728,
+      "11:00\u201312:00": 633,
+      "12:00\u201314:00": 1545,
+      "14:00\u201315:00": 0,
+      "15:00\u201315:55": 0
+    }
+  },
+  "rejected_candidate_entries_by_bin": {
+    "FULL": {
+      "09:30\u201310:00": 0,
+      "10:00\u201311:00": 0,
+      "11:00\u201312:00": 0,
+      "12:00\u201314:00": 0,
+      "14:00\u201315:00": 0,
+      "15:00\u201315:55": 0
+    },
+    "MORNING": {
+      "09:30\u201310:00": 0,
+      "10:00\u201311:00": 0,
+      "11:00\u201312:00": 1311,
+      "12:00\u201314:00": 4751,
+      "14:00\u201315:00": 2792,
+      "15:00\u201315:55": 3097
+    },
+    "MORNING_EXT": {
+      "09:30\u201310:00": 0,
+      "10:00\u201311:00": 0,
+      "11:00\u201312:00": 0,
+      "12:00\u201314:00": 3909,
+      "14:00\u201315:00": 2674,
+      "15:00\u201315:55": 3011
+    },
+    "EARLY_DAY": {
+      "09:30\u201310:00": 0,
+      "10:00\u201311:00": 0,
+      "11:00\u201312:00": 0,
+      "12:00\u201314:00": 1644,
+      "14:00\u201315:00": 2471,
+      "15:00\u201315:55": 2924
+    },
+    "NO_LATE": {
+      "09:30\u201310:00": 0,
+      "10:00\u201311:00": 0,
+      "11:00\u201312:00": 0,
+      "12:00\u201314:00": 0,
+      "14:00\u201315:00": 1817,
+      "15:00\u201315:55": 2770
+    }
+  },
+  "baseline_quality_by_entry_bin": {
+    "09:30\u201310:00": {
+      "count": 838,
+      "win_rate": 0.3401,
+      "profit_factor": 0.9931,
+      "avg_R": -0.0568,
+      "total_R": -47.59,
+      "exit_counts": {
+        "STOP": 521,
+        "TARGET": 210,
+        "FORCED_EXIT": 107
+      },
+      "avg_hold_minutes": 83.5
+    },
+    "10:00\u201311:00": {
+      "count": 728,
+      "win_rate": 0.2912,
+      "profit_factor": 0.9523,
+      "avg_R": -0.1397,
+      "total_R": -101.73,
+      "exit_counts": {
+        "STOP": 511,
+        "TARGET": 200,
+        "FORCED_EXIT": 17
+      },
+      "avg_hold_minutes": 24.6
+    },
+    "11:00\u201312:00": {
+      "count": 633,
+      "win_rate": 0.2622,
+      "profit_factor": 0.7232,
+      "avg_R": -0.2215,
+      "total_R": -140.22,
+      "exit_counts": {
+        "STOP": 462,
+        "TARGET": 161,
+        "FORCED_EXIT": 10
+      },
+      "avg_hold_minutes": 20.0
+    },
+    "12:00\u201314:00": {
+      "count": 1545,
+      "win_rate": 0.3152,
+      "profit_factor": 1.0283,
+      "avg_R": -0.069,
+      "total_R": -106.55,
+      "exit_counts": {
+        "STOP": 1050,
+        "TARGET": 470,
+        "FORCED_EXIT": 25
+      },
+      "avg_hold_minutes": 15.3
+    },
+    "14:00\u201315:00": {
+      "count": 864,
+      "win_rate": 0.287,
+      "profit_factor": 0.8523,
+      "avg_R": -0.1667,
+      "total_R": -144.07,
+      "exit_counts": {
+        "STOP": 602,
+        "TARGET": 223,
+        "FORCED_EXIT": 39
+      },
+      "avg_hold_minutes": 12.4
+    },
+    "15:00\u201315:55": {
+      "count": 1083,
+      "win_rate": 0.3075,
+      "profit_factor": 0.8533,
+      "avg_R": -0.1836,
+      "total_R": -198.83,
+      "exit_counts": {
+        "STOP": 638,
+        "TARGET": 194,
+        "FORCED_EXIT": 251
+      },
+      "avg_hold_minutes": 5.7
+    }
+  },
+  "baseline_boundary_entries": {
+    "11:00": 52,
+    "12:00": 64,
+    "13:00": 64,
+    "14:00": 66,
+    "15:55": 128
+  },
+  "baseline_1555_entries": {
+    "count": 128,
+    "win_rate": 0.4766,
+    "profit_factor": 1.2106,
+    "avg_R": -0.0112,
+    "total_R": -1.43,
+    "exit_counts": {
+      "STOP": 0,
+      "TARGET": 0,
+      "FORCED_EXIT": 128
+    },
+    "avg_hold_minutes": 0.0
+  },
+  "concentration": {
+    "FULL": {
+      "per_symbol_total_R": {
+        "AAPL": -2.25,
+        "MSFT": -43.27,
+        "NVDA": -40.35,
+        "AMZN": -68.97,
+        "META": -12.07,
+        "GOOGL": -50.6,
+        "TSLA": -7.58,
+        "AVGO": -45.67,
+        "AMD": 9.67,
+        "QCOM": -25.69,
+        "INTC": -9.3,
+        "MU": -29.4,
+        "AMAT": -50.11,
+        "ADBE": -6.59,
+        "CRM": -4.93,
+        "ORCL": -38.64,
+        "CSCO": -43.16,
+        "COST": -50.2,
+        "WMT": -23.48,
+        "KO": -32.88,
+        "PEP": -16.91,
+        "NFLX": -56.08,
+        "JNJ": -24.55,
+        "JPM": -41.34,
+        "XOM": -24.65
+      },
+      "symbols_with_positive_R": 1,
+      "symbols_total": 25,
+      "top2_abs_R_symbols": [
+        "AMZN",
+        "NFLX"
+      ]
+    },
+    "MORNING": {
+      "per_symbol_total_R": {
+        "AAPL": 5.55,
+        "MSFT": 2.15,
+        "NVDA": -21.49,
+        "AMZN": -5.06,
+        "META": 1.96,
+        "GOOGL": 1.47,
+        "TSLA": 9.2,
+        "AVGO": -11.61,
+        "AMD": -5.04,
+        "QCOM": -17.0,
+        "INTC": 3.02,
+        "MU": -0.39,
+        "AMAT": -18.0,
+        "ADBE": -0.47,
+        "CRM": 9.89,
+        "ORCL": -19.77,
+        "CSCO": -16.51,
+        "COST": -19.29,
+        "WMT": -6.05,
+        "KO": 5.68,
+        "PEP": -10.77,
+        "NFLX": -7.62,
+        "JNJ": -2.17,
+        "JPM": -20.63,
+        "XOM": -6.36
+      },
+      "symbols_with_positive_R": 8,
+      "symbols_total": 25,
+      "top2_abs_R_symbols": [
+        "NVDA",
+        "JPM"
+      ]
+    },
+    "MORNING_EXT": {
+      "per_symbol_total_R": {
+        "AAPL": 0.72,
+        "MSFT": 0.25,
+        "NVDA": -31.49,
+        "AMZN": -9.06,
+        "META": -9.3,
+        "GOOGL": -10.72,
+        "TSLA": -0.8,
+        "AVGO": -11.46,
+        "AMD": -0.04,
+        "QCOM": -20.0,
+        "INTC": -2.98,
+        "MU": -9.45,
+        "AMAT": -23.0,
+        "ADBE": -6.47,
+        "CRM": 16.89,
+        "ORCL": -30.77,
+        "CSCO": -25.51,
+        "COST": -25.29,
+        "WMT": -13.05,
+        "KO": -4.3,
+        "PEP": -12.77,
+        "NFLX": -21.62,
+        "JNJ": -8.81,
+        "JPM": -17.63,
+        "XOM": -12.88
+      },
+      "symbols_with_positive_R": 3,
+      "symbols_total": 25,
+      "top2_abs_R_symbols": [
+        "NVDA",
+        "ORCL"
+      ]
+    },
+    "EARLY_DAY": {
+      "per_symbol_total_R": {
+        "AAPL": 1.29,
+        "MSFT": -0.4,
+        "NVDA": -28.49,
+        "AMZN": -24.06,
+        "META": -18.72,
+        "GOOGL": -17.72,
+        "TSLA": -1.8,
+        "AVGO": -16.18,
+        "AMD": -3.04,
+        "QCOM": -18.0,
+        "INTC": -3.98,
+        "MU": -0.45,
+        "AMAT": -25.62,
+        "ADBE": -11.47,
+        "CRM": 14.89,
+        "ORCL": -23.77,
+        "CSCO": -32.51,
+        "COST": -41.83,
+        "WMT": -17.92,
+        "KO": -1.3,
+        "PEP": -2.61,
+        "NFLX": -29.62,
+        "JNJ": 1.07,
+        "JPM": -25.16,
+        "XOM": -8.88
+      },
+      "symbols_with_positive_R": 3,
+      "symbols_total": 25,
+      "top2_abs_R_symbols": [
+        "COST",
+        "CSCO"
+      ]
+    },
+    "NO_LATE": {
+      "per_symbol_total_R": {
+        "AAPL": -6.68,
+        "MSFT": -9.4,
+        "NVDA": -27.49,
+        "AMZN": -49.86,
+        "META": -17.6,
+        "GOOGL": -32.72,
+        "TSLA": -11.8,
+        "AVGO": -24.47,
+        "AMD": 1.96,
+        "QCOM": -16.09,
+        "INTC": -10.98,
+        "MU": 2.55,
+        "AMAT": -24.6,
+        "ADBE": 1.53,
+        "CRM": 14.89,
+        "ORCL": -25.77,
+        "CSCO": -35.62,
+        "COST": -45.46,
+        "WMT": -17.92,
+        "KO": -6.91,
+        "PEP": 2.39,
+        "NFLX": -31.62,
+        "JNJ": -9.09,
+        "JPM": -21.45,
+        "XOM": 6.12
+      },
+      "symbols_with_positive_R": 6,
+      "symbols_total": 25,
+      "top2_abs_R_symbols": [
+        "AMZN",
+        "COST"
+      ]
+    }
+  },
+  "h5_evaluation": {
+    "evidence_by_restricted_window": {
+      "MORNING": {
+        "pf_and_avg_r_above_full": true,
+        "pf_above_1": false,
+        "five_bps_non_negative": false,
+        "ten_bps_non_negative": false,
+        "majority_symbols_positive_R": false
+      },
+      "MORNING_EXT": {
+        "pf_and_avg_r_above_full": false,
+        "pf_above_1": false,
+        "five_bps_non_negative": false,
+        "ten_bps_non_negative": false,
+        "majority_symbols_positive_R": false
+      },
+      "EARLY_DAY": {
+        "pf_and_avg_r_above_full": true,
+        "pf_above_1": false,
+        "five_bps_non_negative": false,
+        "ten_bps_non_negative": false,
+        "majority_symbols_positive_R": false
+      },
+      "NO_LATE": {
+        "pf_and_avg_r_above_full": true,
+        "pf_above_1": false,
+        "five_bps_non_negative": false,
+        "ten_bps_non_negative": false,
+        "majority_symbols_positive_R": false
+      }
+    },
+    "restricted_windows_by_gross_0bps_desc": [
+      "MORNING",
+      "EARLY_DAY",
+      "NO_LATE",
+      "MORNING_EXT"
+    ],
+    "status": "INCONCLUSIVE"
+  },
+  "validation": {
+    "h5_tests": "tests/test_day11_time_window.py: 111 passed (boundary 18 times x 5 windows + UTC input, DST, synthetic engine, fast/reference synthetic x5 + frozen AAPL subset x3, frozen-data invariants, PIT mutation, symbol isolation)",
+    "targeted_regression_before_change": "167 passed (DAY-02, DAY-05, DAY-07, DAY-08, DAY-09, DAY-10, cache immutability)",
+    "targeted_regression_after_change_incl_h5": "278 passed, 0 failed",
+    "full_pytest": "1031 tests, 1031 passed, 0 failures, 0 errors, 0 skipped (network blocked by tests/conftest.py guard)",
+    "pit": "future-session mutation (AAPL, sessions >= 2026-08-14, x1.07 price, x3 volume): earlier trades and window-rejection decisions identical for MORNING and NO_LATE; gate depends only on entry timestamp + fixed config",
+    "boundaries": "09:29,09:30,09:35,10:59,11:00,11:01,11:55,12:00,12:01,12:55,13:00,13:01,13:55,14:00,14:01,15:50,15:55,16:00 checked for every window (half-open [start,end) on the ENTRY bar open); signal 10:55 -> entry 11:00 rejected by MORNING; signal 10:50 -> entry 10:55 accepted; 15:50 signal -> 15:55 entry accepted by FULL; 15:55 signal -> simulation_none",
+    "fast_reference_equivalence": "identical trades, candidates, skips, window rejections, metrics (synthetic all windows; frozen AAPL first 312 bars for FULL/MORNING/NO_LATE)",
+    "cache_and_artifact_hashes_before_after": {
+      "data/cache (305 files)": "UNCHANGED manifest f5d45ba3c615cbc6",
+      "artifacts/day08 (2 files)": "UNCHANGED manifest cccbf4270ad0ff8a",
+      "artifacts/day08b (6 files)": "UNCHANGED manifest cc47befd5083ce75",
+      "artifacts/day09 (2 files)": "UNCHANGED manifest 2e68d85871b3dee8",
+      "artifacts/day10 (2 files)": "UNCHANGED manifest 53f2a1294b5cc73e"
+    }
+  }
+}

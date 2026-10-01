@@ -1,0 +1,146 @@
+==============================================================================================================
+DAY-10 — H3 SESSION TRADE FREQUENCY CAP — RESEARCH EXPERIMENT REPORT
+==============================================================================================================
+
+1. HYPOTHESIS & DESIGN
+--------------------------------------------------------------------------------------------------------------
+H3: Many re-entries per symbol per session may increase churn and cost drag. Does a per-session cap on
+actual entries change outcomes? Pre-declared caps only; no cap is selected or called best/optimal.
+  Variants      : NO CAP, CAP 1, CAP 2, CAP 3, CAP 4, CAP 5
+  Cap semantics : per symbol + per RTH session (09:30-16:00 ET); counts ACTUAL entries executed before the current signal; reset each session; checked after the existing position-open skip and before entry
+  Engine        : backtest.day_engine.run_day_backtest (fast engine, unchanged execution) via run_multi_symbol_day_backtest
+  entry         : T + 1 5m OPEN
+  initial_stop  : SIGNAL_LOW
+  target        : 2.0R
+  same_bar_ambiguity: STOP_FIRST
+  forced_exit   : 15:55 ET
+  direction     : long-only
+  costs         : 0 bps simulated; 5/10 bps applied post-hoc (DAY-07 compounded model)
+
+2. FROZEN DATASET
+--------------------------------------------------------------------------------------------------------------
+  25 symbols, 60 RTH sessions, 2026-07-02 13:30:00+00:00 -> 2026-09-25 19:55:00+00:00
+  symbol-sessions: 1500  timeframes: 5m, 15m (context)
+
+3. BASELINE REGRESSION (NO CAP == DAY-02 baseline)
+--------------------------------------------------------------------------------------------------------------
+  total_trades              : actual=5691  expected=5691  OK
+  win_rate                  : actual=0.3042  expected=0.3042  OK
+  profit_factor             : actual=0.9388  expected=0.9388  OK
+  total_R                   : actual=-738.98  expected=-738.98  OK
+  gross_return_compounded   : actual=-41.19  expected=-41.19  OK
+  Regression verified: True
+
+4. SIGNAL vs TRADE POPULATION
+--------------------------------------------------------------------------------------------------------------
+                                           NO CAP          CAP 1          CAP 2          CAP 3          CAP 4          CAP 5
+Candidate signals                           21087          21087          21087          21087          21087          21087
+Actual entries                               5691           1168           1990           2664           3216           3680
+Cap-rejected entries                            0          14323          11323           8904           7192           5753
+Engine skipped (position open)              15057           5577           7693           9410          10539          11493
+Simulation none (EOD/data end)                339             19             81            109            140            161
+Baseline entries removed                        0           4523           3701           3027           2475           2011
+Accounting identity holds                       1              1              1              1              1              1
+
+5. CRITICAL COMPARISON (0 bps unless stated)
+--------------------------------------------------------------------------------------------------------------
+                                           NO CAP          CAP 1          CAP 2          CAP 3          CAP 4          CAP 5
+Trades                                       5691           1168           1990           2664           3216           3680
+Avg trades / active session                 4.872            1.0          1.704          2.281          2.753          3.151
+Win rate                                   30.42%         32.96%         31.66%         31.08%         30.81%         30.65%
+Profit factor                              0.9388         1.0224         0.9807         0.9678         0.9602         0.9539
+Expectancy (%/trade)                      -0.0083         0.0063        -0.0044        -0.0064        -0.0073        -0.0078
+Total R                                   -738.98        -103.59        -205.30        -309.29        -380.56        -453.47
+Average R                                 -0.1299        -0.0887        -0.1032        -0.1161        -0.1183        -0.1232
+Median R                                  -1.0000        -1.0000        -1.0000        -1.0000        -1.0000        -1.0000
+R std                                      1.4304         1.4289         1.3999         1.3878         1.3797         1.3753
+Max drawdown                              -58.65%        -32.17%        -41.76%        -43.89%        -47.81%        -50.45%
+Compounded 0 bps                          -41.19%          3.58%        -12.55%        -19.86%        -24.82%        -28.96%
+Compounded 5 bps                          -99.80%        -67.79%        -88.05%        -94.42%        -96.98%        -98.21%
+Compounded 10 bps                        -100.00%        -89.98%        -98.37%        -99.61%        -99.88%        -99.95%
+Wins / Losses / BE                    1731/3958/2      385/783/0     630/1360/0     828/1836/0     991/2225/0    1128/2552/0
+Exit STOP                                    3784            736           1296           1758           2138           2456
+Exit TARGET                                  1458            298            518            687            831            951
+Exit FORCED_EXIT                              449            134            176            219            247            273
+Same-bar ambiguity                            693             95            187            267            349            427
+Avg hold (min)                               24.8           61.9           45.6           38.9           34.6           32.2
+
+6. SESSION FREQUENCY DISTRIBUTION (denominator: symbol-sessions with >=1 entry)
+--------------------------------------------------------------------------------------------------------------
+                                           NO CAP          CAP 1          CAP 2          CAP 3          CAP 4          CAP 5
+Active symbol-sessions                       1168           1168           1168           1168           1168           1168
+1 trade(s)/session                    346 (29.6%)  1168 (100.0%)    346 (29.6%)    346 (29.6%)    346 (29.6%)    346 (29.6%)
+2 trade(s)/session                    148 (12.7%)       0 (0.0%)    822 (70.4%)    148 (12.7%)    148 (12.7%)    148 (12.7%)
+3 trade(s)/session                    122 (10.4%)       0 (0.0%)       0 (0.0%)    674 (57.7%)    122 (10.4%)    122 (10.4%)
+4 trade(s)/session                      88 (7.5%)       0 (0.0%)       0 (0.0%)       0 (0.0%)    552 (47.3%)      88 (7.5%)
+5+ trade(s)/session                   464 (39.7%)       0 (0.0%)       0 (0.0%)       0 (0.0%)       0 (0.0%)    464 (39.7%)
+Median / active session                       3.0            1.0            2.0            3.0            3.0            3.0
+Max / session                                  28              1              2              3              4              5
+Mean / all symbol-sessions                  3.794          0.779          1.327          1.776          2.144          2.453
+
+7. TRADE-SEQUENCE ATTRIBUTION (baseline trades; explanatory only — NOT used to choose a cap)
+--------------------------------------------------------------------------------------------------------------
+Seq     Count       WR       PF    Avg R   Total R   STOP   TGT   FRC   Hold    Stop%   MFE_R   MAE_R
+#1       1168   32.96%   1.0224  -0.0887   -103.59    736   298   134   61.9   0.4866   2.413  -2.454
+#2        822   29.81%   0.8724  -0.1237   -101.71    560   220    42   22.3   0.2326   2.388  -2.606
+#3        674   29.38%   0.8918  -0.1543   -103.99    462   169    43   19.1   0.1757   2.573  -2.689
+#4        552   29.53%   0.8861  -0.1291    -71.27    380   144    28   14.2   0.1504   6.326  -2.207
+#5+      2475   29.90%   0.8715  -0.1448   -358.42   1646   627   202   12.0   0.1208   2.670  -2.417
+
+8. REPEATED-ENTRY DIAGNOSTICS (baseline)
+--------------------------------------------------------------------------------------------------------------
+  Minutes from previous exit to next entry (same symbol-session): n=4523 median=5.0 p25=5.0 p75=15.0 p90=50.0
+    #2: n=822 median=10.0 p75=45.0
+    #3: n=674 median=5.0 p75=20.0
+    #4: n=552 median=5.0 p75=15.0
+    #5+: n=2475 median=5.0 p75=10.0
+  Re-entry outcome by previous trade's exit reason:
+    after STOP        : n=3224  WR=29.87%  PF=0.8575  avg R=-0.1353  total R=-436.19
+    after TARGET      : n=1299  WR=29.48%  PF=0.9446  avg R=-0.1534  total R=-199.21
+
+9. SYMBOL CONCENTRATION
+--------------------------------------------------------------------------------------------------------------
+Variant            Top-2   Top-2 R   Ex-top2 R  Ex-top2 PF   Sym R>0
+NO CAP         AMZN,NFLX   -125.05     -613.93      0.9517     1/25
+CAP 1            MU,AMZN    -51.22      -52.37      1.0548     9/25
+CAP 2          COST,ORCL    -63.49     -141.81      1.0278     6/25
+CAP 3          COST,ORCL    -64.57     -244.72      1.0049     5/25
+CAP 4          COST,NFLX    -69.94     -310.62      0.9683     3/25
+CAP 5          COST,NFLX    -76.65     -376.83      0.9609     4/25
+
+10. INTEGRITY & POINT-IN-TIME
+--------------------------------------------------------------------------------------------------------------
+  NO CAP  : candidate_signals_equal_baseline=True, trades_are_per_session_prefix_of_baseline=True, trade_count_equals_min(baseline_session_count, cap)=True, max_entries_per_session_le_cap=True
+  CAP 1   : candidate_signals_equal_baseline=True, trades_are_per_session_prefix_of_baseline=True, trade_count_equals_min(baseline_session_count, cap)=True, max_entries_per_session_le_cap=True
+  CAP 2   : candidate_signals_equal_baseline=True, trades_are_per_session_prefix_of_baseline=True, trade_count_equals_min(baseline_session_count, cap)=True, max_entries_per_session_le_cap=True
+  CAP 3   : candidate_signals_equal_baseline=True, trades_are_per_session_prefix_of_baseline=True, trade_count_equals_min(baseline_session_count, cap)=True, max_entries_per_session_le_cap=True
+  CAP 4   : candidate_signals_equal_baseline=True, trades_are_per_session_prefix_of_baseline=True, trade_count_equals_min(baseline_session_count, cap)=True, max_entries_per_session_le_cap=True
+  CAP 5   : candidate_signals_equal_baseline=True, trades_are_per_session_prefix_of_baseline=True, trade_count_equals_min(baseline_session_count, cap)=True, max_entries_per_session_le_cap=True
+  count_uses_only_prior_entries     : True
+  session_reset                     : True
+  symbol_isolation                  : one gate per symbol backtest run
+  future_session_information_used   : False
+  verified_by_tests                 : tests/test_day10_frequency_cap.py
+
+11. DENOMINATORS
+--------------------------------------------------------------------------------------------------------------
+  win_rate/profit_factor/R stats: actual entries of the variant
+  compounded_return             : product of (1 + gross_return) over the variant's trades by entry_time, 1 unit/trade
+  frequency distribution        : symbol-sessions with >=1 entry (DAY-05 definition); mean_per_all_symbol_sessions uses all symbols x sessions
+
+12. H3 EVALUATION (pre-declared rule)
+--------------------------------------------------------------------------------------------------------------
+  Rule: Pre-declared, mechanical. SUPPORTED: every cap 1-5 has profit_factor AND avg_R above the no-cap baseline (0 bps) AND its 5 bps compounded return is above the baseline's AND >= 0%. NOT SUPPORTED: no cap improves both profit_factor and avg_R over the baseline. INCONCLUSIVE: anything else.
+  PF and avg R above baseline          : {'CAP 1': True, 'CAP 2': True, 'CAP 3': True, 'CAP 4': True, 'CAP 5': True}
+  5 bps above baseline and >= 0%        : {'CAP 1': False, 'CAP 2': False, 'CAP 3': False, 'CAP 4': False, 'CAP 5': False}
+  Capped 5 bps compounded range        : -98.21% .. -67.79%
+  Transaction-cost problem resolved @5bps: False
+  H3 STATUS: INCONCLUSIVE
+
+13. INTERPRETATION RULES
+--------------------------------------------------------------------------------------------------------------
+  - No cap is declared best, optimal or production-ready; no new caps are derived from these results.
+  - Trade-sequence subgroups are explanatory diagnostics only.
+  - Gross (0 bps) changes must be read together with 5/10 bps, drawdown, sample size and symbol spread.
+  - H3 is tested in isolation (SIGNAL_LOW, 2R, existing execution); no H2/H4/time-of-day combination.
+==============================================================================================================

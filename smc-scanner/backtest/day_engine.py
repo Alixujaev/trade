@@ -23,16 +23,32 @@ from backtest.day_types import (
 )
 from backtest.execution import simulate_trade_execution
 from backtest.metrics import compute_day_metrics
+from backtest.session_gate import SessionEntryGate
 from data.bars import filter_closed_bars
 from data.factory import get_provider
 from data.provider import DataProvider
-from data.session import get_session_dates, is_rth_series, to_eastern
+from data.session import get_session_date, get_session_dates, is_rth_series, to_eastern
 from strategy.day.types import DaySetupStatus, VwapRelation
 from strategy.day.vwap_momentum import (
     evaluate_vwap_momentum,
     evaluate_vwap_momentum_at_index,
     precompute_day_features,
 )
+
+
+def _prospective_entry_time(df_5m: pd.DataFrame, setup_bar_idx: int) -> pd.Timestamp | None:
+    """Entry bar (T+1) open timestamp, mirroring simulate_trade_execution's entry rule.
+
+    Returns None when no same-session next bar exists; then no entry is possible and
+    simulate_trade_execution returns None (counted as simulation_none, not as a window rejection).
+    """
+    entry_idx = setup_bar_idx + 1
+    if entry_idx >= len(df_5m):
+        return None
+    entry_ts = df_5m.index[entry_idx]
+    if get_session_date(entry_ts) != get_session_date(df_5m.index[setup_bar_idx]):
+        return None
+    return entry_ts
 
 
 def run_day_backtest(
@@ -166,6 +182,12 @@ def run_day_backtest(
     skipped_signals: int = 0
     insufficient_data_count: int = 0
     same_bar_ambiguity_count: int = 0
+    candidate_signals: int = 0
+    cap_rejected_signals: int = 0
+    simulation_none_count: int = 0
+    window_rejected_signals: int = 0
+    window_rejected_entry_times: list[pd.Timestamp] = []
+    entry_gate = SessionEntryGate(exec_config.max_trades_per_session)
 
     n_bars = len(df_5m)
     rth_mask = is_rth_series(df_5m.index)
@@ -194,9 +216,24 @@ def run_day_backtest(
                 continue
 
             if setup.status in exec_config.valid_statuses:
+                candidate_signals += 1
                 if i < current_position_exit_idx:
                     skipped_signals += 1
                     continue
+
+                # DAY-10 H3: faqat oldin amalga oshgan entry'lar soniga qarab yangi entry'ni cheklash
+                signal_session = get_session_date(df_5m.index[i])
+                if not entry_gate.allows(signal_session):
+                    cap_rejected_signals += 1
+                    continue
+
+                # DAY-11 H5: haqiqiy ENTRY bar (T+1 open) vaqti oynadan tashqarida bo'lsa yangi pozitsiya ochilmaydi
+                if exec_config.entry_window is not None:
+                    entry_ts = _prospective_entry_time(df_5m, i)
+                    if entry_ts is not None and not exec_config.entry_window.allows(entry_ts):
+                        window_rejected_signals += 1
+                        window_rejected_entry_times.append(entry_ts)
+                        continue
 
                 sim = simulate_trade_execution(
                     df_5m,
@@ -207,9 +244,12 @@ def run_day_backtest(
 
                 if sim is not None:
                     trades.append(sim.trade)
+                    entry_gate.record_entry(signal_session)
                     current_position_exit_idx = sim.exit_bar_index
                     if sim.was_ambiguous:
                         same_bar_ambiguity_count += 1
+                else:
+                    simulation_none_count += 1
     else:
         # Reference (slice-by-slice) simulyatsiya
         for i in range(14, n_bars):
@@ -242,9 +282,24 @@ def run_day_backtest(
                 continue
 
             if setup.status in exec_config.valid_statuses:
+                candidate_signals += 1
                 if i < current_position_exit_idx:
                     skipped_signals += 1
                     continue
+
+                # DAY-10 H3: faqat oldin amalga oshgan entry'lar soniga qarab yangi entry'ni cheklash
+                signal_session = get_session_date(df_5m.index[i])
+                if not entry_gate.allows(signal_session):
+                    cap_rejected_signals += 1
+                    continue
+
+                # DAY-11 H5: haqiqiy ENTRY bar (T+1 open) vaqti oynadan tashqarida bo'lsa yangi pozitsiya ochilmaydi
+                if exec_config.entry_window is not None:
+                    entry_ts = _prospective_entry_time(df_5m, i)
+                    if entry_ts is not None and not exec_config.entry_window.allows(entry_ts):
+                        window_rejected_signals += 1
+                        window_rejected_entry_times.append(entry_ts)
+                        continue
 
                 sim = simulate_trade_execution(
                     df_5m,
@@ -255,9 +310,12 @@ def run_day_backtest(
 
                 if sim is not None:
                     trades.append(sim.trade)
+                    entry_gate.record_entry(signal_session)
                     current_position_exit_idx = sim.exit_bar_index
                     if sim.was_ambiguous:
                         same_bar_ambiguity_count += 1
+                else:
+                    simulation_none_count += 1
 
     # 3. Metrikalar hisoblash
     metrics = compute_day_metrics(trades, buy_and_hold_return=bnh_return_pct)
@@ -395,6 +453,11 @@ def run_day_backtest(
         insufficient_data_count=insufficient_data_count,
         same_bar_ambiguity_count=same_bar_ambiguity_count,
         execution_config=exec_config,
+        candidate_signals=candidate_signals,
+        cap_rejected_signals=cap_rejected_signals,
+        simulation_none_count=simulation_none_count,
+        window_rejected_signals=window_rejected_signals,
+        window_rejected_entry_times=window_rejected_entry_times,
     )
 
 

@@ -1,0 +1,1052 @@
+{
+  "metadata": {
+    "experiment": "DAY-10 H3 Session Trade Frequency Cap",
+    "variants": [
+      "NO CAP",
+      "CAP 1",
+      "CAP 2",
+      "CAP 3",
+      "CAP 4",
+      "CAP 5"
+    ],
+    "caps": [
+      null,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "cap_semantics": "per symbol + per RTH session (09:30-16:00 ET); counts ACTUAL entries executed before the current signal; reset each session; checked after the existing position-open skip and before entry",
+    "engine": "backtest.day_engine.run_day_backtest (fast engine, unchanged execution) via run_multi_symbol_day_backtest",
+    "execution_rules": {
+      "entry": "T + 1 5m OPEN",
+      "initial_stop": "SIGNAL_LOW",
+      "target": "2.0R",
+      "same_bar_ambiguity": "STOP_FIRST",
+      "forced_exit": "15:55 ET",
+      "direction": "long-only",
+      "costs": "0 bps simulated; 5/10 bps applied post-hoc (DAY-07 compounded model)"
+    },
+    "h3_status_rule": "Pre-declared, mechanical. SUPPORTED: every cap 1-5 has profit_factor AND avg_R above the no-cap baseline (0 bps) AND its 5 bps compounded return is above the baseline's AND >= 0%. NOT SUPPORTED: no cap improves both profit_factor and avg_R over the baseline. INCONCLUSIVE: anything else.",
+    "denominators": {
+      "win_rate/profit_factor/R stats": "actual entries of the variant",
+      "compounded_return": "product of (1 + gross_return) over the variant's trades by entry_time, 1 unit/trade",
+      "frequency distribution": "symbol-sessions with >=1 entry (DAY-05 definition); mean_per_all_symbol_sessions uses all symbols x sessions"
+    }
+  },
+  "frozen_dataset": {
+    "universe_size": 25,
+    "universe_symbols": [
+      "AAPL",
+      "MSFT",
+      "NVDA",
+      "AMZN",
+      "META",
+      "GOOGL",
+      "TSLA",
+      "AVGO",
+      "AMD",
+      "QCOM",
+      "INTC",
+      "MU",
+      "AMAT",
+      "ADBE",
+      "CRM",
+      "ORCL",
+      "CSCO",
+      "COST",
+      "WMT",
+      "KO",
+      "PEP",
+      "NFLX",
+      "JNJ",
+      "JPM",
+      "XOM"
+    ],
+    "period_start": "2026-07-02 13:30:00+00:00",
+    "period_end": "2026-09-25 19:55:00+00:00",
+    "rth_sessions": 60,
+    "symbol_sessions_total": 1500,
+    "timeframes": [
+      "5m",
+      "15m (context)"
+    ]
+  },
+  "baseline_regression": {
+    "checks": {
+      "total_trades": {
+        "actual": 5691,
+        "expected": 5691,
+        "pass": true
+      },
+      "win_rate": {
+        "actual": 0.3042,
+        "expected": 0.3042,
+        "pass": true
+      },
+      "profit_factor": {
+        "actual": 0.9388,
+        "expected": 0.9388,
+        "pass": true
+      },
+      "total_R": {
+        "actual": -738.98,
+        "expected": -738.98,
+        "pass": true
+      },
+      "gross_return_compounded": {
+        "actual": -41.19,
+        "expected": -41.19,
+        "pass": true
+      }
+    },
+    "regression_verified": true
+  },
+  "metrics": {
+    "NO CAP": {
+      "variant_name": "NO CAP",
+      "total_trades": 5691,
+      "wins": 1731,
+      "losses": 3958,
+      "breakevens": 2,
+      "win_rate": 0.3042,
+      "profit_factor": 0.9388,
+      "expectancy": -0.0083,
+      "total_R": -738.98,
+      "avg_R": -0.1299,
+      "median_R": -1.0,
+      "r_std": 1.4304,
+      "gross_return_compounded": -41.19,
+      "gross_return_mean_symbol": -1.86,
+      "avg_trade_return_pct": -0.0083,
+      "median_trade_return_pct": -0.0504,
+      "max_drawdown_pct": -58.65,
+      "avg_hold_duration_mins": 24.8,
+      "slippage_0bps": -41.19,
+      "slippage_5bps": -99.8,
+      "slippage_10bps": -100.0,
+      "exit_counts": {
+        "TARGET": 1458,
+        "STOP": 3784,
+        "FORCED_EXIT": 449,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -6.91
+    },
+    "CAP 1": {
+      "variant_name": "CAP 1",
+      "total_trades": 1168,
+      "wins": 385,
+      "losses": 783,
+      "breakevens": 0,
+      "win_rate": 0.3296,
+      "profit_factor": 1.0224,
+      "expectancy": 0.0063,
+      "total_R": -103.59,
+      "avg_R": -0.0887,
+      "median_R": -1.0,
+      "r_std": 1.4289,
+      "gross_return_compounded": 3.58,
+      "gross_return_mean_symbol": 0.26,
+      "avg_trade_return_pct": 0.0063,
+      "median_trade_return_pct": -0.1074,
+      "max_drawdown_pct": -32.17,
+      "avg_hold_duration_mins": 61.9,
+      "slippage_0bps": 3.58,
+      "slippage_5bps": -67.79,
+      "slippage_10bps": -89.98,
+      "exit_counts": {
+        "TARGET": 298,
+        "FORCED_EXIT": 134,
+        "STOP": 736,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -4.79
+    },
+    "CAP 2": {
+      "variant_name": "CAP 2",
+      "total_trades": 1990,
+      "wins": 630,
+      "losses": 1360,
+      "breakevens": 0,
+      "win_rate": 0.3166,
+      "profit_factor": 0.9807,
+      "expectancy": -0.0044,
+      "total_R": -205.3,
+      "avg_R": -0.1032,
+      "median_R": -1.0,
+      "r_std": 1.3999,
+      "gross_return_compounded": -12.55,
+      "gross_return_mean_symbol": -0.35,
+      "avg_trade_return_pct": -0.0044,
+      "median_trade_return_pct": -0.0803,
+      "max_drawdown_pct": -41.76,
+      "avg_hold_duration_mins": 45.6,
+      "slippage_0bps": -12.55,
+      "slippage_5bps": -88.05,
+      "slippage_10bps": -98.37,
+      "exit_counts": {
+        "TARGET": 518,
+        "STOP": 1296,
+        "FORCED_EXIT": 176,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -5.4
+    },
+    "CAP 3": {
+      "variant_name": "CAP 3",
+      "total_trades": 2664,
+      "wins": 828,
+      "losses": 1836,
+      "breakevens": 0,
+      "win_rate": 0.3108,
+      "profit_factor": 0.9678,
+      "expectancy": -0.0064,
+      "total_R": -309.29,
+      "avg_R": -0.1161,
+      "median_R": -1.0,
+      "r_std": 1.3878,
+      "gross_return_compounded": -19.86,
+      "gross_return_mean_symbol": -0.67,
+      "avg_trade_return_pct": -0.0064,
+      "median_trade_return_pct": -0.0747,
+      "max_drawdown_pct": -43.89,
+      "avg_hold_duration_mins": 38.9,
+      "slippage_0bps": -19.86,
+      "slippage_5bps": -94.42,
+      "slippage_10bps": -99.61,
+      "exit_counts": {
+        "TARGET": 687,
+        "STOP": 1758,
+        "FORCED_EXIT": 219,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -5.72
+    },
+    "CAP 4": {
+      "variant_name": "CAP 4",
+      "total_trades": 3216,
+      "wins": 991,
+      "losses": 2225,
+      "breakevens": 0,
+      "win_rate": 0.3081,
+      "profit_factor": 0.9602,
+      "expectancy": -0.0073,
+      "total_R": -380.56,
+      "avg_R": -0.1183,
+      "median_R": -1.0,
+      "r_std": 1.3797,
+      "gross_return_compounded": -24.82,
+      "gross_return_mean_symbol": -0.91,
+      "avg_trade_return_pct": -0.0073,
+      "median_trade_return_pct": -0.0666,
+      "max_drawdown_pct": -47.81,
+      "avg_hold_duration_mins": 34.6,
+      "slippage_0bps": -24.82,
+      "slippage_5bps": -96.98,
+      "slippage_10bps": -99.88,
+      "exit_counts": {
+        "TARGET": 831,
+        "STOP": 2138,
+        "FORCED_EXIT": 247,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -5.96
+    },
+    "CAP 5": {
+      "variant_name": "CAP 5",
+      "total_trades": 3680,
+      "wins": 1128,
+      "losses": 2552,
+      "breakevens": 0,
+      "win_rate": 0.3065,
+      "profit_factor": 0.9539,
+      "expectancy": -0.0078,
+      "total_R": -453.47,
+      "avg_R": -0.1232,
+      "median_R": -1.0,
+      "r_std": 1.3753,
+      "gross_return_compounded": -28.96,
+      "gross_return_mean_symbol": -1.13,
+      "avg_trade_return_pct": -0.0078,
+      "median_trade_return_pct": -0.0635,
+      "max_drawdown_pct": -50.45,
+      "avg_hold_duration_mins": 32.2,
+      "slippage_0bps": -28.96,
+      "slippage_5bps": -98.21,
+      "slippage_10bps": -99.95,
+      "exit_counts": {
+        "TARGET": 951,
+        "STOP": 2456,
+        "FORCED_EXIT": 273,
+        "BREAKEVEN": 0
+      },
+      "mean_bnh_return": 5.05,
+      "strategy_vs_bnh_diff": -6.18
+    }
+  },
+  "accounting": {
+    "NO CAP": {
+      "candidate_signals": 21087,
+      "actual_entries": 5691,
+      "cap_rejected_entries": 0,
+      "existing_engine_skipped_position_open": 15057,
+      "simulation_none": 339,
+      "data_insufficient_bars": 0,
+      "same_bar_ambiguity": 693,
+      "baseline_entries_removed": 0,
+      "identity_holds": true
+    },
+    "CAP 1": {
+      "candidate_signals": 21087,
+      "actual_entries": 1168,
+      "cap_rejected_entries": 14323,
+      "existing_engine_skipped_position_open": 5577,
+      "simulation_none": 19,
+      "data_insufficient_bars": 0,
+      "same_bar_ambiguity": 95,
+      "baseline_entries_removed": 4523,
+      "identity_holds": true
+    },
+    "CAP 2": {
+      "candidate_signals": 21087,
+      "actual_entries": 1990,
+      "cap_rejected_entries": 11323,
+      "existing_engine_skipped_position_open": 7693,
+      "simulation_none": 81,
+      "data_insufficient_bars": 0,
+      "same_bar_ambiguity": 187,
+      "baseline_entries_removed": 3701,
+      "identity_holds": true
+    },
+    "CAP 3": {
+      "candidate_signals": 21087,
+      "actual_entries": 2664,
+      "cap_rejected_entries": 8904,
+      "existing_engine_skipped_position_open": 9410,
+      "simulation_none": 109,
+      "data_insufficient_bars": 0,
+      "same_bar_ambiguity": 267,
+      "baseline_entries_removed": 3027,
+      "identity_holds": true
+    },
+    "CAP 4": {
+      "candidate_signals": 21087,
+      "actual_entries": 3216,
+      "cap_rejected_entries": 7192,
+      "existing_engine_skipped_position_open": 10539,
+      "simulation_none": 140,
+      "data_insufficient_bars": 0,
+      "same_bar_ambiguity": 349,
+      "baseline_entries_removed": 2475,
+      "identity_holds": true
+    },
+    "CAP 5": {
+      "candidate_signals": 21087,
+      "actual_entries": 3680,
+      "cap_rejected_entries": 5753,
+      "existing_engine_skipped_position_open": 11493,
+      "simulation_none": 161,
+      "data_insufficient_bars": 0,
+      "same_bar_ambiguity": 427,
+      "baseline_entries_removed": 2011,
+      "identity_holds": true
+    }
+  },
+  "frequency_distribution": {
+    "NO CAP": {
+      "symbol_sessions_with_entries": 1168,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 346,
+          "pct": 29.62
+        },
+        "2": {
+          "sessions": 148,
+          "pct": 12.67
+        },
+        "3": {
+          "sessions": 122,
+          "pct": 10.45
+        },
+        "4": {
+          "sessions": 88,
+          "pct": 7.53
+        },
+        "5+": {
+          "sessions": 464,
+          "pct": 39.73
+        }
+      },
+      "mean_per_active_session": 4.872,
+      "median_per_active_session": 3.0,
+      "max_per_session": 28,
+      "mean_per_all_symbol_sessions": 3.794
+    },
+    "CAP 1": {
+      "symbol_sessions_with_entries": 1168,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 1168,
+          "pct": 100.0
+        },
+        "2": {
+          "sessions": 0,
+          "pct": 0.0
+        },
+        "3": {
+          "sessions": 0,
+          "pct": 0.0
+        },
+        "4": {
+          "sessions": 0,
+          "pct": 0.0
+        },
+        "5+": {
+          "sessions": 0,
+          "pct": 0.0
+        }
+      },
+      "mean_per_active_session": 1.0,
+      "median_per_active_session": 1.0,
+      "max_per_session": 1,
+      "mean_per_all_symbol_sessions": 0.779
+    },
+    "CAP 2": {
+      "symbol_sessions_with_entries": 1168,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 346,
+          "pct": 29.62
+        },
+        "2": {
+          "sessions": 822,
+          "pct": 70.38
+        },
+        "3": {
+          "sessions": 0,
+          "pct": 0.0
+        },
+        "4": {
+          "sessions": 0,
+          "pct": 0.0
+        },
+        "5+": {
+          "sessions": 0,
+          "pct": 0.0
+        }
+      },
+      "mean_per_active_session": 1.704,
+      "median_per_active_session": 2.0,
+      "max_per_session": 2,
+      "mean_per_all_symbol_sessions": 1.327
+    },
+    "CAP 3": {
+      "symbol_sessions_with_entries": 1168,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 346,
+          "pct": 29.62
+        },
+        "2": {
+          "sessions": 148,
+          "pct": 12.67
+        },
+        "3": {
+          "sessions": 674,
+          "pct": 57.71
+        },
+        "4": {
+          "sessions": 0,
+          "pct": 0.0
+        },
+        "5+": {
+          "sessions": 0,
+          "pct": 0.0
+        }
+      },
+      "mean_per_active_session": 2.281,
+      "median_per_active_session": 3.0,
+      "max_per_session": 3,
+      "mean_per_all_symbol_sessions": 1.776
+    },
+    "CAP 4": {
+      "symbol_sessions_with_entries": 1168,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 346,
+          "pct": 29.62
+        },
+        "2": {
+          "sessions": 148,
+          "pct": 12.67
+        },
+        "3": {
+          "sessions": 122,
+          "pct": 10.45
+        },
+        "4": {
+          "sessions": 552,
+          "pct": 47.26
+        },
+        "5+": {
+          "sessions": 0,
+          "pct": 0.0
+        }
+      },
+      "mean_per_active_session": 2.753,
+      "median_per_active_session": 3.0,
+      "max_per_session": 4,
+      "mean_per_all_symbol_sessions": 2.144
+    },
+    "CAP 5": {
+      "symbol_sessions_with_entries": 1168,
+      "symbol_sessions_total": 1500,
+      "distribution_active_sessions": {
+        "1": {
+          "sessions": 346,
+          "pct": 29.62
+        },
+        "2": {
+          "sessions": 148,
+          "pct": 12.67
+        },
+        "3": {
+          "sessions": 122,
+          "pct": 10.45
+        },
+        "4": {
+          "sessions": 88,
+          "pct": 7.53
+        },
+        "5+": {
+          "sessions": 464,
+          "pct": 39.73
+        }
+      },
+      "mean_per_active_session": 3.151,
+      "median_per_active_session": 3.0,
+      "max_per_session": 5,
+      "mean_per_all_symbol_sessions": 2.453
+    }
+  },
+  "integrity": {
+    "NO CAP": {
+      "candidate_signals_equal_baseline": true,
+      "trades_are_per_session_prefix_of_baseline": true,
+      "trade_count_equals_min(baseline_session_count, cap)": true,
+      "max_entries_per_session_le_cap": true
+    },
+    "CAP 1": {
+      "candidate_signals_equal_baseline": true,
+      "trades_are_per_session_prefix_of_baseline": true,
+      "trade_count_equals_min(baseline_session_count, cap)": true,
+      "max_entries_per_session_le_cap": true
+    },
+    "CAP 2": {
+      "candidate_signals_equal_baseline": true,
+      "trades_are_per_session_prefix_of_baseline": true,
+      "trade_count_equals_min(baseline_session_count, cap)": true,
+      "max_entries_per_session_le_cap": true
+    },
+    "CAP 3": {
+      "candidate_signals_equal_baseline": true,
+      "trades_are_per_session_prefix_of_baseline": true,
+      "trade_count_equals_min(baseline_session_count, cap)": true,
+      "max_entries_per_session_le_cap": true
+    },
+    "CAP 4": {
+      "candidate_signals_equal_baseline": true,
+      "trades_are_per_session_prefix_of_baseline": true,
+      "trade_count_equals_min(baseline_session_count, cap)": true,
+      "max_entries_per_session_le_cap": true
+    },
+    "CAP 5": {
+      "candidate_signals_equal_baseline": true,
+      "trades_are_per_session_prefix_of_baseline": true,
+      "trade_count_equals_min(baseline_session_count, cap)": true,
+      "max_entries_per_session_le_cap": true
+    }
+  },
+  "concentration": {
+    "NO CAP": {
+      "per_symbol_total_R": {
+        "AAPL": -2.25,
+        "MSFT": -43.27,
+        "NVDA": -40.35,
+        "AMZN": -68.97,
+        "META": -12.07,
+        "GOOGL": -50.6,
+        "TSLA": -7.58,
+        "AVGO": -45.67,
+        "AMD": 9.67,
+        "QCOM": -25.69,
+        "INTC": -9.3,
+        "MU": -29.4,
+        "AMAT": -50.11,
+        "ADBE": -6.59,
+        "CRM": -4.93,
+        "ORCL": -38.64,
+        "CSCO": -43.16,
+        "COST": -50.2,
+        "WMT": -23.48,
+        "KO": -32.88,
+        "PEP": -16.91,
+        "NFLX": -56.08,
+        "JNJ": -24.55,
+        "JPM": -41.34,
+        "XOM": -24.65
+      },
+      "top2_symbols": [
+        "AMZN",
+        "NFLX"
+      ],
+      "top2_total_R": -125.05,
+      "excluding_top2_total_R": -613.93,
+      "excluding_top2_profit_factor": 0.9517,
+      "symbols_with_positive_R": 1,
+      "symbols_total": 25
+    },
+    "CAP 1": {
+      "per_symbol_total_R": {
+        "AAPL": 3.83,
+        "MSFT": -0.48,
+        "NVDA": -4.79,
+        "AMZN": -23.91,
+        "META": -4.95,
+        "GOOGL": 2.47,
+        "TSLA": 11.23,
+        "AVGO": -5.61,
+        "AMD": -1.22,
+        "QCOM": -9.16,
+        "INTC": -5.57,
+        "MU": -27.31,
+        "AMAT": -2.74,
+        "ADBE": 3.16,
+        "CRM": -0.29,
+        "ORCL": -22.27,
+        "CSCO": -6.35,
+        "COST": -21.27,
+        "WMT": 2.81,
+        "KO": 9.05,
+        "PEP": -1.1,
+        "NFLX": 3.38,
+        "JNJ": 6.08,
+        "JPM": -13.74,
+        "XOM": 5.15
+      },
+      "top2_symbols": [
+        "MU",
+        "AMZN"
+      ],
+      "top2_total_R": -51.22,
+      "excluding_top2_total_R": -52.37,
+      "excluding_top2_profit_factor": 1.0548,
+      "symbols_with_positive_R": 9,
+      "symbols_total": 25
+    },
+    "CAP 2": {
+      "per_symbol_total_R": {
+        "AAPL": 0.3,
+        "MSFT": -16.79,
+        "NVDA": -23.12,
+        "AMZN": -10.91,
+        "META": 0.86,
+        "GOOGL": -2.28,
+        "TSLA": -2.22,
+        "AVGO": -6.64,
+        "AMD": 4.58,
+        "QCOM": -10.25,
+        "INTC": -6.32,
+        "MU": -23.5,
+        "AMAT": -14.74,
+        "ADBE": 2.52,
+        "CRM": 10.36,
+        "ORCL": -28.23,
+        "CSCO": -15.23,
+        "COST": -35.26,
+        "WMT": -10.59,
+        "KO": -1.95,
+        "PEP": -0.41,
+        "NFLX": -7.62,
+        "JNJ": 7.65,
+        "JPM": -15.39,
+        "XOM": -0.12
+      },
+      "top2_symbols": [
+        "COST",
+        "ORCL"
+      ],
+      "top2_total_R": -63.49,
+      "excluding_top2_total_R": -141.81,
+      "excluding_top2_profit_factor": 1.0278,
+      "symbols_with_positive_R": 6,
+      "symbols_total": 25
+    },
+    "CAP 3": {
+      "per_symbol_total_R": {
+        "AAPL": -3.65,
+        "MSFT": -14.44,
+        "NVDA": -17.16,
+        "AMZN": -13.76,
+        "META": -3.14,
+        "GOOGL": -8.18,
+        "TSLA": -10.51,
+        "AVGO": -17.21,
+        "AMD": 9.66,
+        "QCOM": -19.87,
+        "INTC": -10.43,
+        "MU": -27.08,
+        "AMAT": -22.08,
+        "ADBE": 3.77,
+        "CRM": 3.39,
+        "ORCL": -31.14,
+        "CSCO": -17.85,
+        "COST": -33.43,
+        "WMT": -21.59,
+        "KO": -10.32,
+        "PEP": 1.68,
+        "NFLX": -26.57,
+        "JNJ": -1.46,
+        "JPM": -20.27,
+        "XOM": 2.36
+      },
+      "top2_symbols": [
+        "COST",
+        "ORCL"
+      ],
+      "top2_total_R": -64.57,
+      "excluding_top2_total_R": -244.72,
+      "excluding_top2_profit_factor": 1.0049,
+      "symbols_with_positive_R": 5,
+      "symbols_total": 25
+    },
+    "CAP 4": {
+      "per_symbol_total_R": {
+        "AAPL": 4.1,
+        "MSFT": -6.84,
+        "NVDA": -26.16,
+        "AMZN": -20.76,
+        "META": -8.14,
+        "GOOGL": -20.06,
+        "TSLA": -21.21,
+        "AVGO": -21.93,
+        "AMD": 4.52,
+        "QCOM": -21.38,
+        "INTC": -1.86,
+        "MU": -22.06,
+        "AMAT": -25.08,
+        "ADBE": -0.67,
+        "CRM": -0.61,
+        "ORCL": -28.54,
+        "CSCO": -17.1,
+        "COST": -40.65,
+        "WMT": -18.59,
+        "KO": -20.28,
+        "PEP": 0.13,
+        "NFLX": -29.29,
+        "JNJ": -12.91,
+        "JPM": -23.17,
+        "XOM": -2.01
+      },
+      "top2_symbols": [
+        "COST",
+        "NFLX"
+      ],
+      "top2_total_R": -69.94,
+      "excluding_top2_total_R": -310.62,
+      "excluding_top2_profit_factor": 0.9683,
+      "symbols_with_positive_R": 3,
+      "symbols_total": 25
+    },
+    "CAP 5": {
+      "per_symbol_total_R": {
+        "AAPL": 11.82,
+        "MSFT": -20.48,
+        "NVDA": -32.16,
+        "AMZN": -32.56,
+        "META": -7.56,
+        "GOOGL": -29.06,
+        "TSLA": -24.52,
+        "AVGO": -19.68,
+        "AMD": 1.52,
+        "QCOM": -14.48,
+        "INTC": -1.86,
+        "MU": -24.06,
+        "AMAT": -34.83,
+        "ADBE": -6.44,
+        "CRM": 1.39,
+        "ORCL": -25.38,
+        "CSCO": -23.72,
+        "COST": -41.2,
+        "WMT": -24.45,
+        "KO": -22.28,
+        "PEP": -11.2,
+        "NFLX": -35.45,
+        "JNJ": -13.91,
+        "JPM": -28.92,
+        "XOM": 5.99
+      },
+      "top2_symbols": [
+        "COST",
+        "NFLX"
+      ],
+      "top2_total_R": -76.65,
+      "excluding_top2_total_R": -376.83,
+      "excluding_top2_profit_factor": 0.9609,
+      "symbols_with_positive_R": 4,
+      "symbols_total": 25
+    }
+  },
+  "sequence_attribution_baseline": {
+    "#1": {
+      "count": 1168,
+      "win_rate": 0.3296,
+      "profit_factor": 1.0224,
+      "avg_R": -0.0887,
+      "total_R": -103.59,
+      "exit_counts": {
+        "STOP": 736,
+        "TARGET": 298,
+        "FORCED_EXIT": 134
+      },
+      "avg_hold_minutes": 61.9,
+      "avg_stop_distance_pct": 0.4866,
+      "avg_mfe_R": 2.4128,
+      "avg_mae_R": -2.4539
+    },
+    "#2": {
+      "count": 822,
+      "win_rate": 0.2981,
+      "profit_factor": 0.8724,
+      "avg_R": -0.1237,
+      "total_R": -101.71,
+      "exit_counts": {
+        "STOP": 560,
+        "TARGET": 220,
+        "FORCED_EXIT": 42
+      },
+      "avg_hold_minutes": 22.3,
+      "avg_stop_distance_pct": 0.2326,
+      "avg_mfe_R": 2.3879,
+      "avg_mae_R": -2.6063
+    },
+    "#3": {
+      "count": 674,
+      "win_rate": 0.2938,
+      "profit_factor": 0.8918,
+      "avg_R": -0.1543,
+      "total_R": -103.99,
+      "exit_counts": {
+        "STOP": 462,
+        "TARGET": 169,
+        "FORCED_EXIT": 43
+      },
+      "avg_hold_minutes": 19.1,
+      "avg_stop_distance_pct": 0.1757,
+      "avg_mfe_R": 2.573,
+      "avg_mae_R": -2.689
+    },
+    "#4": {
+      "count": 552,
+      "win_rate": 0.2953,
+      "profit_factor": 0.8861,
+      "avg_R": -0.1291,
+      "total_R": -71.27,
+      "exit_counts": {
+        "STOP": 380,
+        "TARGET": 144,
+        "FORCED_EXIT": 28
+      },
+      "avg_hold_minutes": 14.2,
+      "avg_stop_distance_pct": 0.1504,
+      "avg_mfe_R": 6.3264,
+      "avg_mae_R": -2.2073
+    },
+    "#5+": {
+      "count": 2475,
+      "win_rate": 0.299,
+      "profit_factor": 0.8715,
+      "avg_R": -0.1448,
+      "total_R": -358.42,
+      "exit_counts": {
+        "STOP": 1646,
+        "TARGET": 627,
+        "FORCED_EXIT": 202
+      },
+      "avg_hold_minutes": 12.0,
+      "avg_stop_distance_pct": 0.1208,
+      "avg_mfe_R": 2.6696,
+      "avg_mae_R": -2.4171
+    }
+  },
+  "repeated_entry_diagnostics_baseline": {
+    "minutes_from_previous_exit_to_next_entry": {
+      "n": 4523,
+      "mean": 22.6133,
+      "p10": 5.0,
+      "p25": 5.0,
+      "median": 5.0,
+      "p75": 15.0,
+      "p90": 50.0,
+      "max": 370.0
+    },
+    "minutes_from_previous_exit_by_sequence": {
+      "#2": {
+        "n": 822,
+        "mean": 50.4501,
+        "p10": 5.0,
+        "p25": 5.0,
+        "median": 10.0,
+        "p75": 45.0,
+        "p90": 179.5,
+        "max": 370.0
+      },
+      "#3": {
+        "n": 674,
+        "mean": 24.4881,
+        "p10": 5.0,
+        "p25": 5.0,
+        "median": 5.0,
+        "p75": 20.0,
+        "p90": 65.0,
+        "max": 315.0
+      },
+      "#4": {
+        "n": 552,
+        "mean": 18.9583,
+        "p10": 5.0,
+        "p25": 5.0,
+        "median": 5.0,
+        "p75": 15.0,
+        "p90": 40.0,
+        "max": 290.0
+      },
+      "#5+": {
+        "n": 2475,
+        "mean": 13.6727,
+        "p10": 5.0,
+        "p25": 5.0,
+        "median": 5.0,
+        "p75": 10.0,
+        "p90": 25.0,
+        "max": 300.0
+      }
+    },
+    "re_entries_by_previous_exit_reason": {
+      "STOP": {
+        "count": 3224,
+        "win_rate": 0.2987,
+        "profit_factor": 0.8575,
+        "avg_R": -0.1353,
+        "total_R": -436.19,
+        "exit_counts": {
+          "STOP": 2163,
+          "TARGET": 837,
+          "FORCED_EXIT": 224
+        },
+        "avg_hold_minutes": 16.7,
+        "avg_stop_distance_pct": 0.165,
+        "avg_mfe_R": 2.9901,
+        "avg_mae_R": -2.2411
+      },
+      "TARGET": {
+        "count": 1299,
+        "win_rate": 0.2948,
+        "profit_factor": 0.9446,
+        "avg_R": -0.1534,
+        "total_R": -199.21,
+        "exit_counts": {
+          "STOP": 885,
+          "TARGET": 323,
+          "FORCED_EXIT": 91
+        },
+        "avg_hold_minutes": 11.5,
+        "avg_stop_distance_pct": 0.1228,
+        "avg_mfe_R": 3.1997,
+        "avg_mae_R": -3.0254
+      },
+      "FORCED_EXIT": {
+        "count": 0
+      }
+    }
+  },
+  "pit_validation": {
+    "count_uses_only_prior_entries": true,
+    "session_reset": true,
+    "symbol_isolation": "one gate per symbol backtest run",
+    "future_session_information_used": false,
+    "verified_by_tests": "tests/test_day10_frequency_cap.py"
+  },
+  "h3_evaluation": {
+    "improves_pf_and_avg_r_vs_baseline": {
+      "CAP 1": true,
+      "CAP 2": true,
+      "CAP 3": true,
+      "CAP 4": true,
+      "CAP 5": true
+    },
+    "five_bps_above_baseline_and_non_negative": {
+      "CAP 1": false,
+      "CAP 2": false,
+      "CAP 3": false,
+      "CAP 4": false,
+      "CAP 5": false
+    },
+    "capped_5bps_range_pct": [
+      -98.21,
+      -67.79
+    ],
+    "transaction_cost_problem_resolved_at_5bps": false,
+    "h3_status": "INCONCLUSIVE"
+  },
+  "test_summary": {
+    "h3_tests": {
+      "file": "tests/test_day10_frequency_cap.py",
+      "passed": 14,
+      "failed": 0
+    },
+    "targeted_regression_before_change": {
+      "passed": 153,
+      "failed": 0,
+      "files": [
+        "test_day_backtest.py",
+        "test_day_backtest_optimized.py",
+        "test_multi_symbol.py",
+        "test_day05_failure_analysis.py",
+        "test_day07_backtest.py",
+        "test_day07_point_in_time.py",
+        "test_day07a_robustness.py",
+        "test_day08_backtest.py",
+        "test_day08_point_in_time.py",
+        "test_day08_timestamp_semantics.py",
+        "test_index_regime.py",
+        "test_day09_volatility_stop.py",
+        "test_cache_immutability.py"
+      ]
+    },
+    "targeted_regression_after_change": {
+      "passed": 153,
+      "failed": 0
+    },
+    "full_pytest": {
+      "tests": 920,
+      "passed": 920,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "network": "blocked by tests/conftest.py guard"
+    }
+  }
+}
