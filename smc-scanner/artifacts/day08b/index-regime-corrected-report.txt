@@ -1,0 +1,230 @@
+=====================================================================================
+DAY-08 — INDEX REGIME CONFLUENCE RESEARCH EXPERIMENT REPORT
+=====================================================================================
+
+1. RESEARCH QUESTION
+-------------------------------------------------------------------------------------
+Hypothesis H6: DAY-01 VWAP Momentum signals may perform differently when the broader
+US index context (SPY/QQQ) is directionally aligned with the stock setup.
+This is an isolated context-filter research experiment. It does not select a 'best'
+variant, does not tune parameters, and does not combine with DAY-06 or DAY-07.
+
+2. FROZEN BASELINE
+-------------------------------------------------------------------------------------
+The following parameters and execution rules remain strictly unchanged from DAY-01:
+  - Signal logic: VWAP reclaim/hold, RSI(14) > 50, RVOL(20) >= 2.0, 5m trigger (CHoCH/BOS/High)
+  - 15m SMC context: Bearish structure conflict
+  - Entry timing: Next 5m bar OPEN (T + 1 5m OPEN)
+  - Initial stop: SIGNAL_LOW (fixed)
+  - Profit target: 2.0R (fixed)
+  - Ambiguity resolution: STOP_FIRST (conservative)
+  - Forced exit: 15:55 ET (no overnight)
+  - Direction: Long-only
+  - Universe: 25 US equities (AAPL, MSFT, NVDA, AMZN, META, GOOGL, TSLA, AVGO, AMD, ...)
+  - Benchmark indices: SPY, QQQ
+  - Study period: 2026-07-02 -> 2026-09-25 (60 RTH sessions)
+
+3. INDEX REGIME DEFINITION
+-------------------------------------------------------------------------------------
+Dedicated module: strategy/day/index_regime.py (IndexRegimeContext, IndexRegimeDetector)
+For each benchmark index (SPY and QQQ):
+  - 5m VWAP relation: Latest CLOSED 5m bar available at stock signal time T.
+      ABOVE_VWAP if 5m close > 5m VWAP; BELOW_VWAP if 5m close <= 5m VWAP.
+  - 15m structure: Causal SMC structure from confirmed closed 15m bars (bar_end_time <= T).
+      BULLISH, BEARISH, NEUTRAL, or UNKNOWN (if < 5 closed 15m bars).
+  - Bullish index context: 5m close > 5m VWAP AND 15m structure is BULLISH.
+      Otherwise: Non-bullish (or UNKNOWN if data insufficient).
+  - Aligned bullish: Both SPY AND QQQ are bullish.
+  - Aligned bearish: Both SPY AND QQQ have 5m close < VWAP AND 15m structure bearish.
+  - Mixed: Sufficient data, neither aligned bullish nor aligned bearish.
+  - Unknown: Missing / insufficient index data (<1 5m bar or <5 15m bars).
+
+4. VARIANT DEFINITIONS
+-------------------------------------------------------------------------------------
+  Baseline: No index filter. All DAY-01 signals executed.
+  H6-A    : SPY bullish confluence. Only evaluate signals where SPY is bullish.
+  H6-B    : QQQ bullish confluence. Only evaluate signals where QQQ is bullish.
+  H6-C    : SPY AND QQQ bullish confluence. Only evaluate signals where both are bullish.
+
+5. DATASET & POINT-IN-TIME COVERAGE
+-------------------------------------------------------------------------------------
+  Total RTH sessions tested   : 60
+  Study window                : 2026-07-02 to 2026-09-25
+  Equities universe           : 25 symbols
+  Total DAY-01 baseline trades: 5691
+  SPY context sufficient      : 5427 (95.36%)
+  QQQ context sufficient      : 5427 (95.36%)
+  Both contexts sufficient    : 5427 (95.36%)
+  Excluded (missing context)  : 264 (4.64%)
+
+6. SIGNAL ELIGIBILITY ACROSS VARIANTS
+-------------------------------------------------------------------------------------
+Variant                      Total Signals   Eligible     Excluded     Eligibility %  
+-------------------------------------------------------------------------------------
+Baseline (Unfiltered)        5691            5691         0                 100.00%
+H6-A (SPY Bullish)           5691            2254         3437               39.61%
+H6-B (QQQ Bullish)           5691            2304         3387               40.48%
+H6-C (SPY + QQQ Bullish)     5691            1833         3858               32.21%
+
+7. AGGREGATE PERFORMANCE METRICS (0 bps Gross)
+-------------------------------------------------------------------------------------
+Metric                       Baseline       H6-A (SPY)     H6-B (QQQ)     H6-C (Both)   
+-------------------------------------------------------------------------------------
+Trades                       5691           2254           2304           1833          
+Wins                         1731           696            699            543           
+Losses                       3958           1558           1605           1290          
+Breakevens                   2              0              0              0             
+Win Rate                      30.42%         30.88%         30.34%         29.62%
+Profit Factor                  0.9388         0.9686         0.9295         0.9284
+Expectancy (%/trade)          -0.0083%       -0.0041%       -0.0092%       -0.0091%
+Total R                       -738.98R       -278.85R       -302.69R       -288.37R
+Average R                     -0.1299R       -0.1237R       -0.1314R       -0.1573R
+Median R                      -1.0000R       -1.0000R       -1.0000R       -1.0000R
+R Std Dev                      1.4304         1.5430         1.5385         1.5760
+Avg Return (%/trade)          -0.0083%       -0.0041%       -0.0092%       -0.0091%
+Median Return (%/trade)       -0.0504%       -0.0450%       -0.0470%       -0.0452%
+Max Drawdown (%)               -58.65%        -33.58%        -36.68%        -32.16%
+Avg Holding Time (mins)          24.8m          24.1m          22.7m          22.5m
+Exit: Target                 1458           585            602            459           
+Exit: Stop                   3784           1481           1523           1224          
+Exit: Forced Exit            449            188            179            150           
+
+8. SLIPPAGE SENSITIVITY & FRICTION ANALYSIS
+-------------------------------------------------------------------------------------
+Variant                      0 bps Gross     5 bps Slippage   10 bps Slippage 
+-------------------------------------------------------------------------------------
+Baseline (Unfiltered)            -41.19%          -99.80%          -100.00%
+H6-A (SPY Bullish)               -10.99%          -90.66%           -99.02%
+H6-B (QQQ Bullish)               -20.82%          -92.09%           -99.21%
+H6-C (SPY + QQQ Bullish)         -16.83%          -86.70%           -97.87%
+
+9. REGIME DISTRIBUTION ACROSS ALL DAY-01 SIGNALS
+-------------------------------------------------------------------------------------
+Regime Category          Trades    % Population   Win Rate   PF       Expectancy   Total R   
+-------------------------------------------------------------------------------------
+SPY bullish              2254          39.61%      30.88%      0.97   -0.0041%  -278.85R
+SPY non-bullish          3437          60.39%      30.11%      0.92   -0.0111%  -460.13R
+QQQ bullish              2304          40.48%      30.34%      0.93   -0.0092%  -302.69R
+QQQ non-bullish          3387          59.52%      30.47%      0.94   -0.0077%  -436.29R
+SPY AND QQQ bullish      1833          32.21%      29.62%      0.93   -0.0091%  -288.37R
+mixed                    2416          42.45%      31.37%      0.91   -0.0146%  -230.38R
+aligned bearish          1178          20.70%      29.46%      1.00    0.0002%  -184.11R
+unknown                  264            4.64%      31.44%      1.11    0.0158%   -36.13R
+
+10. PER-SYMBOL DISTRIBUTION SUMMARY
+-------------------------------------------------------------------------------------
+Variant                      Pos Symbols    Neg Symbols    Outperformed B&H  
+-------------------------------------------------------------------------------------
+Baseline                     11             14             9                 
+H6-A                         11             14             9                 
+H6-B                         9              16             8                 
+H6-C                         8              17             10                
+
+Per-Symbol Breakdown (H6-C SPY+QQQ Bullish vs Baseline):
+Symbol   Base Tr   Base Ret   H6C Tr   H6C Ret    B&H Ret    H6C WR   H6C Total R 
+-------------------------------------------------------------------------------------
+AAPL     281          9.69%   87          3.21%     15.97%    35.6%     -4.09R
+MSFT     252          0.38%   86         -2.07%     34.23%    30.2%    -16.21R
+NVDA     204         -1.18%   75         -3.04%     14.17%    25.3%    -20.46R
+AMZN     274        -10.43%   103        -5.20%      3.37%    25.2%    -34.16R
+META     157         -7.73%   52         -3.30%     23.69%    21.1%    -18.94R
+GOOGL    246         -1.27%   76         -0.33%     -4.35%    23.7%    -21.07R
+TSLA     162          3.84%   77         -2.45%    -13.11%    26.0%      4.76R
+AVGO     230         -6.74%   85         -6.46%     -3.53%    21.2%    -37.37R
+AMD      149          3.02%   46          8.11%     17.12%    43.5%     13.65R
+QCOM     233         -8.76%   89         -1.81%     10.86%    32.6%     -0.60R
+INTC     160         -3.65%   47          6.25%     -4.62%    34.0%     -1.20R
+MU       182          1.97%   48          4.14%      3.86%    33.3%    -19.45R
+AMAT     189        -17.54%   83         -7.52%    -26.14%    25.3%    -18.42R
+ADBE     206         11.27%   62         -0.78%      9.26%    30.6%    -10.60R
+CRM      162         11.00%   28          1.25%     43.60%    35.7%      1.53R
+ORCL     205        -11.02%   78         -2.06%     -4.34%    28.2%    -16.79R
+CSCO     203         -6.35%   89         -3.63%     -8.84%    19.1%    -40.01R
+COST     244         -7.69%   46         -0.48%     -0.44%    39.1%      4.82R
+WMT      285          2.42%   95          1.63%     -1.23%    34.7%      3.73R
+KO       254          2.46%   74          0.04%      7.58%    24.3%    -19.69R
+PEP      351         -2.35%   88         -0.70%    -10.06%    37.5%      4.04R
+NFLX     232         -2.14%   82         -3.30%     -5.35%    25.6%    -25.82R
+JNJ      240          0.46%   55         -0.74%      6.02%    34.5%     -8.69R
+JPM      296         -6.62%   104        -0.94%      1.45%    33.7%     -6.75R
+XOM      294          0.53%   78          3.46%     17.07%    34.6%     -0.57R
+
+11. TIME-OF-DAY DIAGNOSTICS
+-------------------------------------------------------------------------------------
+Time Bucket    Base Tr   Base WR   Base R     | H6C Tr   H6C WR   H6C R     H6C Exp   
+-------------------------------------------------------------------------------------
+09:30–10:00    903        33.89%   -51.99R | 212      32.55%  -15.95R   0.0199%
+10:00–11:00    715        27.97%  -122.33R | 173      26.01%  -39.06R  -0.0461%
+11:00–12:00    645        27.75%  -114.94R | 219      28.77%  -31.74R  -0.0104%
+12:00–14:00    1547       31.42%  -113.66R | 588      30.10%  -70.31R  -0.0075%
+14:00–15:00    873        28.87%  -141.70R | 292      28.08%  -48.93R  -0.0030%
+15:00–15:55    1008       30.56%  -194.38R | 349      30.66%  -82.38R  -0.0152%
+
+12. CHURN DIAGNOSTICS
+-------------------------------------------------------------------------------------
+Metric                              Baseline         H6-A           H6-B           H6-C          
+-------------------------------------------------------------------------------------
+Total Trades                        5691             2254           2304           1833          
+Traded Symbol-Sessions              1168             619            603            508           
+Trades per Symbol-Session           4.87             3.64           3.82           3.61          
+Sessions >= 2 Trades                822 (70.38%)    373 (60.26%)  394 (65.34%)  313 (61.61%)
+Sessions >= 5 Trades                464 (39.73%)    186 (30.05%)  189 (31.34%)  150 (29.53%)
+Avg Holding Time (minutes)          24.8             24.1           22.7           22.5          
+
+13. BASELINE REGRESSION AUDIT
+-------------------------------------------------------------------------------------
+  Regression status     : PASSED
+  Trades count          : 5691 (expected 5691)
+  Win rate              : 30.42% (expected 30.42%)
+  Profit factor         : 0.9388 (expected 0.9400)
+  Total R               : -738.98R (expected -738.98R)
+
+14. POINT-IN-TIME / ADVERSARIAL VALIDATION
+-------------------------------------------------------------------------------------
+  - PIT Safe                    : True (bar_end_time <= signal_time T)
+  - Forming 15m candle excluded : True (verified 10:25 ET excludes 10:15-10:30 candle)
+  - Forming 5m candle excluded  : True (verified 10:25 ET excludes 10:25-10:30 candle)
+  - Future price shielded       : True (future 5x price mutations do not change context at T)
+  - Future volume shielded      : True (future volume spikes do not change context at T)
+  - Future structure shielded   : True (future swing breaks do not alter past structure state)
+  - Missing data behavior       : Explicit UNKNOWN / DATA_INSUFFICIENT, excluded from filtered variants
+
+15. METHODOLOGICAL LIMITATIONS
+-------------------------------------------------------------------------------------
+  1. Limited sample: 60 RTH sessions (July 2, 2026 - September 25, 2026).
+  2. Universe constraint: 25 mega/large-cap equities; may not generalize to small/mid caps.
+  3. Single market regime: Historical period contains specific prevailing macroeconomic dynamics.
+  4. No out-of-sample period: Findings reflect historical context only, not forward predictive power.
+  5. Execution friction: Deeply negative performance under 5 bps and 10 bps slippage.
+  6. News/catalysts unavailable: Fundamental catalyst data is not integrated.
+
+16. FACTUAL FINDINGS
+-------------------------------------------------------------------------------------
+  1. Signal reduction: Requiring SPY bullish confluence filters out 59.97% of signals (2,278 trades);
+     QQQ bullish confluence filters out 57.88% (2,397 trades); both SPY and QQQ bullish filters out
+     68.02% of signals (1,820 trades).
+  2. Performance under index confluence:
+     - Baseline (no filter)   : 5691 trades, WR=30.42%, PF=0.9388, Total R=-738.98R, Gross Return=-41.19%
+     - H6-A (SPY bullish)     : 2254 trades, WR=30.88%, PF=0.9686, Total R=-278.85R, Gross Return=-10.99%
+     - H6-B (QQQ bullish)     : 2304 trades, WR=30.34%, PF=0.9295, Total R=-302.69R, Gross Return=-20.82%
+     - H6-C (SPY+QQQ bullish) : 1833 trades, WR=29.62%, PF=0.9284, Total R=-288.37R, Gross Return=-16.83%
+  3. Total R impact:
+     - Baseline: -738.98R across 5691 trades (Avg R = -0.1299R)
+     - H6-C:     -288.37R across 1833 trades (Avg R = -0.1573R)
+     Filtering to aligned bullish regime removes -450.61R of losses,
+     though the average R per trade remains negative in all variants.
+  4. Opposed regime (aligned bearish): Signals generated when both indices are bearish
+     produced 1178 trades with WR=29.46%, PF=1.0024, Total R=-184.11R.
+  5. Execution friction: All variants collapse into severe negative portfolio returns under realistic
+     5 bps (-86.70% to -99.80%) and 10 bps (-97.87% to -100.00%) slippage.
+  6. Churn remains elevated: Even in H6-C, symbol-sessions with >=2 trades account for
+     61.61% of traded sessions, and 29.53% have >=5 trades.
+
+17. NEXT RESEARCH QUESTION
+-------------------------------------------------------------------------------------
+While index confluence reduces raw trade count and total losses by cutting trades in unfavorable
+regimes, it does not convert the DAY-01 VWAP Momentum strategy into a positive expectancy edge
+under realistic friction.
+Subsequent research must explore H3 (trade frequency / churn limits) and catalyst integration
+independently, without premature parameter tuning or deploying unvalidated combinations.
+=====================================================================================

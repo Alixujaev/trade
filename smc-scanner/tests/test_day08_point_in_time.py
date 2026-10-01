@@ -18,7 +18,7 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from backtest.index_regime import run_day08_index_regime_experiment
+from backtest.index_regime import run_day08_index_regime_experiment, signal_time_for
 from data.factory import get_provider
 from strategy.day.index_regime import (
     IndexRegimeDetector,
@@ -33,10 +33,10 @@ def shared_provider():
 
 def test_future_spy_price_mutation(shared_provider):
     """Mutating SPY price AFTER signal time T by 5x must NOT alter index regime at T."""
-    spy_5m = shared_provider.get_ohlcv("SPY", "5m", include_extended_hours=False, closed_only=False)
-    spy_15m = shared_provider.get_ohlcv("SPY", "15m", include_extended_hours=False, closed_only=False)
-    qqq_5m = shared_provider.get_ohlcv("QQQ", "5m", include_extended_hours=False, closed_only=False)
-    qqq_15m = shared_provider.get_ohlcv("QQQ", "15m", include_extended_hours=False, closed_only=False)
+    spy_5m = shared_provider.get_ohlcv("SPY", "5m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    spy_15m = shared_provider.get_ohlcv("SPY", "15m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    qqq_5m = shared_provider.get_ohlcv("QQQ", "5m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    qqq_15m = shared_provider.get_ohlcv("QQQ", "15m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
 
     det_clean = IndexRegimeDetector(spy_5m, spy_15m, qqq_5m, qqq_15m)
 
@@ -68,10 +68,10 @@ def test_future_spy_price_mutation(shared_provider):
 
 def test_future_qqq_price_mutation(shared_provider):
     """Mutating QQQ price AFTER signal time T by 5x must NOT alter index regime at T."""
-    spy_5m = shared_provider.get_ohlcv("SPY", "5m", include_extended_hours=False, closed_only=False)
-    spy_15m = shared_provider.get_ohlcv("SPY", "15m", include_extended_hours=False, closed_only=False)
-    qqq_5m = shared_provider.get_ohlcv("QQQ", "5m", include_extended_hours=False, closed_only=False)
-    qqq_15m = shared_provider.get_ohlcv("QQQ", "15m", include_extended_hours=False, closed_only=False)
+    spy_5m = shared_provider.get_ohlcv("SPY", "5m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    spy_15m = shared_provider.get_ohlcv("SPY", "15m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    qqq_5m = shared_provider.get_ohlcv("QQQ", "5m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    qqq_15m = shared_provider.get_ohlcv("QQQ", "15m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
 
     det_clean = IndexRegimeDetector(spy_5m, spy_15m, qqq_5m, qqq_15m)
 
@@ -100,10 +100,10 @@ def test_future_qqq_price_mutation(shared_provider):
 
 def test_future_index_volume_mutation(shared_provider):
     """Mutating future SPY/QQQ volume (e.g. 100x volume surge after T) must NOT alter regime at T."""
-    spy_5m = shared_provider.get_ohlcv("SPY", "5m", include_extended_hours=False, closed_only=False)
-    spy_15m = shared_provider.get_ohlcv("SPY", "15m", include_extended_hours=False, closed_only=False)
-    qqq_5m = shared_provider.get_ohlcv("QQQ", "5m", include_extended_hours=False, closed_only=False)
-    qqq_15m = shared_provider.get_ohlcv("QQQ", "15m", include_extended_hours=False, closed_only=False)
+    spy_5m = shared_provider.get_ohlcv("SPY", "5m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    spy_15m = shared_provider.get_ohlcv("SPY", "15m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    qqq_5m = shared_provider.get_ohlcv("QQQ", "5m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    qqq_15m = shared_provider.get_ohlcv("QQQ", "15m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
 
     det_clean = IndexRegimeDetector(spy_5m, spy_15m, qqq_5m, qqq_15m)
 
@@ -127,10 +127,10 @@ def test_future_index_volume_mutation(shared_provider):
 
 def test_future_15m_structure_mutation(shared_provider):
     """Altering future 15m candles to create a major swing break later must NOT change structure at T."""
-    spy_5m = shared_provider.get_ohlcv("SPY", "5m", include_extended_hours=False, closed_only=False)
-    spy_15m = shared_provider.get_ohlcv("SPY", "15m", include_extended_hours=False, closed_only=False)
-    qqq_5m = shared_provider.get_ohlcv("QQQ", "5m", include_extended_hours=False, closed_only=False)
-    qqq_15m = shared_provider.get_ohlcv("QQQ", "15m", include_extended_hours=False, closed_only=False)
+    spy_5m = shared_provider.get_ohlcv("SPY", "5m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    spy_15m = shared_provider.get_ohlcv("SPY", "15m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    qqq_5m = shared_provider.get_ohlcv("QQQ", "5m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    qqq_15m = shared_provider.get_ohlcv("QQQ", "15m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
 
     det_clean = IndexRegimeDetector(spy_5m, spy_15m, qqq_5m, qqq_15m)
 
@@ -154,7 +154,8 @@ def test_forming_15m_candle_excluded_at_1025(shared_provider):
     """At 10:25 ET, verify 10:15-10:30 candle is excluded and 10:00-10:15 candle is used."""
     det = build_index_regime_detector(shared_provider)
 
-    t_1025 = pd.Timestamp("2026-07-06 10:25:00", tz="America/New_York")
+    # Frozen SPY/QQQ coverage starts 2026-07-08; 07-09 is a full covered session
+    t_1025 = pd.Timestamp("2026-07-09 10:25:00", tz="America/New_York")
     as_of = det._normalize_timestamp(t_1025)
 
     # Check 15m index end time
@@ -171,23 +172,23 @@ def test_forming_15m_candle_excluded_at_1025(shared_provider):
 
 def test_session_isolation(shared_provider):
     """Indices VWAP resets daily; previous session's volume/price does not leak into current session VWAP."""
-    spy_5m = shared_provider.get_ohlcv("SPY", "5m", include_extended_hours=False, closed_only=False)
-    spy_15m = shared_provider.get_ohlcv("SPY", "15m", include_extended_hours=False, closed_only=False)
-    qqq_5m = shared_provider.get_ohlcv("QQQ", "5m", include_extended_hours=False, closed_only=False)
-    qqq_15m = shared_provider.get_ohlcv("QQQ", "15m", include_extended_hours=False, closed_only=False)
+    spy_5m = shared_provider.get_ohlcv("SPY", "5m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    spy_15m = shared_provider.get_ohlcv("SPY", "15m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    qqq_5m = shared_provider.get_ohlcv("QQQ", "5m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
+    qqq_15m = shared_provider.get_ohlcv("QQQ", "15m", include_extended_hours=False, closed_only=False, ignore_cache_expiry=True)
 
     det_full = IndexRegimeDetector(spy_5m, spy_15m, qqq_5m, qqq_15m)
 
-    # First session in dataset: 2026-07-06
-    # Mutate 2026-07-06 prices
-    t_session_1 = pd.Timestamp("2026-07-06 15:50:00", tz="America/New_York")
-    t_session_2 = pd.Timestamp("2026-07-07 10:30:00", tz="America/New_York")
+    # First session in frozen SPY/QQQ data: 2026-07-08; session 2 = 2026-07-09
+    t_session_2 = pd.Timestamp("2026-07-09 10:30:00", tz="America/New_York")
 
     ctx_session_2_clean = det_full.get_context_at(t_session_2)
+    assert ctx_session_2_clean.data_sufficient
 
     # Mutate session 1 data by 10x
     spy_5m_mut = spy_5m.copy()
-    s1_mask = spy_5m_mut.index <= pd.Timestamp("2026-07-06 16:00:00", tz="America/New_York")
+    s1_mask = spy_5m_mut.index <= pd.Timestamp("2026-07-08 16:00:00", tz="America/New_York")
+    assert s1_mask.any()
     spy_5m_mut.loc[s1_mask, ["open", "high", "low", "close"]] *= 10.0
     spy_5m_mut.loc[s1_mask, "volume"] *= 10.0
 
@@ -230,6 +231,54 @@ def test_order_independence(shared_provider):
 
     assert res_forward.h6_c_metrics.total_R == res_reverse.h6_c_metrics.total_R
     assert res_forward.h6_c_metrics.win_rate == res_reverse.h6_c_metrics.win_rate
+
+
+# ======================================================================
+# Frozen coverage boundaries (SPY/QQQ: 2026-07-08 -> 2026-09-25)
+# ======================================================================
+
+@pytest.mark.parametrize(
+    "t_str",
+    ["2026-07-02 11:00", "2026-07-06 10:30", "2026-07-06 15:55", "2026-07-07 14:00"],
+)
+def test_sessions_without_index_data_are_insufficient(shared_provider, t_str):
+    """07-02 / 07-06 / 07-07: no SPY/QQQ bars exist -> INSUFFICIENT index context."""
+    det = build_index_regime_detector(shared_provider)
+    ctx = det.get_context_at(pd.Timestamp(t_str, tz="America/New_York"))
+    assert ctx.data_sufficient is False
+    assert ctx.spy_bullish is None
+    assert ctx.qqq_bullish is None
+    assert ctx.aligned_bullish is not True
+
+
+def test_first_index_session_context_starts_at_1045(shared_provider):
+    """07-08: context needs 5 closed 15m bars -> 10:40 insufficient, 10:45 sufficient."""
+    det = build_index_regime_detector(shared_provider)
+    assert det.get_context_at(pd.Timestamp("2026-07-08 10:40", tz="America/New_York")).data_sufficient is False
+    assert det.get_context_at(pd.Timestamp("2026-07-08 10:45", tz="America/New_York")).data_sufficient is True
+
+
+def test_signal_time_boundary_uses_signal_bar_end(shared_provider):
+    """Setup bar 10:40-10:45 on 07-08: signal_time = 10:45 has context, setup_time (bar open) does not."""
+    det = build_index_regime_detector(shared_provider)
+    setup = pd.Timestamp("2026-07-08 10:40", tz="America/New_York")
+    sig = signal_time_for(setup)
+    assert sig == setup + pd.Timedelta(minutes=5)
+    assert det.get_context_at(setup).data_sufficient is False
+    assert det.get_context_at(sig).data_sufficient is True
+
+
+@pytest.mark.parametrize("t_str", ["2026-07-08 10:45", "2026-07-09 10:25", "2026-08-14 13:07", "2026-09-25 15:55"])
+def test_last_used_index_bars_are_closed_at_t(shared_provider, t_str):
+    """Latest 5m/15m bars visible at T all have bar_end <= T (no forming/future bar)."""
+    det = build_index_regime_detector(shared_provider)
+    as_of = det._normalize_timestamp(pd.Timestamp(t_str, tz="America/New_York"))
+    for ends in (det.end_5m_spy, det.end_5m_qqq, det.end_15m_spy, det.end_15m_qqq):
+        k = ends.searchsorted(as_of, side="right") - 1
+        assert k >= 0
+        assert ends[k] <= as_of
+        if k + 1 < len(ends):
+            assert ends[k + 1] > as_of
 
 
 # ======================================================================

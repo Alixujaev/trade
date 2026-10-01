@@ -182,15 +182,16 @@ def test_regime_mutual_exclusivity():
     detector = build_index_regime_detector(provider=prov)
 
     # Sample a set of trading session times
+    # Frozen SPY/QQQ coverage: 2026-07-08 -> 2026-09-25 (context from 07-08 10:45 ET)
     test_times = [
-        pd.Timestamp("2026-07-06 11:30:00", tz="America/New_York"),
-        pd.Timestamp("2026-07-06 14:00:00", tz="America/New_York"),
-        pd.Timestamp("2026-07-07 10:30:00", tz="America/New_York"),
         pd.Timestamp("2026-07-08 15:00:00", tz="America/New_York"),
+        pd.Timestamp("2026-07-09 11:30:00", tz="America/New_York"),
+        pd.Timestamp("2026-07-10 14:00:00", tz="America/New_York"),
+        pd.Timestamp("2026-07-13 10:30:00", tz="America/New_York"),
     ]
 
     for ts in test_times:
         ctx = detector.get_context_at(ts)
-        if ctx.data_sufficient:
-            true_count = sum([ctx.aligned_bullish, ctx.mixed, ctx.aligned_bearish])
-            assert true_count == 1, f"Expected exactly one active category at {ts}, got {true_count}"
+        assert ctx.data_sufficient, f"Index context expected at {ts}"
+        true_count = sum([ctx.aligned_bullish, ctx.mixed, ctx.aligned_bearish])
+        assert true_count == 1, f"Expected exactly one active category at {ts}, got {true_count}"

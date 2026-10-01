@@ -1,0 +1,1571 @@
+{
+  "metadata": {
+    "experiment": "DAY-08 H6 Index Regime Confluence",
+    "universe_size": 25,
+    "universe_symbols": [
+      "AAPL",
+      "MSFT",
+      "NVDA",
+      "AMZN",
+      "META",
+      "GOOGL",
+      "TSLA",
+      "AVGO",
+      "AMD",
+      "QCOM",
+      "INTC",
+      "MU",
+      "AMAT",
+      "ADBE",
+      "CRM",
+      "ORCL",
+      "CSCO",
+      "COST",
+      "WMT",
+      "KO",
+      "PEP",
+      "NFLX",
+      "JNJ",
+      "JPM",
+      "XOM"
+    ],
+    "benchmark_indices": [
+      "SPY",
+      "QQQ"
+    ],
+    "period_start": "2026-07-02 13:30:00+00:00",
+    "period_end": "2026-09-25 19:55:00+00:00",
+    "total_sessions": 60,
+    "execution_rules": {
+      "signal": "closed 5m bar T",
+      "entry": "T + 1 5m OPEN",
+      "initial_stop": "SIGNAL_LOW",
+      "target": "2.0R",
+      "same_bar_ambiguity": "STOP_FIRST",
+      "forced_exit": "15:55 ET",
+      "direction": "long-only"
+    },
+    "variants_evaluated": [
+      "Baseline",
+      "H6-A SPY",
+      "H6-B QQQ",
+      "H6-C SPY+QQQ"
+    ],
+    "h6_context_timestamp": "signal_time = setup_time (signal bar open) + 5m (signal bar end)"
+  },
+  "signal_counts": {
+    "total_day01_signals": 5691,
+    "signals_with_sufficient_spy_context": 5427,
+    "signals_with_sufficient_qqq_context": 5427,
+    "signals_with_sufficient_both_context": 5427,
+    "signals_excluded_due_to_missing_context": 264
+  },
+  "baseline_metrics": {
+    "variant_name": "Baseline (Unfiltered)",
+    "description": "Frozen DAY-01 VWAP Momentum with no index filter",
+    "total_day01_signals": 5691,
+    "eligible_signals": 5691,
+    "excluded_signals": 0,
+    "eligibility_pct": 100.0,
+    "trades": 5691,
+    "wins": 1731,
+    "losses": 3958,
+    "breakevens": 2,
+    "win_rate": 0.3042,
+    "profit_factor": 0.9388,
+    "expectancy": -0.0083,
+    "avg_return": -0.0083,
+    "median_return": -0.0504,
+    "total_R": -738.98,
+    "avg_R": -0.1299,
+    "median_R": -1.0,
+    "r_std": 1.4304,
+    "max_drawdown": -58.65,
+    "avg_holding_time": 24.8,
+    "slippage_0bps": -41.19,
+    "slippage_5bps": -99.8,
+    "slippage_10bps": -100.0,
+    "buy_hold_return": 5.05,
+    "strategy_vs_bnh_diff": -6.91,
+    "exit_counts": {
+      "TARGET": 1458,
+      "STOP": 3784,
+      "FORCED_EXIT": 449
+    }
+  },
+  "h6_a_metrics": {
+    "variant_name": "H6-A (SPY Bullish)",
+    "description": "DAY-01 signals with SPY bullish confluence (5m close > VWAP AND 15m structure bullish)",
+    "total_day01_signals": 5691,
+    "eligible_signals": 2254,
+    "excluded_signals": 3437,
+    "eligibility_pct": 39.61,
+    "trades": 2254,
+    "wins": 696,
+    "losses": 1558,
+    "breakevens": 0,
+    "win_rate": 0.3088,
+    "profit_factor": 0.9686,
+    "expectancy": -0.0041,
+    "avg_return": -0.0041,
+    "median_return": -0.045,
+    "total_R": -278.85,
+    "avg_R": -0.1237,
+    "median_R": -1.0,
+    "r_std": 1.543,
+    "max_drawdown": -33.58,
+    "avg_holding_time": 24.1,
+    "slippage_0bps": -10.99,
+    "slippage_5bps": -90.66,
+    "slippage_10bps": -99.02,
+    "buy_hold_return": 5.05,
+    "strategy_vs_bnh_diff": -5.46,
+    "exit_counts": {
+      "TARGET": 585,
+      "STOP": 1481,
+      "FORCED_EXIT": 188
+    }
+  },
+  "h6_b_metrics": {
+    "variant_name": "H6-B (QQQ Bullish)",
+    "description": "DAY-01 signals with QQQ bullish confluence (5m close > VWAP AND 15m structure bullish)",
+    "total_day01_signals": 5691,
+    "eligible_signals": 2304,
+    "excluded_signals": 3387,
+    "eligibility_pct": 40.48,
+    "trades": 2304,
+    "wins": 699,
+    "losses": 1605,
+    "breakevens": 0,
+    "win_rate": 0.3034,
+    "profit_factor": 0.9295,
+    "expectancy": -0.0092,
+    "avg_return": -0.0092,
+    "median_return": -0.047,
+    "total_R": -302.69,
+    "avg_R": -0.1314,
+    "median_R": -1.0,
+    "r_std": 1.5385,
+    "max_drawdown": -36.68,
+    "avg_holding_time": 22.7,
+    "slippage_0bps": -20.82,
+    "slippage_5bps": -92.09,
+    "slippage_10bps": -99.21,
+    "buy_hold_return": 5.05,
+    "strategy_vs_bnh_diff": -5.89,
+    "exit_counts": {
+      "TARGET": 602,
+      "STOP": 1523,
+      "FORCED_EXIT": 179
+    }
+  },
+  "h6_c_metrics": {
+    "variant_name": "H6-C (SPY + QQQ Bullish)",
+    "description": "DAY-01 signals with both SPY AND QQQ bullish confluence",
+    "total_day01_signals": 5691,
+    "eligible_signals": 1833,
+    "excluded_signals": 3858,
+    "eligibility_pct": 32.21,
+    "trades": 1833,
+    "wins": 543,
+    "losses": 1290,
+    "breakevens": 0,
+    "win_rate": 0.2962,
+    "profit_factor": 0.9284,
+    "expectancy": -0.0091,
+    "avg_return": -0.0091,
+    "median_return": -0.0452,
+    "total_R": -288.37,
+    "avg_R": -0.1573,
+    "median_R": -1.0,
+    "r_std": 1.576,
+    "max_drawdown": -32.16,
+    "avg_holding_time": 22.5,
+    "slippage_0bps": -16.83,
+    "slippage_5bps": -86.7,
+    "slippage_10bps": -97.87,
+    "buy_hold_return": 5.05,
+    "strategy_vs_bnh_diff": -5.72,
+    "exit_counts": {
+      "TARGET": 459,
+      "STOP": 1224,
+      "FORCED_EXIT": 150
+    }
+  },
+  "regime_distribution": {
+    "SPY bullish": {
+      "category_name": "SPY bullish",
+      "trades": 2254,
+      "percentage": 39.61,
+      "wins": 696,
+      "losses": 1558,
+      "breakevens": 0,
+      "win_rate": 0.3088,
+      "profit_factor": 0.9686,
+      "expectancy": -0.0041,
+      "total_R": -278.85,
+      "avg_R": -0.1237
+    },
+    "SPY non-bullish": {
+      "category_name": "SPY non-bullish",
+      "trades": 3437,
+      "percentage": 60.39,
+      "wins": 1035,
+      "losses": 2400,
+      "breakevens": 2,
+      "win_rate": 0.3011,
+      "profit_factor": 0.9203,
+      "expectancy": -0.0111,
+      "total_R": -460.13,
+      "avg_R": -0.1339
+    },
+    "QQQ bullish": {
+      "category_name": "QQQ bullish",
+      "trades": 2304,
+      "percentage": 40.48,
+      "wins": 699,
+      "losses": 1605,
+      "breakevens": 0,
+      "win_rate": 0.3034,
+      "profit_factor": 0.9295,
+      "expectancy": -0.0092,
+      "total_R": -302.69,
+      "avg_R": -0.1314
+    },
+    "QQQ non-bullish": {
+      "category_name": "QQQ non-bullish",
+      "trades": 3387,
+      "percentage": 59.52,
+      "wins": 1032,
+      "losses": 2353,
+      "breakevens": 2,
+      "win_rate": 0.3047,
+      "profit_factor": 0.9446,
+      "expectancy": -0.0077,
+      "total_R": -436.29,
+      "avg_R": -0.1288
+    },
+    "SPY AND QQQ bullish": {
+      "category_name": "SPY AND QQQ bullish",
+      "trades": 1833,
+      "percentage": 32.21,
+      "wins": 543,
+      "losses": 1290,
+      "breakevens": 0,
+      "win_rate": 0.2962,
+      "profit_factor": 0.9284,
+      "expectancy": -0.0091,
+      "total_R": -288.37,
+      "avg_R": -0.1573
+    },
+    "mixed": {
+      "category_name": "mixed",
+      "trades": 2416,
+      "percentage": 42.45,
+      "wins": 758,
+      "losses": 1656,
+      "breakevens": 2,
+      "win_rate": 0.3137,
+      "profit_factor": 0.9089,
+      "expectancy": -0.0146,
+      "total_R": -230.38,
+      "avg_R": -0.0954
+    },
+    "aligned bearish": {
+      "category_name": "aligned bearish",
+      "trades": 1178,
+      "percentage": 20.7,
+      "wins": 347,
+      "losses": 831,
+      "breakevens": 0,
+      "win_rate": 0.2946,
+      "profit_factor": 1.0024,
+      "expectancy": 0.0002,
+      "total_R": -184.11,
+      "avg_R": -0.1563
+    },
+    "unknown": {
+      "category_name": "unknown",
+      "trades": 264,
+      "percentage": 4.64,
+      "wins": 83,
+      "losses": 181,
+      "breakevens": 0,
+      "win_rate": 0.3144,
+      "profit_factor": 1.1145,
+      "expectancy": 0.0158,
+      "total_R": -36.13,
+      "avg_R": -0.1368
+    }
+  },
+  "per_symbol_metrics": {
+    "Baseline": {
+      "AAPL": {
+        "symbol": "AAPL",
+        "trades": 281,
+        "strategy_return": 9.69,
+        "buy_hold_return": 15.97,
+        "win_rate": 0.363,
+        "profit_factor": 1.3833,
+        "expectancy": 0.0336,
+        "total_R": -2.25
+      },
+      "MSFT": {
+        "symbol": "MSFT",
+        "trades": 252,
+        "strategy_return": 0.38,
+        "buy_hold_return": 34.23,
+        "win_rate": 0.2976,
+        "profit_factor": 1.0195,
+        "expectancy": 0.002,
+        "total_R": -43.27
+      },
+      "NVDA": {
+        "symbol": "NVDA",
+        "trades": 204,
+        "strategy_return": -1.18,
+        "buy_hold_return": 14.17,
+        "win_rate": 0.2794,
+        "profit_factor": 0.9673,
+        "expectancy": -0.0048,
+        "total_R": -40.35
+      },
+      "AMZN": {
+        "symbol": "AMZN",
+        "trades": 274,
+        "strategy_return": -10.43,
+        "buy_hold_return": 3.37,
+        "win_rate": 0.2737,
+        "profit_factor": 0.6538,
+        "expectancy": -0.0398,
+        "total_R": -68.97
+      },
+      "META": {
+        "symbol": "META",
+        "trades": 157,
+        "strategy_return": -7.73,
+        "buy_hold_return": 23.69,
+        "win_rate": 0.3057,
+        "profit_factor": 0.7184,
+        "expectancy": -0.0503,
+        "total_R": -12.07
+      },
+      "GOOGL": {
+        "symbol": "GOOGL",
+        "trades": 246,
+        "strategy_return": -1.27,
+        "buy_hold_return": -4.35,
+        "win_rate": 0.2764,
+        "profit_factor": 0.9608,
+        "expectancy": -0.0044,
+        "total_R": -50.6
+      },
+      "TSLA": {
+        "symbol": "TSLA",
+        "trades": 162,
+        "strategy_return": 3.84,
+        "buy_hold_return": -13.11,
+        "win_rate": 0.2716,
+        "profit_factor": 1.1351,
+        "expectancy": 0.0255,
+        "total_R": -7.58
+      },
+      "AVGO": {
+        "symbol": "AVGO",
+        "trades": 230,
+        "strategy_return": -6.74,
+        "buy_hold_return": -3.53,
+        "win_rate": 0.287,
+        "profit_factor": 0.8093,
+        "expectancy": -0.0293,
+        "total_R": -45.67
+      },
+      "AMD": {
+        "symbol": "AMD",
+        "trades": 149,
+        "strategy_return": 3.02,
+        "buy_hold_return": 17.12,
+        "win_rate": 0.3624,
+        "profit_factor": 1.1003,
+        "expectancy": 0.0223,
+        "total_R": 9.67
+      },
+      "QCOM": {
+        "symbol": "QCOM",
+        "trades": 233,
+        "strategy_return": -8.76,
+        "buy_hold_return": 10.86,
+        "win_rate": 0.2961,
+        "profit_factor": 0.8109,
+        "expectancy": -0.0379,
+        "total_R": -25.69
+      },
+      "INTC": {
+        "symbol": "INTC",
+        "trades": 160,
+        "strategy_return": -3.65,
+        "buy_hold_return": -4.62,
+        "win_rate": 0.3187,
+        "profit_factor": 0.9298,
+        "expectancy": -0.02,
+        "total_R": -9.3
+      },
+      "MU": {
+        "symbol": "MU",
+        "trades": 182,
+        "strategy_return": 1.97,
+        "buy_hold_return": 3.86,
+        "win_rate": 0.3132,
+        "profit_factor": 1.0588,
+        "expectancy": 0.0136,
+        "total_R": -29.4
+      },
+      "AMAT": {
+        "symbol": "AMAT",
+        "trades": 189,
+        "strategy_return": -17.54,
+        "buy_hold_return": -26.14,
+        "win_rate": 0.2487,
+        "profit_factor": 0.5912,
+        "expectancy": -0.1002,
+        "total_R": -50.11
+      },
+      "ADBE": {
+        "symbol": "ADBE",
+        "trades": 206,
+        "strategy_return": 11.27,
+        "buy_hold_return": 9.26,
+        "win_rate": 0.3398,
+        "profit_factor": 1.3509,
+        "expectancy": 0.0539,
+        "total_R": -6.59
+      },
+      "CRM": {
+        "symbol": "CRM",
+        "trades": 162,
+        "strategy_return": 11.0,
+        "buy_hold_return": 43.6,
+        "win_rate": 0.3395,
+        "profit_factor": 1.4355,
+        "expectancy": 0.0664,
+        "total_R": -4.93
+      },
+      "ORCL": {
+        "symbol": "ORCL",
+        "trades": 205,
+        "strategy_return": -11.02,
+        "buy_hold_return": -4.34,
+        "win_rate": 0.2732,
+        "profit_factor": 0.7253,
+        "expectancy": -0.0556,
+        "total_R": -38.64
+      },
+      "CSCO": {
+        "symbol": "CSCO",
+        "trades": 203,
+        "strategy_return": -6.35,
+        "buy_hold_return": -8.84,
+        "win_rate": 0.2808,
+        "profit_factor": 0.781,
+        "expectancy": -0.0314,
+        "total_R": -43.16
+      },
+      "COST": {
+        "symbol": "COST",
+        "trades": 244,
+        "strategy_return": -7.69,
+        "buy_hold_return": -0.44,
+        "win_rate": 0.2828,
+        "profit_factor": 0.6625,
+        "expectancy": -0.0325,
+        "total_R": -50.2
+      },
+      "WMT": {
+        "symbol": "WMT",
+        "trades": 285,
+        "strategy_return": 2.42,
+        "buy_hold_return": -1.23,
+        "win_rate": 0.3158,
+        "profit_factor": 1.1043,
+        "expectancy": 0.0088,
+        "total_R": -23.48
+      },
+      "KO": {
+        "symbol": "KO",
+        "trades": 254,
+        "strategy_return": 2.46,
+        "buy_hold_return": 7.58,
+        "win_rate": 0.3031,
+        "profit_factor": 1.1388,
+        "expectancy": 0.0099,
+        "total_R": -32.88
+      },
+      "PEP": {
+        "symbol": "PEP",
+        "trades": 351,
+        "strategy_return": -2.35,
+        "buy_hold_return": -10.06,
+        "win_rate": 0.3305,
+        "profit_factor": 0.9162,
+        "expectancy": -0.0065,
+        "total_R": -16.91
+      },
+      "NFLX": {
+        "symbol": "NFLX",
+        "trades": 232,
+        "strategy_return": -2.14,
+        "buy_hold_return": -5.35,
+        "win_rate": 0.2672,
+        "profit_factor": 0.9294,
+        "expectancy": -0.0085,
+        "total_R": -56.08
+      },
+      "JNJ": {
+        "symbol": "JNJ",
+        "trades": 240,
+        "strategy_return": 0.46,
+        "buy_hold_return": 6.02,
+        "win_rate": 0.325,
+        "profit_factor": 1.0248,
+        "expectancy": 0.0024,
+        "total_R": -24.55
+      },
+      "JPM": {
+        "symbol": "JPM",
+        "trades": 296,
+        "strategy_return": -6.62,
+        "buy_hold_return": 1.45,
+        "win_rate": 0.3074,
+        "profit_factor": 0.7434,
+        "expectancy": -0.0229,
+        "total_R": -41.34
+      },
+      "XOM": {
+        "symbol": "XOM",
+        "trades": 294,
+        "strategy_return": 0.53,
+        "buy_hold_return": 17.07,
+        "win_rate": 0.3299,
+        "profit_factor": 1.0233,
+        "expectancy": 0.0022,
+        "total_R": -24.65
+      }
+    },
+    "H6-A": {
+      "AAPL": {
+        "symbol": "AAPL",
+        "trades": 102,
+        "strategy_return": 2.15,
+        "buy_hold_return": 15.97,
+        "win_rate": 0.3725,
+        "profit_factor": 1.2248,
+        "expectancy": 0.0216,
+        "total_R": -1.06
+      },
+      "MSFT": {
+        "symbol": "MSFT",
+        "trades": 97,
+        "strategy_return": -0.88,
+        "buy_hold_return": 34.23,
+        "win_rate": 0.3299,
+        "profit_factor": 0.9086,
+        "expectancy": -0.0087,
+        "total_R": -10.9
+      },
+      "NVDA": {
+        "symbol": "NVDA",
+        "trades": 96,
+        "strategy_return": -2.13,
+        "buy_hold_return": 14.17,
+        "win_rate": 0.25,
+        "profit_factor": 0.8679,
+        "expectancy": -0.0212,
+        "total_R": -29.82
+      },
+      "AMZN": {
+        "symbol": "AMZN",
+        "trades": 112,
+        "strategy_return": -4.75,
+        "buy_hold_return": 3.37,
+        "win_rate": 0.2768,
+        "profit_factor": 0.6308,
+        "expectancy": -0.0431,
+        "total_R": -29.37
+      },
+      "META": {
+        "symbol": "META",
+        "trades": 58,
+        "strategy_return": -2.13,
+        "buy_hold_return": 23.69,
+        "win_rate": 0.2414,
+        "profit_factor": 0.7425,
+        "expectancy": -0.0365,
+        "total_R": -15.98
+      },
+      "GOOGL": {
+        "symbol": "GOOGL",
+        "trades": 101,
+        "strategy_return": 3.23,
+        "buy_hold_return": -4.35,
+        "win_rate": 0.297,
+        "profit_factor": 1.2906,
+        "expectancy": 0.0327,
+        "total_R": -10.07
+      },
+      "TSLA": {
+        "symbol": "TSLA",
+        "trades": 91,
+        "strategy_return": 1.05,
+        "buy_hold_return": -13.11,
+        "win_rate": 0.2637,
+        "profit_factor": 1.0833,
+        "expectancy": 0.013,
+        "total_R": 3.57
+      },
+      "AVGO": {
+        "symbol": "AVGO",
+        "trades": 93,
+        "strategy_return": -7.1,
+        "buy_hold_return": -3.53,
+        "win_rate": 0.2151,
+        "profit_factor": 0.56,
+        "expectancy": -0.0779,
+        "total_R": -40.12
+      },
+      "AMD": {
+        "symbol": "AMD",
+        "trades": 55,
+        "strategy_return": 6.34,
+        "buy_hold_return": 17.12,
+        "win_rate": 0.4182,
+        "profit_factor": 1.5058,
+        "expectancy": 0.1153,
+        "total_R": 12.27
+      },
+      "QCOM": {
+        "symbol": "QCOM",
+        "trades": 122,
+        "strategy_return": -2.55,
+        "buy_hold_return": 10.86,
+        "win_rate": 0.3033,
+        "profit_factor": 0.8871,
+        "expectancy": -0.0198,
+        "total_R": -11.63
+      },
+      "INTC": {
+        "symbol": "INTC",
+        "trades": 56,
+        "strategy_return": 5.13,
+        "buy_hold_return": -4.62,
+        "win_rate": 0.3393,
+        "profit_factor": 1.3634,
+        "expectancy": 0.0935,
+        "total_R": -1.2
+      },
+      "MU": {
+        "symbol": "MU",
+        "trades": 71,
+        "strategy_return": 1.36,
+        "buy_hold_return": 3.86,
+        "win_rate": 0.3239,
+        "profit_factor": 1.0894,
+        "expectancy": 0.0229,
+        "total_R": -22.83
+      },
+      "AMAT": {
+        "symbol": "AMAT",
+        "trades": 91,
+        "strategy_return": -8.08,
+        "buy_hold_return": -26.14,
+        "win_rate": 0.2418,
+        "profit_factor": 0.6148,
+        "expectancy": -0.0909,
+        "total_R": -23.42
+      },
+      "ADBE": {
+        "symbol": "ADBE",
+        "trades": 84,
+        "strategy_return": -0.56,
+        "buy_hold_return": 9.26,
+        "win_rate": 0.369,
+        "profit_factor": 0.9608,
+        "expectancy": -0.0057,
+        "total_R": 1.49
+      },
+      "CRM": {
+        "symbol": "CRM",
+        "trades": 47,
+        "strategy_return": 2.11,
+        "buy_hold_return": 43.6,
+        "win_rate": 0.383,
+        "profit_factor": 1.2758,
+        "expectancy": 0.046,
+        "total_R": 4.77
+      },
+      "ORCL": {
+        "symbol": "ORCL",
+        "trades": 97,
+        "strategy_return": -0.99,
+        "buy_hold_return": -4.34,
+        "win_rate": 0.299,
+        "profit_factor": 0.9516,
+        "expectancy": -0.0087,
+        "total_R": -14.48
+      },
+      "CSCO": {
+        "symbol": "CSCO",
+        "trades": 102,
+        "strategy_return": -4.39,
+        "buy_hold_return": -8.84,
+        "win_rate": 0.2059,
+        "profit_factor": 0.6388,
+        "expectancy": -0.0435,
+        "total_R": -41.36
+      },
+      "COST": {
+        "symbol": "COST",
+        "trades": 56,
+        "strategy_return": -1.38,
+        "buy_hold_return": -0.44,
+        "win_rate": 0.3393,
+        "profit_factor": 0.7158,
+        "expectancy": -0.0245,
+        "total_R": -2.51
+      },
+      "WMT": {
+        "symbol": "WMT",
+        "trades": 107,
+        "strategy_return": 1.91,
+        "buy_hold_return": -1.23,
+        "win_rate": 0.3364,
+        "profit_factor": 1.3507,
+        "expectancy": 0.0178,
+        "total_R": 0.9
+      },
+      "KO": {
+        "symbol": "KO",
+        "trades": 95,
+        "strategy_return": 0.79,
+        "buy_hold_return": 7.58,
+        "win_rate": 0.2421,
+        "profit_factor": 1.1528,
+        "expectancy": 0.0085,
+        "total_R": -24.69
+      },
+      "PEP": {
+        "symbol": "PEP",
+        "trades": 125,
+        "strategy_return": -1.03,
+        "buy_hold_return": -10.06,
+        "win_rate": 0.376,
+        "profit_factor": 0.8934,
+        "expectancy": -0.008,
+        "total_R": 9.02
+      },
+      "NFLX": {
+        "symbol": "NFLX",
+        "trades": 104,
+        "strategy_return": -0.8,
+        "buy_hold_return": -5.35,
+        "win_rate": 0.2885,
+        "profit_factor": 0.9482,
+        "expectancy": -0.0068,
+        "total_R": -23.26
+      },
+      "JNJ": {
+        "symbol": "JNJ",
+        "trades": 73,
+        "strategy_return": 0.54,
+        "buy_hold_return": 6.02,
+        "win_rate": 0.3699,
+        "profit_factor": 1.0939,
+        "expectancy": 0.0076,
+        "total_R": -5.6
+      },
+      "JPM": {
+        "symbol": "JPM",
+        "trades": 117,
+        "strategy_return": -1.39,
+        "buy_hold_return": 1.45,
+        "win_rate": 0.3504,
+        "profit_factor": 0.8271,
+        "expectancy": -0.0118,
+        "total_R": -5.58
+      },
+      "XOM": {
+        "symbol": "XOM",
+        "trades": 102,
+        "strategy_return": 3.37,
+        "buy_hold_return": 17.07,
+        "win_rate": 0.3627,
+        "profit_factor": 1.4392,
+        "expectancy": 0.0329,
+        "total_R": 3.0
+      }
+    },
+    "H6-B": {
+      "AAPL": {
+        "symbol": "AAPL",
+        "trades": 104,
+        "strategy_return": 4.09,
+        "buy_hold_return": 15.97,
+        "win_rate": 0.3654,
+        "profit_factor": 1.4368,
+        "expectancy": 0.0393,
+        "total_R": 0.74
+      },
+      "MSFT": {
+        "symbol": "MSFT",
+        "trades": 106,
+        "strategy_return": -0.4,
+        "buy_hold_return": 34.23,
+        "win_rate": 0.3113,
+        "profit_factor": 0.9616,
+        "expectancy": -0.0034,
+        "total_R": -14.31
+      },
+      "NVDA": {
+        "symbol": "NVDA",
+        "trades": 98,
+        "strategy_return": -4.32,
+        "buy_hold_return": 14.17,
+        "win_rate": 0.2653,
+        "profit_factor": 0.7308,
+        "expectancy": -0.0442,
+        "total_R": -23.78
+      },
+      "AMZN": {
+        "symbol": "AMZN",
+        "trades": 116,
+        "strategy_return": -4.12,
+        "buy_hold_return": 3.37,
+        "win_rate": 0.2586,
+        "profit_factor": 0.688,
+        "expectancy": -0.0358,
+        "total_R": -35.16
+      },
+      "META": {
+        "symbol": "META",
+        "trades": 66,
+        "strategy_return": -2.3,
+        "buy_hold_return": 23.69,
+        "win_rate": 0.2879,
+        "profit_factor": 0.729,
+        "expectancy": -0.0347,
+        "total_R": -8.06
+      },
+      "GOOGL": {
+        "symbol": "GOOGL",
+        "trades": 92,
+        "strategy_return": -1.91,
+        "buy_hold_return": -4.35,
+        "win_rate": 0.2283,
+        "profit_factor": 0.8422,
+        "expectancy": -0.0199,
+        "total_R": -28.07
+      },
+      "TSLA": {
+        "symbol": "TSLA",
+        "trades": 106,
+        "strategy_return": -4.37,
+        "buy_hold_return": -13.11,
+        "win_rate": 0.2264,
+        "profit_factor": 0.7499,
+        "expectancy": -0.0411,
+        "total_R": -11.95
+      },
+      "AVGO": {
+        "symbol": "AVGO",
+        "trades": 109,
+        "strategy_return": -5.61,
+        "buy_hold_return": -3.53,
+        "win_rate": 0.2661,
+        "profit_factor": 0.68,
+        "expectancy": -0.0518,
+        "total_R": -30.31
+      },
+      "AMD": {
+        "symbol": "AMD",
+        "trades": 64,
+        "strategy_return": 7.97,
+        "buy_hold_return": 17.12,
+        "win_rate": 0.4219,
+        "profit_factor": 1.6095,
+        "expectancy": 0.1229,
+        "total_R": 16.65
+      },
+      "QCOM": {
+        "symbol": "QCOM",
+        "trades": 106,
+        "strategy_return": -2.81,
+        "buy_hold_return": 10.86,
+        "win_rate": 0.3208,
+        "profit_factor": 0.8488,
+        "expectancy": -0.0257,
+        "total_R": -2.6
+      },
+      "INTC": {
+        "symbol": "INTC",
+        "trades": 63,
+        "strategy_return": 4.55,
+        "buy_hold_return": -4.62,
+        "win_rate": 0.3175,
+        "profit_factor": 1.2907,
+        "expectancy": 0.0746,
+        "total_R": -5.31
+      },
+      "MU": {
+        "symbol": "MU",
+        "trades": 72,
+        "strategy_return": -0.51,
+        "buy_hold_return": 3.86,
+        "win_rate": 0.3056,
+        "profit_factor": 0.9862,
+        "expectancy": -0.0035,
+        "total_R": -25.45
+      },
+      "AMAT": {
+        "symbol": "AMAT",
+        "trades": 107,
+        "strategy_return": -10.39,
+        "buy_hold_return": -26.14,
+        "win_rate": 0.2243,
+        "profit_factor": 0.5733,
+        "expectancy": -0.101,
+        "total_R": -34.77
+      },
+      "ADBE": {
+        "symbol": "ADBE",
+        "trades": 72,
+        "strategy_return": 0.46,
+        "buy_hold_return": 9.26,
+        "win_rate": 0.3194,
+        "profit_factor": 1.0491,
+        "expectancy": 0.0079,
+        "total_R": -8.04
+      },
+      "CRM": {
+        "symbol": "CRM",
+        "trades": 42,
+        "strategy_return": 4.63,
+        "buy_hold_return": 43.6,
+        "win_rate": 0.3571,
+        "profit_factor": 1.7024,
+        "expectancy": 0.1105,
+        "total_R": 2.53
+      },
+      "ORCL": {
+        "symbol": "ORCL",
+        "trades": 101,
+        "strategy_return": -5.84,
+        "buy_hold_return": -4.34,
+        "win_rate": 0.2574,
+        "profit_factor": 0.7114,
+        "expectancy": -0.058,
+        "total_R": -27.79
+      },
+      "CSCO": {
+        "symbol": "CSCO",
+        "trades": 111,
+        "strategy_return": -4.36,
+        "buy_hold_return": -8.84,
+        "win_rate": 0.2432,
+        "profit_factor": 0.6417,
+        "expectancy": -0.0397,
+        "total_R": -32.77
+      },
+      "COST": {
+        "symbol": "COST",
+        "trades": 73,
+        "strategy_return": -1.43,
+        "buy_hold_return": -0.44,
+        "win_rate": 0.3425,
+        "profit_factor": 0.7101,
+        "expectancy": -0.0196,
+        "total_R": -4.16
+      },
+      "WMT": {
+        "symbol": "WMT",
+        "trades": 103,
+        "strategy_return": 3.8,
+        "buy_hold_return": -1.23,
+        "win_rate": 0.3786,
+        "profit_factor": 1.7584,
+        "expectancy": 0.0364,
+        "total_R": 12.56
+      },
+      "KO": {
+        "symbol": "KO",
+        "trades": 97,
+        "strategy_return": 2.41,
+        "buy_hold_return": 7.58,
+        "win_rate": 0.3093,
+        "profit_factor": 1.5161,
+        "expectancy": 0.0248,
+        "total_R": -9.42
+      },
+      "PEP": {
+        "symbol": "PEP",
+        "trades": 116,
+        "strategy_return": -0.31,
+        "buy_hold_return": -10.06,
+        "win_rate": 0.3707,
+        "profit_factor": 0.9614,
+        "expectancy": -0.0025,
+        "total_R": 5.49
+      },
+      "NFLX": {
+        "symbol": "NFLX",
+        "trades": 97,
+        "strategy_return": -3.09,
+        "buy_hold_return": -5.35,
+        "win_rate": 0.2784,
+        "profit_factor": 0.7372,
+        "expectancy": -0.0318,
+        "total_R": -22.82
+      },
+      "JNJ": {
+        "symbol": "JNJ",
+        "trades": 77,
+        "strategy_return": 0.29,
+        "buy_hold_return": 6.02,
+        "win_rate": 0.3506,
+        "profit_factor": 1.0469,
+        "expectancy": 0.004,
+        "total_R": -7.67
+      },
+      "JPM": {
+        "symbol": "JPM",
+        "trades": 116,
+        "strategy_return": -2.44,
+        "buy_hold_return": 1.45,
+        "win_rate": 0.319,
+        "profit_factor": 0.7206,
+        "expectancy": -0.0211,
+        "total_R": -13.88
+      },
+      "XOM": {
+        "symbol": "XOM",
+        "trades": 90,
+        "strategy_return": 4.95,
+        "buy_hold_return": 17.07,
+        "win_rate": 0.3667,
+        "profit_factor": 1.917,
+        "expectancy": 0.054,
+        "total_R": 5.65
+      }
+    },
+    "H6-C": {
+      "AAPL": {
+        "symbol": "AAPL",
+        "trades": 87,
+        "strategy_return": 3.21,
+        "buy_hold_return": 15.97,
+        "win_rate": 0.3563,
+        "profit_factor": 1.466,
+        "expectancy": 0.037,
+        "total_R": -4.09
+      },
+      "MSFT": {
+        "symbol": "MSFT",
+        "trades": 86,
+        "strategy_return": -2.07,
+        "buy_hold_return": 34.23,
+        "win_rate": 0.3023,
+        "profit_factor": 0.7197,
+        "expectancy": -0.0241,
+        "total_R": -16.21
+      },
+      "NVDA": {
+        "symbol": "NVDA",
+        "trades": 75,
+        "strategy_return": -3.04,
+        "buy_hold_return": 14.17,
+        "win_rate": 0.2533,
+        "profit_factor": 0.7618,
+        "expectancy": -0.0401,
+        "total_R": -20.46
+      },
+      "AMZN": {
+        "symbol": "AMZN",
+        "trades": 103,
+        "strategy_return": -5.2,
+        "buy_hold_return": 3.37,
+        "win_rate": 0.2524,
+        "profit_factor": 0.562,
+        "expectancy": -0.0515,
+        "total_R": -34.16
+      },
+      "META": {
+        "symbol": "META",
+        "trades": 52,
+        "strategy_return": -3.3,
+        "buy_hold_return": 23.69,
+        "win_rate": 0.2115,
+        "profit_factor": 0.5592,
+        "expectancy": -0.0639,
+        "total_R": -18.94
+      },
+      "GOOGL": {
+        "symbol": "GOOGL",
+        "trades": 76,
+        "strategy_return": -0.33,
+        "buy_hold_return": -4.35,
+        "win_rate": 0.2368,
+        "profit_factor": 0.9746,
+        "expectancy": -0.0032,
+        "total_R": -21.07
+      },
+      "TSLA": {
+        "symbol": "TSLA",
+        "trades": 77,
+        "strategy_return": -2.45,
+        "buy_hold_return": -13.11,
+        "win_rate": 0.2597,
+        "profit_factor": 0.7998,
+        "expectancy": -0.0311,
+        "total_R": 4.76
+      },
+      "AVGO": {
+        "symbol": "AVGO",
+        "trades": 85,
+        "strategy_return": -6.46,
+        "buy_hold_return": -3.53,
+        "win_rate": 0.2118,
+        "profit_factor": 0.5631,
+        "expectancy": -0.0772,
+        "total_R": -37.37
+      },
+      "AMD": {
+        "symbol": "AMD",
+        "trades": 46,
+        "strategy_return": 8.11,
+        "buy_hold_return": 17.12,
+        "win_rate": 0.4348,
+        "profit_factor": 1.7654,
+        "expectancy": 0.1735,
+        "total_R": 13.65
+      },
+      "QCOM": {
+        "symbol": "QCOM",
+        "trades": 89,
+        "strategy_return": -1.81,
+        "buy_hold_return": 10.86,
+        "win_rate": 0.3258,
+        "profit_factor": 0.8845,
+        "expectancy": -0.0194,
+        "total_R": -0.6
+      },
+      "INTC": {
+        "symbol": "INTC",
+        "trades": 47,
+        "strategy_return": 6.25,
+        "buy_hold_return": -4.62,
+        "win_rate": 0.3404,
+        "profit_factor": 1.5312,
+        "expectancy": 0.1335,
+        "total_R": -1.2
+      },
+      "MU": {
+        "symbol": "MU",
+        "trades": 48,
+        "strategy_return": 4.14,
+        "buy_hold_return": 3.86,
+        "win_rate": 0.3333,
+        "profit_factor": 1.3507,
+        "expectancy": 0.0893,
+        "total_R": -19.45
+      },
+      "AMAT": {
+        "symbol": "AMAT",
+        "trades": 83,
+        "strategy_return": -7.52,
+        "buy_hold_return": -26.14,
+        "win_rate": 0.253,
+        "profit_factor": 0.5983,
+        "expectancy": -0.0926,
+        "total_R": -18.42
+      },
+      "ADBE": {
+        "symbol": "ADBE",
+        "trades": 62,
+        "strategy_return": -0.78,
+        "buy_hold_return": 9.26,
+        "win_rate": 0.3065,
+        "profit_factor": 0.9248,
+        "expectancy": -0.0116,
+        "total_R": -10.6
+      },
+      "CRM": {
+        "symbol": "CRM",
+        "trades": 28,
+        "strategy_return": 1.25,
+        "buy_hold_return": 43.6,
+        "win_rate": 0.3571,
+        "profit_factor": 1.3025,
+        "expectancy": 0.0455,
+        "total_R": 1.53
+      },
+      "ORCL": {
+        "symbol": "ORCL",
+        "trades": 78,
+        "strategy_return": -2.06,
+        "buy_hold_return": -4.34,
+        "win_rate": 0.2821,
+        "profit_factor": 0.8623,
+        "expectancy": -0.0251,
+        "total_R": -16.79
+      },
+      "CSCO": {
+        "symbol": "CSCO",
+        "trades": 89,
+        "strategy_return": -3.63,
+        "buy_hold_return": -8.84,
+        "win_rate": 0.191,
+        "profit_factor": 0.606,
+        "expectancy": -0.0411,
+        "total_R": -40.01
+      },
+      "COST": {
+        "symbol": "COST",
+        "trades": 46,
+        "strategy_return": -0.48,
+        "buy_hold_return": -0.44,
+        "win_rate": 0.3913,
+        "profit_factor": 0.8421,
+        "expectancy": -0.0102,
+        "total_R": 4.82
+      },
+      "WMT": {
+        "symbol": "WMT",
+        "trades": 95,
+        "strategy_return": 1.63,
+        "buy_hold_return": -1.23,
+        "win_rate": 0.3474,
+        "profit_factor": 1.3495,
+        "expectancy": 0.0171,
+        "total_R": 3.73
+      },
+      "KO": {
+        "symbol": "KO",
+        "trades": 74,
+        "strategy_return": 0.04,
+        "buy_hold_return": 7.58,
+        "win_rate": 0.2432,
+        "profit_factor": 1.0145,
+        "expectancy": 0.0007,
+        "total_R": -19.69
+      },
+      "PEP": {
+        "symbol": "PEP",
+        "trades": 88,
+        "strategy_return": -0.7,
+        "buy_hold_return": -10.06,
+        "win_rate": 0.375,
+        "profit_factor": 0.8859,
+        "expectancy": -0.0078,
+        "total_R": 4.04
+      },
+      "NFLX": {
+        "symbol": "NFLX",
+        "trades": 82,
+        "strategy_return": -3.3,
+        "buy_hold_return": -5.35,
+        "win_rate": 0.2561,
+        "profit_factor": 0.678,
+        "expectancy": -0.0403,
+        "total_R": -25.82
+      },
+      "JNJ": {
+        "symbol": "JNJ",
+        "trades": 55,
+        "strategy_return": -0.74,
+        "buy_hold_return": 6.02,
+        "win_rate": 0.3455,
+        "profit_factor": 0.8481,
+        "expectancy": -0.0133,
+        "total_R": -8.69
+      },
+      "JPM": {
+        "symbol": "JPM",
+        "trades": 104,
+        "strategy_return": -0.94,
+        "buy_hold_return": 1.45,
+        "win_rate": 0.3365,
+        "profit_factor": 0.8683,
+        "expectancy": -0.0089,
+        "total_R": -6.75
+      },
+      "XOM": {
+        "symbol": "XOM",
+        "trades": 78,
+        "strategy_return": 3.46,
+        "buy_hold_return": 17.07,
+        "win_rate": 0.3462,
+        "profit_factor": 1.7615,
+        "expectancy": 0.0439,
+        "total_R": -0.57
+      }
+    }
+  },
+  "per_symbol_summaries": {
+    "Baseline": {
+      "positive_strategy_symbols": 11,
+      "negative_strategy_symbols": 14,
+      "outperformed_buy_hold_count": 9
+    },
+    "H6-A": {
+      "positive_strategy_symbols": 11,
+      "negative_strategy_symbols": 14,
+      "outperformed_buy_hold_count": 9
+    },
+    "H6-B": {
+      "positive_strategy_symbols": 9,
+      "negative_strategy_symbols": 16,
+      "outperformed_buy_hold_count": 8
+    },
+    "H6-C": {
+      "positive_strategy_symbols": 8,
+      "negative_strategy_symbols": 17,
+      "outperformed_buy_hold_count": 10
+    }
+  },
+  "time_of_day_diagnostics": {
+    "Baseline": [
+      {
+        "bucket_name": "09:30\u201310:00",
+        "trades": 903,
+        "win_rate": 0.3389,
+        "total_R": -51.99,
+        "expectancy": -0.0021
+      },
+      {
+        "bucket_name": "10:00\u201311:00",
+        "trades": 715,
+        "win_rate": 0.2797,
+        "total_R": -122.33,
+        "expectancy": -0.0159
+      },
+      {
+        "bucket_name": "11:00\u201312:00",
+        "trades": 645,
+        "win_rate": 0.2775,
+        "total_R": -114.94,
+        "expectancy": -0.0223
+      },
+      {
+        "bucket_name": "12:00\u201314:00",
+        "trades": 1547,
+        "win_rate": 0.3142,
+        "total_R": -113.66,
+        "expectancy": 0.0005
+      },
+      {
+        "bucket_name": "14:00\u201315:00",
+        "trades": 873,
+        "win_rate": 0.2887,
+        "total_R": -141.7,
+        "expectancy": -0.0095
+      },
+      {
+        "bucket_name": "15:00\u201315:55",
+        "trades": 1008,
+        "win_rate": 0.3056,
+        "total_R": -194.38,
+        "expectancy": -0.012
+      }
+    ],
+    "H6-A": [
+      {
+        "bucket_name": "09:30\u201310:00",
+        "trades": 310,
+        "win_rate": 0.3484,
+        "total_R": -9.13,
+        "expectancy": 0.0294
+      },
+      {
+        "bucket_name": "10:00\u201311:00",
+        "trades": 235,
+        "win_rate": 0.2894,
+        "total_R": -32.06,
+        "expectancy": -0.0263
+      },
+      {
+        "bucket_name": "11:00\u201312:00",
+        "trades": 260,
+        "win_rate": 0.2923,
+        "total_R": -34.06,
+        "expectancy": -0.0172
+      },
+      {
+        "bucket_name": "12:00\u201314:00",
+        "trades": 672,
+        "win_rate": 0.3125,
+        "total_R": -57.1,
+        "expectancy": -0.0032
+      },
+      {
+        "bucket_name": "14:00\u201315:00",
+        "trades": 334,
+        "win_rate": 0.2934,
+        "total_R": -47.85,
+        "expectancy": -0.004
+      },
+      {
+        "bucket_name": "15:00\u201315:55",
+        "trades": 443,
+        "win_rate": 0.307,
+        "total_R": -98.65,
+        "expectancy": -0.0096
+      }
+    ],
+    "H6-B": [
+      {
+        "bucket_name": "09:30\u201310:00",
+        "trades": 282,
+        "win_rate": 0.3298,
+        "total_R": -18.03,
+        "expectancy": 0.007
+      },
+      {
+        "bucket_name": "10:00\u201311:00",
+        "trades": 226,
+        "win_rate": 0.2832,
+        "total_R": -35.06,
+        "expectancy": -0.028
+      },
+      {
+        "bucket_name": "11:00\u201312:00",
+        "trades": 262,
+        "win_rate": 0.2863,
+        "total_R": -38.74,
+        "expectancy": -0.0164
+      },
+      {
+        "bucket_name": "12:00\u201314:00",
+        "trades": 730,
+        "win_rate": 0.311,
+        "total_R": -62.31,
+        "expectancy": -0.003
+      },
+      {
+        "bucket_name": "14:00\u201315:00",
+        "trades": 379,
+        "win_rate": 0.2929,
+        "total_R": -51.68,
+        "expectancy": -0.0046
+      },
+      {
+        "bucket_name": "15:00\u201315:55",
+        "trades": 425,
+        "win_rate": 0.3035,
+        "total_R": -96.86,
+        "expectancy": -0.02
+      }
+    ],
+    "H6-C": [
+      {
+        "bucket_name": "09:30\u201310:00",
+        "trades": 212,
+        "win_rate": 0.3255,
+        "total_R": -15.95,
+        "expectancy": 0.0199
+      },
+      {
+        "bucket_name": "10:00\u201311:00",
+        "trades": 173,
+        "win_rate": 0.2601,
+        "total_R": -39.06,
+        "expectancy": -0.0461
+      },
+      {
+        "bucket_name": "11:00\u201312:00",
+        "trades": 219,
+        "win_rate": 0.2877,
+        "total_R": -31.74,
+        "expectancy": -0.0104
+      },
+      {
+        "bucket_name": "12:00\u201314:00",
+        "trades": 588,
+        "win_rate": 0.301,
+        "total_R": -70.31,
+        "expectancy": -0.0075
+      },
+      {
+        "bucket_name": "14:00\u201315:00",
+        "trades": 292,
+        "win_rate": 0.2808,
+        "total_R": -48.93,
+        "expectancy": -0.003
+      },
+      {
+        "bucket_name": "15:00\u201315:55",
+        "trades": 349,
+        "win_rate": 0.3066,
+        "total_R": -82.38,
+        "expectancy": -0.0152
+      }
+    ]
+  },
+  "churn_diagnostics": {
+    "Baseline": {
+      "total_trades": 5691,
+      "total_traded_sessions": 1168,
+      "trades_per_symbol_session": 4.87,
+      "sessions_with_ge_2_trades": 822,
+      "sessions_with_ge_2_pct": 70.38,
+      "sessions_with_ge_5_trades": 464,
+      "sessions_with_ge_5_pct": 39.73,
+      "avg_holding_time_minutes": 24.8
+    },
+    "H6-A": {
+      "total_trades": 2254,
+      "total_traded_sessions": 619,
+      "trades_per_symbol_session": 3.64,
+      "sessions_with_ge_2_trades": 373,
+      "sessions_with_ge_2_pct": 60.26,
+      "sessions_with_ge_5_trades": 186,
+      "sessions_with_ge_5_pct": 30.05,
+      "avg_holding_time_minutes": 24.1
+    },
+    "H6-B": {
+      "total_trades": 2304,
+      "total_traded_sessions": 603,
+      "trades_per_symbol_session": 3.82,
+      "sessions_with_ge_2_trades": 394,
+      "sessions_with_ge_2_pct": 65.34,
+      "sessions_with_ge_5_trades": 189,
+      "sessions_with_ge_5_pct": 31.34,
+      "avg_holding_time_minutes": 22.7
+    },
+    "H6-C": {
+      "total_trades": 1833,
+      "total_traded_sessions": 508,
+      "trades_per_symbol_session": 3.61,
+      "sessions_with_ge_2_trades": 313,
+      "sessions_with_ge_2_pct": 61.61,
+      "sessions_with_ge_5_trades": 150,
+      "sessions_with_ge_5_pct": 29.53,
+      "avg_holding_time_minutes": 22.5
+    }
+  },
+  "baseline_regression": {
+    "expected_trades": 5691,
+    "actual_trades": 5691,
+    "expected_win_rate": 0.3042,
+    "actual_win_rate": 0.3042,
+    "expected_profit_factor": 0.94,
+    "actual_profit_factor": 0.9388,
+    "expected_total_R": -738.98,
+    "actual_total_R": -738.98,
+    "regression_verified": true
+  },
+  "pit_summary": {
+    "point_in_time_safe": true,
+    "forming_15m_excluded": true,
+    "forming_5m_excluded": true,
+    "future_data_shielded": true,
+    "closed_bar_rule": "bar_end_time <= signal_time T"
+  }
+}

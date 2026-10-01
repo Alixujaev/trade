@@ -1,0 +1,219 @@
+{
+  "frozen_period": {
+    "universe": "2026-07-02 -> 2026-09-25 (25 symbols, 5m=4680, 15m=1560 RTH bars/symbol)",
+    "spy_qqq": "2026-07-08 -> 2026-09-25 (5m=4446, 15m=1482 RTH bars)",
+    "index_context_unavailable_sessions": [
+      "2026-07-02",
+      "2026-07-06",
+      "2026-07-07"
+    ],
+    "holiday": "2026-07-03 (Independence Day observed)",
+    "study_window": [
+      "2026-07-02 13:30:00+00:00",
+      "2026-09-25 19:55:00+00:00"
+    ],
+    "total_sessions": 60
+  },
+  "timestamp_semantics": {
+    "signal_time": "setup_time (5m signal bar open) + 5 minutes (signal bar end)",
+    "index_bar_rule": "only SPY/QQQ bars with bar_end <= signal_time",
+    "forming_or_future_bars_used": false
+  },
+  "baseline_regression_strict": {
+    "trades": {
+      "actual": 5691,
+      "expected": 5691,
+      "pass": true
+    },
+    "win_rate_pct": {
+      "actual": 30.42,
+      "expected": 30.42,
+      "pass": true
+    },
+    "profit_factor": {
+      "actual": 0.9388,
+      "expected": 0.9388,
+      "pass": true
+    },
+    "total_R": {
+      "actual": -738.98,
+      "expected": -738.98,
+      "pass": true
+    },
+    "gross_0bps_pct": {
+      "actual": -41.19,
+      "expected": -41.19,
+      "pass": true
+    }
+  },
+  "baseline_regression_runner": {
+    "expected_trades": 5691,
+    "actual_trades": 5691,
+    "expected_win_rate": 0.3042,
+    "actual_win_rate": 0.3042,
+    "expected_profit_factor": 0.94,
+    "actual_profit_factor": 0.9388,
+    "expected_total_R": -738.98,
+    "actual_total_R": -738.98,
+    "regression_verified": true
+  },
+  "baseline_regression_ok": true,
+  "h6_validation_status": "EVALUATED",
+  "coverage": {
+    "total_baseline_trades": 5691,
+    "context_sufficient_both": 5427,
+    "INSUFFICIENT_INDEX_CONTEXT": 264,
+    "spy_context_missing": 264,
+    "qqq_context_missing": 264,
+    "coverage_pct_both": 95.36,
+    "insufficient_pct": 4.64
+  },
+  "insufficient_by_session": {
+    "2026-07-02": {
+      "insufficient": 56,
+      "baseline_trades_that_session": 56
+    },
+    "2026-07-06": {
+      "insufficient": 125,
+      "baseline_trades_that_session": 125
+    },
+    "2026-07-07": {
+      "insufficient": 66,
+      "baseline_trades_that_session": 66
+    },
+    "2026-07-08": {
+      "insufficient": 17,
+      "baseline_trades_that_session": 70
+    }
+  },
+  "insufficient_sessions_match_expected_missing": false,
+  "baseline_trades_on_missing_sessions": {
+    "2026-07-02": 56,
+    "2026-07-06": 125,
+    "2026-07-07": 66
+  },
+  "insufficient_by_symbol": {
+    "AAPL": 10,
+    "ADBE": 7,
+    "AMAT": 2,
+    "AMD": 1,
+    "AMZN": 32,
+    "AVGO": 3,
+    "COST": 9,
+    "CRM": 16,
+    "CSCO": 8,
+    "GOOGL": 10,
+    "INTC": 6,
+    "JNJ": 5,
+    "JPM": 12,
+    "KO": 7,
+    "META": 6,
+    "MSFT": 17,
+    "MU": 9,
+    "NFLX": 1,
+    "NVDA": 22,
+    "ORCL": 24,
+    "PEP": 20,
+    "QCOM": 6,
+    "TSLA": 2,
+    "WMT": 14,
+    "XOM": 15
+  },
+  "variant_population": {
+    "H6-A (SPY)": {
+      "baseline_population": 5691,
+      "h6_evaluable_population": 5427,
+      "eligible_bullish_trades": 2254,
+      "sufficient_non_bullish_filtered_out": 3173,
+      "INSUFFICIENT_INDEX_CONTEXT_excluded": 264,
+      "check_sum": true
+    },
+    "H6-B (QQQ)": {
+      "baseline_population": 5691,
+      "h6_evaluable_population": 5427,
+      "eligible_bullish_trades": 2304,
+      "sufficient_non_bullish_filtered_out": 3123,
+      "INSUFFICIENT_INDEX_CONTEXT_excluded": 264,
+      "check_sum": true
+    },
+    "H6-C (SPY+QQQ)": {
+      "baseline_population": 5691,
+      "h6_evaluable_population": 5427,
+      "eligible_bullish_trades": 1833,
+      "sufficient_non_bullish_filtered_out": 3594,
+      "INSUFFICIENT_INDEX_CONTEXT_excluded": 264,
+      "check_sum": true
+    }
+  },
+  "supplementary": {
+    "baseline_full": {
+      "trades": 5691,
+      "win_rate_pct": 30.42,
+      "profit_factor": 0.9388,
+      "total_R": -738.98,
+      "avg_R": -0.1299,
+      "gross_0bps_pct": -41.19,
+      "slip_5bps_pct": -99.8,
+      "slip_10bps_pct": -100.0,
+      "max_drawdown_pct": -58.65
+    },
+    "baseline_context_sufficient_only": {
+      "trades": 5427,
+      "win_rate_pct": 30.37,
+      "profit_factor": 0.93,
+      "total_R": -702.86,
+      "avg_R": -0.1295,
+      "gross_0bps_pct": -43.42,
+      "slip_5bps_pct": -99.75,
+      "slip_10bps_pct": -100.0,
+      "max_drawdown_pct": -58.65
+    },
+    "baseline_insufficient_only": {
+      "trades": 264,
+      "win_rate_pct": 31.44,
+      "profit_factor": 1.1145,
+      "total_R": -36.13,
+      "avg_R": -0.1368,
+      "gross_0bps_pct": 3.95,
+      "slip_5bps_pct": -20.17,
+      "slip_10bps_pct": -38.69,
+      "max_drawdown_pct": -9.64
+    },
+    "h6_a": {
+      "trades": 2254,
+      "win_rate_pct": 30.88,
+      "profit_factor": 0.9686,
+      "total_R": -278.85,
+      "avg_R": -0.1237,
+      "gross_0bps_pct": -10.99,
+      "slip_5bps_pct": -90.66,
+      "slip_10bps_pct": -99.02,
+      "max_drawdown_pct": -33.58
+    },
+    "h6_b": {
+      "trades": 2304,
+      "win_rate_pct": 30.34,
+      "profit_factor": 0.9295,
+      "total_R": -302.69,
+      "avg_R": -0.1314,
+      "gross_0bps_pct": -20.82,
+      "slip_5bps_pct": -92.09,
+      "slip_10bps_pct": -99.21,
+      "max_drawdown_pct": -36.68
+    },
+    "h6_c": {
+      "trades": 1833,
+      "win_rate_pct": 29.62,
+      "profit_factor": 0.9284,
+      "total_R": -288.37,
+      "avg_R": -0.1573,
+      "gross_0bps_pct": -16.83,
+      "slip_5bps_pct": -86.7,
+      "slip_10bps_pct": -97.87,
+      "max_drawdown_pct": -32.16
+    }
+  },
+  "interpretation_rule": "INSUFFICIENT_INDEX_CONTEXT trades are excluded from H6 numerators/trade counts and are NOT an H6 PASS or FAIL.",
+  "cache_sha256_unchanged": true,
+  "network_access": "blocked (yfinance.download / requests patched to raise)"
+}

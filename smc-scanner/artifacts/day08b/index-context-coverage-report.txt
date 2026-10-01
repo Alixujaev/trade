@@ -1,0 +1,62 @@
+=====================================================================================
+DAY-08B — CORRECTED RERUN: INDEX CONTEXT COVERAGE ADDENDUM (runner-generated)
+=====================================================================================
+Frozen data period
+  universe                              : 2026-07-02 -> 2026-09-25 (25 symbols, 5m=4680, 15m=1560 RTH bars/symbol)
+  spy_qqq                               : 2026-07-08 -> 2026-09-25 (5m=4446, 15m=1482 RTH bars)
+  index_context_unavailable_sessions    : ['2026-07-02', '2026-07-06', '2026-07-07']
+  holiday                               : 2026-07-03 (Independence Day observed)
+  study_window                          : ['2026-07-02 13:30:00+00:00', '2026-09-25 19:55:00+00:00']
+  total_sessions                        : 60
+
+Timestamp semantics
+  signal_time                           : setup_time (5m signal bar open) + 5 minutes (signal bar end)
+  index_bar_rule                        : only SPY/QQQ bars with bar_end <= signal_time
+  forming_or_future_bars_used           : False
+
+Baseline regression (strict)            : PASS
+  trades                                : actual=5691  expected=5691  OK
+  win_rate_pct                          : actual=30.42  expected=30.42  OK
+  profit_factor                         : actual=0.9388  expected=0.9388  OK
+  total_R                               : actual=-738.98  expected=-738.98  OK
+  gross_0bps_pct                        : actual=-41.19  expected=-41.19  OK
+H6 validation status                    : EVALUATED
+
+Coverage
+  total_baseline_trades                 : 5691
+  context_sufficient_both               : 5427
+  INSUFFICIENT_INDEX_CONTEXT            : 264
+  spy_context_missing                   : 264
+  qqq_context_missing                   : 264
+  coverage_pct_both                     : 95.36
+  insufficient_pct                      : 4.64
+
+INSUFFICIENT_INDEX_CONTEXT by session (ET)
+  2026-07-02: 56 of 56 baseline trades
+  2026-07-06: 125 of 125 baseline trades
+  2026-07-07: 66 of 66 baseline trades
+  2026-07-08: 17 of 70 baseline trades
+  sessions match expected 07-02/07-06/07-07: False
+  baseline trades on missing sessions      : {'2026-07-02': 56, '2026-07-06': 125, '2026-07-07': 66}
+
+INSUFFICIENT_INDEX_CONTEXT by symbol
+  AAPL=10, ADBE=7, AMAT=2, AMD=1, AMZN=32, AVGO=3, COST=9, CRM=16, CSCO=8, GOOGL=10, INTC=6, JNJ=5, JPM=12, KO=7, META=6, MSFT=17, MU=9, NFLX=1, NVDA=22, ORCL=24, PEP=20, QCOM=6, TSLA=2, WMT=14, XOM=15
+
+Sample population: Baseline vs H6 variants
+  Variant          Baseline pop  H6 evaluable  Eligible  Non-bull  INSUFF
+  H6-A (SPY)               5691          5427      2254      3173     264
+  H6-B (QQQ)               5691          5427      2304      3123     264
+  H6-C (SPY+QQQ)           5691          5427      1833      3594     264
+
+Supplementary metrics (0/5/10 bps are compounded gross returns %)
+  Population                         Trades     WR%      PF    TotalR     0bps     5bps    10bps
+  baseline_full                        5691   30.42  0.9388   -738.98   -41.19    -99.8   -100.0
+  baseline_context_sufficient_only     5427   30.37    0.93   -702.86   -43.42   -99.75   -100.0
+  baseline_insufficient_only            264   31.44  1.1145    -36.13     3.95   -20.17   -38.69
+  h6_a                                 2254   30.88  0.9686   -278.85   -10.99   -90.66   -99.02
+  h6_b                                 2304   30.34  0.9295   -302.69   -20.82   -92.09   -99.21
+  h6_c                                 1833   29.62  0.9284   -288.37   -16.83    -86.7   -97.87
+
+Rule: INSUFFICIENT_INDEX_CONTEXT trades are excluded from H6 numerators/trade counts and are NOT an H6 PASS or FAIL.
+Cache SHA-256 unchanged during run      : True
+Network access                          : blocked (yfinance.download / requests patched to raise)
