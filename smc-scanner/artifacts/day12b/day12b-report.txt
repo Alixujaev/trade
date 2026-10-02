@@ -1,0 +1,196 @@
+==============================================================================================================
+DAY-12B — +0.5R -> BREAKEVEN — SINGLE COUNTERFACTUAL EXIT-MANAGEMENT EXPERIMENT
+==============================================================================================================
+
+1. HYPOTHESIS & PROVENANCE
+--------------------------------------------------------------------------------------------------------------
+  Move the stop to breakeven after the trade has reached +0.5R.
+  New hypothesis, NOT pre-declared. 0.5R was chosen after viewing DAY-12A and after DAY-07 (1.0R) and DAY-07A (0.75/1.00/1.25R) were evaluated on the same frozen data: effectively a 4th threshold of the H2 BE family, in-sample, subject to data-snooping / multiple-testing bias.
+
+2. FROZEN BASELINE
+--------------------------------------------------------------------------------------------------------------
+  Universe : 25 symbols (AAPL, MSFT, NVDA, AMZN, META, GOOGL, TSLA, AVGO, AMD, QCOM, INTC, MU, AMAT, ADBE, CRM, ORCL, CSCO, COST, WMT, KO, PEP, NFLX, JNJ, JPM, XOM)
+  Period   : 2026-07-02 13:30:00+00:00 -> 2026-09-25 19:55:00+00:00 (60 RTH sessions)
+  Candidate signals: 21087   Baseline trades: 5691
+  Regression vs artifacts\day10\frequency-cap-results.json:
+    total_trades      : anchor=5691  OK
+    win_rate          : anchor=0.3042  OK
+    profit_factor     : anchor=0.9388  OK
+    total_R           : anchor=-738.98  OK
+    avg_R             : anchor=-0.1299  OK
+    max_drawdown_pct  : anchor=-58.65  OK
+    slippage_0bps     : anchor=-41.19  OK
+    slippage_5bps     : anchor=-99.8  OK
+    slippage_10bps    : anchor=-100.0  OK
+  Plain-baseline config: {'stop_mode_SIGNAL_LOW': True, 'target_2R': True, 'same_bar_STOP_FIRST': True, 'no_breakeven_H2': True, 'no_atr_stop_H4': True, 'no_frequency_cap_H3': True, 'no_entry_window_H5': True, 'zero_cost': True, 'no_vwap_exit': True}
+  Paired replay with baseline config reproduces every baseline trade: True
+  Regression verified: True
+
+3. METHODOLOGY & INTRABAR SEMANTICS
+--------------------------------------------------------------------------------------------------------------
+  risk_unit             : R = entry - original SIGNAL_LOW stop; never recalculated after the stop moves
+  trigger               : entry + 0.5R, recognised only from a CLOSED 5m bar that produced no exit (High >= trigger)
+  activation            : BE stop active from the NEXT bar; never applied retroactively to the trigger bar
+  be_stop               : exactly entry_price (R = 0 on a BE exit)
+  pre_confirmation_stop : original stop hit before a closed bar confirms +0.5R -> normal STOP
+  target                : entry + 2R (original R); target touched on the trigger bar executes normally
+  same_bar              : later bar touching both BE stop and target -> existing STOP_FIRST -> BREAKEVEN (ambiguous)
+  gap_fill              : bar opening below entry after BE activation fills at entry (existing engine stop-fill convention, no gap slippage) — counted as a limitation
+  forced_exit           : 15:55 ET bar close, unchanged (no stop/target/BE checks on that bar)
+  implementation        : existing opt-in ExecutionConfig.breakeven_trigger_r path in backtest/execution.py (DAY-07); no engine/strategy/signal code changed
+  population            : PAIRED 1:1: each baseline trade re-simulated from its own signal bar. Candidate and traded populations identical to the baseline. Position slots freed by earlier BE exits are NOT re-used (baseline-skipped signals stay skipped) — documented limitation.
+  costs                 : 0 bps simulated; 5/10 bps applied post-hoc with the existing DAY-07 compounded model (compute_metrics_for_trades)
+
+4. RESULTS (0 bps unless stated)
+--------------------------------------------------------------------------------------------------------------
+                                          BASELINE         BE_0.5R
+  Trades                                      5691            5691
+  Wins / Losses / BE                   1731/3958/2  1235/2912/1544
+  Win rate                                  30.42%          21.70%
+  Profit factor                             0.9388          0.9522
+  Expectancy (avg trade return)            -0.0083         -0.0041
+  Total R                                  -738.98         -582.87
+  Average R                                -0.1299         -0.1024
+  Median R                                 -1.0000         -0.7765
+  Max drawdown (compounded)                -58.65%         -44.95%
+  Geometric (compounded) return            -41.19%         -23.73%
+  Return 0 bps                             -41.19%         -23.73%
+  Return 5 bps                             -99.80%         -99.74%
+  Return 10 bps                           -100.00%        -100.00%
+  Exit STOP                                   3784            2800
+  Exit BREAKEVEN                                 0            1542
+  Exit TARGET                                 1458            1079
+  Exit FORCED_EXIT                             449             270
+  Same-bar ambiguity                           693             729
+  Avg hold (min)                              24.8            12.4
+
+5. TRADE-BY-TRADE ACCOUNTING
+--------------------------------------------------------------------------------------------------------------
+  baseline_trades: 5691
+  be_trades: 5691
+  resimulation_failures: []
+  same_population: True
+  be_activated_trades: 2162
+  be_activated_pct_of_all: 37.99
+  baseline_losers: 3958
+  baseline_losers_with_be_activated: 1060
+  baseline_losers_outcome_changed: 1046
+  baseline_losers_affected_pct: 26.43
+  baseline_stop_to_be: 984
+  baseline_target_changed: 379
+  baseline_target_to_be: 379
+  baseline_forced_to_be: 179
+  trades_changed: 1542
+  trades_unchanged: 4149
+  be_activated_but_unchanged_outcome: 620
+  sum_delta_R: 156.1135
+  total_R_difference: 156.1135
+  delta_R_positive_trades: 1046
+  delta_R_negative_trades: 496
+  sum_positive_delta_R: 1017.03
+  sum_negative_delta_R: -860.92
+  be_exit_gap_through_open_below_entry: 275
+  be_exit_gap_through_sum_R_if_filled_at_open: -84.21
+  be_exit_r_all_zero: True
+  reconciles: True
+  Exit transition matrix (rows = BASELINE exit, cols = BE_0.5R exit):
+                           STOP    BREAKEVEN       TARGET  FORCED_EXIT
+    STOP                   2800          984            0            0
+    BREAKEVEN                 0            0            0            0
+    TARGET                    0          379         1079            0
+    FORCED_EXIT               0          179            0          270
+
+6. BY BASELINE EXIT REASON
+--------------------------------------------------------------------------------------------------------------
+  Group                N    base R      BE R       dR  base WR   BE WR  base PF   BE PF  BE act BE exits
+  STOP              3784  -3784.00  -2800.00   984.00    0.00%   0.00%   0.0000  0.0000     984      984
+  TARGET            1458   2916.00   2158.00  -758.00  100.00%  74.01%        -       -     911      379
+  FORCED_EXIT        449    129.02     59.13   -69.89   60.80%  34.74%   3.0387  2.9593     267      179
+
+7. BY BASELINE HOLDING-TIME BUCKET
+--------------------------------------------------------------------------------------------------------------
+  Group                N    base R      BE R       dR  base WR   BE WR  base PF   BE PF  BE act BE exits
+  0–5 min           2869  -1140.43  -1140.43     0.00   20.74%  20.74%   0.4054  0.4054       0        0
+  5–15 min          1206      8.04    234.94   226.90   34.00%  26.70%   0.7245  0.9769     803      485
+  15–30 min          612    102.95    137.44    34.49   40.36%  22.88%   0.8954  1.0913     481      346
+  30–60 min          442     75.61     58.99   -16.61   40.27%  16.06%   1.0644  1.4666     363      295
+  60–120 min         261     71.93     58.38   -13.55   45.59%  18.01%   1.6083  3.9245     237      192
+  120+ min           301    142.92     67.80   -75.12   60.47%  19.93%   3.0444  6.6965     278      224
+
+8. BY ENTRY TIME OF DAY (DAY-05 bins; explanatory only)
+--------------------------------------------------------------------------------------------------------------
+  Group                N    base R      BE R       dR  base WR   BE WR  base PF   BE PF  BE act BE exits
+  09:30–10:00        838    -47.59    -43.88     3.71   34.01%  19.57%   0.9931  0.9454     442      324
+  10:00–11:00        728   -101.73    -76.23    25.49   29.12%  19.92%   0.9523  1.0090     308      218
+  11:00–12:00        633   -140.22   -110.00    30.22   26.22%  18.96%   0.7232  0.8280     228      163
+  12:00–14:00       1545   -106.55    -84.09    22.46   31.52%  23.24%   1.0283  1.0418     553      396
+  14:00–15:00        864   -144.07    -97.62    46.45   28.70%  20.95%   0.8523  0.9871     320      237
+  15:00–15:55       1083   -198.83   -171.05    27.78   30.75%  24.56%   0.8533  0.8733     311      204
+
+9. BE ACTIVATION TIMING (trigger bar index after entry; 0 = entry bar)
+--------------------------------------------------------------------------------------------------------------
+  {'0': 1449, '1': 343, '2': 138, '3': 58, '4': 41, '5+': 133}
+
+10. BY SYMBOL (alphabetical; NOT a ranking or selection)
+--------------------------------------------------------------------------------------------------------------
+  Group                N    base R      BE R       dR  base WR   BE WR  base PF   BE PF  BE act BE exits
+  AAPL               281     -2.25     -6.83    -4.58   36.30%  27.05%   1.3833  1.3551     104       66
+  ADBE               206     -6.59     -4.51     2.08   33.98%  24.27%   1.3509  1.9334      85       56
+  AMAT               189    -50.11    -26.51    23.60   24.87%  18.52%   0.5912  0.6389      72       57
+  AMD                149      9.67      9.62    -0.05   36.24%  26.85%   1.1003  1.0599      61       43
+  AMZN               274    -68.97    -73.60    -4.62   27.37%  16.06%   0.6538  0.4053      97       78
+  AVGO               230    -45.67    -37.71     7.96   28.70%  20.43%   0.8093  0.7737      81       60
+  COST               244    -50.20    -41.38     8.82   28.28%  20.90%   0.6625  0.6128      77       57
+  CRM                162     -4.93     -7.04    -2.10   33.95%  24.69%   1.4355  1.6119      64       39
+  CSCO               203    -43.16    -40.21     2.96   28.08%  19.21%   0.7810  0.7503      81       55
+  GOOGL              246    -50.60    -49.50     1.10   27.64%  18.29%   0.9608  0.8028      88       66
+  INTC               160     -9.30    -10.46    -1.16   31.87%  25.62%   0.9298  0.9356      55       28
+  JNJ                240    -24.55    -11.82    12.73   32.50%  22.92%   1.0248  1.3508     108       75
+  JPM                296    -41.34    -24.57    16.78   30.74%  21.28%   0.7434  0.8774     118       91
+  KO                 254    -32.88    -17.23    15.65   30.31%  21.65%   1.1388  1.2936      96       74
+  META               157    -12.07     -5.03     7.04   30.57%  23.57%   0.7184  0.7383      52       42
+  MSFT               252    -43.27    -29.97    13.30   29.76%  20.63%   1.0195  1.0574     104       79
+  MU                 182    -29.40    -24.21     5.19   31.32%  23.08%   1.0588  1.1271      68       49
+  NFLX               232    -56.08    -42.04    14.04   26.72%  19.83%   0.9294  0.9168      86       60
+  NVDA               204    -40.35    -28.28    12.07   27.94%  19.12%   0.9673  0.8660      83       60
+  ORCL               205    -38.64    -33.78     4.86   27.32%  18.05%   0.7253  0.6474      70       57
+  PEP                351    -16.91    -18.15    -1.24   33.05%  23.65%   0.9162  0.9538     138       97
+  QCOM               233    -25.69    -16.50     9.19   29.61%  23.18%   0.8109  0.7808      81       55
+  TSLA               162     -7.58      2.42    10.01   27.16%  19.14%   1.1351  1.1571      67       47
+  WMT                285    -23.48    -14.00     9.48   31.58%  23.51%   1.1043  1.2176     110       72
+  XOM                294    -24.65    -31.62    -6.98   32.99%  22.45%   1.0233  0.9962     116       79
+
+  Symbols with positive / negative / zero delta R: 18 / 7 / 0 of 25
+  Median / min / max symbol delta R: 7.04 / -6.98 / 23.6
+  Top-2 symbols' share of total |delta R|: 20.44%; top-2 share of positive delta R: 22.83%
+
+11. TRANSACTION-COST SENSITIVITY (compounded, 1 unit/trade)
+--------------------------------------------------------------------------------------------------------------
+  slippage_0bps   : BASELINE    -41.19%   BE_0.5R    -23.73%
+  slippage_5bps   : BASELINE    -99.80%   BE_0.5R    -99.74%
+  slippage_10bps  : BASELINE   -100.00%   BE_0.5R   -100.00%
+
+12. TESTS, PIT & HASH VERIFICATION
+--------------------------------------------------------------------------------------------------------------
+  day12b_tests: tests/test_day12b_breakeven.py: 16 passed, 0 failed (incl. 3 frozen-data experiment tests on final code)
+  full_pytest: 1064 passed, 0 failed, 0 errors, 0 skipped (network blocked by tests/conftest.py guard)
+  targeted_regression_day02_to_day12a: 319 passed, 0 failed (DAY-02, 05, 06A, 07, 07A, 08, 08B semantics, 09, 10, 11, multi-symbol, cache immutability, DAY-12A)
+  day12a_facts_rechecked: 5,691 trades; losers >=+0.5R/+1R 27.51%/14.68% (PRIMARY), 61.50%/40.53% (UPPER_BOUND); 2,869 single-bar trades (50.4%); per-symbol +1R 6.42-22.03%; MECHANISM INCONCLUSIVE
+  pit: future-session mutation (AAPL, sessions >= mid-period cutoff, x1.07 OHLC): earlier paired BE trades and trigger times identical
+  fast_reference_equivalence: identical trades, BE trigger times and metrics with breakeven_trigger_r=0.5 on frozen AAPL first 312 bars
+  candidate_invariance: candidate signals identical for default vs BE config (frozen AAPL full period); paired population = 5,691 baseline trades
+  fill_convention_limitation: BE exits on bars opening below entry are filled at entry (existing engine stop-fill convention); count and R-if-filled-at-open are in accounting (descriptive only; not applied to results; no second experiment)
+  cache_and_artifact_hashes_phase1_vs_final: {'data/cache (305 files)': 'UNCHANGED manifest f745f65fa6f25833', 'artifacts/day05 (2 files)': 'UNCHANGED manifest da9c2f855731cc14', 'artifacts/day08 (2 files)': 'UNCHANGED manifest 6359f5a34e6d4c55', 'artifacts/day08b (6 files)': 'UNCHANGED manifest 283d063f9dd89cd4', 'artifacts/day09 (2 files)': 'UNCHANGED manifest 940ae341754bbd91', 'artifacts/day10 (2 files)': 'UNCHANGED manifest 4dbe905d5358a3df', 'artifacts/day11 (3 files)': 'UNCHANGED manifest a52c349fbbd59185', 'artifacts/day12a (3 files)': 'UNCHANGED manifest aac86459990793fd'}
+
+13. CLASSIFICATION
+--------------------------------------------------------------------------------------------------------------
+  (1) Mechanism effect : {'be_exits': 1542, 'stop_exits_baseline': 3784, 'stop_exits_be': 2800, 'target_exits_baseline': 1458, 'target_exits_be': 1079, 'exit_distribution_changed': True}
+  (2) Gross 0 bps      : {'total_R_improved': True, 'profit_factor_improved': True, 'max_drawdown_improved': True, 'compounded_0bps_improved': True}
+  (3) Costs            : 5 bps non-negative=False, 10 bps non-negative=False
+  Majority of symbols with positive delta R: True
+  Criterion: Analyst criterion defined before DAY-12B results were viewed (not protocol-predeclared). Evaluated in three separate parts: (1) mechanism — does BE materially change the exit distribution (BE exits occur, baseline STOP exits convert to BE); (2) gross 0 bps effect — total R, profit factor and max drawdown vs BASELINE; (3) transaction-cost robustness — 5 and 10 bps compounded returns. MECHANISM SUPPORTED: total R AND profit factor improve at 0 bps, the 5 bps compounded return is non-negative, AND per-symbol R delta is positive in a majority of symbols. MECHANISM NOT SUPPORTED: total R or profit factor does not improve at 0 bps. MECHANISM INCONCLUSIVE: anything else (e.g. gross improvement that does not survive costs). If 5/10 bps returns remain strongly negative the report states that transaction costs remain unresolved. No classification implies a validated trading edge or production readiness.
+  DAY-12B STATUS: MECHANISM INCONCLUSIVE
+  TRANSACTION COSTS REMAIN UNRESOLVED: the 5 / 10 bps compounded returns are negative for BE_0.5R.
+  This is an in-sample counterfactual on the frozen dataset (threshold chosen after viewing DAY-12A).
+  It is NOT a validated trading edge and is NOT a recommendation for production adoption.
+==============================================================================================================
