@@ -1,0 +1,290 @@
+======================================================================================================================
+DAY-12A — EXIT FAILURE DECOMPOSITION — DIAGNOSTIC REPORT (ex-post observation; no counterfactual)
+======================================================================================================================
+
+1. RESEARCH QUESTION
+----------------------------------------------------------------------------------------------------------------------
+  For the existing baseline trades, how much favorable price movement occurs before the eventual exit, and how often do trades that initially move favorably later become losers under the existing exit model?
+  Ex-post diagnostic observation of completed trades. NOT tradable rule validation; no counterfactual exit was simulated.
+
+2. FROZEN BASELINE
+----------------------------------------------------------------------------------------------------------------------
+  Universe : 25 symbols (AAPL, MSFT, NVDA, AMZN, META, GOOGL, TSLA, AVGO, AMD, QCOM, INTC, MU, AMAT, ADBE, CRM, ORCL, CSCO, COST, WMT, KO, PEP, NFLX, JNJ, JPM, XOM)
+  Period   : 2026-07-02 13:30:00+00:00 -> 2026-09-25 19:55:00+00:00 (60 RTH sessions)
+  Trades   : 5691
+  entry               : T + 1 5m OPEN
+  initial_stop        : SIGNAL_LOW (fallback VWAP / entry*0.99)
+  target              : 2.0R
+  same_bar_ambiguity  : STOP_FIRST
+  forced_exit         : 15:55 ET bar CLOSE
+  direction           : long-only
+  frequency_cap       : none
+  entry_window        : none
+  costs               : 0 bps
+  Regression vs artifacts\day10\frequency-cap-results.json (DAY-10 NO CAP):
+    total_trades      : anchor=5691  OK
+    win_rate          : anchor=0.3042  OK
+    profit_factor     : anchor=0.9388  OK
+    total_R           : anchor=-738.98  OK
+    avg_R             : anchor=-0.1299  OK
+    max_drawdown_pct  : anchor=-58.65  OK
+    slippage_0bps     : anchor=-41.19  OK
+    slippage_5bps     : anchor=-99.8  OK
+    slippage_10bps    : anchor=-100.0  OK
+  Plain-baseline config checks: {'stop_mode_SIGNAL_LOW': True, 'target_2R': True, 'same_bar_STOP_FIRST': True, 'no_breakeven_H2': True, 'no_atr_stop_H4': True, 'no_frequency_cap_H3': True, 'no_entry_window_H5': True, 'zero_cost': True, 'no_vwap_exit': True}
+  Regression verified: True
+
+3. METHODOLOGY
+----------------------------------------------------------------------------------------------------------------------
+  Baseline trades are produced by the unchanged multi-symbol runner (default ExecutionConfig). Each trade's
+  price path is read from the SAME frozen 5m cache frame, located by its recorded entry/exit timestamps.
+  Path window: entry bar .. actual exit bar inclusive (positional slice); no bar after the exit bar is read.
+  Timing     : 5m bar-open timestamps; time_to_X = first bar reaching the extreme - entry bar (entry bar = 0 min); holding_minutes = existing hold_duration_minutes (exit bar open - entry bar open).
+  Outcomes   : WIN gross_return > 0, LOSS < 0, BREAKEVEN == 0 (same as prior DAY reports).
+  Every trade record is re-verified against the bars (entry=T+1 open, SIGNAL_LOW stop rule, target=entry+2R,
+  fill price matches exit reason, R and holding minutes recompute). No counterfactual exit is simulated.
+
+4. MFE / MAE DEFINITIONS & EXIT-BAR SEMANTICS
+----------------------------------------------------------------------------------------------------------------------
+  PRIMARY                     : adverse-first (open->low->high), consistent with STOP_FIRST. STOP exit bar: favorable={open}, adverse={open, stop fill}. TARGET exit bar: favorable={open, target fill}, adverse={open, low}. FORCED exit bar: full high/low (engine holds to the bar close without stop/target checks).
+  UPPER_BOUND                 : full high/low of the exit bar for every exit reason (sensitivity only).
+  entry_and_intermediate_bars : full high/low; entry open is a path point (MFE >= 0, MAE <= 0).
+  R conversion: MFE_R = (MFE_price - entry)/risk_per_share; MAE_R = (MAE_price - entry)/risk_per_share; risk_per_share = original entry - SIGNAL_LOW stop distance
+  Note: MFE/MAE in USD are not comparable across symbols; % of entry and R are reported alongside.
+  Stop exits on a bar whose high also reached the target (STOP_FIRST ambiguity): 693 (engine counter: 693)
+  Exit bars that opened beyond the fill (gap-through): 15
+  Invalid-risk trades (excluded from R stats): 0
+
+5. EXIT-REASON DECOMPOSITION (PRIMARY)
+----------------------------------------------------------------------------------------------------------------------
+  Raw exit reasons: {'target': 1458, 'stop': 3784, 'forced_eod': 449}
+Group                      N      WR      PF    avgR    medR      totR  avgMFE%  medMFE% avgMFE_R medMFE_R  avgMAE%  medMAE% avgMAE_R medMAE_R avgHold medHold
+STOP                    3784   0.00%   0.000  -1.000  -1.000 -3784.000    0.089    0.000    0.329    0.000   -0.194   -0.103   -1.000   -1.000  12.279   0.000
+TARGET                  1458 100.00%       -   2.000   2.000  2916.000    0.416    0.239    2.000    2.000   -0.076   -0.036   -0.387   -0.340  24.420   5.000
+FORCED_EXIT              449  60.80%   3.039   0.287   0.250   129.020    0.548    0.335    1.423    1.172   -0.300   -0.206   -1.017   -0.674 131.281  30.000
+
+6. WINNER / LOSER DECOMPOSITION (PRIMARY)
+----------------------------------------------------------------------------------------------------------------------
+Group                      N      WR      PF    avgR    medR      totR  avgMFE%  medMFE% avgMFE_R medMFE_R  avgMAE%  medMAE% avgMAE_R medMAE_R avgHold medHold
+WINNERS                 1731 100.00%       -   1.860   2.000  3219.940    0.459    0.264    1.961    2.000   -0.102   -0.044   -0.416   -0.368  43.972  10.000
+LOSERS                  3958   0.00%   0.000  -1.000  -1.000 -3958.930    0.099    0.000    0.355    0.000   -0.203   -0.109   -1.032   -1.000  16.396   0.000
+BREAKEVENS                 2   0.00%       -   0.000   0.000     0.000    0.120    0.120    0.680    0.680   -0.145   -0.145   -0.530   -0.530   2.500   2.500
+STOP_LOSERS             3784   0.00%   0.000  -1.000  -1.000 -3784.000    0.089    0.000    0.329    0.000   -0.194   -0.103   -1.000   -1.000  12.279   0.000
+OTHER_LOSERS             174   0.00%   0.000  -1.005  -0.474  -174.930    0.333    0.169    0.919    0.690   -0.402   -0.292   -1.726   -0.921 105.919  10.000
+
+7. MFE THRESHOLD ANALYSIS (count / % of group reaching MFE_R >= threshold; descriptive only)
+----------------------------------------------------------------------------------------------------------------------
+  [PRIMARY]
+  Group              N          +0.25R          +0.50R          +0.75R          +1.00R          +1.25R          +1.50R          +2.00R
+  ALL             5691   3152 ( 55.4%)   2802 ( 49.2%)   2491 ( 43.8%)   2236 ( 39.3%)   2020 ( 35.5%)   1824 ( 32.0%)   1516 ( 26.6%)
+  WINNERS         1731   1727 ( 99.8%)   1712 ( 98.9%)   1684 ( 97.3%)   1654 ( 95.5%)   1626 ( 93.9%)   1584 ( 91.5%)   1508 ( 87.1%)
+  LOSERS          3958   1424 ( 36.0%)   1089 ( 27.5%)    806 ( 20.4%)    581 ( 14.7%)    393 (  9.9%)    240 (  6.1%)      8 (  0.2%)
+  STOP            3784   1289 ( 34.1%)    984 ( 26.0%)    723 ( 19.1%)    523 ( 13.8%)    354 (  9.4%)    216 (  5.7%)      0 (  0.0%)
+  TARGET          1458   1458 (100.0%)   1458 (100.0%)   1458 (100.0%)   1458 (100.0%)   1458 (100.0%)   1458 (100.0%)   1458 (100.0%)
+  FORCED_EXIT      449    405 ( 90.2%)    360 ( 80.2%)    310 ( 69.0%)    255 ( 56.8%)    208 ( 46.3%)    150 ( 33.4%)     58 ( 12.9%)
+
+  [UPPER_BOUND]
+  Group              N          +0.25R          +0.50R          +0.75R          +1.00R          +1.25R          +1.50R          +2.00R
+  ALL             5691   4753 ( 83.5%)   4147 ( 72.9%)   3635 ( 63.9%)   3259 ( 57.3%)   2929 ( 51.5%)   2659 ( 46.7%)   2209 ( 38.8%)
+  WINNERS         1731   1727 ( 99.8%)   1712 ( 98.9%)   1684 ( 97.3%)   1654 ( 95.5%)   1626 ( 93.9%)   1584 ( 91.5%)   1508 ( 87.1%)
+  LOSERS          3958   3025 ( 76.4%)   2434 ( 61.5%)   1950 ( 49.3%)   1604 ( 40.5%)   1302 ( 32.9%)   1075 ( 27.2%)    701 ( 17.7%)
+  STOP            3784   2890 ( 76.4%)   2329 ( 61.5%)   1867 ( 49.3%)   1546 ( 40.9%)   1263 ( 33.4%)   1051 ( 27.8%)    693 ( 18.3%)
+  TARGET          1458   1458 (100.0%)   1458 (100.0%)   1458 (100.0%)   1458 (100.0%)   1458 (100.0%)   1458 (100.0%)   1458 (100.0%)
+  FORCED_EXIT      449    405 ( 90.2%)    360 ( 80.2%)    310 ( 69.0%)    255 ( 56.8%)    208 ( 46.3%)    150 ( 33.4%)     58 ( 12.9%)
+
+8. LOSERS REACHING POSITIVE EXCURSION BEFORE EXIT
+----------------------------------------------------------------------------------------------------------------------
+  [PRIMARY] losers=3958
+    +0.25R: 1424 (35.98%)  +0.50R: 1089 (27.51%)  +0.75R: 806 (20.36%)  +1.00R: 581 (14.68%)  +1.25R: 393 (9.93%)  +1.50R: 240 (6.06%)  +2.00R: 8 (0.20%)
+  [UPPER_BOUND] losers=3958
+    +0.25R: 3025 (76.43%)  +0.50R: 2434 (61.50%)  +0.75R: 1950 (49.27%)  +1.00R: 1604 (40.53%)  +1.25R: 1302 (32.90%)  +1.50R: 1075 (27.16%)  +2.00R: 701 (17.71%)
+  [STOP_LOSERS_PRIMARY] losers=3784
+    +0.25R: 1289 (34.06%)  +0.50R: 984 (26.00%)  +0.75R: 723 (19.11%)  +1.00R: 523 (13.82%)  +1.25R: 354 (9.36%)  +1.50R: 216 (5.71%)  +2.00R: 0 (0.00%)
+  [OTHER_LOSERS_PRIMARY] losers=174
+    +0.25R: 135 (77.59%)  +0.50R: 105 (60.34%)  +0.75R: 83 (47.70%)  +1.00R: 58 (33.33%)  +1.25R: 39 (22.41%)  +1.50R: 24 (13.79%)  +2.00R: 8 (4.60%)
+
+9. TIME-TO-MFE (PRIMARY)
+----------------------------------------------------------------------------------------------------------------------
+  [ALL]
+  Bin                 N       %   avg MFE_R   med MFE_R  avg final R
+  0–5 min          3806   66.88       0.491       0.000       -0.543
+  5–10 min          526    9.24       1.437       1.700        0.398
+  10–15 min         304    5.34       1.519       2.000        0.612
+  15–30 min         409    7.19       1.609       2.000        0.756
+  30–60 min         300    5.27       1.625       2.000        0.826
+  60–120 min        178    3.13       1.685       2.000        0.959
+  120+ min          168    2.95       1.608       1.912        1.215
+
+  [LOSERS]
+  Bin                 N       %   avg MFE_R   med MFE_R  avg final R
+  0–5 min          3204   80.95       0.195       0.000       -1.014
+  5–10 min          279    7.05       0.955       0.903       -0.971
+  10–15 min         135    3.41       0.975       0.887       -0.968
+  15–30 min         164    4.14       1.075       1.088       -0.943
+  30–60 min         107    2.70       1.126       1.222       -0.907
+  60–120 min         50    1.26       1.253       1.298       -0.889
+  120+ min           19    0.48       1.134       1.110       -0.627
+
+10. TIME-TO-MAE (PRIMARY)
+----------------------------------------------------------------------------------------------------------------------
+  [ALL]
+  Bin                 N       %   avg MAE_R   med MAE_R  avg final R
+  0–5 min          3601   63.28      -0.800      -1.000        0.070
+  5–10 min          644   11.32      -0.924      -1.000       -0.416
+  10–15 min         368    6.47      -0.907      -1.000       -0.395
+  15–30 min         455    8.00      -0.926      -1.000       -0.498
+  30–60 min         324    5.69      -0.924      -1.000       -0.569
+  60–120 min        178    3.13      -0.923      -1.000       -0.526
+  120+ min          121    2.13      -0.922      -1.000       -0.612
+
+  [STOP]
+  Bin                 N       %   avg MAE_R   med MAE_R  avg final R
+  0–5 min          2207   58.32      -1.000      -1.000       -1.000
+  5–10 min          499   13.19      -1.001      -1.000       -1.000
+  10–15 min         274    7.24      -1.000      -1.000       -1.000
+  15–30 min         353    9.33      -1.000      -1.000       -1.000
+  30–60 min         254    6.71      -1.000      -1.000       -1.000
+  60–120 min        128    3.38      -1.000      -1.000       -1.000
+  120+ min           69    1.82      -1.000      -1.000       -1.000
+
+  [LOSERS]
+  Bin                 N       %   avg MAE_R   med MAE_R  avg final R
+  0–5 min          2276   57.50      -1.057      -1.000       -1.020
+  5–10 min          509   12.86      -1.010      -1.000       -0.997
+  10–15 min         288    7.28      -0.991      -1.000       -0.973
+  15–30 min         370    9.35      -1.001      -1.000       -0.978
+  30–60 min         266    6.72      -0.995      -1.000       -0.976
+  60–120 min        146    3.69      -0.997      -1.000       -0.949
+  120+ min          103    2.60      -0.957      -1.000       -0.866
+
+11. HOLDING-TIME ANALYSIS (no causal inference)
+----------------------------------------------------------------------------------------------------------------------
+Group                      N      WR      PF    avgR    medR      totR  avgMFE%  medMFE% avgMFE_R medMFE_R  avgMAE%  medMAE% avgMAE_R medMAE_R avgHold medHold
+0–5 min                 2869  20.74%   0.405  -0.398  -1.000 -1140.430    0.038    0.000    0.454    0.000   -0.093   -0.046   -0.916   -1.000   0.000   0.000
+5–15 min                1206  34.00%   0.725   0.007  -1.000     8.040    0.205    0.126    1.112    0.967   -0.185   -0.105   -0.791   -1.000   6.870   5.000
+15–30 min                612  40.36%   0.895   0.168  -1.000   102.950    0.294    0.203    1.270    1.364   -0.230   -0.144   -0.766   -1.000  19.061  20.000
+30–60 min                442  40.27%   1.064   0.171  -1.000    75.610    0.407    0.279    1.307    1.375   -0.280   -0.196   -0.795   -1.000  39.943  40.000
+60–120 min               261  45.59%   1.608   0.276  -1.000    71.930    0.615    0.427    1.435    1.581   -0.317   -0.241   -0.764   -1.000  82.050  80.000
+120+ min                 301  60.47%   3.044   0.475   0.421   142.920    1.038    0.863    1.420    1.489   -0.479   -0.422   -0.678   -0.711 272.409 300.000
+
+12. MFE vs FINAL R (PRIMARY MFE_R buckets)
+----------------------------------------------------------------------------------------------------------------------
+Group                      N      WR      PF    avgR    medR      totR
+MFE < 0R                 (empty)
+0R <= MFE < 0.5R        2889   0.66%   0.007  -0.988  -1.000 -2854.670
+0.5R <= MFE < 1R         566  10.25%   0.112  -0.826  -1.000  -467.560
+1R <= MFE < 1.5R         412  16.99%   0.306  -0.665  -1.000  -274.160
+1.5R <= MFE < 2R         308  24.68%   1.041  -0.490  -1.000  -150.890
+MFE >= 2R               1516  99.47% 468.277   1.984   2.000  3008.290
+
+  0R <= MFE < 0.5R       exits: {'STOP': 2800, 'TARGET': 0, 'FORCED_EXIT': 89}
+  0.5R <= MFE < 1R       exits: {'STOP': 461, 'TARGET': 0, 'FORCED_EXIT': 105}
+  1R <= MFE < 1.5R       exits: {'STOP': 307, 'TARGET': 0, 'FORCED_EXIT': 105}
+  1.5R <= MFE < 2R       exits: {'STOP': 216, 'TARGET': 0, 'FORCED_EXIT': 92}
+  MFE >= 2R              exits: {'STOP': 0, 'TARGET': 1458, 'FORCED_EXIT': 58}
+  Note: 'MFE < 0R' is empty by construction (the entry open is a path point).
+
+  MFE/|MAE| ratio (MAE_R == 0 -> undefined, reported separately):
+    ALL     : {'defined': 5507, 'undefined_mae_zero': 184, 'mean': 9.5082, 'median': 0.4181, 'p10': 0.0, 'p25': 0.0, 'p75': 2.2227, 'p90': 6.7145}
+    WINNERS : {'defined': 1547, 'undefined_mae_zero': 184, 'mean': 32.9397, 'median': 4.5435, 'p10': 2.1484, 'p25': 2.7533, 'p75': 9.4195, 'p90': 21.4737}
+    LOSERS  : {'defined': 3958, 'undefined_mae_zero': 0, 'mean': 0.3537, 'median': 0.0, 'p10': 0.0, 'p25': 0.0, 'p75': 0.577, 'p90': 1.2563}
+
+13. RAPID-EXIT ANALYSIS (holding < 15 min)
+----------------------------------------------------------------------------------------------------------------------
+Group                      N      WR      PF    avgR avgMFE_R medMFE_R avgMAE_R medMAE_R  %>=0.5R   %>=1R
+0–5 min                 2869  20.74%   0.405  -0.398    0.454    0.000   -0.916   -1.000   21.470  20.600
+5–10 min                 755  32.45%   0.657  -0.037    1.082    0.909   -0.797   -1.000   65.560  47.280
+10–15 min                451  36.59%   0.819   0.080    1.162    1.082   -0.782   -1.000   71.620  52.110
+
+  0–5 min      exits: {'STOP': 2207, 'TARGET': 534, 'FORCED_EXIT': 128}
+  5–10 min     exits: {'STOP': 499, 'TARGET': 231, 'FORCED_EXIT': 25}
+  10–15 min    exits: {'STOP': 274, 'TARGET': 150, 'FORCED_EXIT': 27}
+
+14. STOP-DISTANCE ANALYSIS (original SIGNAL_LOW risk / entry; existing DAY-05 buckets)
+----------------------------------------------------------------------------------------------------------------------
+Group                      N      WR      PF    avgR avgMFE_R medMFE_R avgMAE_R medMAE_R  %>=0.5R   %>=1R
+<0.25%                  4175  29.15%   0.939  -0.148    0.802    0.176   -0.865   -1.000   44.720  37.770
+0.25–0.50%               887  32.13%   0.840  -0.112    0.954    0.806   -0.804   -1.000   61.100  43.970
+0.50–1.00%               458  32.97%   0.806  -0.118    0.969    0.782   -0.798   -1.000   63.100  43.670
+1.00–2.00%               160  44.37%   1.381   0.190    0.975    0.818   -0.694   -0.890   60.620  42.500
+2.00%+                    11  63.64%   1.268   0.003    0.643    0.556   -0.432   -0.176   63.640   9.090
+
+  <0.25%       exits: {'STOP': 2879, 'TARGET': 1111, 'FORCED_EXIT': 185}
+  0.25–0.50%   exits: {'STOP': 548, 'TARGET': 206, 'FORCED_EXIT': 133}
+  0.50–1.00%   exits: {'STOP': 283, 'TARGET': 103, 'FORCED_EXIT': 72}
+  1.00–2.00%   exits: {'STOP': 72, 'TARGET': 38, 'FORCED_EXIT': 50}
+  2.00%+       exits: {'STOP': 2, 'TARGET': 0, 'FORCED_EXIT': 9}
+
+15. SYMBOL ROBUSTNESS (not a ranking / selection)
+----------------------------------------------------------------------------------------------------------------------
+  Symbol       N  Losers  avgMFE_R  avgMAE_R  L%>=0.5R   L%>=1R     totR
+  AAPL       281     179     0.909    -0.848     23.46    12.85    -2.25
+  ADBE       206     136     0.837    -0.805     27.94    10.29    -6.59
+  AMAT       189     142     0.826    -0.897     33.80    20.42   -50.11
+  AMD        149      95     1.018    -0.785     31.58    14.74     9.67
+  AMZN       274     199     0.778    -0.875     24.62    12.06   -68.97
+  AVGO       230     163     0.805    -0.862     25.77    12.88   -45.67
+  COST       244     175     0.770    -0.837     24.00    14.29   -50.20
+  CRM        162     107     0.857    -0.817     22.43    14.95    -4.93
+  CSCO       203     146     0.757    -0.834     26.03    10.96   -43.16
+  GOOGL      246     178     0.753    -0.853     24.72    14.04   -50.60
+  INTC       160     109     0.798    -0.793     18.35     6.42    -9.30
+  JNJ        240     162     0.926    -0.893     33.33    16.67   -24.55
+  JPM        296     205     0.853    -0.834     31.71    13.66   -41.34
+  KO         254     177     0.842    -0.821     31.07    18.08   -32.88
+  META       157     109     0.886    -0.800     28.44    17.43   -12.07
+  MSFT       252     177     0.851    -0.853     33.33    20.34   -43.27
+  MU         182     125     0.942    -0.969     28.80    16.80   -29.40
+  NFLX       232     170     0.757    -0.862     27.06    13.53   -56.08
+  NVDA       204     147     0.816    -0.861     30.61    17.69   -40.35
+  ORCL       205     149     0.810    -0.844     25.50    12.08   -38.64
+  PEP        351     234     0.864    -0.803     27.78    14.96   -16.91
+  QCOM       233     164     0.826    -0.802     25.61    12.80   -25.69
+  TSLA       162     118     1.011    -0.861     29.66    22.03    -7.58
+  WMT        285     195     0.847    -0.805     26.15    16.92   -23.48
+  XOM        294     197     0.851    -0.888     25.38    11.17   -24.65
+  avg_MFE_R             : {'median': 0.8422, 'min': 0.7534, 'max': 1.0177}
+  avg_MAE_R             : {'median': -0.844, 'min': -0.9692, 'max': -0.7855}
+  loser_pct_reach_0.5R  : {'median': 27.06, 'min': 18.35, 'max': 33.8, 'aggregate': 27.51, 'symbols_above_aggregate': 12, 'symbols_at_or_below_aggregate': 13}
+  loser_pct_reach_1R    : {'median': 14.29, 'min': 6.42, 'max': 22.03, 'aggregate': 14.68, 'symbols_above_aggregate': 12, 'symbols_at_or_below_aggregate': 13}
+
+16. TIME-OF-DAY CROSS-CHECK (DAY-05 bins on the entry bar; explanatory only, H5 not re-run)
+----------------------------------------------------------------------------------------------------------------------
+  Bin                N     avgR  avgMFE_R  avgMAE_R  Losers  L%>=0.5R   L%>=1R  medHold
+  09:30–10:00      838   -0.057     0.926    -0.798     553     36.71    15.91     15.0
+  10:00–11:00      728   -0.140     0.837    -0.819     516     29.26    15.70      5.0
+  11:00–12:00      633   -0.222     0.762    -0.849     467     25.05    16.06      0.0
+  12:00–14:00     1545   -0.069     0.840    -0.806    1058     25.43    13.99      0.0
+  14:00–15:00      864   -0.167     0.809    -0.824     616     27.60    14.61      0.0
+  15:00–15:55     1083   -0.184     0.864    -0.966     748     23.93    13.24      0.0
+
+17. PIT / DATA INTEGRITY
+----------------------------------------------------------------------------------------------------------------------
+  trades_reconstructed: 5691
+  record_check_failures: {}
+  all_record_checks_pass: True
+  invalid_risk_trades: 0
+  exit_bar_same_bar_ambiguous_stop_trades: 693
+  exit_bar_gap_through_trades: 15
+  primary_mfe_never_exceeds_upper_bound: True
+  primary_mae_never_below_upper_bound: True
+  trades_in_baseline: 5691
+  all_trades_reconstructed: True
+  raw_exit_reasons: {'target': 1458, 'stop': 3784, 'forced_eod': 449}
+  same_bar_ambiguity_engine_count: 693
+
+18. TESTS
+----------------------------------------------------------------------------------------------------------------------
+  note: validation block not embedded
+
+19. RESEARCH INTERPRETATION (descriptive; ex-post observation, NOT tradable rule validation)
+----------------------------------------------------------------------------------------------------------------------
+  Under the PRIMARY convention, 27.51% of losing trades reached >= +0.5R and 14.68% reached >= +1.0R before their exit (3958 losers).
+  Under the UPPER_BOUND convention the corresponding shares are 61.5% and 40.53%.
+  Evidence: {'primary_loser_pct_reach_1R': 14.68, 'primary_loser_pct_reach_0.5R': 27.51, 'upper_bound_loser_pct_reach_0.5R': 61.5, 'symbols_with_>=10_losers': 25, 'symbols_loser_reach_1R_>=25pct': 0}
+  Criterion: Analyst criterion defined before DAY-12A results were viewed (not a protocol-predeclared rule). MECHANISM SUPPORTED: under the PRIMARY (adverse-first) convention >= 25% of losing trades reached >= +1.0R MFE before exit, AND that share is >= 25% in a majority of symbols with >= 10 losers. MECHANISM NOT SUPPORTED: < 15% of losers reached >= +0.5R under PRIMARY AND < 25% under UPPER_BOUND. MECHANISM INCONCLUSIVE: anything else. The classification only describes whether eventual losers experienced substantial favorable excursion; it does not imply any exit modification would help.
+  DIAGNOSTIC CLASSIFICATION: MECHANISM INCONCLUSIVE
+  This classification does NOT mean the strategy is profitable, nor that BE / trailing / partial exits /
+  a different target would improve results. Any such change requires a separate pre-declared hypothesis
+  and counterfactual backtest.
+======================================================================================================================
