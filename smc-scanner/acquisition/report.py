@@ -12,6 +12,7 @@ from typing import Any
 from acquisition.contract import ROOT_DIR
 
 REPORT_DIR = ROOT_DIR / "artifacts" / "day15"
+REPORT_NAME = "day15b-acquisition.md"  # the only writable file (DAY-15A documents are protected)
 
 
 class ReportPathError(ValueError):
@@ -20,8 +21,8 @@ class ReportPathError(ValueError):
 
 def write_report(path: Path, text: str) -> Path:
     rp = Path(path).resolve()
-    if not rp.is_relative_to(REPORT_DIR.resolve()):
-        raise ReportPathError(f"report path must be under {REPORT_DIR}")
+    if rp != (REPORT_DIR / REPORT_NAME).resolve():
+        raise ReportPathError(f"report may only be written to {REPORT_DIR / REPORT_NAME}")
     rp.write_text(text, encoding="utf-8")
     return rp
 
@@ -34,8 +35,9 @@ def render_report(run: dict[str, Any], manifest: dict[str, Any], preflight: dict
     complete_pairs = [r for r in got if r["coverage"]["complete"] and r["structural_passed"]]
     sym_complete = sorted({r["symbol"] for r in res} - {r["symbol"] for r in res if r not in complete_pairs})
     sym_incomplete = sorted({r["symbol"] for r in res} - set(sym_complete))
-    status = "PARTIAL"  # by construction until all 60 sessions are captured and complete
-    if len(run["captured_sessions"]) == len(manifest["oos_sessions"]) and len(complete_pairs) == len(res):
+    progress = manifest.get("progress", {})
+    status = "PARTIAL"  # until the ledger shows every one of the 60 sessions complete
+    if progress.get("progress") == f"{len(manifest['oos_sessions'])}/{len(manifest['oos_sessions'])}":
         status = "ACQUIRED"
     if not got:
         status = "FAILED"
@@ -44,8 +46,10 @@ def render_report(run: dict[str, Any], manifest: dict[str, Any], preflight: dict
     p("# DAY-15B — OOS Acquisition Report (structural only)\n")
     p("> No OOS signals, returns, performance metrics, setup counts, rankings, or trading outcomes were computed or inspected.\n")
     p("## Acquisition status\n")
-    p(f"- **Status: {status}** — snapshot `{run['snapshot_id']}` covers {len(run['captured_sessions'])} of "
-      f"{len(manifest['oos_sessions'])} OOS sessions (the remaining sessions have not occurred yet / are not past the capture wait).")
+    p(f"- **Status: {status}** — ledger progress {progress.get('progress', '?')} complete sessions "
+      f"(complete session = every symbol x interval verified). Snapshot `{run['snapshot_id']}` requested "
+      f"{len(run['captured_sessions'])} session(s) incrementally (provider window: "
+      f"{run.get('provider_window', {}).get('earliest_requestable_start_utc', 'n/a')}, INFERRED).")
     p(f"- Run (UTC): {run['run_utc']}\n")
     p("## Session definition\n")
     cal = manifest["calendar"]
@@ -64,14 +68,14 @@ def render_report(run: dict[str, Any], manifest: dict[str, Any], preflight: dict
         p(f"  - MISSING {r['symbol']} {r['interval']}: {r.get('error')}")
     p("")
     p("## Coverage (structural)\n")
-    p("| Symbol | Interval | Exp. sessions | Sessions w/ data | Exp. bars | Present bars | Missing bars | Outside grid | Structural |")
-    p("|---|---|---|---|---|---|---|---|---|")
+    p("| Symbol | Interval | Part | Exp. sessions | Sessions w/ data | Exp. bars | Present bars | Missing bars | Outside grid | Structural |")
+    p("|---|---|---|---|---|---|---|---|---|---|")
     for r in res:
         if r["status"] == "MISSING":
-            p(f"| {r['symbol']} | {r['interval']} | {len(run['captured_sessions'])} | 0 | - | 0 | - | - | MISSING |")
+            p(f"| {r['symbol']} | {r['interval']} | {r.get('part', '-')} | {len(r.get('requested_sessions', run['captured_sessions']))} | 0 | - | 0 | - | - | MISSING |")
             continue
         c = r["coverage"]
-        p(f"| {r['symbol']} | {r['interval']} | {c['expected_sessions']} | {c['sessions_with_data']} | {c['expected_bars']} | "
+        p(f"| {r['symbol']} | {r['interval']} | {r.get('part', '-')} | {c['expected_sessions']} | {c['sessions_with_data']} | {c['expected_bars']} | "
           f"{c['present_expected_bars']} | {c['missing_bars']} | {c['bars_outside_expected_grid']} | "
           f"{'PASS' if r['structural_passed'] else 'FAIL: ' + '; '.join(r['structural_errors'])} |")
     p("")

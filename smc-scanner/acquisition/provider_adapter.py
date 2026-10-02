@@ -17,6 +17,19 @@ from acquisition.contract import STORED_COLUMNS, ProviderConfig, validate_interv
 
 _RENAME = {"open": "open", "high": "high", "low": "low", "close": "close", "adj close": "adj_close", "volume": "volume"}
 
+# Provider-specific intraday lookback (INFERRED, not a contractual API guarantee): the yfinance
+# docstring says "Intraday data cannot extend last 60 days"; the cut-off is enforced by Yahoo's server.
+# A safety margin keeps requests away from the uncertain edge of that window.
+INTRADAY_LOOKBACK_DAYS = 60
+LOOKBACK_SAFETY_MARGIN_DAYS = 2
+
+
+def earliest_requestable_start(now: datetime) -> pd.Timestamp:
+    """Earliest request start considered safe at `now` (deterministic given `now`)."""
+    if now.tzinfo is None:
+        raise ValueError("now must be timezone-aware")
+    return pd.Timestamp(now).tz_convert("UTC") - pd.Timedelta(days=INTRADAY_LOOKBACK_DAYS - LOOKBACK_SAFETY_MARGIN_DAYS)
+
 
 def provider_version() -> str:
     try:

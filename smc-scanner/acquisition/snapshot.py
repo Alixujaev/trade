@@ -96,26 +96,31 @@ def build_metadata(
 
 def write_snapshot(
     root: Path, snapshot_id: str, symbol: str, interval: str, df: pd.DataFrame, metadata: dict[str, Any],
+    part: str | None = None,
 ) -> dict[str, Any]:
-    """Write-once store. Returns {'status': 'WRITTEN' | 'IDENTICAL' | 'DISCREPANCY', ...}."""
+    """Write-once store. Returns {'status': 'WRITTEN' | 'IDENTICAL' | 'DISCREPANCY', ...}.
+
+    `part` (e.g. 's005-s020') names an incremental session range; None keeps the original naming.
+    """
     _check_location(root)
     snap_dir = Path(root) / "snapshots" / snapshot_id
     snap_dir.mkdir(parents=True, exist_ok=True)
-    data_path = snap_dir / f"{symbol}_{interval}.parquet"
-    meta_path = snap_dir / f"{symbol}_{interval}.meta.json"
+    stem = f"{symbol}_{interval}" + (f"_{part}" if part else "")
+    data_path = snap_dir / f"{stem}.parquet"
+    meta_path = snap_dir / f"{stem}.meta.json"
     new_hash = content_sha256(df)
     if metadata.get("content_sha256") != new_hash:
         raise ValueError("metadata content_sha256 does not match the frame")
 
     if not data_path.exists():
-        tmp = snap_dir / f".{symbol}_{interval}.parquet.tmp"
+        tmp = snap_dir / f".{stem}.parquet.tmp"
         df[list(STORED_COLUMNS)].to_parquet(tmp)
         payload = tmp.read_bytes()
         tmp.unlink()
         _write_readonly(data_path, payload)
         meta = dict(metadata, file_sha256=file_sha256(data_path))
         _write_readonly(meta_path, json.dumps(meta, indent=2, sort_keys=True).encode("utf-8"))
-        return {"status": "WRITTEN", "data_path": str(data_path), "content_sha256": new_hash}
+        return {"status": "WRITTEN", "data_path": str(data_path), "data_file": data_path.name, "content_sha256": new_hash}
 
     original_meta = json.loads(meta_path.read_text(encoding="utf-8"))
     original_hash = original_meta["content_sha256"]
@@ -125,14 +130,14 @@ def write_snapshot(
     attempts = snap_dir / "attempts"
     attempts.mkdir(exist_ok=True)
     record = {"symbol": symbol, "interval": interval, "attempt_utc": stamp, "original_content_sha256": original_hash,
-              "new_content_sha256": new_hash}
+              "new_content_sha256": new_hash, "data_file": data_path.name}
     if new_hash == original_hash:
         record["status"] = "IDENTICAL"
     else:
         record["status"] = "DISCREPANCY"
         conflicts = snap_dir / "conflicts"
         conflicts.mkdir(exist_ok=True)
-        cpath = conflicts / f"{stamp}_{symbol}_{interval}.parquet"
+        cpath = conflicts / f"{stamp}_{stem}.parquet"
         tmp = conflicts / f".{stamp}.tmp"
         df[list(STORED_COLUMNS)].to_parquet(tmp)
         payload = tmp.read_bytes()
@@ -140,7 +145,7 @@ def write_snapshot(
         _write_readonly(cpath, payload)
         record["conflict_path"] = str(cpath)
         record["overlap"] = compare_overlap(pd.read_parquet(data_path), df)
-    _write_readonly(attempts / f"{stamp}_{symbol}_{interval}.json", json.dumps(record, indent=2, sort_keys=True).encode("utf-8"))
+    _write_readonly(attempts / f"{stamp}_{stem}.json", json.dumps(record, indent=2, sort_keys=True).encode("utf-8"))
     return record
 
 

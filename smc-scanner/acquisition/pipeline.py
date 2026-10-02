@@ -31,6 +31,7 @@ def write_environment_manifest(root: Path, snapshot_id: str, env: dict[str, Any]
 def acquire_one(
     adapter: YFinanceAdapter, root: Path, snapshot_id: str, symbol: str, interval: str,
     start: datetime, end: datetime, env: dict[str, Any], extra_meta: dict[str, Any] | None = None,
+    part: str | None = None,
 ) -> dict[str, Any]:
     _check_location(root)
     df, request = adapter.fetch(symbol, interval, start, end)
@@ -44,7 +45,7 @@ def acquire_one(
     meta["git_dirty"] = env.get("git_dirty")
     meta.update(extra_meta or {})
     write_environment_manifest(root, snapshot_id, env)
-    result = write_snapshot(root, snapshot_id, symbol, interval, df, meta)
+    result = write_snapshot(root, snapshot_id, symbol, interval, df, meta, part=part)
     result["structural_checks_passed"] = checks["passed"]
     result["structural_errors"] = checks["errors"]
     result["metadata"] = meta

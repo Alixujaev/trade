@@ -300,7 +300,7 @@ def test_no_forbidden_modules_loaded_at_runtime():
         "import sys; sys.path.insert(0, r'%s');"
         "import acquisition.contract, acquisition.provider_adapter, acquisition.validation, acquisition.snapshot,"
         " acquisition.environment, acquisition.sessions, acquisition.pipeline, acquisition.capture_policy,"
-        " acquisition.run, acquisition.report;"
+        " acquisition.run, acquisition.report, acquisition.ledger;"
         "print(sorted({m.split('.')[0] for m in sys.modules} & set(%r)))" % (ROOT_DIR, FORBIDDEN_PREFIXES)
     )
     out = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True).stdout.strip()

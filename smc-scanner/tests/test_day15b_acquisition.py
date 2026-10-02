@@ -153,6 +153,7 @@ def test_capture_run_universe_missing_reported_not_substituted(monkeypatch, tmp_
     assert all(r["coverage"]["complete"] for r in run["results"] if r["status"] != "MISSING")
     man = json.loads((tmp_path / "manifest.json").read_text())
     assert len(man["oos_sessions"]) == 60 and man["calendar"]["version"] == "4.13.2"
+    assert man["progress"]["progress"] == "0/60"  # subset run: a session needs all 25 x 2 units
     assert man["snapshots"][0]["missing"] == [{"symbol": "MSFT", "interval": "15m", "error": "ConnectionError: provider failure (fake)"},
                                               {"symbol": "MSFT", "interval": "5m", "error": "ConnectionError: provider failure (fake)"}]
     report = render_report(run, man, {"passed": True})
@@ -170,21 +171,16 @@ def test_capture_before_first_session_wait_refused(tmp_path):
         capture_run(now=datetime(2026, 9, 28, 16, 0, tzinfo=ET), env=ENV, root=tmp_path, symbols=["AAPL"])
 
 
-def test_second_capture_overlap_identical_then_discrepancy(monkeypatch, tmp_path):
+def test_repeat_capture_of_complete_sessions_is_noop(monkeypatch, tmp_path):
+    # Incremental lifecycle (DAY-15B fix): complete sessions are never requested again. Overlap
+    # IDENTICAL / DISCREPANCY behaviour for partial sessions is covered in test_day15b_lifecycle.py.
     monkeypatch.setattr(provider_adapter.yf, "download", _fake_download_factory())
     first = capture_run(now=NOW, env=ENV, root=tmp_path, symbols=["AAPL"])
-    later = datetime(2026, 10, 2, 7, 31, tzinfo=ET)
-    second = capture_run(now=later, env=ENV, root=tmp_path, symbols=["AAPL"])
-    assert second["snapshot_id"] != first["snapshot_id"]
-    assert all(o["identical_on_overlap"] for r in second["results"] for o in r["overlap_with_previous"])
-    monkeypatch.setattr(provider_adapter.yf, "download", _fake_download_factory(bump=0.5))
-    third = capture_run(now=datetime(2026, 10, 2, 8, 31, tzinfo=ET), env=ENV, root=tmp_path, symbols=["AAPL"])
-    discrep = [o for r in third["results"] for o in r["overlap_with_previous"] if not o["identical_on_overlap"]]
-    assert discrep and all(r["corporate_action_status"]["overlap_discrepancy"] for r in third["results"])
-    first_file = tmp_path / "snapshots" / first["snapshot_id"] / "AAPL_5m.parquet"
-    assert first_file.exists()  # original preserved
-    man = build_manifest(tmp_path)
-    assert len(man["snapshots"]) == 3 and man["snapshots"][-1]["discrepancies"]
+    assert first["status"] == "CAPTURED"
+    monkeypatch.setattr(provider_adapter.yf, "download", lambda *a, **k: pytest.fail("must not request"))
+    second = capture_run(now=datetime(2026, 10, 2, 7, 31, tzinfo=ET), env=ENV, root=tmp_path, symbols=["AAPL"])
+    assert second["status"] == "UP_TO_DATE" and second["results"] == []
+    assert len(list((tmp_path / "snapshots").glob("*"))) == 1
 
 
 # ---------------- preflight ----------------
