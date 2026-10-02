@@ -1,0 +1,545 @@
+{
+  "schema_version": "1.0",
+  "protocol_version": "v1.0",
+  "phase": "DAY-14 (specification only; no backtest, no data acquisition, no OOS inspection)",
+  "freeze": {
+    "documents_sha256": {
+      "artifacts/day14/research-protocol.md": "5c99484df6cec8f006cab90f712e2332f36fd514466fa7f9a53e4ff4ba7f8f80",
+      "artifacts/day14/data-expansion-spec.md": "b0002c2198eb064169e8394bcbfbaefcd5c6fb11920ff53dced986c4c34c01fd",
+      "artifacts/day14/oos-protocol-template.md": "26ddebfaf846d7278f327e8d29655aaaa7e97d876d0bd6b693ac5178e31d58d8"
+    },
+    "frozen": false,
+    "freeze_condition": "Protocol counts as frozen only after these files are committed; record the commit SHA here in a new protocol version or in the experiment protocol. Hashes above identify the exact text.",
+    "oos_data_acquired": false,
+    "oos_data_inspected": false
+  },
+  "status_vocabulary": [
+    "PREDEFINED",
+    "NOT PREDEFINED",
+    "OPEN QUESTION",
+    "NOT YET IMPLEMENTED",
+    "UNKNOWN / NOT RECORDED"
+  ],
+  "status_counts": {
+    "PREDEFINED": 44,
+    "NOT YET IMPLEMENTED": 7,
+    "OPEN QUESTION": 4,
+    "NOT PREDEFINED": 7,
+    "UNKNOWN / NOT RECORDED": 1,
+    "NO": 1
+  },
+  "items": [
+    {
+      "id": "REPRO-A1",
+      "section": "reproducibility.code",
+      "requirement": "Record git commit SHA and clean/dirty flag; list dirty files with SHA-256",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#2",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "REPRO-A2",
+      "section": "reproducibility.code",
+      "requirement": "Record Python version and pip freeze (no lock file exists; requirements.txt unpinned)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#2",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "REPRO-A3",
+      "section": "reproducibility.code",
+      "requirement": "Dependency lock file",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "requirements.txt (unpinned)",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "REPRO-B1",
+      "section": "reproducibility.data",
+      "requirement": "Record provider, version, call params, symbols, first/last bar, interval, tz, session/extended-hours/closed-bar policy",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#2",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "REPRO-B2",
+      "section": "reproducibility.data",
+      "requirement": "Per-file SHA-256 manifest and file count, compared before/after",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#2",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "REPRO-C1",
+      "section": "reproducibility.strategy",
+      "requirement": "Serialise signal parameters, valid status set and full ExecutionConfig",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#2",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "REPRO-D1",
+      "section": "reproducibility.experiment",
+      "requirement": "Experiment ID, family ID, variants, selection rule, provenance, frozen_before_results with evidence",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#2/#10",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "REPRO-E1",
+      "section": "reproducibility.output",
+      "requirement": "Results JSON with schema version, report, trade CSV, test command and counts",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#2/#14",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "PIT-1",
+      "section": "pit",
+      "requirement": "Decisions use only bars with bar_end <= as_of (5m, 15m, SPY/QQQ)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#3; data/bars.py::filter_closed_bars",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "PIT-2",
+      "section": "pit",
+      "requirement": "Signal observable at signal-bar CLOSE; entry at next bar OPEN in same session",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#3; backtest/execution.py",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "PIT-3",
+      "section": "pit",
+      "requirement": "In-trade state changes recognised at bar CLOSE, effective next bar",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#3",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "PIT-4",
+      "section": "pit",
+      "requirement": "Future-data mutation test proves earlier decisions unchanged",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#3; tests/test_day07_point_in_time.py pattern",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "DATA-1",
+      "section": "data",
+      "requirement": "Provider yfinance, auto_adjust=True, prepost=False, 5m/15m RTH, UTC index = bar open",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#1",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "DATA-2",
+      "section": "data",
+      "requirement": "Missing bars not filled; counted and logged",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#1 (logging)",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "DATA-3",
+      "section": "data",
+      "requirement": "Duplicates keep-last (existing); counted and logged; OOS duplicates fail check until explained",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#1 (logging)",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "DATA-4",
+      "section": "data",
+      "requirement": "Zero-volume bars kept and counted",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#1",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "DATA-5",
+      "section": "data",
+      "requirement": "Malformed OHLC rows dropped (existing); counted and logged",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#1 (logging)",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "DATA-6",
+      "section": "data",
+      "requirement": "Intraday auto_adjust / retroactive corporate-action adjustment semantics",
+      "status": "OPEN QUESTION",
+      "evidence": "artifacts/day14/data-expansion-spec.md#1/#7",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "DATA-7",
+      "section": "data",
+      "requirement": "DST sessions sanity-checked for full 78-bar grid",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#1/#5",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "DATA-8",
+      "section": "data",
+      "requirement": "Warmup: research-window bars as indicator history only; trades only in OOS sessions",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#1",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "DATA-9",
+      "section": "data",
+      "requirement": "Provider switch (e.g. Alpaca IEX) is a separate experiment",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#1",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "SPLIT-1",
+      "section": "split",
+      "requirement": "Research = 2026-07-02..2026-09-25 (60 sessions, exploratory only)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#2",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "SPLIT-2",
+      "section": "split",
+      "requirement": "Validation period: none in this cycle",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#2",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "SPLIT-3",
+      "section": "split",
+      "requirement": "OOS = first N=60 NYSE sessions strictly after 2026-09-25 (projected 2026-09-28..2026-12-21; rule governs)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#3",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "SPLIT-4",
+      "section": "split",
+      "requirement": "NYSE calendar source for session verification",
+      "status": "OPEN QUESTION",
+      "evidence": "artifacts/day14/data-expansion-spec.md#3/#7",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "ACQ-1",
+      "section": "acquisition",
+      "requirement": "Snapshots every <=20 sessions into write-once data/oos_cache/protocol_v1.0/snapshots/<date>/; first before ~2026-11-27",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#4",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "ACQ-2",
+      "section": "acquisition",
+      "requirement": "Never write to data/cache; do not use YFinanceProvider._write_cache for acquisition",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#4",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "ACQ-3",
+      "section": "acquisition",
+      "requirement": "Append-only merge; overlapping sessions must be identical; conflicts flagged, never overwritten",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#4",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "ACQ-4",
+      "section": "acquisition",
+      "requirement": "Acquisition/merge/structural-check tool",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#4/#7",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "ACQ-5",
+      "section": "acquisition",
+      "requirement": "yfinance 60-day intraday window definition (snapshot deadline)",
+      "status": "OPEN QUESTION",
+      "evidence": "artifacts/day14/data-expansion-spec.md#4/#7",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "ACQ-6",
+      "section": "acquisition",
+      "requirement": "Capture-time buffer after 16:00 ET to avoid forming bars",
+      "status": "NOT PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#7",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "STRUCT-1",
+      "section": "structural_checks",
+      "requirement": "Only structural checks before gate: sessions, 78/26 bars (early close 42/14), missing, duplicates, monotonicity, OHLC, volume, RTH, tz, hashes",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#5",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "STRUCT-2",
+      "section": "structural_checks",
+      "requirement": "Forbidden before gate: signals, returns, P&L, R, benchmark, price summaries or plots",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/data-expansion-spec.md#5",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "UNIV-1",
+      "section": "universe",
+      "requirement": "First OOS cycle uses the existing 25 symbols unchanged, frozen by this commit",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#6",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "UNIV-2",
+      "section": "universe",
+      "requirement": "No additions; missing symbol-sessions excluded per session, never replaced",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#6",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "UNIV-3",
+      "section": "universe",
+      "requirement": "Delisting / ticker-change data source",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day14/research-protocol.md#6",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "UNIV-4",
+      "section": "universe",
+      "requirement": "PIT market cap / index constituents",
+      "status": "OPEN QUESTION",
+      "evidence": "artifacts/day14/research-protocol.md#6",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "UNIV-5",
+      "section": "universe",
+      "requirement": "Rule-based survivorship-safe universe construction",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day14/research-protocol.md#6",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "UNIV-6",
+      "section": "universe",
+      "requirement": "Liquidity / min price / min dollar-volume criteria (only for a rule-based universe)",
+      "status": "NOT PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#6",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "UNIV-7",
+      "section": "universe",
+      "requirement": "Selection date of the current 25-symbol universe",
+      "status": "UNKNOWN / NOT RECORDED",
+      "evidence": "config/day_universe.py; first commit dcebe47 (2026-09-28)",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "COST-1",
+      "section": "costs",
+      "requirement": "0/5/10 bps per side; (1+g)(1-s)/(1+s)-1 on every exit incl. breakeven; no separate commission; scales with notional",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#7",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "COST-2",
+      "section": "costs",
+      "requirement": "Report compounded 1-unit return AND mean net trade return vs round trip (~0.10%/~0.20%)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#7",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "COST-3",
+      "section": "costs",
+      "requirement": "Known limitations listed (no portfolio model, gap fills at level, no spread/impact)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#7",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "EXEC-1",
+      "section": "execution",
+      "requirement": "Frozen semantics: T+1 open, SIGNAL_LOW (VWAP / 0.99 fallback), 2R, STOP_FIRST, 15:55 close exit, fills at level, one position per symbol, no partial fills",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#8",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "EXEC-2",
+      "section": "execution",
+      "requirement": "Execution-model changes are separate experiments; never introduced into an existing experiment",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#8",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "EXEC-3",
+      "section": "execution",
+      "requirement": "DAY-12B gap-through limitation documented: 275 BE exits opened below entry; ~-84.21R under bar-open filling",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#7/#8; artifacts/day12b/day12b-results.json accounting",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "EXEC-4",
+      "section": "execution",
+      "requirement": "Early-close sessions: exit via session-change rule at last bar close; flagged",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#8; artifacts/day14/data-expansion-spec.md#3",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "FREEZE-1",
+      "section": "hypothesis_freeze",
+      "requirement": "Protocol file committed before results with all fields of the template",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#9; artifacts/day14/oos-protocol-template.md",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "FREEZE-2",
+      "section": "hypothesis_freeze",
+      "requirement": "Multi-variant selection: evaluate all, retain none unless predeclared condition met; no best-metric selection",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#9",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "MHT-1",
+      "section": "multiple_testing",
+      "requirement": "Experiment ID, family ID, variant count, relation to prior work; DERIVED flag; failed variants never hidden",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#10",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "MHT-2",
+      "section": "multiple_testing",
+      "requirement": "Existing 60-session window exhausted for confirmation (40 variant rows already evaluated)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#10; artifacts/day13/research-matrix.json",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "GATE-1",
+      "section": "oos_gate",
+      "requirement": "Seven gate conditions + in-sample non-negative after acceptance cost scenario; otherwise OOS GATE = NO",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#11",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "GATE-2",
+      "section": "oos_gate",
+      "requirement": "Current gate state",
+      "status": "NO",
+      "evidence": "artifacts/day13/oos-gate.md",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "EVAL-1",
+      "section": "oos_evaluation",
+      "requirement": "Fixed metric set incl. 0/5/10 bps, mean net trade return, exits, holding, per-symbol, accounting, benchmark",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#12",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "EVAL-2",
+      "section": "oos_evaluation",
+      "requirement": "Benchmark: equal-weight per-symbol buy & hold over the same OOS sessions, same exclusions",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#12",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "ACC-1",
+      "section": "acceptance",
+      "requirement": "Primary metric = mean net trade return at 5 bps per side; sign >= 0",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#13",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "ACC-2",
+      "section": "acceptance",
+      "requirement": "Primary metric magnitude threshold",
+      "status": "NOT PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#13",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "ACC-3",
+      "section": "acceptance",
+      "requirement": "Minimum OOS trade count",
+      "status": "NOT PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#13",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "ACC-4",
+      "section": "acceptance",
+      "requirement": "Max drawdown constraint",
+      "status": "NOT PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#13",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "ACC-5",
+      "section": "acceptance",
+      "requirement": "Symbol-breadth and concentration limits",
+      "status": "NOT PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#13",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "ACC-6",
+      "section": "acceptance",
+      "requirement": "Benchmark margin",
+      "status": "NOT PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#13",
+      "blocking_for_oos": false
+    },
+    {
+      "id": "ACC-7",
+      "section": "acceptance",
+      "requirement": "Data integrity, PIT mutation test, reproducibility block are hard requirements",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#13",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "LOG-1",
+      "section": "research_log",
+      "requirement": "Every report answers 'What information was known before this experiment was run?'",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#14",
+      "blocking_for_oos": true
+    },
+    {
+      "id": "BASE-1",
+      "section": "baseline",
+      "requirement": "Traded population = DETECTED + CONFIRMED (DETECTED does not require RSI>50 / RVOL>=2 / trigger)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day14/research-protocol.md#1; strategy/day/vwap_momentum.py",
+      "blocking_for_oos": false
+    }
+  ]
+}
