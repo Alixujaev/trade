@@ -11,3 +11,4 @@ breakout_retest_results.csv
 portfolio_backtest_results.csv
 trade_journal.csv
 core_watchlist.json
+data/oos_cache/

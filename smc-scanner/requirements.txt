@@ -6,3 +6,4 @@ matplotlib
 alpaca-py
 python-dotenv
 python-telegram-bot>=21.0
+exchange_calendars==4.13.2
