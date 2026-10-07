@@ -1,0 +1,451 @@
+{
+  "schema_version": "1.0",
+  "task": "DAY-18G",
+  "starting_head": "c36b673609e1f238dd52e15fcc9b5503e108468f",
+  "protocol_chain": {
+    "v2.0 R1": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+    "v2.0.1": "ed034b3e9500cc4d9b33625de7e1883f572cd5a4",
+    "v2.0.2": "0ebb6065f6e981e324220bae2abd2222800b2228",
+    "v2.0.3": "d26b36ef802cf0810952b2e5c4e8e19d908b4555"
+  },
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+  "protocol_files_verified": 9,
+  "day18f_review_records_commit": "c36b673609e1f238dd52e15fcc9b5503e108468f",
+  "source_snapshot": {
+    "path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+    "file_count": 64,
+    "unchanged": true,
+    "independent_sha256_check": "PASS (64/64, before and after)"
+  },
+  "execution": {
+    "implementation": "frozen acquisition/v2/reevaluate.reevaluate(protocol='v2.0.3'); module SHA-256s identical to DAY-18D provenance",
+    "acquisition_v2_sha256_equal_to_day18d": true,
+    "wrapper": "session-scratchpad script (not a repository file); identical to reevaluate.main() except output_dir_for() returns the default v2_0_3 directory name + '__day18g' (the default is occupied by DAY-18D and is write-once)",
+    "socket_connect_refused": true
+  },
+  "review_output": {
+    "path": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_3__stage_r_20261007T093410Z__day18g",
+    "files_sha256": {
+      "crosscheck.json": "98f3efd0388bcf2f9226268e1e9f3fcd8b3ea0ef5051816e35d5e99a62c8ff59",
+      "data_quality_comparison.json": "b7af64540d8e6067490d222df2301d806362c1851fa0c42e5a24cf2a413fbd03",
+      "evaluation.json": "09dab92f31bdbd0854a7cec10ed0c945b7546229be9ac56272801a0cdc99a829",
+      "events_normalised.json": "e89b9c4361ba668df070d38d9139ddadcca968bf74cf3d582226dcb1341ef0e3",
+      "identity.json": "a775e3db846f88c6ce888d918114fc8c6c291f50d613ea4b5e94fe7981aa48c9",
+      "manifest.json": "a1c9ea1283ba46b6e3a395cc84a1794eeae205bb5ed96fc57eab9e49aaadd9ea",
+      "review_records.json": "f34a045efd4a16cffc35431596337cbbe488b4a4daac3c908c96ccf9989d6a43",
+      "reviews.json": "228baeef8b43952068d961631345acd005f92f6305482e7c5490e00a7b52ac60",
+      "validation.json": "b17d175325391dbb6d38cc1582e35427eb2c15d63a070bab8c8642c2a571cb04"
+    },
+    "write_once_read_only": true,
+    "committed": false
+  },
+  "other_review_outputs_unchanged": {
+    "by_run": true,
+    "checked": [
+      "v2_0_2__stage_r_20261007T093410Z",
+      "v2_0_3__stage_r_20261007T093410Z"
+    ],
+    "independent_sha256_check": "PASS (DAY-18D v2.0.3 9/9, v2.0.2 8/8)"
+  },
+  "day18e_dossier_unchanged": "PASS (7/7, untracked)",
+  "evaluated_utc": "2026-10-07T12:23:49.344041+00:00",
+  "offline": true,
+  "network_calls": 0,
+  "leakage_dates_checked": 1513,
+  "review_records": {
+    "dir": "artifacts/reviews/stage_r",
+    "files_found": 14,
+    "applied": 14,
+    "invalid": 0,
+    "superseded": 0,
+    "worktree_equals_head": true,
+    "agent_created_records": 0
+  },
+  "final_status": "BLOCKED",
+  "usable_for_research": false,
+  "blocking_count": {
+    "day18d": 14,
+    "day18g": 2
+  },
+  "status_counts": {
+    "day18d": {
+      "BLOCKING": 14,
+      "FIRST_SESSION_UNTESTABLE": 3,
+      "HARD_FAIL": 0,
+      "RESOLVED": 4,
+      "RESOLVED_EXCLUDED": 1
+    },
+    "day18g": {
+      "BLOCKING": 2,
+      "FIRST_SESSION_UNTESTABLE": 3,
+      "HARD_FAIL": 0,
+      "RESOLVED": 16,
+      "RESOLVED_EXCLUDED": 1
+    }
+  },
+  "category_counts": {
+    "day18d": {
+      "BLOCKING": 0,
+      "FIRST_SESSION_UNTESTABLE": 3,
+      "IDENTITY_UNVERIFIED": 2,
+      "PASS": 5,
+      "UNRESOLVED": 12
+    },
+    "day18g": {
+      "BLOCKING": 0,
+      "FIRST_SESSION_UNTESTABLE": 3,
+      "IDENTITY_UNVERIFIED": 0,
+      "PASS": 17,
+      "UNRESOLVED": 2
+    }
+  },
+  "crosscheck_symbols_blocking_review_layer": {
+    "day18d": [
+      "AMZN",
+      "NFLX",
+      "NVDA"
+    ],
+    "day18g": [
+      "AMZN",
+      "NFLX"
+    ]
+  },
+  "events_excluded_by_review": [],
+  "blocking_items": [
+    {
+      "category": "UNRESOLVED",
+      "entity": "AMZN",
+      "event_date": "2016-02-22",
+      "item": "unexplained-change AMZN 2016-02-22",
+      "reason": "v2.0.3 item 3: unexplained change without an applicable committed review record",
+      "status": "BLOCKING"
+    },
+    {
+      "category": "UNRESOLVED",
+      "entity": "NFLX",
+      "event_date": "2018-11-29",
+      "item": "unexplained-change NFLX 2018-11-29",
+      "reason": "v2.0.3 item 3: unexplained change without an applicable committed review record",
+      "status": "BLOCKING"
+    }
+  ],
+  "items_with_review_records": [
+    {
+      "item": "identity-unverified stock_mergers AMD<-XLNX",
+      "entity": "AMD",
+      "event_date": "2022-02-14",
+      "id": "15459aa5-b297-4e33-9624-c9d59b75ba46",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "IDENTITY_UNVERIFIED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review SAME_ENTITY; processed as frozen §3.4 review item (acquirer-side, clean date)"
+      },
+      "review_record": {
+        "record_id": "amd-xlnx-20261007",
+        "decision": "SAME_ENTITY",
+        "blob_sha256": "cf07edbd55dea4a4476bac2a48aa056e5923f0223c9e89303980a336efc9776e"
+      }
+    },
+    {
+      "item": "identity-unverified stock_and_cash_mergers CRM<-WORK",
+      "entity": "CRM",
+      "event_date": "2021-07-21",
+      "id": "299d6bfe-da13-4491-bc28-481f1f2aa54c",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "IDENTITY_UNVERIFIED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review SAME_ENTITY; processed as frozen §3.4 review item (acquirer-side, clean date)"
+      },
+      "review_record": {
+        "record_id": "crm-work-20261007",
+        "decision": "SAME_ENTITY",
+        "blob_sha256": "c849cb49c2248763569bba0dc94e59463638b52d40435d263512e5286c1e3e1b"
+      }
+    },
+    {
+      "item": "unexplained-change AMZN 2016-02-22",
+      "entity": "AMZN",
+      "event_date": "2016-02-22",
+      "id": null,
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED",
+        "reason": "v2.0.3 item 3: unexplained change without an applicable committed review record"
+      },
+      "review_record": {
+        "record_id": "amzn-20160222-20261007",
+        "decision": "UNRESOLVED",
+        "blob_sha256": "dfd73ab0e5f365618021eeffaa0480929366d7ccd8e6404e1ddd3c8028c41b58"
+      }
+    },
+    {
+      "item": "unexplained-change NFLX 2018-11-29",
+      "entity": "NFLX",
+      "event_date": "2018-11-29",
+      "id": null,
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED",
+        "reason": "v2.0.3 item 3: unexplained change without an applicable committed review record"
+      },
+      "review_record": {
+        "record_id": "nflx-20181129-20261007",
+        "decision": "UNRESOLVED",
+        "blob_sha256": "454a3bb838e0f98ed3e44ac49bab3886de475f6b2726632f6f42d8f976374921"
+      }
+    },
+    {
+      "item": "unconfirmed-event NVDA cash_dividend 2018-05-23",
+      "entity": "NVDA",
+      "event_date": "2018-05-23",
+      "id": "4be70358-dc7e-429c-ad3a-6b56e5c29ca0",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review EVENT_RETAINED (mechanical evidence check passed)"
+      },
+      "review_record": {
+        "record_id": "nvda-div-20180523-20261007",
+        "decision": "EVENT_RETAINED",
+        "blob_sha256": "6249980c2b6ffa3af672bd976c1699c4b474ab9894630bdd2623b6da36f12fc7"
+      }
+    },
+    {
+      "item": "unconfirmed-event NVDA cash_dividend 2019-08-28",
+      "entity": "NVDA",
+      "event_date": "2019-08-28",
+      "id": "08cdc20f-26c2-47bd-a6d4-3b10ca86185c",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review EVENT_RETAINED (mechanical evidence check passed)"
+      },
+      "review_record": {
+        "record_id": "nvda-div-20190828-20261007",
+        "decision": "EVENT_RETAINED",
+        "blob_sha256": "ad62fdbc59b3d05d0e9f4544607da1dc6322528a794e425420c4a42b92f932c8"
+      }
+    },
+    {
+      "item": "unconfirmed-event NVDA cash_dividend 2020-09-01",
+      "entity": "NVDA",
+      "event_date": "2020-09-01",
+      "id": "391f36bb-8a9c-4b04-85fc-2661d20f9ae5",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review EVENT_RETAINED (mechanical evidence check passed)"
+      },
+      "review_record": {
+        "record_id": "nvda-div-20200901-20261007",
+        "decision": "EVENT_RETAINED",
+        "blob_sha256": "7a9ca3385ef30fdf93cc661ffa7caaabd369d93b514b555f4291c3604d655c5e"
+      }
+    },
+    {
+      "item": "unconfirmed-event NVDA cash_dividend 2020-12-03",
+      "entity": "NVDA",
+      "event_date": "2020-12-03",
+      "id": "c94296da-7080-4fe3-b101-e41e06f2cd09",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review EVENT_RETAINED (mechanical evidence check passed)"
+      },
+      "review_record": {
+        "record_id": "nvda-div-20201203-20261007",
+        "decision": "EVENT_RETAINED",
+        "blob_sha256": "7d3425ee0edeba38bb04e765f7215c8eedf68614b5c7bd8576af33269b1fdb3d"
+      }
+    },
+    {
+      "item": "unconfirmed-event NVDA cash_dividend 2021-03-09",
+      "entity": "NVDA",
+      "event_date": "2021-03-09",
+      "id": "d80fa14c-6eb4-418f-b003-f5775322eba3",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review EVENT_RETAINED (mechanical evidence check passed)"
+      },
+      "review_record": {
+        "record_id": "nvda-div-20210309-20261007",
+        "decision": "EVENT_RETAINED",
+        "blob_sha256": "3e81d07b0b76b1a3d7fd8c3c127ee175c709ebaf72a957ae2c17d754b2a40850"
+      }
+    },
+    {
+      "item": "unconfirmed-event NVDA cash_dividend 2021-06-09",
+      "entity": "NVDA",
+      "event_date": "2021-06-09",
+      "id": "d1a013e0-aea6-46ec-b844-d7a546ace337",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review EVENT_RETAINED (mechanical evidence check passed)"
+      },
+      "review_record": {
+        "record_id": "nvda-div-20210609-20261007",
+        "decision": "EVENT_RETAINED",
+        "blob_sha256": "d5c4c980e56631227edc29b6372cefff1061a8565c10f285e11f9a307847e238"
+      }
+    },
+    {
+      "item": "unconfirmed-event NVDA cash_dividend 2021-12-01",
+      "entity": "NVDA",
+      "event_date": "2021-12-01",
+      "id": "ef9b148b-f031-4c05-8faf-4814f099b11d",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review EVENT_RETAINED (mechanical evidence check passed)"
+      },
+      "review_record": {
+        "record_id": "nvda-div-20211201-20261007",
+        "decision": "EVENT_RETAINED",
+        "blob_sha256": "98fce0f6a2e2762cb423901614a64b173261546e201117a7d192a183eba5d931"
+      }
+    },
+    {
+      "item": "unconfirmed-event NVDA cash_dividend 2022-03-02",
+      "entity": "NVDA",
+      "event_date": "2022-03-02",
+      "id": "13ca6ae3-efe8-461a-af9c-fa2490d56d9c",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review EVENT_RETAINED (mechanical evidence check passed)"
+      },
+      "review_record": {
+        "record_id": "nvda-div-20220302-20261007",
+        "decision": "EVENT_RETAINED",
+        "blob_sha256": "89a248091158a4cc3dec1d9dd102b7771fcd40bd10b7760e9579a0210f1de422"
+      }
+    },
+    {
+      "item": "unconfirmed-event NVDA cash_dividend 2022-06-08",
+      "entity": "NVDA",
+      "event_date": "2022-06-08",
+      "id": "4ac972c2-d010-4c59-9bc5-3804d580e957",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review EVENT_RETAINED (mechanical evidence check passed)"
+      },
+      "review_record": {
+        "record_id": "nvda-div-20220608-20261007",
+        "decision": "EVENT_RETAINED",
+        "blob_sha256": "eca834e01339e9da6507f7e833cadf10f2aacf2f4e64e0883c4349952714bb0d"
+      }
+    },
+    {
+      "item": "unconfirmed-event NVDA cash_dividend 2022-09-07",
+      "entity": "NVDA",
+      "event_date": "2022-09-07",
+      "id": "90e63976-7fbe-41e6-a747-98da5ec27d03",
+      "day18d": {
+        "status": "BLOCKING",
+        "category": "UNRESOLVED"
+      },
+      "day18g": {
+        "status": "RESOLVED",
+        "category": "PASS",
+        "reason": "committed review EVENT_RETAINED (mechanical evidence check passed)"
+      },
+      "review_record": {
+        "record_id": "nvda-div-20220907-20261007",
+        "decision": "EVENT_RETAINED",
+        "blob_sha256": "bb064736bcfca135ae7f954b2332b882c1a1ef125b9bae8c6a6fa43b120c577c"
+      }
+    }
+  ],
+  "mechanical_layer_vs_day18d": {
+    "crosscheck.json": {
+      "sha256": "98f3efd0388bcf2f9226268e1e9f3fcd8b3ea0ef5051816e35d5e99a62c8ff59",
+      "byte_identical": true
+    },
+    "identity.json": {
+      "sha256": "a775e3db846f88c6ce888d918114fc8c6c291f50d613ea4b5e94fe7981aa48c9",
+      "byte_identical": true
+    },
+    "events_normalised.json": {
+      "sha256": "e89b9c4361ba668df070d38d9139ddadcca968bf74cf3d582226dcb1341ef0e3",
+      "byte_identical": true
+    },
+    "validation.json": {
+      "sha256": "b17d175325391dbb6d38cc1582e35427eb2c15d63a070bab8c8642c2a571cb04",
+      "byte_identical": true
+    },
+    "data_quality_comparison.json": {
+      "sha256": "b7af64540d8e6067490d222df2301d806362c1851fa0c42e5a24cf2a413fbd03",
+      "byte_identical": true
+    }
+  },
+  "per_symbol_summary_identical_to_day18d": true,
+  "unchanged_items_identical_to_day18d": true,
+  "tests": {
+    "focused": "66 passed (test_day18d_v203 28, test_day18b_v202 15, test_day18_stage_r 23)",
+    "full_suite": "1249 passed, 0 failed (38 min 16 s; 28 third-party deprecation warnings, as before)"
+  },
+  "not_done": [
+    "no acquisition or network",
+    "no holdout or forward-OOS access",
+    "no research/backtest/signal/metric",
+    "no review record created or modified",
+    "no code or protocol change",
+    "no push"
+  ]
+}
