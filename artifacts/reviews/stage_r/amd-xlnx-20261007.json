@@ -1,0 +1,56 @@
+{
+  "record_id": "amd-xlnx-20261007",
+  "item_type": "IDENTITY_UNVERIFIED",
+  "item_key": {
+    "entity": "AMD",
+    "event_date": "2022-02-14",
+    "ca_id": "15459aa5-b297-4e33-9624-c9d59b75ba46"
+  },
+  "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+  "evidence": [
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=15459aa5-b297-4e33-9624-c9d59b75ba46",
+      "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+      "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+      "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+      "content_scope": "the stock_mergers record id=15459aa5-b297-4e33-9624-c9d59b75ba46",
+      "relevance": "provider record carrying acquirer/acquiree symbols and CUSIPs",
+      "supports_check": "identity evidence (C2 rule 3 / v2.0.3 item 5)"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=15459aa5-b297-4e33-9624-c9d59b75ba46",
+      "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+      "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+      "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+      "content_scope": "the same record in the data_quality=all payload",
+      "relevance": "shows the record content in the audit payload",
+      "supports_check": "identity evidence; payload consistency"
+    },
+    {
+      "type": "regulatory_filing",
+      "reference": "url:https://www.sec.gov/Archives/edgar/data/743988/000110465922021762/tm226258d1_8k.htm",
+      "retrieved_utc": "2026-10-07T11:42:44.202454+00:00",
+      "sha256": "492d6a6eab9f116c5be33c8f59113402471df53e38d2b17a71275d6937d518e7",
+      "hash_scope": "SHA-256 of the exact HTTP response body bytes (HTTP 200, text/html)",
+      "http_status": 200,
+      "bytes": 46642,
+      "local_copy": "data/oos_cache/protocol_v2/evidence/sec/492d6a6eab9f116c5be33c8f59113402471df53e38d2b17a71275d6937d518e7.htm (git-ignored, write-once; same SHA-256)",
+      "registrant_text_check": "XILINX, INC.",
+      "quoted_statements": [
+        "(the \"Company\") completed the previously announced combination with Advanced Micro Devices, Inc.",
+        "As a result of the consummation of the Merger on February 14, 2022, at the Effective Time a change in control of the Company occurred and the Company became a wholly owned subsidiary of AMD."
+      ],
+      "quote_note": "quoted from the retrieved document decoded as Windows-1252; only quotation-mark characters normalised to ASCII",
+      "relevance": "primary regulatory filing (SEC EDGAR) admissible for IDENTITY_UNVERIFIED decisions only (v2.0.3 item 5)"
+    }
+  ],
+  "decision": "SAME_ENTITY",
+  "reasoning": "Provider record 15459aa5-b297-4e33-9624-c9d59b75ba46 (stock_mergers, event date 2022-02-14) names acquirer AMD (CUSIP 007903107) and acquiree XLNX (CUSIP 983919101); it is identical in both data_quality payloads. The primary SEC filing (URL, retrieval time and SHA-256 in evidence) states: \"(the \"Company\") completed the previously announced combination with Advanced Micro Devices, Inc.\" and \"As a result of the consummation of the Merger on February 14, 2022, at the Effective Time a change in control of the Company occurred and the Company became a wholly owned subsidiary of AMD.\". The filing therefore documents that Xilinx, Inc. became a wholly owned subsidiary of Advanced Micro Devices, Inc. on 2022-02-14, consistent with the provider record placing AMD as the acquiring issuer of this merger record. Decision SAME_ENTITY: the record belongs to the Stage R entity AMD (as acquirer). Economic neutrality was not used as identity evidence. Under v2.0.3 item 5 the record is then processed as the entity's frozen §3.4 review item (acquirer-side merger).",
+  "reviewer": "Alixujaev (protocol owner)",
+  "decided_utc": "2026-10-07T11:43:46Z",
+  "supersedes": null,
+  "authorization": "Decision selected by the protocol owner (DAY-18F instruction) and encoded by the implementation agent; the agent made no decision."
+}

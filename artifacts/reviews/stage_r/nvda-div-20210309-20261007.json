@@ -1,0 +1,59 @@
+{
+  "record_id": "nvda-div-20210309-20261007",
+  "item_type": "UNCONFIRMED_EVENT",
+  "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2021-03-09",
+    "ca_id": "d80fa14c-6eb4-418f-b003-f5775322eba3"
+  },
+  "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+  "evidence": [
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=d80fa14c-6eb4-418f-b003-f5775322eba3",
+      "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+      "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+      "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+      "content_scope": "cash_dividends record id=d80fa14c-6eb4-418f-b003-f5775322eba3",
+      "relevance": "provider dividend record",
+      "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=d80fa14c-6eb4-418f-b003-f5775322eba3",
+      "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+      "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+      "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+      "content_scope": "same record, data_quality=all payload",
+      "relevance": "payload consistency",
+      "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2021-03-08..2021-03-09",
+      "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+      "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+      "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+      "content_scope": "rows session_date=2021-03-08 and 2021-03-09, column close",
+      "relevance": "raw closes",
+      "supports_check": "factor change detection (v2.0.3 item 1)"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2021-03-08..2021-03-09",
+      "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+      "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+      "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+      "content_scope": "rows session_date=2021-03-08 and 2021-03-09, column close",
+      "relevance": "adjusted closes and displayed precision",
+      "supports_check": "factor change detection (v2.0.3 item 1)"
+    }
+  ],
+  "decision": "EVENT_RETAINED",
+  "reasoning": "(1) The provider corporate-action record d80fa14c-6eb4-418f-b003-f5775322eba3 (cash dividend, ex-date 2021-03-09, rate 0.16, CUSIP 67066G104) exists, is identity-resolved to NVDA, appears exactly once and identically in both data_quality payloads, and is not duplicated. (2) At its ex-date session the v2.0.3 per-value rounding interval contains 1, so the cross-check detects no factor change outside the rounding interval; the event is not mechanically confirmed by the adjusted series, and no claim of a detectable adjusted-price change is made. (3) The absence of a detectable change within the provider's rounding precision does not, by itself, invalidate the provider record. (4) The protocol owner's decision is EVENT_RETAINED: the provider record remains authoritative for the TR index and accounting (v2.0.1 C3; v2.0.3 item 4).",
+  "reviewer": "Alixujaev (protocol owner)",
+  "decided_utc": "2026-10-07T11:43:46Z",
+  "supersedes": null,
+  "authorization": "Decision selected by the protocol owner (DAY-18F instruction) and encoded by the implementation agent; the agent made no decision."
+}

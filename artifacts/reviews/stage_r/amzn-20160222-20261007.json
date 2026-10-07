@@ -1,0 +1,58 @@
+{
+  "record_id": "amzn-20160222-20261007",
+  "item_type": "UNEXPLAINED_CHANGE",
+  "item_key": {
+    "entity": "AMZN",
+    "session": "2016-02-22"
+  },
+  "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+  "evidence": [
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/AMZN.parquet#session=2016-02-19..2016-02-22",
+      "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+      "sha256": "061c07cb4fb0ba09d9ac69a2fabc932c33f3e178a588966fd5b6e4b727c57ab3",
+      "hash_scope": "SHA-256 of the entire original file bars_raw/AMZN.parquet (unmodified bytes)",
+      "content_scope": "rows session_date=2016-02-19 and 2016-02-22, column close",
+      "relevance": "raw closes defining f",
+      "supports_check": "factor change detection (v2.0.3 item 1)"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_r_20261007T093410Z/bars_all/AMZN.parquet#session=2016-02-19..2016-02-22",
+      "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+      "sha256": "24ae996bd7fcea9420cb919725ea3fa8ab5d301a1f09e1a69e8fa1c174526649",
+      "hash_scope": "SHA-256 of the entire original file bars_all/AMZN.parquet (unmodified bytes)",
+      "content_scope": "rows session_date=2016-02-19 and 2016-02-22, column close",
+      "relevance": "adjusted closes and their displayed precision",
+      "supports_check": "factor change detection (v2.0.3 item 1)"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#entity=AMZN;event_date_in=(2016-02-19,2016-02-22]",
+      "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+      "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+      "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+      "content_scope": "all records of any type referencing the entity",
+      "relevance": "event coverage of the interval",
+      "supports_check": "PROVIDER_ADJUSTMENT_ARTIFACT precondition (v2.0.3 item 3)"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#entity=AMZN;event_date_in=(2016-02-19,2016-02-22]",
+      "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+      "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+      "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+      "content_scope": "all records of any type referencing the entity",
+      "relevance": "event coverage of the interval (audit payload)",
+      "supports_check": "PROVIDER_ADJUSTMENT_ARTIFACT precondition (v2.0.3 item 3)"
+    }
+  ],
+  "decision": "UNRESOLVED",
+  "reasoning": "The v2.0.3 cross-check detects a factor change for AMZN between 2016-02-19 and 2016-02-22 (1 lies outside the per-value rounding interval). No corporate-action record of any type for the entity has an event or ex date in that interval in either data_quality payload. The admissible evidence available is insufficient to establish either a provider adjustment artifact (PROVIDER_ADJUSTMENT_ARTIFACT) or a confirmed missing event (MISSING_EVENT_CONFIRMED); the snapshot does not state the cause. The magnitude of the change is not used as evidence. Decision UNRESOLVED: the item remains BLOCKING under v2.0.3 item 3.",
+  "reviewer": "Alixujaev (protocol owner)",
+  "decided_utc": "2026-10-07T11:43:46Z",
+  "supersedes": null,
+  "authorization": "Decision selected by the protocol owner (DAY-18F instruction) and encoded by the implementation agent; the agent made no decision."
+}
