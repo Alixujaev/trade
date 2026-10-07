@@ -13,10 +13,16 @@ from typing import Any
 from acquisition.contract import ROOT_DIR
 from config.day_universe import get_day_universe
 
-PROTOCOL_VERSION = "2.0 R1 + 2.0.1"
+PROTOCOL_VERSION = "2.0 R1 + 2.0.1 + 2.0.2"
 SCHEMA_VERSION = "v2-stage-r-snapshot/1.0"
+REVIEW_SCHEMA_VERSION = "v2-stage-r-review/1.0"
 FREEZE_COMMIT = "ba3cefe54ccf2fe14c62f1c609f143d8a0904221"
 AMENDMENT_COMMIT = "ed034b3e9500cc4d9b33625de7e1883f572cd5a4"
+AMENDMENT_002_COMMIT = "0ebb6065f6e981e324220bae2abd2222800b2228"
+AMENDMENT_002_FILES = (
+    "artifacts/day18a/protocol-v2.0.2-amendment.md",
+    "artifacts/day18a/protocol-v2.0.2-amendment.json",
+)
 PROTOCOL_FILES = (
     "artifacts/day16/research-protocol-v2.md",
     "artifacts/day16/research-protocol-v2.json",
@@ -48,7 +54,9 @@ CA_TYPES = ("reverse_split", "forward_split", "unit_split", "cash_dividend", "st
 BENCHMARK_SYMBOL = "SPY"
 CA_QUERY_ALIASES = ("FB",)                 # v2.0.1 C2 rule 2 (Stage R alias)
 
-# Frozen tolerances (protocol §3.4, §3.8) - never changed here
+# Frozen tolerances (protocol §3.4, §3.8) - never changed here.
+# FACTOR_CHANGE_REL_TOL is the retired v2.0 R1 value, kept as a historical record only: v2.0.2 item 1 replaced
+# the fixed relative test with the precision-interval rule (acquisition/v2/crosscheck.py), which has no constant.
 FACTOR_CHANGE_REL_TOL = 1e-6
 SPLIT_RATIO_REL_TOL = 0.001
 MISSING_SESSION_REVIEW_FRACTION = 0.02

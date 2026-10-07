@@ -1,50 +1,93 @@
-"""acquisition/v2/crosscheck.py: raw/all implied-factor cross-check (protocol §3.4, frozen tolerances).
+"""acquisition/v2/crosscheck.py: raw/all implied-factor cross-check (v2.0 R1 §3.4 as amended by v2.0.2 items 1-2).
 
-f(k) = C_raw(k) / C_all(k) on sessions present in both series. A change exists at k (previous common session p)
-where |f(k)/f(p) - 1| > 1e-6. Every change must coincide with >= 1 retained split/dividend event whose ex_date
-is in (p, k], and every such event must coincide with a change. Split magnitude: f(p)/f(k) must equal the
-product of q within 0.1 % (sessions carrying only split events). Mismatches are BLOCKING data reviews.
-This is an audit of data completeness; no factor value, price or return is written - only dates, counts, flags.
+Per symbol, on sessions present in both raw and `all` series:
+- r = stored raw close (exact), a = stored adjustment=all close, f = r / a.
+- d = maximum decimal places among the symbol's stored `all` closes (shortest round-trip representation,
+  trailing zeros not counted); delta = 0.5 * 10^-d.
+- For consecutive common sessions p < k: rho = f_k / f_p,
+      rho_min = rho * (a_k / (a_k + delta)) * ((a_p - delta) / a_p)
+      rho_max = rho * (a_k / (a_k - delta)) * ((a_p + delta) / a_p)
+  A change is DETECTED iff 1 lies outside [rho_min, rho_max]. If a_p - delta <= 0 or a_k - delta <= 0 the pair
+  is PRECISION_DEGENERATE (BLOCKING).
+- Coincidence (unchanged): every detected change needs a retained split/dividend event with ex_date in (p, k]
+  (else UNEXPLAINED change, BLOCKING); every event needs a detected change (else UNCONFIRMED, BLOCKING; no
+  precision exemption); split magnitude f_p / f_k within 0.1 % of prod(q) (frozen).
+- v2.0.2 item 2: events with ex_date <= the first common session are FIRST_SESSION_UNTESTABLE (non-blocking,
+  listed). Events after the last common session are not covered by v2.0.2 and stay BLOCKING (uncheckable).
+No symbol-specific branch exists. Only dates, counts, flags, d and delta are reported - never prices or factors.
 """
 
 from __future__ import annotations
 
 from collections import defaultdict
+from decimal import Decimal
 from typing import Any
 
 import numpy as np
 import pandas as pd
 
-from acquisition.v2.contract import FACTOR_CHANGE_REL_TOL, SPLIT_RATIO_REL_TOL
+from acquisition.v2.contract import SPLIT_RATIO_REL_TOL
+
+RULE = "v2.0.2 item 1 (precision-interval) + item 2 (first-session); split ratio 0.1 % (frozen §3.4)"
+
+
+def decimals_of(x: float) -> int:
+    """Decimal places of the shortest round-trip representation of a stored float (trailing zeros dropped)."""
+    exp = Decimal(repr(float(x))).normalize().as_tuple().exponent
+    return int(-exp) if isinstance(exp, int) and exp < 0 else 0
+
+
+def precision_of(all_close: pd.Series) -> tuple[int, float]:
+    d = max(decimals_of(v) for v in all_close.to_numpy(dtype=np.float64))
+    return d, 0.5 * 10.0 ** (-d)
+
+
+def detect_changes(r: np.ndarray, a: np.ndarray, delta: float) -> tuple[np.ndarray, np.ndarray]:
+    """For consecutive pairs (i-1, i): (detected[i-1], degenerate[i-1]) per v2.0.2 item 1."""
+    rp, rk, ap, ak = r[:-1], r[1:], a[:-1], a[1:]
+    degenerate = (ap - delta <= 0) | (ak - delta <= 0)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        rho = (rk / ak) / (rp / ap)
+        rho_min = rho * (ak / (ak + delta)) * ((ap - delta) / ap)
+        rho_max = rho * (ak / (ak - delta)) * ((ap + delta) / ap)
+        detected = ~((rho_min <= 1.0) & (1.0 <= rho_max))
+    detected = detected & ~degenerate
+    return detected, degenerate
 
 
 def crosscheck_symbol(raw_close: pd.Series, all_close: pd.Series, events: list[dict[str, Any]]) -> dict[str, Any]:
-    """raw_close/all_close: indexed by session date (datetime.date), strictly the acquired rows."""
+    """raw_close / all_close: indexed by session date, exactly the acquired rows."""
     common = sorted(set(raw_close.index) & set(all_close.index))
-    out: dict[str, Any] = {"common_sessions": len(common)}
+    out: dict[str, Any] = {"rule": RULE, "common_sessions": len(common)}
     if len(common) < 2:
         out.update(status="BLOCKING", reason="fewer than two common sessions")
         return out
     r = raw_close.reindex(common).to_numpy(dtype=np.float64)
     a = all_close.reindex(common).to_numpy(dtype=np.float64)
-    f = r / a
-    rel = np.abs(f[1:] / f[:-1] - 1.0)
-    change_at = {common[i + 1] for i in np.nonzero(rel > FACTOR_CHANGE_REL_TOL)[0]}
+    d, delta = precision_of(pd.Series(a))
+    detected, degenerate = detect_changes(r, a, delta)
+    change_at = {common[i + 1] for i in np.nonzero(detected)[0]}
+    degenerate_at = sorted(common[i + 1].isoformat() for i in np.nonzero(degenerate)[0])
 
-    # map events to the first common session k with p < ex_date <= k
+    pos = {dd: i for i, dd in enumerate(common)}
+    first, last = common[0], common[-1]
     ev_at: dict[Any, list[dict[str, Any]]] = defaultdict(list)
+    first_session: list[dict[str, Any]] = []
     uncheckable: list[dict[str, Any]] = []
-    pos = {d: i for i, d in enumerate(common)}
     for e in events:
         ex = pd.Timestamp(e["ex_date"]).date()
-        k = next((d for d in common if d >= ex), None)
-        if k is None or pos[k] == 0:
-            uncheckable.append({"id": e["id"], "event": e["event"], "ex_date": e["ex_date"],
-                                "reason": "ex_date at/before first or after last common session"})
+        if ex <= first:
+            first_session.append({"id": e["id"], "event": e["event"], "ex_date": e["ex_date"],
+                                  "classification": "FIRST_SESSION_UNTESTABLE", "blocking": False})
             continue
+        if ex > last:
+            uncheckable.append({"id": e["id"], "event": e["event"], "ex_date": e["ex_date"],
+                                "reason": "ex_date after the last common session (not covered by v2.0.2)"})
+            continue
+        k = next(dd for dd in common if dd >= ex)
         ev_at[k].append(e)
-    unmatched_changes = sorted(d.isoformat() for d in change_at - set(ev_at))
-    unmatched_events = sorted({e["ex_date"] for k, es in ev_at.items() if k not in change_at for e in es})
+    unexplained = sorted(dd.isoformat() for dd in change_at - set(ev_at))
+    unconfirmed = sorted({e["ex_date"] for k, es in ev_at.items() if k not in change_at for e in es})
     split_checks = []
     for k, es in sorted(ev_at.items()):
         if k not in change_at:
@@ -57,15 +100,17 @@ def crosscheck_symbol(raw_close: pd.Series, all_close: pd.Series, events: list[d
             continue
         q = float(np.prod([e["q"] for e in splits]))
         i = pos[k]
-        implied = f[i - 1] / f[i]
-        ok = bool(abs(implied / q - 1.0) <= SPLIT_RATIO_REL_TOL)
-        split_checks.append({"session": k.isoformat(), "ok": ok})
+        implied = (r[i - 1] / a[i - 1]) / (r[i] / a[i])
+        split_checks.append({"session": k.isoformat(), "ok": bool(abs(implied / q - 1.0) <= SPLIT_RATIO_REL_TOL)})
         del implied
     bad_splits = [s for s in split_checks if s["ok"] is not True]
-    status = "OK" if not (unmatched_changes or unmatched_events or bad_splits or uncheckable) else "BLOCKING"
-    out.update(status=status, factor_changes=len(change_at), events_checked=sum(len(v) for v in ev_at.values()),
-               matched_sessions=len(change_at & set(ev_at)), unmatched_changes=unmatched_changes,
-               unmatched_events=unmatched_events, split_magnitude_checks=split_checks,
+    blocking = bool(unexplained or unconfirmed or bad_splits or uncheckable or degenerate_at)
+    out.update(status="BLOCKING" if blocking else "OK", d=d, delta=delta, detected_changes=len(change_at),
+               expected_events=sum(len(v) for v in ev_at.values()),
+               matched_events=sum(len(v) for k, v in ev_at.items() if k in change_at),
+               matched_sessions=len(change_at & set(ev_at)), unexplained_changes=unexplained,
+               unconfirmed_events=unconfirmed, split_magnitude_checks=split_checks,
+               precision_degenerate_pairs=degenerate_at, first_session_untestable=first_session,
                uncheckable_events=uncheckable)
     return out
 
@@ -80,5 +125,7 @@ def crosscheck_all(raw: dict[str, pd.DataFrame], adj: dict[str, pd.DataFrame],
         rc = pd.Series(raw[sym]["close"].to_numpy(), index=[session_of(t)[0] for t in raw[sym].index])
         ac = pd.Series(adj[sym]["close"].to_numpy(), index=[session_of(t)[0] for t in adj[sym].index])
         per[sym] = crosscheck_symbol(rc, ac, by_ent.get(sym, []))
-    return {"rule": "protocol §3.4 (1e-6 factor change; 0.1 % split ratio)", "per_symbol": per,
-            "blocking_symbols": sorted(s for s, v in per.items() if v["status"] != "OK")}
+    return {"rule": RULE, "per_symbol": per,
+            "blocking_symbols": sorted(s for s, v in per.items() if v["status"] != "OK"),
+            "first_session_untestable": sorted(f"{s} {e['event']} {e['ex_date']}" for s, v in per.items()
+                                              for e in v.get("first_session_untestable", []))}

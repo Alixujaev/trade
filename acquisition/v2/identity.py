@@ -1,4 +1,8 @@
-"""acquisition/v2/identity.py: corporate-action entity identity (v2.0.1 C2).
+"""acquisition/v2/identity.py: corporate-action entity identity (v2.0.1 C2 + v2.0.2 rule 4a).
+
+v2.0.2 rule 4a: if T has no anchor, a record under T (or its alias) with a non-empty CUSIP is
+IDENTITY_UNVERIFIED (neither assigned nor foreign; BLOCKING until resolved). Rule 4 (foreign) applies only
+when T has an anchor.
 
 Rules implemented (amendment C2):
 1. A non-empty CUSIP is authoritative; the ticker is a query key only.
@@ -143,11 +147,13 @@ def resolve(records: list[dict[str, Any]], entities: list[str], queried: list[st
 
     assignments: list[dict[str, Any]] = []
     foreign: list[dict[str, Any]] = []
+    unverified: list[dict[str, Any]] = []
     unassigned: list[dict[str, Any]] = []
     ticker_only: list[tuple[int, str]] = []
     for r in records:
         matched: dict[str, dict[str, Any]] = {}
         frn: list[dict[str, Any]] = []
+        unv: list[dict[str, Any]] = []
         for ticker, cusip, role in _refs(r):
             if cusip and len(owner.get(cusip, [])) == 1:
                 ent = owner[cusip][0]
@@ -156,7 +162,11 @@ def resolve(records: list[dict[str, Any]], entities: list[str], queried: list[st
             ent = to_entity(ticker)
             if ent is None:
                 continue
-            if cusip:
+            if cusip and anchors.get(ent) is None:
+                # v2.0.2 rule 4a: no anchor -> the CUSIP can be neither confirmed nor refuted
+                unv.append({"ticker": ticker, "entity": ent, "role": role, "classification": "IDENTITY_UNVERIFIED",
+                            "reason": "entity has no CUSIP anchor (v2.0.1 C2 rule 3); v2.0.2 rule 4a"})
+            elif cusip:
                 frn.append({"ticker": ticker, "entity": ent, "role": role,
                             "reason": "ticker matches a Stage R entity but CUSIP is not in its CUSIP set"})
             else:
@@ -167,10 +177,12 @@ def resolve(records: list[dict[str, Any]], entities: list[str], queried: list[st
                 assignments.append({**base, **m})
                 if m["match"] == "ticker_only":
                     ticker_only.append((len(assignments) - 1, ent))
-        if frn and not matched:
+        if not matched:
+            for u in unv:
+                unverified.append({**base, **u})
             for f in frn:
                 foreign.append({**base, **f})
-        if not matched and not frn:
+        if not matched and not frn and not unv:
             unassigned.append(base)
 
     foreign_entities = {f["entity"] for f in foreign}
@@ -182,9 +194,11 @@ def resolve(records: list[dict[str, Any]], entities: list[str], queried: list[st
 
     return {"rule": "v2.0.1 C2", "entities": sorted(ents), "queried_symbols": sorted(queried),
             "anchors": anchors, "anchor_source": anchor_source, "cusip_sets": cusip_sets, "aliases": aliases,
-            "assignments": assignments, "foreign_entity_records": foreign, "unassigned_records": unassigned,
+            "assignments": assignments, "foreign_entity_records": foreign,
+            "identity_unverified_records": unverified, "unassigned_records": unassigned,
             "conflicts": conflicts,
             "counts": {"records": len(records), "assigned": len(assignments),
                        "assigned_by_cusip": sum(1 for a in assignments if a["match"] == "cusip"),
                        "assigned_ticker_only": sum(1 for a in assignments if a["match"] == "ticker_only"),
-                       "foreign": len(foreign), "unassigned": len(unassigned), "conflicts": len(conflicts)}}
+                       "foreign": len(foreign), "identity_unverified": len(unverified),
+                       "unassigned": len(unassigned), "conflicts": len(conflicts)}}

@@ -35,7 +35,7 @@ from acquisition.v2 import validation as val
 from acquisition.v2.bars_client import DailyBarsClient
 from acquisition.v2.ca_client import CorporateActionsClient
 from acquisition.v2.contract import (
-    AMENDMENT_COMMIT, AMENDMENT_FILES, ASSETS_URL, CA_DATA_QUALITY, CA_WINDOWS, EVENT_DATE_MAX, FORBIDDEN_WRITE_ROOTS,
+    AMENDMENT_002_COMMIT, AMENDMENT_002_FILES, AMENDMENT_COMMIT, AMENDMENT_FILES, ASSETS_URL, CA_DATA_QUALITY, CA_WINDOWS, EVENT_DATE_MAX, FORBIDDEN_WRITE_ROOTS,
     FREEZE_COMMIT, PROTOCOL_FILES, PROTOCOL_VERSION, SCHEMA_VERSION, STAGE_R_ROOT, ca_query_symbols,
     stage_r_symbols,
 )
@@ -231,8 +231,10 @@ def _git(*args: str) -> str:
 
 def protocol_identity() -> dict[str, Any]:
     out: dict[str, Any] = {"version": PROTOCOL_VERSION, "freeze_commit": FREEZE_COMMIT,
-                           "amendment_commit": AMENDMENT_COMMIT, "files": {}}
-    for path, commit in [(p, FREEZE_COMMIT) for p in PROTOCOL_FILES] + [(p, AMENDMENT_COMMIT) for p in AMENDMENT_FILES]:
+                           "amendment_commit": AMENDMENT_COMMIT, "amendment_002_commit": AMENDMENT_002_COMMIT,
+                           "files": {}}
+    for path, commit in ([(p, FREEZE_COMMIT) for p in PROTOCOL_FILES] + [(p, AMENDMENT_COMMIT) for p in AMENDMENT_FILES]
+                         + [(p, AMENDMENT_002_COMMIT) for p in AMENDMENT_002_FILES]):
         if subprocess.run(["git", "diff", "--quiet", commit, "--", path], cwd=ROOT_DIR).returncode != 0:
             raise PreflightError(f"{path} differs from commit {commit}")
         blob = subprocess.run(["git", "show", f"{commit}:{path}"], cwd=ROOT_DIR, capture_output=True, check=True).stdout

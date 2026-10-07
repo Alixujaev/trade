@@ -353,13 +353,14 @@ def test_crosscheck_matches_split_and_dividend():
     evs = [{"id": "d", "event": "cash_dividend", "ex_date": "2019-05-10", "entity": "AAPL"},
            {"id": "s", "event": "forward_split", "ex_date": "2020-08-31", "q": 4.0, "entity": "AAPL"}]
     r = _cc("AAPL", evs)
-    assert r["status"] == "OK" and r["factor_changes"] == 2 and r["split_magnitude_checks"] == [{"session": "2020-08-31", "ok": True}]
+    assert r["status"] == "OK" and r["detected_changes"] == 2 and r["split_magnitude_checks"] == [{"session": "2020-08-31", "ok": True}]
 
 
 def test_crosscheck_detects_missing_event_extra_event_and_wrong_ratio():
-    assert _cc("AAPL", [{"id": "s", "event": "forward_split", "ex_date": "2020-08-31", "q": 4.0}])["unmatched_changes"] == ["2019-05-10"]
+    # v2.0.2 field names: unexplained_changes (was unmatched_changes), unconfirmed_events (was unmatched_events)
+    assert _cc("AAPL", [{"id": "s", "event": "forward_split", "ex_date": "2020-08-31", "q": 4.0}])["unexplained_changes"] == ["2019-05-10"]
     extra = _cc("META", [{"id": "x", "event": "cash_dividend", "ex_date": "2018-03-01"}])
-    assert extra["status"] == "BLOCKING" and extra["unmatched_events"] == ["2018-03-01"]
+    assert extra["status"] == "BLOCKING" and extra["unconfirmed_events"] == ["2018-03-01"]
     wrong = _cc("AAPL", [{"id": "d", "event": "cash_dividend", "ex_date": "2019-05-10"},
                          {"id": "s", "event": "forward_split", "ex_date": "2020-08-31", "q": 2.0}])
     assert wrong["status"] == "BLOCKING" and wrong["split_magnitude_checks"][0]["ok"] is False

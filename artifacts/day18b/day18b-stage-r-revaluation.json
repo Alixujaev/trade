@@ -1,0 +1,535 @@
+{
+  "schema_version": "1.0",
+  "task": "DAY-18B",
+  "evaluated_utc": "2026-10-07T10:07:53.474331+00:00",
+  "protocol_chain": {
+    "v2.0 R1": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+    "v2.0.1": "ed034b3e9500cc4d9b33625de7e1883f572cd5a4",
+    "v2.0.2": "0ebb6065f6e981e324220bae2abd2222800b2228",
+    "protocol_files_verified": 7
+  },
+  "v2_0_2_amendment_sha256": {
+    "md": "0ce87282112c4407a56a868c462f8b39810597437d4e1ed240922ba4ce203e8e",
+    "json": "1b182ba1d582ffc921051db2dd278ffd16b097a6e8f7896c0ee8dfd2a97193d4"
+  },
+  "source_snapshot": {
+    "path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+    "file_count": 64,
+    "manifest_entries": 63
+  },
+  "immutability": {
+    "pre_check": "PASS",
+    "post_check": "PASS",
+    "independent_sha256_check": "PASS (64/64)",
+    "snapshot_unchanged": true
+  },
+  "review_output": {
+    "path": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_2__stage_r_20261007T093410Z",
+    "evaluation_sha256": "b62c5bcee144533920de8afb9fefeb049d556f2509247feaf124ac2b683360f5",
+    "manifest_sha256": "387e83339e11762b4c3e71f6df81bbefee330168457180e95d6d0f1708abfde7"
+  },
+  "offline": true,
+  "network_calls": 0,
+  "rule": "v2.0.2 item 1 precision-interval (d = max decimals of stored all closes, delta = 0.5*10^-d, detected iff 1 not in [rho_min, rho_max], degenerate if a-delta<=0) + item 2 first-session + coincidence rules + split 0.1%",
+  "symbols_evaluated": 26,
+  "crosscheck": {
+    "ok": [
+      "AAPL",
+      "ADBE",
+      "AMAT",
+      "AMD",
+      "COST",
+      "CRM",
+      "CSCO",
+      "GOOGL",
+      "INTC",
+      "JNJ",
+      "JPM",
+      "KO",
+      "META",
+      "MSFT",
+      "ORCL",
+      "PEP",
+      "QCOM",
+      "SPY",
+      "WMT",
+      "XOM"
+    ],
+    "blocking": [
+      "AMZN",
+      "AVGO",
+      "MU",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+    ],
+    "per_symbol": {
+      "AAPL": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 29,
+        "expected_events": 29,
+        "matched": 29,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [
+          true
+        ],
+        "first_session": 0
+      },
+      "ADBE": {
+        "status": "OK",
+        "d": 3,
+        "delta": 0.0005,
+        "detected": 0,
+        "expected_events": 0,
+        "matched": 0,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "AMAT": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 28,
+        "expected_events": 28,
+        "matched": 28,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "AMD": {
+        "status": "OK",
+        "d": 4,
+        "delta": 5e-05,
+        "detected": 0,
+        "expected_events": 0,
+        "matched": 0,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "AMZN": {
+        "status": "BLOCKING",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 2,
+        "expected_events": 1,
+        "matched": 1,
+        "unexplained": 1,
+        "unexplained_dates": [
+          "2016-02-22"
+        ],
+        "unconfirmed": 0,
+        "splits": [
+          true
+        ],
+        "first_session": 0
+      },
+      "AVGO": {
+        "status": "BLOCKING",
+        "d": 3,
+        "delta": 0.0005,
+        "detected": 1428,
+        "expected_events": 28,
+        "matched": 28,
+        "unexplained": 1400,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "COST": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 30,
+        "expected_events": 30,
+        "matched": 30,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "CRM": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 0,
+        "expected_events": 0,
+        "matched": 0,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "CSCO": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 27,
+        "expected_events": 27,
+        "matched": 27,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 1
+      },
+      "GOOGL": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 1,
+        "expected_events": 1,
+        "matched": 1,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [
+          true
+        ],
+        "first_session": 0
+      },
+      "INTC": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 28,
+        "expected_events": 28,
+        "matched": 28,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "JNJ": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 28,
+        "expected_events": 28,
+        "matched": 28,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "JPM": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 27,
+        "expected_events": 27,
+        "matched": 27,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 1
+      },
+      "KO": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 28,
+        "expected_events": 28,
+        "matched": 28,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "META": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 0,
+        "expected_events": 0,
+        "matched": 0,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "MSFT": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 28,
+        "expected_events": 28,
+        "matched": 28,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "MU": {
+        "status": "BLOCKING",
+        "d": 3,
+        "delta": 0.0005,
+        "detected": 1429,
+        "expected_events": 6,
+        "matched": 6,
+        "unexplained": 1423,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "NFLX": {
+        "status": "BLOCKING",
+        "d": 3,
+        "delta": 0.0005,
+        "detected": 1315,
+        "expected_events": 0,
+        "matched": 0,
+        "unexplained": 1315,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "NVDA": {
+        "status": "BLOCKING",
+        "d": 4,
+        "delta": 5e-05,
+        "detected": 1463,
+        "expected_events": 29,
+        "matched": 28,
+        "unexplained": 1435,
+        "unconfirmed": 1,
+        "unconfirmed_dates": [
+          "2022-03-02"
+        ],
+        "splits": [
+          true
+        ],
+        "first_session": 0
+      },
+      "ORCL": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 27,
+        "expected_events": 27,
+        "matched": 27,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 1
+      },
+      "PEP": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 28,
+        "expected_events": 28,
+        "matched": 28,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "QCOM": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 29,
+        "expected_events": 29,
+        "matched": 29,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "SPY": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 26,
+        "expected_events": 26,
+        "matched": 26,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "TSLA": {
+        "status": "BLOCKING",
+        "d": 3,
+        "delta": 0.0005,
+        "detected": 1285,
+        "expected_events": 2,
+        "matched": 2,
+        "unexplained": 1283,
+        "unconfirmed": 0,
+        "splits": [
+          true,
+          true
+        ],
+        "first_session": 0
+      },
+      "WMT": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 28,
+        "expected_events": 28,
+        "matched": 28,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      },
+      "XOM": {
+        "status": "OK",
+        "d": 2,
+        "delta": 0.005,
+        "detected": 28,
+        "expected_events": 28,
+        "matched": 28,
+        "unexplained": 0,
+        "unconfirmed": 0,
+        "splits": [],
+        "first_session": 0
+      }
+    },
+    "precision_degenerate_pairs": 0,
+    "uncheckable_events": 0,
+    "diagnosis": {
+      "mixed_precision_symbols": {
+        "AVGO": {
+          "0": 18,
+          "1": 151,
+          "2": 1573,
+          "3": 20
+        },
+        "MU": {
+          "0": 20,
+          "1": 162,
+          "2": 1565,
+          "3": 15
+        },
+        "NFLX": {
+          "0": 23,
+          "1": 146,
+          "2": 1456,
+          "3": 137
+        },
+        "NVDA": {
+          "0": 3,
+          "1": 63,
+          "2": 651,
+          "3": 966,
+          "4": 79
+        },
+        "TSLA": {
+          "0": 30,
+          "1": 160,
+          "2": 1568,
+          "3": 4
+        }
+      },
+      "interpretation": "d = max decimals is set by a minority of finer-precision values; most values carry coarser rounding, so jitter exceeds the bound -> fail-safe BLOCKING anticipated by v2.0.2 OQ2; requires a protocol decision; rule not changed",
+      "amzn_2016_02_22": {
+        "ratio_change_bucket": "1e-4..1e-3",
+        "all_decimals": [
+          2,
+          2
+        ],
+        "raw_decimals": [
+          1,
+          1
+        ],
+        "cause": "UNKNOWN"
+      },
+      "nvda_2022_03_02": {
+        "issue": "retained cash dividend without detected change",
+        "cause": "UNKNOWN"
+      }
+    }
+  },
+  "first_session_untestable": [
+    "CSCO cash_dividend 2016-01-04",
+    "JPM cash_dividend 2016-01-04",
+    "ORCL cash_dividend 2016-01-04"
+  ],
+  "identity": {
+    "records": 496,
+    "assigned": 493,
+    "by_cusip": 209,
+    "ticker_only": 284,
+    "foreign": 1,
+    "identity_unverified": 2,
+    "unassigned": 0,
+    "conflicts": 0,
+    "foreign_records": [
+      "name_change META->METV (RESOLVED_EXCLUDED)"
+    ],
+    "identity_unverified_records": [
+      "stock_and_cash_merger CRM<-WORK 2021-07-21 (BLOCKING)",
+      "stock_merger AMD<-XLNX 2022-02-14 (BLOCKING)"
+    ]
+  },
+  "reviews": {
+    "status_counts": {
+      "RESOLVED": 4,
+      "RESOLVED_EXCLUDED": 1,
+      "FIRST_SESSION_UNTESTABLE": 3,
+      "BLOCKING": 8,
+      "HARD_FAIL": 0
+    },
+    "blocking": [
+      "identity-unverified CRM<-WORK",
+      "identity-unverified AMD<-XLNX",
+      "cross-check AMZN",
+      "cross-check AVGO",
+      "cross-check MU",
+      "cross-check NFLX",
+      "cross-check NVDA",
+      "cross-check TSLA"
+    ],
+    "resolved": [
+      "cash_merger NVDA<-MLNX (caveat: NVDA cross-check BLOCKING)",
+      "cash_merger CSCO<-ACIA",
+      "cash_merger MSFT<-NUAN",
+      "name_change FB->META"
+    ]
+  },
+  "spy": {
+    "status": "RESOLVED",
+    "d": 2,
+    "detected": 26,
+    "expected_events": 26,
+    "matched": 26,
+    "unexplained": 0,
+    "unconfirmed": 0
+  },
+  "structural_validation": {
+    "series_ok": 52,
+    "hard_fail": 0,
+    "blocking": 0
+  },
+  "data_quality_difference": false,
+  "final_status": "BLOCKED",
+  "usable_for_research": false,
+  "corrections": [
+    "DAY-18 report stated 63 persisted files incl. manifest; actual: 64 (63 manifest entries + manifest.json)"
+  ],
+  "not_done": [
+    "acquisition",
+    "network access",
+    "snapshot modification",
+    "v2.0.2 or tolerance change",
+    "TR index",
+    "signals",
+    "returns",
+    "backtests",
+    "push"
+  ],
+  "tests": {
+    "focused": "38 passed (15 DAY-18B + 23 DAY-18)",
+    "full_suite": "1221 passed, 0 failed"
+  }
+}

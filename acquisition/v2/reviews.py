@@ -1,4 +1,7 @@
-"""acquisition/v2/reviews.py: classification of Stage R BLOCKING data reviews (protocol §3.4/§3.8 + v2.0.1).
+"""acquisition/v2/reviews.py: classification of Stage R BLOCKING data reviews (protocol §3.4/§3.8 + v2.0.1 + v2.0.2).
+
+v2.0.2: IDENTITY_UNVERIFIED records (rule 4a) -> BLOCKING; FIRST_SESSION_UNTESTABLE events (item 2) are listed
+and non-blocking; the cross-check clean-date condition uses the v2.0.2 unexplained-change dates.
 
 Deterministic rules on acquired data only. Each item -> RESOLVED / RESOLVED_EXCLUDED / BLOCKING with a reason.
 - name_change touching a Stage R entity whose old and new CUSIP are equal (pure rename) -> RESOLVED if the
@@ -25,7 +28,7 @@ def classify(*, records: list[dict[str, Any]], identity: dict[str, Any], normali
 
     def cc_clean_on(ent: str, day: str) -> bool:
         per = crosscheck["per_symbol"].get(ent)
-        return per is not None and day not in set(per.get("unmatched_changes", []))
+        return per is not None and day not in set(per.get("unexplained_changes", []))
 
     for it in normalised["review_items"]:
         r = by_id[it["id"]]
@@ -55,6 +58,20 @@ def classify(*, records: list[dict[str, Any]], identity: dict[str, Any], normali
         items.append({"item": f"foreign-entity {f['ca_type']} {label}", "entity": f["entity"],
                       "event_date": f["event_date"], "id": f["id"], "status": "RESOLVED_EXCLUDED",
                       "reason": f["reason"] + "; excluded from the Stage R entity (v2.0.1 C2 rule 4)"})
+    for u in identity.get("identity_unverified_records", []):
+        r = by_id.get(u["id"], {})
+        label = (f"{r.get('acquirer_symbol')}<-{r.get('acquiree_symbol')}" if r.get("acquirer_symbol")
+                 else f"{r.get('old_symbol')}->{r.get('new_symbol')}" if r.get("old_symbol") else u["ticker"])
+        items.append({"item": f"identity-unverified {u['ca_type']} {label}", "entity": u["entity"],
+                      "event_date": u["event_date"], "id": u["id"], "status": "BLOCKING",
+                      "classification": "IDENTITY_UNVERIFIED",
+                      "reason": "v2.0.2 rule 4a: entity has no CUSIP anchor; resolution requires a same-provider anchor "
+                                "or an explicit committed reviewer record (economic neutrality is not identity evidence)"})
+    for sym, v in sorted(crosscheck["per_symbol"].items()):
+        for e in v.get("first_session_untestable", []):
+            items.append({"item": f"first-session {e['event']} {sym}", "entity": sym, "event_date": e["ex_date"],
+                          "id": e["id"], "status": "FIRST_SESSION_UNTESTABLE",
+                          "reason": "v2.0.2 item 2: ex_date <= first common session; non-blocking; excluded from TR/accounting"})
     for c in identity["conflicts"]:
         items.append({"item": f"identity conflict {c['kind']}", "entity": c.get("entity") or c.get("entities"),
                       "status": "BLOCKING", "reason": "v2.0.1 C2 rule 7"})
@@ -72,10 +89,12 @@ def classify(*, records: list[dict[str, Any]], identity: dict[str, Any], normali
     for sym, v in sorted(crosscheck["per_symbol"].items()):
         if v["status"] != "OK":
             items.append({"item": f"raw/all cross-check {sym}", "entity": sym, "status": "BLOCKING",
-                          "reason": (f"unmatched_changes={len(v.get('unmatched_changes', []))}, unmatched_events="
-                                     f"{len(v.get('unmatched_events', []))}, split_checks_failed="
+                          "reason": (f"unexplained_changes={len(v.get('unexplained_changes', []))}, unconfirmed_events="
+                                     f"{len(v.get('unconfirmed_events', []))}, split_checks_failed="
                                      f"{sum(1 for s in v.get('split_magnitude_checks', []) if s['ok'] is not True)}, "
-                                     f"uncheckable_events={len(v.get('uncheckable_events', []))}")})
+                                     f"precision_degenerate_pairs={len(v.get('precision_degenerate_pairs', []))}, "
+                                     f"uncheckable_events={len(v.get('uncheckable_events', []))}"
+                                     + (f", {v['reason']}" if v.get("reason") else ""))})
     for key, v in sorted(validation["per_series"].items()):
         if v["status"] != "OK":
             items.append({"item": f"structural {key}", "status": v["status"],
@@ -90,5 +109,6 @@ def classify(*, records: list[dict[str, Any]], identity: dict[str, Any], normali
     blocking = [i for i in items if i["status"] in ("BLOCKING", "HARD_FAIL")]
     return {"items": items, "blocking_count": len(blocking),
             "status_counts": {s: sum(1 for i in items if i["status"] == s)
-                              for s in ("RESOLVED", "RESOLVED_EXCLUDED", "BLOCKING", "HARD_FAIL")},
+                              for s in ("RESOLVED", "RESOLVED_EXCLUDED", "FIRST_SESSION_UNTESTABLE", "BLOCKING",
+                                        "HARD_FAIL")},
             "usable_for_research": not blocking}
