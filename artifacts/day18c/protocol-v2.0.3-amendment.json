@@ -1,0 +1,184 @@
+{
+  "schema_version": "1.0",
+  "amendment_version": "2.0.3",
+  "type": "protocol_change",
+  "status": "DRAFT - PENDING COMMIT",
+  "drafted": "2026-10-07",
+  "human_readable": "artifacts/day18c/protocol-v2.0.3-amendment.md",
+  "modified": true,
+  "parent_protocol_commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+  "parent_amendment": "0ebb6065f6e981e324220bae2abd2222800b2228",
+  "parent_chain": {
+    "v2.0 R1": {"commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221", "files_sha256": {
+      "artifacts/day16/research-protocol-v2.md": "57cc368d80a0a3c89af78fe5fd1a6b95962859a3f494ae79a759fb7406a86fb1",
+      "artifacts/day16/research-protocol-v2.json": "ed21cfa508ac9aadcb6600b227014a084cbbfd6a9a5546433bd5327f5154e037",
+      "artifacts/day16/research-checklist.json": "7142f02ca243c08163385b5e5e1560024d3b71b87d3aaabf449d41f8ddf40eb3"}},
+    "v2.0.1": {"commit": "ed034b3e9500cc4d9b33625de7e1883f572cd5a4", "files_sha256": {
+      "artifacts/day17a/protocol-v2.0.1-amendment.md": "97ad311be549e8769838be99c6e559660408930015bdc35ac765ac5d7d304afe",
+      "artifacts/day17a/protocol-v2.0.1-amendment.json": "361b1909fddf5d6f00cf3eb098f625a75f2368c3e71898ed0fb3ea45e3e77c76",
+      "artifacts/day17/day17-data-blockers.md": "4c4187cb56507f783b22a1e80c9a27f2f383284c993bcec461228d6f7810079f",
+      "artifacts/day17/day17-data-blockers.json": "68ae17c4fdea0be1f1f3f7332439dafbd0746e53c22ad9e000c87b987a61159b"}},
+    "v2.0.2": {"commit": "0ebb6065f6e981e324220bae2abd2222800b2228", "files_sha256": {
+      "artifacts/day18a/protocol-v2.0.2-amendment.md": "0ce87282112c4407a56a868c462f8b39810597437d4e1ed240922ba4ce203e8e",
+      "artifacts/day18a/protocol-v2.0.2-amendment.json": "1b182ba1d582ffc921051db2dd278ffd16b097a6e8f7896c0ee8dfd2a97193d4"}}
+  },
+  "evidence_commit": "4a36fc70e0b0d28d228e1ebdfd3ffda0ea4cd633",
+  "evidence_report": {
+    "artifacts/day18b/day18b-stage-r-revaluation.md": "0103536b9328428e523576088404a51c45fa9c540c36703b0607c94258310800",
+    "artifacts/day18b/day18b-stage-r-revaluation.json": "fce707b3bcc1fba6f45996fbdc5c42d73757c5b5bc3b48bea6b763f49991c287",
+    "artifacts/day18/day18-stage-r-report.md": "225b0d8ff53af5c88010f78f3e33dbc5bb9c0618c34b88d89a77e5c2c0a79a5b",
+    "artifacts/day18/day18-stage-r-report.json": "1b58bf4f38abd1ea206128867dee280362e1e134a74c1d732075c8f30c56f0db",
+    "stage_r_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+    "snapshot_accessed_in_this_task": false
+  },
+  "decided_by": {"precision_rule": "protocol owner (DAY-18C)", "identity_evidence_scope": "protocol owner (DAY-18C)",
+                 "reviewer_records_for_AMZN_NVDA": "protocol owner (DAY-18C)", "review_record_mechanism": "derived"},
+  "changed_sections": ["v2.0.2 item 1 (d = max decimals -> per-value precision with 2-decimal floor)",
+                       "frozen §3.4 BLOCKING data review: committed review-record mechanism added",
+                       "UNEXPLAINED_CHANGE review path (AMZN 2016-02-22)", "UNCONFIRMED_EVENT review path (NVDA 2022-03-02)",
+                       "v2.0.2 rule 4a resolution path (b): evidence scope and decision enums"],
+  "unchanged_sections": ["universe", "SPY benchmark-only role", "timeline", "strategy definitions and parameters", "execution model",
+                         "portfolio construction and accounting (§11)", "benchmarks B1/B2", "transaction costs", "Gate A", "Gate B", "Gate C",
+                         "raw OHLC execution/accounting role", "adjustment=all audit-only role", "v2.0.1 C1", "v2.0.1 C3", "v2.0.1 C4",
+                         "v2.0.1 C2 incl. v2.0.2 rule 4a classification", "v2.0.2 first-session rule", "v2.0.2 coincidence rules (no precision exemption)",
+                         "split-magnitude tolerance 0.1%", "PRECISION_DEGENERATE -> BLOCKING", "round-to-nearest and exact-raw assumptions",
+                         "META->METV foreign-entity classification", "v2.0.2 SPY completeness criterion", "2% missing-session rule",
+                         "cross-check mismatch = BLOCKING data review"],
+  "old_rules": {
+    "precision": "v2.0.2 item 1: d_i = max decimal places among symbol's stored adjusted closes; delta_i = 0.5*10^-d_i for every session",
+    "review_records": "not defined",
+    "unexplained_change": "BLOCKING; no resolution path defined",
+    "unconfirmed_event": "BLOCKING; no resolution path defined",
+    "identity_unverified": "v2.0.2 rule 4a: BLOCKING until same-provider anchor or committed reviewer decision; evidence and decisions unspecified"
+  },
+  "new_rules": {
+    "precision": "see precision_rule",
+    "review_records": "see review_record_mechanism",
+    "unexplained_change": "see AMZN_review_rule",
+    "unconfirmed_event": "see NVDA_review_rule",
+    "identity_unverified": "see identity_review_rule"
+  },
+  "rationale": {
+    "precision": "v2.0.2 assumed one precision per symbol; DAY-18B representation histograms refute this for 5 symbols. A per-value bound is a guaranteed rounding-error bound (displayed decimals <= stored precision); the 2-decimal floor only tightens it (fail-safe). Selected by representation logic, not by outcomes; not applied in this task.",
+    "review_records": "frozen §3.4 and v2.0.2 rule 4a require reviews but defined neither recorder, evidence nor provenance; a committed, immutable, human-decided record makes every resolution auditable and reproducible.",
+    "amzn_nvda": "unexplained or unconfirmed cross-check items must stay BLOCKING unless mechanics or documented same-provider evidence resolve them; magnitude and economic neutrality are never evidence.",
+    "identity": "the provider offers no CUSIP anchor for CRM/AMD (asset cusip null); primary regulatory filings are admitted for the identity decision only, so the decision can rest on documentary evidence rather than economic neutrality."
+  },
+  "precision_rule": {
+    "status": "FROZEN",
+    "name": "per-value precision with 2-decimal floor",
+    "d_k": "decimal places of the shortest round-trip decimal representation of stored adjusted close a_k (trailing zeros not counted)",
+    "delta_k": "0.5 * 10^(-max(d_k, 2))",
+    "raw_close": "exact (unchanged)",
+    "rho": "f_k / f_p, f = r / a, consecutive common sessions p<k",
+    "rho_min": "rho * (a_k/(a_k+delta_k)) * ((a_p-delta_p)/a_p)",
+    "rho_max": "rho * (a_k/(a_k-delta_k)) * ((a_p+delta_p)/a_p)",
+    "change_detected": "1 not in [rho_min, rho_max]",
+    "precision_degenerate": "a_p - delta_p <= 0 or a_k - delta_k <= 0 -> BLOCKING",
+    "unchanged_with_it": ["coincidence rules", "no precision exemption", "split 0.1%", "first-session rule"],
+    "persisted_evidence": ["per-symbol precision histogram", "pairs evaluated", "all v2.0.2 cross-check evidence fields"],
+    "applied_to_stage_r_in_this_task": false
+  },
+  "precision_rule_selection_basis": {
+    "basis": "provider-representation logic, outcome-independent",
+    "arguments": [
+      "displayed decimals d_k <= stored precision P, so rounding error <= 0.5*10^-P <= 0.5*10^-d_k: a guaranteed upper bound under round-to-nearest",
+      "2-decimal floor: 0- and 1-decimal shares in the 10 measured symbols (~0.2-1.7% and ~3.6-11%) match trailing-zero frequencies of storage at >= 2 decimals (~1% and ~9%)",
+      "the floor only tightens the bound -> a false assumption yields false BLOCKING, never a false pass",
+      "identical to v2.0.2 for series with <= 2 decimals; differs only for mixed-precision series"
+    ],
+    "rejected_candidates": {
+      "per_value_without_floor": "valid but loose (delta 0.05/0.5 on ~10% of sessions could hide a missing event)",
+      "dominant_or_mode_precision": "not an error bound; NVDA shows two precision regimes",
+      "open_blocking": "unnecessary; a rigorous bound exists"
+    },
+    "non_iteration": "rule frozen without evaluation on any Stage R symbol; if it blocks later it is not adjusted and re-run; a further change needs a new amendment justified by representation evidence",
+    "selected_by_outcome": false
+  },
+  "mixed_precision_handling": {
+    "evidence_histograms": {"AVGO": {"0": 18, "1": 151, "2": 1573, "3": 20}, "MU": {"0": 20, "1": 162, "2": 1565, "3": 15},
+                            "NFLX": {"0": 23, "1": 146, "2": 1456, "3": 137}, "TSLA": {"0": 30, "1": 160, "2": 1568, "3": 4},
+                            "NVDA": {"0": 3, "1": 63, "2": 651, "3": 966, "4": 79}},
+    "handling": "each value carries its own delta_k (floored at 2 decimals); the pairwise interval uses delta_p and delta_k separately",
+    "symbols_affected": ["AVGO", "MU", "NFLX", "TSLA", "NVDA"],
+    "outcome_for_these_symbols": "UNKNOWN until re-evaluation (not evaluated in DAY-18C)"
+  },
+  "review_record_mechanism": {
+    "location": "artifacts/reviews/stage_r/<record_id>.json",
+    "effective_when": "committed; immutable afterwards; corrections via new record with supersedes",
+    "decider_and_recorder": "protocol owner (human); an agent may draft but must not decide, approve or commit a decision on its own",
+    "required_fields": ["record_id", "item_type", "item_key", "source_snapshot_manifest_sha256", "protocol_version", "evidence[]",
+                        "decision", "reasoning", "reviewer", "decided_utc", "supersedes"],
+    "item_types": ["UNEXPLAINED_CHANGE", "UNCONFIRMED_EVENT", "IDENTITY_UNVERIFIED"],
+    "evidence_item_fields": ["type in {same_provider_record, regulatory_filing}", "reference", "retrieved_utc", "sha256"],
+    "provenance": "re-evaluation applies only records committed at its HEAD; validates schema, item_key and snapshot manifest hash; stores each record blob SHA-256",
+    "invalid_or_missing_record": "item stays BLOCKING",
+    "forbidden_evidence": ["economic neutrality", "magnitude of a change", "research outcomes"]
+  },
+  "AMZN_review_rule": {
+    "item": "AMZN 2016-02-22", "item_type": "UNEXPLAINED_CHANGE", "current_status": "BLOCKING",
+    "step_1": "re-classified by v2.0.3 re-evaluation; disappears only if no longer detected",
+    "decisions": {
+      "PROVIDER_ADJUSTMENT_ARTIFACT": {"result": "RESOLVED (no event added; TR/accounting unchanged)",
+                                       "required_evidence": "same-provider: no corporate-action record of any of the 16 types for the entity with event_date or ex_date in (p,k] in both data_quality payloads; written reasoning"},
+      "MISSING_EVENT_CONFIRMED": {"result": "BLOCKING until committed acquisition step or amendment supplies the event"},
+      "UNRESOLVED": {"result": "BLOCKING"}
+    },
+    "if_unresolved": "BLOCKING; Stage R remains BLOCKED", "magnitude_is_evidence": false
+  },
+  "NVDA_review_rule": {
+    "item": "NVDA cash dividend ex 2022-03-02", "item_type": "UNCONFIRMED_EVENT", "current_status": "BLOCKING",
+    "separate_from": "NVDA<-MLNX acquirer-side merger review (identity/§3.4 review item); neither affects the other",
+    "step_1": "re-classified by v2.0.3 re-evaluation; RESOLVED mechanically if a change is detected at its session",
+    "decisions": {
+      "EVENT_RETAINED": {"result": "RESOLVED; provider record authoritative for TR/accounting (v2.0.1 C3)",
+                         "required_evidence": "record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated; reasoning on missing adjusted-series corroboration"},
+      "EVENT_REJECTED": {"result": "event excluded from TR/accounting",
+                         "required_evidence": "same-provider evidence the record is erroneous (later same-provider acquisition showing DISCREPANCY or absence)"},
+      "UNRESOLVED": {"result": "BLOCKING"}
+    },
+    "if_unresolved": "BLOCKING; Stage R remains BLOCKED"
+  },
+  "identity_review_rule": {
+    "item_type": "IDENTITY_UNVERIFIED",
+    "path_a": "same-provider anchor under v2.0.1 C2 rule 3 (unchanged)",
+    "path_b": "committed review record",
+    "decisions": {
+      "SAME_ENTITY": "processed as the entity's frozen §3.4 review item (acquirer-side merger RESOLVED iff role acquirer and no unexplained change on that date)",
+      "DIFFERENT_ENTITY": "excluded from the entity",
+      "UNRESOLVED": "BLOCKING"
+    },
+    "required_evidence_for_same_or_different": ">=1 item tying/distinguishing the record CUSIP and the issuer: same-provider data or a primary regulatory filing (e.g. SEC EDGAR) cited by URL, retrieved_utc, sha256",
+    "regulatory_filings_scope": "identity decision only; not market data; no prices or events; not an anchor substitute",
+    "economic_neutrality_is_evidence": false,
+    "automatic_conversion": "none",
+    "if_confirmation_unavailable": "BLOCKING; Stage R remains BLOCKED"
+  },
+  "CRM_WORK_status": {"record": "stock_and_cash_merger CRM<-WORK", "event_date": "2021-07-21", "status": "IDENTITY_UNVERIFIED", "blocking": true},
+  "AMD_XLNX_status": {"record": "stock_merger AMD<-XLNX", "event_date": "2022-02-14", "status": "IDENTITY_UNVERIFIED", "blocking": true},
+  "stage_r_status": "BLOCKED",
+  "stage_r_usable_by_this_amendment": false,
+  "blockers_cleared_by_this_amendment": [],
+  "open_questions": [
+    {"id": "OQ1", "question": "precision-based exemption for undetected genuine events", "status": "OPEN; not adopted (review paths used instead)"},
+    {"id": "OQ2", "question": "round-to-nearest and exact raw closes (+ floor: nothing stored coarser than 0.01)", "status": "NON-BLOCKING (fail-safe)"},
+    {"id": "OQ5", "question": "CRLF drift of frozen artifacts", "status": "NON-BLOCKING (process)"},
+    {"id": "OQ6", "question": "2-decimal floor checked on 10 of 26 symbols' histograms", "status": "NON-BLOCKING (fail-safe; histograms persisted at re-evaluation)"},
+    {"id": "OQ7", "question": "AMZN 2016-02-22 resolution", "status": "BLOCKING"},
+    {"id": "OQ8", "question": "NVDA 2022-03-02 resolution", "status": "BLOCKING"},
+    {"id": "OQ9", "question": "CRM<-WORK and AMD<-XLNX identity", "status": "BLOCKING"}
+  ],
+  "implementation_impact": {
+    "code_changed_in_day18c": false,
+    "crosscheck.py": "per-value delta_k = 0.5*10^-max(d_k,2); interval with delta_p and delta_k; precision histogram output",
+    "review_records": "new loader/validator for artifacts/reviews/stage_r/*.json committed at HEAD; decision application per item type; blob SHA-256 provenance",
+    "reviews.py": "UNEXPLAINED_CHANGE / UNCONFIRMED_EVENT / IDENTITY_UNVERIFIED record-driven outcomes; default BLOCKING",
+    "reevaluate.py": "protocol chain incl. v2.0.3; new write-once output data/oos_cache/protocol_v2/stage_r/reviews/v2_0_3__<snapshot_id>/; v2.0.2 output untouched",
+    "tests": ["per-value precision incl. floor and mixed precision", "record schema/key/hash validation", "each decision enum", "BLOCKING defaults", "uncommitted record ignored"],
+    "reacquisition_required": false
+  },
+  "research_safety_impact": {
+    "data_acquired": false, "network": false, "snapshot_accessed": false, "holdout_or_forward_accessed": false,
+    "signals_returns_tr_backtests": false, "rule_depends_on_outcomes": false, "makes_stage_r_usable": false
+  }
+}
