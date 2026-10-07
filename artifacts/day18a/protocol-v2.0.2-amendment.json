@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0",
+  "amendment_version": "2.0.2",
+  "type": "protocol_change",
+  "status": "DRAFT - PENDING COMMIT",
+  "drafted": "2026-10-07",
+  "human_readable": "artifacts/day18a/protocol-v2.0.2-amendment.md",
+  "modified": true,
+  "parent_protocol": {
+    "version": "2.0 R1", "commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+    "files_sha256": {
+      "artifacts/day16/research-protocol-v2.md": "57cc368d80a0a3c89af78fe5fd1a6b95962859a3f494ae79a759fb7406a86fb1",
+      "artifacts/day16/research-protocol-v2.json": "ed21cfa508ac9aadcb6600b227014a084cbbfd6a9a5546433bd5327f5154e037",
+      "artifacts/day16/research-checklist.json": "7142f02ca243c08163385b5e5e1560024d3b71b87d3aaabf449d41f8ddf40eb3"
+    }
+  },
+  "parent_clarification": {
+    "version": "2.0.1", "commit": "ed034b3e9500cc4d9b33625de7e1883f572cd5a4",
+    "files_sha256": {
+      "artifacts/day17a/protocol-v2.0.1-amendment.md": "97ad311be549e8769838be99c6e559660408930015bdc35ac765ac5d7d304afe",
+      "artifacts/day17a/protocol-v2.0.1-amendment.json": "361b1909fddf5d6f00cf3eb098f625a75f2368c3e71898ed0fb3ea45e3e77c76",
+      "artifacts/day17/day17-data-blockers.md": "4c4187cb56507f783b22a1e80c9a27f2f383284c993bcec461228d6f7810079f",
+      "artifacts/day17/day17-data-blockers.json": "68ae17c4fdea0be1f1f3f7332439dafbd0746e53c22ad9e000c87b987a61159b"
+    }
+  },
+  "evidence": {
+    "stage_r_report_commit": "858547edbef943c9daedb09c2a623ac911779d8a",
+    "stage_r_report_sha256": {
+      "artifacts/day18/day18-stage-r-report.md": "225b0d8ff53af5c88010f78f3e33dbc5bb9c0618c34b88d89a77e5c2c0a79a5b",
+      "artifacts/day18/day18-stage-r-report.json": "1b58bf4f38abd1ea206128867dee280362e1e134a74c1d732075c8f30c56f0db"
+    },
+    "stage_r_implementation_commit": "3fe0c92e18c70d35da73a5b4a799cfbb4c78bae4",
+    "stage_r_snapshot": {"path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+                         "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+                         "modified": false},
+    "facts_used": [
+      "adjustment=all closes stored with 2-4 decimals (mostly 2)",
+      "non-event raw/all ratio jitter: >1e-6 on 1475-1734 sessions per affected symbol; >1e-5 904-1647; >1e-4 0-907; >1e-3 0 in every symbol",
+      "event dates: 460/480 dividends > 1e-3; 20 NVDA dividends <= 1e-3; 6/6 splits > 1e-2",
+      "no SIP 1Day bar exists before 2016-01-04 (DAY-17 Q2)",
+      "3 dividends with ex_date 2016-01-04 (CSCO, JPM, ORCL)",
+      "CRM and AMD have no CUSIP anchor; their acquirer-side merger records carry non-empty CUSIPs"
+    ],
+    "observations_not_adopted_as_rules": ["fixed 1e-3 threshold", "external quarterly SPY distribution count"]
+  },
+  "decided_by": {"cross_check_rule": "protocol owner (DAY-18A)", "identity_rule_4a": "protocol owner (DAY-18A)",
+                 "first_session_rule": "derived from frozen TR formula + DAY-17 provider facts", "spy_status": "derived from frozen bijection rule"},
+  "changed_sections": ["v2.0 R1 §3.4 cross-check change-detection test", "v2.0 R1 §3.4 coincidence test scope (first-session events)",
+                       "v2.0.1 C2 (new rule 4a)", "v2.0.1 §7 / DAY-17A SPY count note (withdrawn as criterion)"],
+  "unchanged_sections": ["universe", "SPY benchmark-only role", "timeline (warmup/research/holdout/excluded/forward OOS)",
+                         "strategy definitions and parameters", "execution model", "portfolio construction and accounting (§11)",
+                         "benchmarks B1/B2", "transaction costs", "economic gate", "robustness completeness gate",
+                         "family selection / multiple testing / graduation", "three-series price policy",
+                         "corporate-action normalisation", "v2.0.1 C1, C3, C4", "v2.0.1 C2 rules 1-7 (except addition of 4a)",
+                         "split-ratio tolerance 0.1%", "2% missing-session rule", "cross-check mismatch = BLOCKING data review"],
+  "old_rules": {
+    "cross_check_change_test": "change exists where |f(k)/f(p) - 1| > 1e-6 (relative), f = C_raw / C_all",
+    "first_session_events": "not addressed; every event must coincide with a change",
+    "identity_no_anchor": "v2.0.1 C2 rule 4 applied literally: non-empty CUSIP not in (empty) CUSIP set -> foreign-entity record",
+    "spy_completeness": "DAY-17A noted 25 records vs 27 implied by a quarterly schedule (outside inference)"
+  },
+  "new_rules": {
+    "cross_check_change_test": {
+      "name": "precision-interval rule",
+      "d_i": "maximum number of decimal places among symbol i's stored adjustment=all closes (shortest round-trip decimal representation, trailing zeros not counted)",
+      "delta_i": "0.5 * 10^(-d_i)",
+      "raw_close": "treated as exact",
+      "rho": "f(k)/f(p), f = r/a, consecutive common sessions p<k",
+      "rho_min": "rho * (a_k/(a_k+delta_i)) * ((a_p-delta_i)/a_p)",
+      "rho_max": "rho * (a_k/(a_k-delta_i)) * ((a_p+delta_i)/a_p)",
+      "change_detected": "1 not in [rho_min, rho_max]",
+      "precision_degenerate": "a_p - delta_i <= 0 or a_k - delta_i <= 0 -> BLOCKING data review",
+      "coincidence": "every detected change needs a retained split/dividend event with ex_date in (p,k]; every retained event needs a detected change (no precision exemption); split magnitude within 0.1% (frozen)",
+      "pass": "0 unexplained detected changes, 0 unconfirmed events, all split checks within 0.1%, 0 precision-degenerate pairs",
+      "blocking": "any of the pass conditions violated",
+      "free_parameters": [],
+      "fail_safe": "coarser rounding, truncation or rounded raw closes produce extra detected changes -> BLOCKING, never a false pass"
+    },
+    "first_session_events": "see first_session_event_rule",
+    "identity_no_anchor": "see identity_status (rule 4a)",
+    "spy_completeness": "see spy_status"
+  },
+  "rationale": {
+    "cross_check": "rounding error of a stored adjusted close is an absolute bound (half a unit in the last stored place); its relative effect depends on price level, so any fixed relative tolerance is wrong in principle; the interval bound follows from the stored representation with no tuned constant and fails safe",
+    "not_1e-3": "1e-3 is the observed non-event noise ceiling of this snapshot; adopting it would fit the rule to this snapshot and leave 20 NVDA dividend dates undetectable"
+  },
+  "first_session_event_rule": {
+    "scope": "events with ex_date <= the symbol's first session present in both raw and all series of the snapshot",
+    "classification": "FIRST_SESSION_UNTESTABLE",
+    "blocking": false,
+    "treatment": "listed in cross-check evidence; excluded from PIT TR index and accounting",
+    "not_applicable_to": "ex_dates falling in later missing-bar gaps (tested via (p,k] as usual)",
+    "justification": ["no provider bar exists before 2016-01-04 (DAY-17 Q2)", "frozen TR: TR(k0)=1, only ex-dates in (p,k] applied",
+                      "frozen §11: segments start flat; research starts 2017-02-01",
+                      "a genuinely missing event later in the series still produces an unexplained detected change -> BLOCKING"],
+    "stage_r_events": ["CSCO cash_dividend 2016-01-04", "JPM cash_dividend 2016-01-04", "ORCL cash_dividend 2016-01-04"]
+  },
+  "identity_status": {
+    "decision": "B - OPEN/BLOCKING pending confirmation",
+    "rule_4a": "if T has no anchor (v2.0.1 C2 rule 3), every record under T or its alias with a non-empty CUSIP is IDENTITY_UNVERIFIED (neither assigned nor foreign) and is a BLOCKING data review",
+    "resolution_paths": ["anchor established from same-provider data under C2 rule 3 in a later acquisition",
+                         "explicit reviewer decision per record in a committed review artifact (belongs to T -> frozen §3.4 review item; other entity -> excluded)"],
+    "economic_neutrality_is_identity_evidence": false,
+    "records": [{"record": "stock_and_cash_merger CRM<-WORK", "event_date": "2021-07-21", "status": "IDENTITY_UNVERIFIED", "blocking": true},
+                {"record": "stock_merger AMD<-XLNX", "event_date": "2022-02-14", "status": "IDENTITY_UNVERIFIED", "blocking": true}],
+    "unchanged": [{"record": "name_change META->METV", "status": "foreign-entity (META anchored via FB->META)"}]
+  },
+  "spy_status": {
+    "status": "PENDING_REEVALUATION",
+    "criterion": "v2.0.2 cross-check bijection for SPY (same as every symbol)",
+    "withdrawn_criterion": "DAY-17A quarterly-schedule count (outside inference)",
+    "day18_evidence_recorded_not_adopted": "26 retained SPY dividends, all coincident with a change under the old test",
+    "role": "benchmark B2, reference only"
+  },
+  "open_questions": [
+    {"id": "OQ1", "question": "precision-based exemption if a genuine event yields no detected change", "status": "OPEN (only if it occurs; later amendment, never outcome-driven)"},
+    {"id": "OQ2", "question": "round-to-nearest and exact-raw assumptions", "status": "NON-BLOCKING (fail-safe)"},
+    {"id": "OQ3", "question": "CRM<-WORK and AMD<-XLNX IDENTITY_UNVERIFIED resolution", "status": "BLOCKING"},
+    {"id": "OQ4", "question": "SPY completeness under v2.0.2", "status": "PENDING_REEVALUATION"},
+    {"id": "OQ5", "question": "CRLF drift of frozen artifacts under core.autocrlf=true", "status": "NON-BLOCKING (process)"}
+  ],
+  "stage_r_usable_by_this_amendment": false,
+  "implementation_impact": {
+    "code_changed_in_day18a": false,
+    "crosscheck.py": "precision-interval test; d_i from stored all closes; PRECISION_DEGENERATE; FIRST_SESSION_UNTESTABLE (non-blocking)",
+    "identity.py": "IDENTITY_UNVERIFIED records separate from foreign-entity records (rule 4a)",
+    "reviews.py": "IDENTITY_UNVERIFIED = BLOCKING; FIRST_SESSION_UNTESTABLE non-blocking; clean-date condition uses v2.0.2 cross-check",
+    "contract.py": "protocol version includes 2.0.2; 1e-6 retired from the cross-check",
+    "tests": ["interval rule incl. price-level dependence", "coarser-than-assumed rounding fails safe", "precision-degenerate pairs", "first-session classification", "rule 4a"],
+    "reacquisition_required": false,
+    "reevaluation_output": "new location; original write-once snapshot not modified"
+  },
+  "research_safety_impact": {
+    "data_acquired": false, "holdout_or_forward_accessed": false, "prices_returns_signals_backtests_computed": false,
+    "rule_depends_on_outcomes": false, "makes_stage_r_usable": false
+  }
+}
