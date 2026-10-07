@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0",
+  "task": "DAY-17",
+  "date": "2026-10-07",
+  "governing_protocol": {
+    "version": "2.0 R1",
+    "freeze_commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+    "modified": false
+  },
+  "report": "artifacts/day17/day17-data-blockers.md",
+  "safety": {
+    "research_or_backtest_run": false,
+    "prices_inspected": false,
+    "stage_r_acquired": false,
+    "holdout_dates_requested": false,
+    "forward_oos_dates_requested": false,
+    "max_requested_date": "2022-12-31",
+    "market_data_cache_modified": false,
+    "code_changed": false
+  },
+  "probe": {
+    "requests": 8,
+    "all_http_200": true,
+    "retained": ["http status", "request ids", "keys", "field names", "row counts", "timestamp labels", "event counts by type/symbol/year", "payload sha256"],
+    "discarded": ["o", "h", "l", "c", "v", "vw", "n", "rate", "old_rate", "new_rate", "cash_rate", "acquirer_rate", "acquiree_rate"],
+    "request_ids": {
+      "B1_bars_raw_2015-12-01_2016-01-08": "04d43da972955689864d18e9821fda1e",
+      "B2_bars_raw_repeat": "8230117fdfa20bda165549d003aa7d69",
+      "B3_bars_all": "1a967cf28c0ce143b53fd3cb830c537c",
+      "C1_ca_2016": "de5fa7d6f167aa6296f22eb22eb37a60",
+      "C2_ca_2019": "5df765fea3b5b193a09c5f210a6fb5fc",
+      "C3_ca_2021": "430c7b6787e7bd5df0096ca89df4378f",
+      "C4_ca_name_change_META_FB_2022-06": "3fc173e7a1a5033aae6760212811f9de",
+      "C5_ca_non_dividend_types_2016_2022": "5f7a35e457ccfa9c652e352ada9a9bcf"
+    },
+    "results": {
+      "bars": {
+        "symbols_returned": 26,
+        "first_label_all_symbols": "2016-01-04T05:00:00Z",
+        "rows_before_2016-01-04": 0,
+        "rows_per_symbol_2016-01-04_to_2016-01-08": 5,
+        "label_time_of_day": "T05:00:00Z (00:00 America/New_York, EST)",
+        "fields": ["c", "h", "l", "n", "o", "t", "v", "vw"],
+        "repeat_payload_identical": true,
+        "raw_vs_all_label_sets_equal": true,
+        "META_rows_2016": 5
+      },
+      "corporate_actions": {
+        "cash_dividend_counts": {"2016": 67, "2019": 68, "2021": 69},
+        "symbols_with_dividends_2016_2019": ["AAPL", "AMAT", "AVGO", "COST", "CSCO", "INTC", "JNJ", "JPM", "KO", "MSFT", "NVDA", "ORCL", "PEP", "QCOM", "SPY", "WMT", "XOM"],
+        "window_filter_field": "process_date (DOC); 2021 window contained 3 events with 2020 ex-dates (PROBE)",
+        "forward_splits": ["AAPL 2020", "TSLA 2020", "NVDA 2021", "AMZN 2022", "GOOGL 2022", "TSLA 2022"],
+        "other_events": ["cash_merger NVDA<-MLNX 2020", "cash_merger CSCO<-ACIA 2021", "cash_merger MSFT<-NUAN 2022", "stock_and_cash_merger CRM<-WORK 2021", "stock_merger AMD<-XLNX 2022", "name_change FB->META 2022", "name_change META->METV 2022 (different entity)"],
+        "absent_types_for_universe": ["reverse_split", "unit_split", "stock_dividend", "spin_off", "redemption", "worthless_removal", "rights_distribution", "partial_call", "reorganization", "capital_gains_distribution"],
+        "field_names": {
+          "cash_dividends": ["cusip", "ex_date", "foreign", "id", "payable_date", "process_date", "rate", "record_date", "special", "symbol"],
+          "forward_splits": ["cusip", "due_bill_redemption_date", "ex_date", "id", "new_rate", "old_rate", "payable_date", "process_date", "record_date", "symbol"],
+          "name_changes": ["id", "new_cusip", "new_symbol", "old_cusip", "old_symbol", "process_date"]
+        },
+        "status_or_correction_field_observed": false
+      }
+    }
+  },
+  "questions": {
+    "Q1": {
+      "status": "RESOLVED",
+      "conclusion": "1Day bar = SIP trades truncated to the New York day; open = first Close/Last-eligible trade (not guaranteed auction print); close = last eligible trade; daily OHLC NOT updated by extended-hours conditions T/U (volume and trade count are); label = 00:00 America/New_York in UTC. Frozen amendment trigger (OHLC includes extended hours) not triggered. Suitable for signal close(t) / fill raw open(t+1).",
+      "evidence": ["DOC market-data FAQ trade-condition table (daily rows)", "DOC stockbars reference", "STAFF forum 2024-05-17", "STAFF forum 2025-03-31", "PROBE B1 labels"],
+      "non_blocking_notes": ["volume includes extended hours (unused by v2 signals)", "open not necessarily auction print (= frozen Q6)", "EDT label 04:00Z is INFERENCE (STAFF example), not probed"]
+    },
+    "Q2": {
+      "status": "RESOLVED",
+      "conclusion": "SIP 1Day history starts 2016-01-04 for all 25 universe symbols and SPY; current key entitled for raw and all; repeat request deterministic in probed window. In-range gaps handled by frozen 3.8 checks at acquisition.",
+      "evidence": ["DOC 'Since 2016'", "PROBE B1/B2/B3", "REPO DAY-15E 5Min entitlement"],
+      "expected_rows_per_symbol_stage_r": 1762
+    },
+    "Q3": {
+      "status": "PARTIALLY_RESOLVED",
+      "conclusion": "Bars: resolved via asof (default/acquisition date) mapping FB->META; universe unchanged. Corporate actions: endpoint has no asof; ticker META previously identified a different entity (META->METV 2022); CUSIP-based identity rule required and not frozen.",
+      "evidence": ["DOC stockbars asof", "DOC FAQ asof", "PROBE B1 META rows 2016", "PROBE C4/C5 name_changes FB->META and META->METV"]
+    },
+    "Q16": {
+      "status": "PARTIALLY_RESOLVED",
+      "conclusion": "Endpoint available to current key; dividend coverage back to 2016; all public Stage R splits present; required fields exist. Unresolved: process_date window vs ex_date range at Stage R end (PROTOCOL CHANGE REQUIRED), entity identity (C2), same-day split+dividend basis (C3), data_quality (C4); no correction/status field.",
+      "evidence": ["DOC corporate-actions reference", "PROBE C1-C5"]
+    }
+  },
+  "decisions_required": [
+    {"id": "C1", "item": "corporate-action query window: API filters on process_date; Stage R needs ex_date in [2016-01-04, 2022-12-30], some processed in 2023", "classification": "PROTOCOL CHANGE REQUIRED"},
+    {"id": "C2", "item": "corporate-action entity identity (CUSIP / name-change chain; META ticker reuse)", "classification": "OPEN - REQUIRES PROTOCOL DECISION"},
+    {"id": "C3", "item": "same-ex-date split + dividend: Alpaca rate per pre- or post-split share", "classification": "OPEN - REQUIRES PROTOCOL DECISION (only if such an event exists in Stage R)"},
+    {"id": "C4", "item": "data_quality parameter (complete vs all)", "classification": "OPEN - REQUIRES PROTOCOL DECISION"},
+    {"id": "C5", "item": "corrections/cancellations without status field", "classification": "handled by frozen write-once + IDENTICAL/DISCREPANCY"},
+    {"id": "C6", "item": "split ratio direction q = new_rate/old_rate", "classification": "INFERENCE; verified by frozen split-magnitude cross-check"}
+  ],
+  "expected_blocking_data_reviews_stage_r": ["cash_merger NVDA<-MLNX", "cash_merger CSCO<-ACIA", "cash_merger MSFT<-NUAN", "stock_and_cash_merger CRM<-WORK", "stock_merger AMD<-XLNX", "name_change FB->META", "foreign-entity record META->METV"],
+  "stage_r_design": {
+    "status": "DESIGN ONLY - NOT RUN",
+    "preconditions": ["C1 resolved by committed protocol clarification", "C2-C4 decided", "implementation reviewed", "DAY-16 hashes verified at preflight"],
+    "sessions": {"first": "2016-01-04", "last": "2022-12-30", "count": 1762, "early_closes": 13},
+    "symbols": "25 FROZEN_DAY_UNIVERSE + SPY",
+    "series": {
+      "raw_bars": {"endpoint": "/v2/stocks/bars", "timeframe": "1Day", "feed": "sip", "adjustment": "raw", "asof": "acquisition date (explicit)", "start": "2016-01-04", "end": "2022-12-30", "limit": 10000, "sort": "asc"},
+      "all_bars_audit": {"endpoint": "/v2/stocks/bars", "adjustment": "all", "other_params": "identical to raw"},
+      "corporate_actions": {"endpoint": "/v1/corporate-actions", "types": "all 16 documented types", "sort": "asc", "limit": 1000, "window": "per C1", "data_quality": "per C4", "identity": "per C2"},
+      "identity": {"sources": ["/v2/assets/{symbol}", "name_changes records"]}
+    },
+    "snapshot_root": "data/oos_cache/protocol_v2/stage_r/<capture_id>/",
+    "files": ["bars_raw/<SYMBOL>.parquet", "bars_all/<SYMBOL>.parquet", "corporate_actions.json", "events_normalised.parquet", "identity.json", "assets.json", "run.json", "environment.json", "manifest.json"],
+    "tolerances": {"factor_change_relative": "1e-6 (frozen)", "split_ratio_match": "0.1% (frozen)", "missing_session_review": "2% (frozen)", "new_tolerances_introduced": false},
+    "leakage_tests": ["truncation invariance of TR", "future-event mutation", "adjusted-series exclusion", "event-date discipline"]
+  },
+  "implementation_prerequisites": [
+    "v2 bars client: multi-symbol, 1Day, explicit asof, adjustment raw/all",
+    "corporate-actions client with pagination, all types, canonical payload persistence",
+    "v2 contract/sessions module with protocol_v2 roots and forbidden roots",
+    "daily structural validation, identity resolution, event normalisation, implied-factor cross-check, leakage tests"
+  ]
+}

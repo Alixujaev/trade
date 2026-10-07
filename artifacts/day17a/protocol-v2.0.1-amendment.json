@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0",
+  "amendment_version": "2.0.1",
+  "type": "clarification",
+  "status": "DRAFT - PENDING COMMIT",
+  "drafted": "2026-10-07",
+  "human_readable": "artifacts/day17a/protocol-v2.0.1-amendment.md",
+  "parent": {
+    "version": "2.0 R1",
+    "commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+    "files_sha256": {
+      "artifacts/day16/research-protocol-v2.md": "57cc368d80a0a3c89af78fe5fd1a6b95962859a3f494ae79a759fb7406a86fb1",
+      "artifacts/day16/research-protocol-v2.json": "ed21cfa508ac9aadcb6600b227014a084cbbfd6a9a5546433bd5327f5154e037",
+      "artifacts/day16/research-checklist.json": "7142f02ca243c08163385b5e5e1560024d3b71b87d3aaabf449d41f8ddf40eb3"
+    },
+    "modified": false
+  },
+  "evidence_base": {
+    "artifacts/day17/day17-data-blockers.md": "4c4187cb56507f783b22a1e80c9a27f2f383284c993bcec461228d6f7810079f",
+    "artifacts/day17/day17-data-blockers.json": "68ae17c4fdea0be1f1f3f7332439dafbd0746e53c22ad9e000c87b987a61159b"
+  },
+  "unchanged": ["universe", "SPY benchmark-only role", "warmup/research/holdout/excluded/forward-OOS dates", "strategy definitions and parameters",
+                "portfolio construction and accounting model", "execution model", "transaction costs", "benchmarks", "economic gate",
+                "robustness completeness gate", "family-selection/multiple-testing/graduation rules", "frozen tolerances (1e-6, 0.1%, 2%)",
+                "three-series price policy"],
+  "new_numeric_tolerances": [],
+  "decisions": {
+    "C1": {
+      "status": "RESOLVED",
+      "decided_by": "protocol owner (DAY-17A)",
+      "event_date": "ex_date, else effective_date, else process_date",
+      "stage_r_event_set": "identity-resolved records with 2016-01-04 <= event_date <= 2022-12-30",
+      "queries": [
+        {"id": "Q1", "process_date": ["2016-01-01", "2022-12-30"]},
+        {"id": "Q2", "process_date": ["2022-12-31", "2023-03-31"], "role": "supplementary"}
+      ],
+      "query_params": {"types": "all 16 documented types", "sort": "asc", "limit": 1000, "pagination": "follow page_token", "data_quality": "per C4"},
+      "boundary_filter": "records with event_date > 2022-12-30 or < 2016-01-04 discarded in memory before persistence; never written, printed, logged field-wise, displayed or used; only total discard count per query logged",
+      "holdout_status": "retained records (event_date <= 2022-12-30) are research-period information; transient filtered contact with event_date > 2022-12-30 records is not acquisition; their persistence/display/use is a violation",
+      "construction_metadata": ["process_date", "payable_date", "record_date", "id", "Q2 window"],
+      "completeness_guard": "frozen raw/all implied-factor cross-check; unmatched factor change = BLOCKING data review; Q2 never widened without committed amendment"
+    },
+    "C2": {
+      "status": "RESOLVED",
+      "identity_key": "non-empty cusip / old_cusip / new_cusip (authoritative); ticker = query key only",
+      "query_keys": "25 universe + SPY + aliases from name_changes with new_symbol in universe (Stage R: FB)",
+      "anchor": "new_cusip of latest name_changes record with new_symbol = T, else the single non-empty CUSIP among T's split/dividend records; CUSIP set extended by name-change and split CUSIP chains",
+      "ticker_match_cusip_mismatch": "foreign-entity record: excluded, listed, documented in frozen BLOCKING data review (Stage R: META->METV)",
+      "missing_cusip": "match by ticker only if T has no foreign-entity record; otherwise unresolved identity conflict",
+      "unresolved_conflicts": ["T has >=2 non-empty CUSIPs not chain-linked", "empty-CUSIP split/dividend record under T with a foreign-entity record",
+                               "one CUSIP in the sets of two universe symbols", "chain cycle or unorderable name change"],
+      "conflict_effect": "BLOCKING data review; Stage R unusable until resolved and documented or amended",
+      "asset_endpoint_cusip": "documented but null for all 26 symbols on current key; not used",
+      "backstop": "frozen raw/all cross-check"
+    },
+    "C3": {
+      "status": "RESOLVED",
+      "rate_meaning": "declared cash amount per share outstanding on record date, unadjusted for later splits (both old empty-CUSIP and new CUSIP-bearing sources)",
+      "d_definition": "d(e) = rate of identity-resolved cash_dividends record with ex_date = e (regular and special)",
+      "accounting": "unchanged frozen 11.2: cash += shares held at close before ex-date x d",
+      "split_ratio": "q = new_rate / old_rate",
+      "same_exdate_split_and_dividend": "BLOCKING data review (none exists in Stage R)",
+      "magnitude_crosscheck": "none (frozen: coincidence only)"
+    },
+    "C4": {
+      "status": "RESOLVED",
+      "data_quality": {"canonical": "complete", "audit": "all", "both_persisted": true},
+      "complete_vs_all_difference": "BLOCKING data review",
+      "duplicates": "same (type, resolved entity, event_date) with different id = BLOCKING data review",
+      "corrections": "no Alpaca correction model; identify by id; frozen write-once + IDENTICAL/DISCREPANCY on re-acquisition"
+    }
+  },
+  "sections_affected": {
+    "3.1": "corporate-action query contract (Q1+Q2, aliases, data_quality)",
+    "3.4": "event_date; identity rule; d basis; same-ex-date BLOCKING",
+    "3.8": "new BLOCKING reviews: identity conflict, complete/all difference, duplicates",
+    "3.9": "Stage R events = event_date range via Q1+Q2 with in-memory discard",
+    "15.1": "holdout prohibition applied to CA metadata as in C1 rule 5",
+    "20": "Q3 and Q16 resolved for Stage R subject to C1-C4"
+  },
+  "checklist_status_changes_proposed": {
+    "DATA-16": "PREDEFINED (amended by v2.0.1 C1)",
+    "DATA-18": "OPEN -> RESOLVED by DAY-17/17A evidence + v2.0.1",
+    "DATA-19": "PREDEFINED (amended by v2.0.1 C2/C3)",
+    "UNIV-07": "OPEN -> RESOLVED (bars via asof; CA via v2.0.1 C2)",
+    "note": "artifacts/day16/research-checklist.json is not modified"
+  },
+  "probe": {
+    "requests": 32,
+    "all_http_200": true,
+    "endpoints": {"paper /v2/assets/{symbol}": 26, "data /v1/corporate-actions": 6},
+    "ca_process_date_max": "2022-12-30",
+    "q2_window_requested": false,
+    "bars_requested": false,
+    "values_printed_or_stored": false,
+    "results": {
+      "asset_cusip_nonnull": 0,
+      "ca_records_complete": 492,
+      "ca_records_all": 492,
+      "complete_all_id_difference": 0,
+      "repeat_identical": true,
+      "duplicate_type_symbol_eventdate_groups": 0,
+      "empty_cusip_records": "all records with ex-dates 2016 -> 2019/2020",
+      "nonempty_cusips_per_symbol_max": 1,
+      "fb_meta_old_cusip_eq_new_cusip": true,
+      "metv_old_cusip_ne_fb_meta_cusip": true,
+      "symbols_without_split_dividend_records": ["META", "AMD", "ADBE", "CRM", "NFLX"],
+      "dividend_basis": {"AAPL": "declared (ratio == split ratio)", "NVDA": "declared (ratio == split ratio)", "NVDA_old_vs_new_source": "equal (same declared basis)"},
+      "same_exdate_split_dividend": {"AAPL": false, "AMZN": false, "GOOGL": false, "NVDA": false, "TSLA": false},
+      "forward_split_q_gt_1": true
+    },
+    "ca_request_ids": ["a13b3d4f9e65129dc8edc7804112520e", "9267d2d327b43b32d73cce06674e2cd1", "6bf8f49c8a22e2736bd5990ae56de9e9",
+                       "3824ad5f5708ac9ff607a6d5c2467ed4", "d766102fbdb4dc70ad4ff8782e45501b", "261b08b8cf9d4738a2f14f7253c625c9"]
+  },
+  "other_findings": [
+    {"item": "SPY dividend records = 25 in process_date 2016-01-01..2022-12-30 vs 27 implied by a quarterly schedule (INFERENCE)", "impact": "B2 reference only; decided by frozen cross-check at Stage R", "rule_changed": false}
+  ],
+  "stage_r_ready_for_implementation_after_commit": true,
+  "expected_stage_r_blocking_reviews": ["cash_merger NVDA<-MLNX", "cash_merger CSCO<-ACIA", "cash_merger MSFT<-NUAN", "stock_and_cash_merger CRM<-WORK",
+                                        "stock_merger AMD<-XLNX", "name_change FB->META", "foreign-entity META->METV", "SPY count question if cross-check confirms gap"]
+}
