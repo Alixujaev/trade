@@ -1,0 +1,205 @@
+{
+  "DRAFT_ONLY": true,
+  "not_a_review_record": true,
+  "do_not_place_under": "artifacts/reviews/stage_r/",
+  "snapshot": {
+    "id": "stage_r_20261007T093410Z",
+    "path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd"
+  },
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+  "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+  "task": "DAY-18E",
+  "head": "25d74f770760460c3427b37c63f7fd9b6fd5803e",
+  "protocol_files": {
+    "artifacts/day16/research-protocol-v2.md": {
+      "commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+      "sha256": "57cc368d80a0a3c89af78fe5fd1a6b95962859a3f494ae79a759fb7406a86fb1"
+    },
+    "artifacts/day17a/protocol-v2.0.1-amendment.md": {
+      "commit": "ed034b3e9500cc4d9b33625de7e1883f572cd5a4",
+      "sha256": "97ad311be549e8769838be99c6e559660408930015bdc35ac765ac5d7d304afe"
+    },
+    "artifacts/day18a/protocol-v2.0.2-amendment.md": {
+      "commit": "0ebb6065f6e981e324220bae2abd2222800b2228",
+      "sha256": "0ce87282112c4407a56a868c462f8b39810597437d4e1ed240922ba4ce203e8e"
+    },
+    "artifacts/day18c/protocol-v2.0.3-amendment.md": {
+      "commit": "d26b36ef802cf0810952b2e5c4e8e19d908b4555",
+      "sha256": "3492359a8376c4e6fb093a85a87dac31bb986ffdba38617ac15e8ac82dab5f3f"
+    }
+  },
+  "day18d_report_sha256": "02a436fbb15e94051379655883f63d76121977b460c8e6fd7552733c92c7d486",
+  "v2_0_3_review_output_sha256": {
+    "crosscheck.json": "98f3efd0388bcf2f9226268e1e9f3fcd8b3ea0ef5051816e35d5e99a62c8ff59",
+    "data_quality_comparison.json": "b7af64540d8e6067490d222df2301d806362c1851fa0c42e5a24cf2a413fbd03",
+    "evaluation.json": "c0a0f240da77aec83798cc402689ce5b149ce6e6df6b9eceac3eb6ba18dd85b7",
+    "events_normalised.json": "e89b9c4361ba668df070d38d9139ddadcca968bf74cf3d582226dcb1341ef0e3",
+    "identity.json": "a775e3db846f88c6ce888d918114fc8c6c291f50d613ea4b5e94fe7981aa48c9",
+    "manifest.json": "8999961a059c73c5dbacd33f127a57092019e3a33ed1938108ee2fc81c4dabed",
+    "review_records.json": "140f7df96e5ed2142fbca0f4bf876815c603bbb191d8d44692b358f3fb1055f6",
+    "reviews.json": "9fa1d6c873efbad8beefdd7c5f6e89e27ce6e99765117b05e1a49bdc5c284a85",
+    "validation.json": "b17d175325391dbb6d38cc1582e35427eb2c15d63a070bab8c8642c2a571cb04"
+  },
+  "generator": {
+    "location": "session scratchpad (not a repository file)",
+    "sha256": "bf8780112210858cb864bcc01cd834ffe366fbfab04196d6dca78eeb16dc72e0",
+    "offline": true
+  },
+  "blocker_count": 14,
+  "items": [
+    {
+      "file": "crm-work.json",
+      "item_type": "IDENTITY_UNVERIFIED",
+      "item_key": {
+        "entity": "CRM",
+        "event_date": "2021-07-21",
+        "ca_id": "299d6bfe-da13-4491-bc28-481f1f2aa54c"
+      },
+      "status": "IDENTITY_UNVERIFIED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "amd-xlnx.json",
+      "item_type": "IDENTITY_UNVERIFIED",
+      "item_key": {
+        "entity": "AMD",
+        "event_date": "2022-02-14",
+        "ca_id": "15459aa5-b297-4e33-9624-c9d59b75ba46"
+      },
+      "status": "IDENTITY_UNVERIFIED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "amzn-2016-02-22.json",
+      "item_type": "UNEXPLAINED_CHANGE",
+      "item_key": {
+        "entity": "AMZN",
+        "session": "2016-02-22"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nflx-2018-11-29.json",
+      "item_type": "UNEXPLAINED_CHANGE",
+      "item_key": {
+        "entity": "NFLX",
+        "session": "2018-11-29"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nvda-dividends.json",
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2018-05-23",
+        "ca_id": "4be70358-dc7e-429c-ad3a-6b56e5c29ca0"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nvda-dividends.json",
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2019-08-28",
+        "ca_id": "08cdc20f-26c2-47bd-a6d4-3b10ca86185c"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nvda-dividends.json",
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2020-09-01",
+        "ca_id": "391f36bb-8a9c-4b04-85fc-2661d20f9ae5"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nvda-dividends.json",
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2020-12-03",
+        "ca_id": "c94296da-7080-4fe3-b101-e41e06f2cd09"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nvda-dividends.json",
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2021-03-09",
+        "ca_id": "d80fa14c-6eb4-418f-b003-f5775322eba3"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nvda-dividends.json",
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2021-06-09",
+        "ca_id": "d1a013e0-aea6-46ec-b844-d7a546ace337"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nvda-dividends.json",
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2021-12-01",
+        "ca_id": "ef9b148b-f031-4c05-8faf-4814f099b11d"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nvda-dividends.json",
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2022-03-02",
+        "ca_id": "13ca6ae3-efe8-461a-af9c-fa2490d56d9c"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nvda-dividends.json",
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2022-06-08",
+        "ca_id": "4ac972c2-d010-4c59-9bc5-3804d580e957"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    },
+    {
+      "file": "nvda-dividends.json",
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2022-09-07",
+        "ca_id": "90e63976-7fbe-41e6-a747-98da5ec27d03"
+      },
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision": null
+    }
+  ],
+  "reproduction_matches_day18d": true
+}

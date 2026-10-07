@@ -1,0 +1,178 @@
+{
+  "DRAFT_ONLY": true,
+  "not_a_review_record": true,
+  "do_not_place_under": "artifacts/reviews/stage_r/",
+  "snapshot": {
+    "id": "stage_r_20261007T093410Z",
+    "path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd"
+  },
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+  "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+  "items": [
+    {
+      "item_type": "UNEXPLAINED_CHANGE",
+      "item_key": {
+        "entity": "AMZN",
+        "session": "2016-02-22"
+      },
+      "item_key_str": "UNEXPLAINED_CHANGE|entity=AMZN|session=2016-02-22",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2016-02-19",
+        "k_session": "2016-02-22",
+        "raw_close": {
+          "p": 534.9,
+          "k": 559.5
+        },
+        "adjusted_close": {
+          "p": 26.74,
+          "k": 27.98
+        },
+        "displayed_decimals_adjusted": {
+          "p": 2,
+          "k": 2
+        },
+        "displayed_decimals_raw": {
+          "p": 1,
+          "k": 1
+        },
+        "delta": {
+          "p": 0.005,
+          "k": 0.005
+        },
+        "f": {
+          "p": 20.003739715781602,
+          "k": 19.996426018584703
+        },
+        "rho": 0.9996343835052438,
+        "abs_rho_minus_1": 0.0003656164947561935,
+        "rho_min": 0.999268897657797,
+        "rho_max": 0.9999999999999998,
+        "one_inside_interval": false,
+        "change_detected_v2_0_3": true,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "corporate_action_records_in_interval": {
+          "complete": [],
+          "all": []
+        },
+        "corporate_action_records_within_30_sessions": [],
+        "all_stage_r_records_for_entity": [
+          {
+            "ca_type": "forward_splits",
+            "event_date": "2022-06-06"
+          }
+        ],
+        "aliases_considered": [],
+        "symbol_precision_histogram": {
+          "0": 29,
+          "1": 189,
+          "2": 1544
+        }
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection on (p,k]",
+          "result": "BLOCKING",
+          "detail": "1 lies outside [rho_min, rho_max]"
+        },
+        {
+          "check": "retained corporate-action event with ex_date in (p,k]",
+          "result": "UNRESOLVED",
+          "detail": "none -> unexplained change"
+        },
+        {
+          "check": "PROVIDER_ADJUSTMENT_ARTIFACT evidence precondition (no record of any type for the entity in (p,k], both payloads)",
+          "result": "precondition satisfied",
+          "detail": "mechanical precondition only; it does not select an outcome"
+        },
+        {
+          "check": "v2.0.3 item 3 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "provider_evidence": "stored raw and adjusted closes for the two sessions and the full corporate-action payloads (both data_quality values)",
+      "limitations": [
+        "The snapshot does not state why the adjusted series changes on this session.",
+        "The magnitude of the change is not evidence under v2.0.3.",
+        "No re-acquisition was performed (not allowed in DAY-18E)."
+      ],
+      "admissible_decisions": {
+        "PROVIDER_ADJUSTMENT_ARTIFACT": "RESOLVED, no event added; requires same-provider evidence that no corporate-action record of any of the 16 types for the entity has event_date/ex_date in (p,k] in both data_quality payloads, plus written reasoning (mechanically re-checked by the validator)",
+        "MISSING_EVENT_CONFIRMED": "stays BLOCKING until a committed acquisition step or amendment supplies the event",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "supporting_artifacts": [
+        {
+          "artifact": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_3__stage_r_20261007T093410Z/crosscheck.json",
+          "sha256": "98f3efd0388bcf2f9226268e1e9f3fcd8b3ea0ef5051816e35d5e99a62c8ff59",
+          "hash_scope": "SHA-256 of the entire file",
+          "kind": "DAY-18D v2.0.3 evaluation output (not provider evidence)",
+          "relevance": "v2.0.3 cross-check result for AMZN (unexplained_pairs, precision_histogram)"
+        }
+      ],
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-AMZN-2016-02-22",
+        "item_type": "UNEXPLAINED_CHANGE",
+        "item_key": {
+          "entity": "AMZN",
+          "session": "2016-02-22"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/AMZN.parquet#session=2016-02-19..2016-02-22",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "061c07cb4fb0ba09d9ac69a2fabc932c33f3e178a588966fd5b6e4b727c57ab3",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/AMZN.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2016-02-19 and 2016-02-22, column close",
+            "relevance": "raw closes defining f",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/AMZN.parquet#session=2016-02-19..2016-02-22",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "24ae996bd7fcea9420cb919725ea3fa8ab5d301a1f09e1a69e8fa1c174526649",
+            "hash_scope": "SHA-256 of the entire original file bars_all/AMZN.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2016-02-19 and 2016-02-22, column close",
+            "relevance": "adjusted closes and their displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#entity=AMZN;event_date_in=(2016-02-19,2016-02-22]",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "all records of any type referencing the entity",
+            "relevance": "event coverage of the interval",
+            "supports_check": "PROVIDER_ADJUSTMENT_ARTIFACT precondition (v2.0.3 item 3)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#entity=AMZN;event_date_in=(2016-02-19,2016-02-22]",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "all records of any type referencing the entity",
+            "relevance": "event coverage of the interval (audit payload)",
+            "supports_check": "PROVIDER_ADJUSTMENT_ARTIFACT precondition (v2.0.3 item 3)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    }
+  ]
+}

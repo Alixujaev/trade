@@ -1,0 +1,1921 @@
+{
+  "DRAFT_ONLY": true,
+  "not_a_review_record": true,
+  "do_not_place_under": "artifacts/reviews/stage_r/",
+  "snapshot": {
+    "id": "stage_r_20261007T093410Z",
+    "path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd"
+  },
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+  "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+  "items": [
+    {
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2018-05-23",
+        "ca_id": "4be70358-dc7e-429c-ad3a-6b56e5c29ca0"
+      },
+      "item_key_str": "UNCONFIRMED_EVENT|entity=NVDA|ex_date=2018-05-23|ca_id=4be70358-dc7e-429c-ad3a-6b56e5c29ca0",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2018-05-22",
+        "k_session": "2018-05-23",
+        "raw_close": {
+          "p": 242.7,
+          "k": 247.54
+        },
+        "adjusted_close": {
+          "p": 5.99,
+          "k": 6.113
+        },
+        "displayed_decimals_adjusted": {
+          "p": 2,
+          "k": 3
+        },
+        "displayed_decimals_raw": {
+          "p": 1,
+          "k": 2
+        },
+        "delta": {
+          "p": 0.005,
+          "k": 0.0005
+        },
+        "f": {
+          "p": 40.51752921535893,
+          "k": 40.49402911827253
+        },
+        "rho": 0.9994200017241552,
+        "abs_rho_minus_1": 0.0005799982758447619,
+        "rho_min": 0.9985040907764262,
+        "rho_max": 1.0003360625141662,
+        "one_inside_interval": true,
+        "change_detected_v2_0_3": false,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "event_type": "cash_dividend",
+        "corporate_action_record": {
+          "ca_type": "cash_dividends",
+          "cusip": "",
+          "event_date": "2018-05-23",
+          "ex_date": "2018-05-23",
+          "foreign": false,
+          "id": "4be70358-dc7e-429c-ad3a-6b56e5c29ca0",
+          "process_date": "2018-05-23",
+          "rate": 0.15,
+          "special": false,
+          "symbol": "NVDA"
+        },
+        "record_canonical_sha256": "1dc6387a31e82aeda2fac7c945cd0b2540dd759c6599d7823af9877425fc09c7",
+        "rate": 0.15,
+        "cusip": "",
+        "special": false,
+        "foreign": false,
+        "ex_date": "2018-05-23",
+        "record_date": null,
+        "payable_date": null,
+        "process_date": "2018-05-23",
+        "present_in_complete": 1,
+        "present_in_all": 1,
+        "identical_in_both_payloads": true,
+        "identity_assignment": [
+          {
+            "ca_type": "cash_dividends",
+            "entity": "NVDA",
+            "event_date": "2018-05-23",
+            "id": "4be70358-dc7e-429c-ad3a-6b56e5c29ca0",
+            "match": "ticker_only",
+            "role": "subject"
+          }
+        ],
+        "duplicate_groups_containing_record": [],
+        "events_with_same_entity_type_ex_date": 1,
+        "reference_quantity_rate_over_raw_close_p": 0.0006180469715698394,
+        "reference_quantity_note": "rate / raw close at p; shown for orientation only; assumes a multiplicative dividend adjustment whose method is unverified (v2.0 R1 Q4); not evidence under v2.0.3",
+        "interval_half_width_rel": 0.000915985868869984
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection at the event session",
+          "result": "UNRESOLVED",
+          "detail": "1 lies inside [rho_min, rho_max]: no detected change -> event unconfirmed (no precision exemption, v2.0.3)"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: identity-resolved",
+          "result": "PASS",
+          "detail": "assignments=[('NVDA', 'ticker_only')]"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: present once and identical in both payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: not duplicated",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_REJECTED precondition: same-provider evidence from a different (later) snapshot",
+          "result": "not available",
+          "detail": "only one Stage R snapshot exists; no later acquisition"
+        },
+        {
+          "check": "v2.0.3 item 4 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "limitations": [
+        "Preconditions above are mechanical facts; they do not select an outcome.",
+        "The adjusted series' dividend-adjustment method is not documented by the provider (v2.0 R1 Q4)."
+      ],
+      "admissible_decisions": {
+        "EVENT_RETAINED": "RESOLVED; provider record stays authoritative for TR/accounting; requires record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated, plus written reasoning (mechanically re-checked)",
+        "EVENT_REJECTED": "event excluded from TR/accounting; requires same-provider evidence from a different (later) snapshot that the record is erroneous",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-NVDA-2018-05-23-4be70358-dc7e-429c-ad3a-6b56e5c29ca0",
+        "item_type": "UNCONFIRMED_EVENT",
+        "item_key": {
+          "entity": "NVDA",
+          "ex_date": "2018-05-23",
+          "ca_id": "4be70358-dc7e-429c-ad3a-6b56e5c29ca0"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=4be70358-dc7e-429c-ad3a-6b56e5c29ca0",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "cash_dividends record id=4be70358-dc7e-429c-ad3a-6b56e5c29ca0",
+            "relevance": "provider dividend record",
+            "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=4be70358-dc7e-429c-ad3a-6b56e5c29ca0",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "same record, data_quality=all payload",
+            "relevance": "payload consistency",
+            "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2018-05-22..2018-05-23",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2018-05-22 and 2018-05-23, column close",
+            "relevance": "raw closes",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2018-05-22..2018-05-23",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+            "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2018-05-22 and 2018-05-23, column close",
+            "relevance": "adjusted closes and displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    },
+    {
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2019-08-28",
+        "ca_id": "08cdc20f-26c2-47bd-a6d4-3b10ca86185c"
+      },
+      "item_key_str": "UNCONFIRMED_EVENT|entity=NVDA|ex_date=2019-08-28|ca_id=08cdc20f-26c2-47bd-a6d4-3b10ca86185c",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2019-08-27",
+        "k_session": "2019-08-28",
+        "raw_close": {
+          "p": 161.8,
+          "k": 161.22
+        },
+        "adjusted_close": {
+          "p": 4.011,
+          "k": 4.0
+        },
+        "displayed_decimals_adjusted": {
+          "p": 3,
+          "k": 0
+        },
+        "displayed_decimals_raw": {
+          "p": 1,
+          "k": 2
+        },
+        "delta": {
+          "p": 0.0005,
+          "k": 0.005
+        },
+        "f": {
+          "p": 40.33906756419846,
+          "k": 40.305
+        },
+        "rho": 0.9991554697156982,
+        "abs_rho_minus_1": 0.0008445302843017588,
+        "rho_min": 0.9977836881895159,
+        "rho_max": 1.0005306849878788,
+        "one_inside_interval": true,
+        "change_detected_v2_0_3": false,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "event_type": "cash_dividend",
+        "corporate_action_record": {
+          "ca_type": "cash_dividends",
+          "cusip": "",
+          "event_date": "2019-08-28",
+          "ex_date": "2019-08-28",
+          "foreign": false,
+          "id": "08cdc20f-26c2-47bd-a6d4-3b10ca86185c",
+          "process_date": "2019-08-28",
+          "rate": 0.16,
+          "special": false,
+          "symbol": "NVDA"
+        },
+        "record_canonical_sha256": "f9120c42432374d088c7f5b42a97a1e5e44b0686ca18591b211d9db7479881ba",
+        "rate": 0.16,
+        "cusip": "",
+        "special": false,
+        "foreign": false,
+        "ex_date": "2019-08-28",
+        "record_date": null,
+        "payable_date": null,
+        "process_date": "2019-08-28",
+        "present_in_complete": 1,
+        "present_in_all": 1,
+        "identical_in_both_payloads": true,
+        "identity_assignment": [
+          {
+            "ca_type": "cash_dividends",
+            "entity": "NVDA",
+            "event_date": "2019-08-28",
+            "id": "08cdc20f-26c2-47bd-a6d4-3b10ca86185c",
+            "match": "ticker_only",
+            "role": "subject"
+          }
+        ],
+        "duplicate_groups_containing_record": [],
+        "events_with_same_entity_type_ex_date": 1,
+        "reference_quantity_rate_over_raw_close_p": 0.0009888751545117428,
+        "reference_quantity_note": "rate / raw close at p; shown for orientation only; assumes a multiplicative dividend adjustment whose method is unverified (v2.0 R1 Q4); not evidence under v2.0.3",
+        "interval_half_width_rel": 0.0013734983991814387
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection at the event session",
+          "result": "UNRESOLVED",
+          "detail": "1 lies inside [rho_min, rho_max]: no detected change -> event unconfirmed (no precision exemption, v2.0.3)"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: identity-resolved",
+          "result": "PASS",
+          "detail": "assignments=[('NVDA', 'ticker_only')]"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: present once and identical in both payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: not duplicated",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_REJECTED precondition: same-provider evidence from a different (later) snapshot",
+          "result": "not available",
+          "detail": "only one Stage R snapshot exists; no later acquisition"
+        },
+        {
+          "check": "v2.0.3 item 4 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "limitations": [
+        "Preconditions above are mechanical facts; they do not select an outcome.",
+        "The adjusted series' dividend-adjustment method is not documented by the provider (v2.0 R1 Q4)."
+      ],
+      "admissible_decisions": {
+        "EVENT_RETAINED": "RESOLVED; provider record stays authoritative for TR/accounting; requires record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated, plus written reasoning (mechanically re-checked)",
+        "EVENT_REJECTED": "event excluded from TR/accounting; requires same-provider evidence from a different (later) snapshot that the record is erroneous",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-NVDA-2019-08-28-08cdc20f-26c2-47bd-a6d4-3b10ca86185c",
+        "item_type": "UNCONFIRMED_EVENT",
+        "item_key": {
+          "entity": "NVDA",
+          "ex_date": "2019-08-28",
+          "ca_id": "08cdc20f-26c2-47bd-a6d4-3b10ca86185c"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=08cdc20f-26c2-47bd-a6d4-3b10ca86185c",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "cash_dividends record id=08cdc20f-26c2-47bd-a6d4-3b10ca86185c",
+            "relevance": "provider dividend record",
+            "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=08cdc20f-26c2-47bd-a6d4-3b10ca86185c",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "same record, data_quality=all payload",
+            "relevance": "payload consistency",
+            "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2019-08-27..2019-08-28",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2019-08-27 and 2019-08-28, column close",
+            "relevance": "raw closes",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2019-08-27..2019-08-28",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+            "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2019-08-27 and 2019-08-28, column close",
+            "relevance": "adjusted closes and displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    },
+    {
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2020-09-01",
+        "ca_id": "391f36bb-8a9c-4b04-85fc-2661d20f9ae5"
+      },
+      "item_key_str": "UNCONFIRMED_EVENT|entity=NVDA|ex_date=2020-09-01|ca_id=391f36bb-8a9c-4b04-85fc-2661d20f9ae5",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2020-08-31",
+        "k_session": "2020-09-01",
+        "raw_close": {
+          "p": 534.98,
+          "k": 552.84
+        },
+        "adjusted_close": {
+          "p": 13.3,
+          "k": 13.75
+        },
+        "displayed_decimals_adjusted": {
+          "p": 1,
+          "k": 2
+        },
+        "displayed_decimals_raw": {
+          "p": 2,
+          "k": 2
+        },
+        "delta": {
+          "p": 0.005,
+          "k": 0.005
+        },
+        "f": {
+          "p": 40.22406015037594,
+          "k": 40.206545454545456
+        },
+        "rho": 0.999564571657734,
+        "abs_rho_minus_1": 0.0004354283422659533,
+        "rho_min": 0.998825586198903,
+        "rho_max": 1.0003040947560404,
+        "one_inside_interval": true,
+        "change_detected_v2_0_3": false,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "event_type": "cash_dividend",
+        "corporate_action_record": {
+          "ca_type": "cash_dividends",
+          "cusip": "67066G104",
+          "event_date": "2020-09-01",
+          "ex_date": "2020-09-01",
+          "foreign": false,
+          "id": "391f36bb-8a9c-4b04-85fc-2661d20f9ae5",
+          "payable_date": "2020-09-24",
+          "process_date": "2020-09-24",
+          "rate": 0.16,
+          "record_date": "2020-09-02",
+          "special": false,
+          "symbol": "NVDA"
+        },
+        "record_canonical_sha256": "8effcf06f9641aa670caab42f41ac3057bedc46d923d8ef22a43683fb45c4f63",
+        "rate": 0.16,
+        "cusip": "67066G104",
+        "special": false,
+        "foreign": false,
+        "ex_date": "2020-09-01",
+        "record_date": "2020-09-02",
+        "payable_date": "2020-09-24",
+        "process_date": "2020-09-24",
+        "present_in_complete": 1,
+        "present_in_all": 1,
+        "identical_in_both_payloads": true,
+        "identity_assignment": [
+          {
+            "ca_type": "cash_dividends",
+            "entity": "NVDA",
+            "event_date": "2020-09-01",
+            "id": "391f36bb-8a9c-4b04-85fc-2661d20f9ae5",
+            "match": "cusip",
+            "role": "subject"
+          }
+        ],
+        "duplicate_groups_containing_record": [],
+        "events_with_same_entity_type_ex_date": 1,
+        "reference_quantity_rate_over_raw_close_p": 0.0002990766009944297,
+        "reference_quantity_note": "rate / raw close at p; shown for orientation only; assumes a multiplicative dividend adjustment whose method is unverified (v2.0 R1 Q4); not evidence under v2.0.3",
+        "interval_half_width_rel": 0.0007392542785686906
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection at the event session",
+          "result": "UNRESOLVED",
+          "detail": "1 lies inside [rho_min, rho_max]: no detected change -> event unconfirmed (no precision exemption, v2.0.3)"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: identity-resolved",
+          "result": "PASS",
+          "detail": "assignments=[('NVDA', 'cusip')]"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: present once and identical in both payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: not duplicated",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_REJECTED precondition: same-provider evidence from a different (later) snapshot",
+          "result": "not available",
+          "detail": "only one Stage R snapshot exists; no later acquisition"
+        },
+        {
+          "check": "v2.0.3 item 4 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "limitations": [
+        "Preconditions above are mechanical facts; they do not select an outcome.",
+        "The adjusted series' dividend-adjustment method is not documented by the provider (v2.0 R1 Q4)."
+      ],
+      "admissible_decisions": {
+        "EVENT_RETAINED": "RESOLVED; provider record stays authoritative for TR/accounting; requires record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated, plus written reasoning (mechanically re-checked)",
+        "EVENT_REJECTED": "event excluded from TR/accounting; requires same-provider evidence from a different (later) snapshot that the record is erroneous",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-NVDA-2020-09-01-391f36bb-8a9c-4b04-85fc-2661d20f9ae5",
+        "item_type": "UNCONFIRMED_EVENT",
+        "item_key": {
+          "entity": "NVDA",
+          "ex_date": "2020-09-01",
+          "ca_id": "391f36bb-8a9c-4b04-85fc-2661d20f9ae5"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=391f36bb-8a9c-4b04-85fc-2661d20f9ae5",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "cash_dividends record id=391f36bb-8a9c-4b04-85fc-2661d20f9ae5",
+            "relevance": "provider dividend record",
+            "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=391f36bb-8a9c-4b04-85fc-2661d20f9ae5",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "same record, data_quality=all payload",
+            "relevance": "payload consistency",
+            "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2020-08-31..2020-09-01",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2020-08-31 and 2020-09-01, column close",
+            "relevance": "raw closes",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2020-08-31..2020-09-01",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+            "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2020-08-31 and 2020-09-01, column close",
+            "relevance": "adjusted closes and displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    },
+    {
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2020-12-03",
+        "ca_id": "c94296da-7080-4fe3-b101-e41e06f2cd09"
+      },
+      "item_key_str": "UNCONFIRMED_EVENT|entity=NVDA|ex_date=2020-12-03|ca_id=c94296da-7080-4fe3-b101-e41e06f2cd09",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2020-12-02",
+        "k_session": "2020-12-03",
+        "raw_close": {
+          "p": 541.78,
+          "k": 535.84
+        },
+        "adjusted_close": {
+          "p": 13.47,
+          "k": 13.33
+        },
+        "displayed_decimals_adjusted": {
+          "p": 2,
+          "k": 2
+        },
+        "displayed_decimals_raw": {
+          "p": 2,
+          "k": 2
+        },
+        "delta": {
+          "p": 0.005,
+          "k": 0.005
+        },
+        "f": {
+          "p": 40.221232368225685,
+          "k": 40.1980495123781
+        },
+        "rho": 0.9994236164711378,
+        "abs_rho_minus_1": 0.0005763835288622454,
+        "rho_min": 0.9986780372598133,
+        "rho_max": 1.0001697552165794,
+        "one_inside_interval": true,
+        "change_detected_v2_0_3": false,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "event_type": "cash_dividend",
+        "corporate_action_record": {
+          "ca_type": "cash_dividends",
+          "cusip": "67066G104",
+          "event_date": "2020-12-03",
+          "ex_date": "2020-12-03",
+          "foreign": false,
+          "id": "c94296da-7080-4fe3-b101-e41e06f2cd09",
+          "payable_date": "2020-12-29",
+          "process_date": "2020-12-29",
+          "rate": 0.16,
+          "record_date": "2020-12-04",
+          "special": false,
+          "symbol": "NVDA"
+        },
+        "record_canonical_sha256": "f03e1fffe588b231085c6230838087b5b5f2862a078adeb074400589c39df6ea",
+        "rate": 0.16,
+        "cusip": "67066G104",
+        "special": false,
+        "foreign": false,
+        "ex_date": "2020-12-03",
+        "record_date": "2020-12-04",
+        "payable_date": "2020-12-29",
+        "process_date": "2020-12-29",
+        "present_in_complete": 1,
+        "present_in_all": 1,
+        "identical_in_both_payloads": true,
+        "identity_assignment": [
+          {
+            "ca_type": "cash_dividends",
+            "entity": "NVDA",
+            "event_date": "2020-12-03",
+            "id": "c94296da-7080-4fe3-b101-e41e06f2cd09",
+            "match": "cusip",
+            "role": "subject"
+          }
+        ],
+        "duplicate_groups_containing_record": [],
+        "events_with_same_entity_type_ex_date": 1,
+        "reference_quantity_rate_over_raw_close_p": 0.0002953228247628189,
+        "reference_quantity_note": "rate / raw close at p; shown for orientation only; assumes a multiplicative dividend adjustment whose method is unverified (v2.0 R1 Q4); not evidence under v2.0.3",
+        "interval_half_width_rel": 0.0007458589783830294
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection at the event session",
+          "result": "UNRESOLVED",
+          "detail": "1 lies inside [rho_min, rho_max]: no detected change -> event unconfirmed (no precision exemption, v2.0.3)"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: identity-resolved",
+          "result": "PASS",
+          "detail": "assignments=[('NVDA', 'cusip')]"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: present once and identical in both payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: not duplicated",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_REJECTED precondition: same-provider evidence from a different (later) snapshot",
+          "result": "not available",
+          "detail": "only one Stage R snapshot exists; no later acquisition"
+        },
+        {
+          "check": "v2.0.3 item 4 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "limitations": [
+        "Preconditions above are mechanical facts; they do not select an outcome.",
+        "The adjusted series' dividend-adjustment method is not documented by the provider (v2.0 R1 Q4)."
+      ],
+      "admissible_decisions": {
+        "EVENT_RETAINED": "RESOLVED; provider record stays authoritative for TR/accounting; requires record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated, plus written reasoning (mechanically re-checked)",
+        "EVENT_REJECTED": "event excluded from TR/accounting; requires same-provider evidence from a different (later) snapshot that the record is erroneous",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-NVDA-2020-12-03-c94296da-7080-4fe3-b101-e41e06f2cd09",
+        "item_type": "UNCONFIRMED_EVENT",
+        "item_key": {
+          "entity": "NVDA",
+          "ex_date": "2020-12-03",
+          "ca_id": "c94296da-7080-4fe3-b101-e41e06f2cd09"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=c94296da-7080-4fe3-b101-e41e06f2cd09",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "cash_dividends record id=c94296da-7080-4fe3-b101-e41e06f2cd09",
+            "relevance": "provider dividend record",
+            "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=c94296da-7080-4fe3-b101-e41e06f2cd09",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "same record, data_quality=all payload",
+            "relevance": "payload consistency",
+            "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2020-12-02..2020-12-03",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2020-12-02 and 2020-12-03, column close",
+            "relevance": "raw closes",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2020-12-02..2020-12-03",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+            "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2020-12-02 and 2020-12-03, column close",
+            "relevance": "adjusted closes and displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    },
+    {
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2021-03-09",
+        "ca_id": "d80fa14c-6eb4-418f-b003-f5775322eba3"
+      },
+      "item_key_str": "UNCONFIRMED_EVENT|entity=NVDA|ex_date=2021-03-09|ca_id=d80fa14c-6eb4-418f-b003-f5775322eba3",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2021-03-08",
+        "k_session": "2021-03-09",
+        "raw_close": {
+          "p": 463.73,
+          "k": 500.81
+        },
+        "adjusted_close": {
+          "p": 11.53,
+          "k": 12.46
+        },
+        "displayed_decimals_adjusted": {
+          "p": 2,
+          "k": 2
+        },
+        "displayed_decimals_raw": {
+          "p": 2,
+          "k": 2
+        },
+        "delta": {
+          "p": 0.005,
+          "k": 0.005
+        },
+        "f": {
+          "p": 40.2194275802255,
+          "k": 40.19341894060995
+        },
+        "rho": 0.9993533314325852,
+        "abs_rho_minus_1": 0.0006466685674147987,
+        "rho_min": 0.9985192706009879,
+        "rho_max": 1.0001880619236216,
+        "one_inside_interval": true,
+        "change_detected_v2_0_3": false,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "event_type": "cash_dividend",
+        "corporate_action_record": {
+          "ca_type": "cash_dividends",
+          "cusip": "67066G104",
+          "event_date": "2021-03-09",
+          "ex_date": "2021-03-09",
+          "foreign": false,
+          "id": "d80fa14c-6eb4-418f-b003-f5775322eba3",
+          "payable_date": "2021-03-31",
+          "process_date": "2021-03-31",
+          "rate": 0.16,
+          "record_date": "2021-03-10",
+          "special": false,
+          "symbol": "NVDA"
+        },
+        "record_canonical_sha256": "5d8b4113e8b23515c3ec6b0915b4cff19fa6d9b5c375750001b44c80822a88fb",
+        "rate": 0.16,
+        "cusip": "67066G104",
+        "special": false,
+        "foreign": false,
+        "ex_date": "2021-03-09",
+        "record_date": "2021-03-10",
+        "payable_date": "2021-03-31",
+        "process_date": "2021-03-31",
+        "present_in_complete": 1,
+        "present_in_all": 1,
+        "identical_in_both_payloads": true,
+        "identity_assignment": [
+          {
+            "ca_type": "cash_dividends",
+            "entity": "NVDA",
+            "event_date": "2021-03-09",
+            "id": "d80fa14c-6eb4-418f-b003-f5775322eba3",
+            "match": "cusip",
+            "role": "subject"
+          }
+        ],
+        "duplicate_groups_containing_record": [],
+        "events_with_same_entity_type_ex_date": 1,
+        "reference_quantity_rate_over_raw_close_p": 0.00034502835701809243,
+        "reference_quantity_note": "rate / raw close at p; shown for orientation only; assumes a multiplicative dividend adjustment whose method is unverified (v2.0 R1 Q4); not evidence under v2.0.3",
+        "interval_half_width_rel": 0.0008343956613168779
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection at the event session",
+          "result": "UNRESOLVED",
+          "detail": "1 lies inside [rho_min, rho_max]: no detected change -> event unconfirmed (no precision exemption, v2.0.3)"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: identity-resolved",
+          "result": "PASS",
+          "detail": "assignments=[('NVDA', 'cusip')]"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: present once and identical in both payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: not duplicated",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_REJECTED precondition: same-provider evidence from a different (later) snapshot",
+          "result": "not available",
+          "detail": "only one Stage R snapshot exists; no later acquisition"
+        },
+        {
+          "check": "v2.0.3 item 4 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "limitations": [
+        "Preconditions above are mechanical facts; they do not select an outcome.",
+        "The adjusted series' dividend-adjustment method is not documented by the provider (v2.0 R1 Q4)."
+      ],
+      "admissible_decisions": {
+        "EVENT_RETAINED": "RESOLVED; provider record stays authoritative for TR/accounting; requires record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated, plus written reasoning (mechanically re-checked)",
+        "EVENT_REJECTED": "event excluded from TR/accounting; requires same-provider evidence from a different (later) snapshot that the record is erroneous",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-NVDA-2021-03-09-d80fa14c-6eb4-418f-b003-f5775322eba3",
+        "item_type": "UNCONFIRMED_EVENT",
+        "item_key": {
+          "entity": "NVDA",
+          "ex_date": "2021-03-09",
+          "ca_id": "d80fa14c-6eb4-418f-b003-f5775322eba3"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=d80fa14c-6eb4-418f-b003-f5775322eba3",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "cash_dividends record id=d80fa14c-6eb4-418f-b003-f5775322eba3",
+            "relevance": "provider dividend record",
+            "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=d80fa14c-6eb4-418f-b003-f5775322eba3",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "same record, data_quality=all payload",
+            "relevance": "payload consistency",
+            "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2021-03-08..2021-03-09",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2021-03-08 and 2021-03-09, column close",
+            "relevance": "raw closes",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2021-03-08..2021-03-09",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+            "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2021-03-08 and 2021-03-09, column close",
+            "relevance": "adjusted closes and displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    },
+    {
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2021-06-09",
+        "ca_id": "d1a013e0-aea6-46ec-b844-d7a546ace337"
+      },
+      "item_key_str": "UNCONFIRMED_EVENT|entity=NVDA|ex_date=2021-06-09|ca_id=d1a013e0-aea6-46ec-b844-d7a546ace337",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2021-06-08",
+        "k_session": "2021-06-09",
+        "raw_close": {
+          "p": 698.28,
+          "k": 694.33
+        },
+        "adjusted_close": {
+          "p": 17.37,
+          "k": 17.28
+        },
+        "displayed_decimals_adjusted": {
+          "p": 2,
+          "k": 2
+        },
+        "displayed_decimals_raw": {
+          "p": 2,
+          "k": 2
+        },
+        "delta": {
+          "p": 0.005,
+          "k": 0.005
+        },
+        "f": {
+          "p": 40.20034542314335,
+          "k": 40.18113425925926
+        },
+        "rho": 0.9995221144574289,
+        "abs_rho_minus_1": 0.0004778855425711104,
+        "rho_min": 0.9989453527108697,
+        "rho_max": 1.0000992100747532,
+        "one_inside_interval": true,
+        "change_detected_v2_0_3": false,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "event_type": "cash_dividend",
+        "corporate_action_record": {
+          "ca_type": "cash_dividends",
+          "cusip": "67066G104",
+          "event_date": "2021-06-09",
+          "ex_date": "2021-06-09",
+          "foreign": false,
+          "id": "d1a013e0-aea6-46ec-b844-d7a546ace337",
+          "payable_date": "2021-07-01",
+          "process_date": "2021-07-01",
+          "rate": 0.16,
+          "record_date": "2021-06-10",
+          "special": false,
+          "symbol": "NVDA"
+        },
+        "record_canonical_sha256": "1e1f26580da09d13cc06a13fb6919f79672d6476e503f7afbd7e5d2fe9948f6f",
+        "rate": 0.16,
+        "cusip": "67066G104",
+        "special": false,
+        "foreign": false,
+        "ex_date": "2021-06-09",
+        "record_date": "2021-06-10",
+        "payable_date": "2021-07-01",
+        "process_date": "2021-07-01",
+        "present_in_complete": 1,
+        "present_in_all": 1,
+        "identical_in_both_payloads": true,
+        "identity_assignment": [
+          {
+            "ca_type": "cash_dividends",
+            "entity": "NVDA",
+            "event_date": "2021-06-09",
+            "id": "d1a013e0-aea6-46ec-b844-d7a546ace337",
+            "match": "cusip",
+            "role": "subject"
+          }
+        ],
+        "duplicate_groups_containing_record": [],
+        "events_with_same_entity_type_ex_date": 1,
+        "reference_quantity_rate_over_raw_close_p": 0.00022913444463538982,
+        "reference_quantity_note": "rate / raw close at p; shown for orientation only; assumes a multiplicative dividend adjustment whose method is unverified (v2.0 R1 Q4); not evidence under v2.0.3",
+        "interval_half_width_rel": 0.0005769286819417574
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection at the event session",
+          "result": "UNRESOLVED",
+          "detail": "1 lies inside [rho_min, rho_max]: no detected change -> event unconfirmed (no precision exemption, v2.0.3)"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: identity-resolved",
+          "result": "PASS",
+          "detail": "assignments=[('NVDA', 'cusip')]"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: present once and identical in both payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: not duplicated",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_REJECTED precondition: same-provider evidence from a different (later) snapshot",
+          "result": "not available",
+          "detail": "only one Stage R snapshot exists; no later acquisition"
+        },
+        {
+          "check": "v2.0.3 item 4 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "limitations": [
+        "Preconditions above are mechanical facts; they do not select an outcome.",
+        "The adjusted series' dividend-adjustment method is not documented by the provider (v2.0 R1 Q4)."
+      ],
+      "admissible_decisions": {
+        "EVENT_RETAINED": "RESOLVED; provider record stays authoritative for TR/accounting; requires record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated, plus written reasoning (mechanically re-checked)",
+        "EVENT_REJECTED": "event excluded from TR/accounting; requires same-provider evidence from a different (later) snapshot that the record is erroneous",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-NVDA-2021-06-09-d1a013e0-aea6-46ec-b844-d7a546ace337",
+        "item_type": "UNCONFIRMED_EVENT",
+        "item_key": {
+          "entity": "NVDA",
+          "ex_date": "2021-06-09",
+          "ca_id": "d1a013e0-aea6-46ec-b844-d7a546ace337"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=d1a013e0-aea6-46ec-b844-d7a546ace337",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "cash_dividends record id=d1a013e0-aea6-46ec-b844-d7a546ace337",
+            "relevance": "provider dividend record",
+            "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=d1a013e0-aea6-46ec-b844-d7a546ace337",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "same record, data_quality=all payload",
+            "relevance": "payload consistency",
+            "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2021-06-08..2021-06-09",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2021-06-08 and 2021-06-09, column close",
+            "relevance": "raw closes",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2021-06-08..2021-06-09",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+            "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2021-06-08 and 2021-06-09, column close",
+            "relevance": "adjusted closes and displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    },
+    {
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2021-12-01",
+        "ca_id": "ef9b148b-f031-4c05-8faf-4814f099b11d"
+      },
+      "item_key_str": "UNCONFIRMED_EVENT|entity=NVDA|ex_date=2021-12-01|ca_id=ef9b148b-f031-4c05-8faf-4814f099b11d",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2021-11-30",
+        "k_session": "2021-12-01",
+        "raw_close": {
+          "p": 326.76,
+          "k": 314.35
+        },
+        "adjusted_close": {
+          "p": 32.53,
+          "k": 31.3
+        },
+        "displayed_decimals_adjusted": {
+          "p": 2,
+          "k": 1
+        },
+        "displayed_decimals_raw": {
+          "p": 2,
+          "k": 2
+        },
+        "delta": {
+          "p": 0.005,
+          "k": 0.005
+        },
+        "f": {
+          "p": 10.044881647709806,
+          "k": 10.043130990415335
+        },
+        "rho": 0.999825716483691,
+        "abs_rho_minus_1": 0.00017428351630899286,
+        "rho_min": 0.9995123724856566,
+        "rho_max": 1.0001391606076235,
+        "one_inside_interval": true,
+        "change_detected_v2_0_3": false,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "event_type": "cash_dividend",
+        "corporate_action_record": {
+          "ca_type": "cash_dividends",
+          "cusip": "67066G104",
+          "event_date": "2021-12-01",
+          "ex_date": "2021-12-01",
+          "foreign": false,
+          "id": "ef9b148b-f031-4c05-8faf-4814f099b11d",
+          "payable_date": "2021-12-23",
+          "process_date": "2021-12-23",
+          "rate": 0.04,
+          "record_date": "2021-12-02",
+          "special": false,
+          "symbol": "NVDA"
+        },
+        "record_canonical_sha256": "a804b8d7618ec03f9e6fdbeee37ceebbe5e2bd197b826c16fed686bda4401077",
+        "rate": 0.04,
+        "cusip": "67066G104",
+        "special": false,
+        "foreign": false,
+        "ex_date": "2021-12-01",
+        "record_date": "2021-12-02",
+        "payable_date": "2021-12-23",
+        "process_date": "2021-12-23",
+        "present_in_complete": 1,
+        "present_in_all": 1,
+        "identical_in_both_payloads": true,
+        "identity_assignment": [
+          {
+            "ca_type": "cash_dividends",
+            "entity": "NVDA",
+            "event_date": "2021-12-01",
+            "id": "ef9b148b-f031-4c05-8faf-4814f099b11d",
+            "match": "cusip",
+            "role": "subject"
+          }
+        ],
+        "duplicate_groups_containing_record": [],
+        "events_with_same_entity_type_ex_date": 1,
+        "reference_quantity_rate_over_raw_close_p": 0.00012241400416207614,
+        "reference_quantity_note": "rate / raw close at p; shown for orientation only; assumes a multiplicative dividend adjustment whose method is unverified (v2.0 R1 Q4); not evidence under v2.0.3",
+        "interval_half_width_rel": 0.0003133940609834629
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection at the event session",
+          "result": "UNRESOLVED",
+          "detail": "1 lies inside [rho_min, rho_max]: no detected change -> event unconfirmed (no precision exemption, v2.0.3)"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: identity-resolved",
+          "result": "PASS",
+          "detail": "assignments=[('NVDA', 'cusip')]"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: present once and identical in both payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: not duplicated",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_REJECTED precondition: same-provider evidence from a different (later) snapshot",
+          "result": "not available",
+          "detail": "only one Stage R snapshot exists; no later acquisition"
+        },
+        {
+          "check": "v2.0.3 item 4 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "limitations": [
+        "Preconditions above are mechanical facts; they do not select an outcome.",
+        "The adjusted series' dividend-adjustment method is not documented by the provider (v2.0 R1 Q4)."
+      ],
+      "admissible_decisions": {
+        "EVENT_RETAINED": "RESOLVED; provider record stays authoritative for TR/accounting; requires record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated, plus written reasoning (mechanically re-checked)",
+        "EVENT_REJECTED": "event excluded from TR/accounting; requires same-provider evidence from a different (later) snapshot that the record is erroneous",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-NVDA-2021-12-01-ef9b148b-f031-4c05-8faf-4814f099b11d",
+        "item_type": "UNCONFIRMED_EVENT",
+        "item_key": {
+          "entity": "NVDA",
+          "ex_date": "2021-12-01",
+          "ca_id": "ef9b148b-f031-4c05-8faf-4814f099b11d"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=ef9b148b-f031-4c05-8faf-4814f099b11d",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "cash_dividends record id=ef9b148b-f031-4c05-8faf-4814f099b11d",
+            "relevance": "provider dividend record",
+            "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=ef9b148b-f031-4c05-8faf-4814f099b11d",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "same record, data_quality=all payload",
+            "relevance": "payload consistency",
+            "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2021-11-30..2021-12-01",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2021-11-30 and 2021-12-01, column close",
+            "relevance": "raw closes",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2021-11-30..2021-12-01",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+            "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2021-11-30 and 2021-12-01, column close",
+            "relevance": "adjusted closes and displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    },
+    {
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2022-03-02",
+        "ca_id": "13ca6ae3-efe8-461a-af9c-fa2490d56d9c"
+      },
+      "item_key_str": "UNCONFIRMED_EVENT|entity=NVDA|ex_date=2022-03-02|ca_id=13ca6ae3-efe8-461a-af9c-fa2490d56d9c",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2022-03-01",
+        "k_session": "2022-03-02",
+        "raw_close": {
+          "p": 234.77,
+          "k": 242.2
+        },
+        "adjusted_close": {
+          "p": 23.38,
+          "k": 24.12
+        },
+        "displayed_decimals_adjusted": {
+          "p": 2,
+          "k": 2
+        },
+        "displayed_decimals_raw": {
+          "p": 2,
+          "k": 1
+        },
+        "delta": {
+          "p": 0.005,
+          "k": 0.005
+        },
+        "f": {
+          "p": 10.041488451668092,
+          "k": 10.041459369817577
+        },
+        "rho": 0.9999971038307064,
+        "abs_rho_minus_1": 2.896169293609141e-06,
+        "rho_min": 0.9995760374887911,
+        "rho_max": 1.000418344780269,
+        "one_inside_interval": true,
+        "change_detected_v2_0_3": false,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "event_type": "cash_dividend",
+        "corporate_action_record": {
+          "ca_type": "cash_dividends",
+          "cusip": "67066G104",
+          "event_date": "2022-03-02",
+          "ex_date": "2022-03-02",
+          "foreign": false,
+          "id": "13ca6ae3-efe8-461a-af9c-fa2490d56d9c",
+          "payable_date": "2022-03-24",
+          "process_date": "2022-03-24",
+          "rate": 0.04,
+          "record_date": "2022-03-03",
+          "special": false,
+          "symbol": "NVDA"
+        },
+        "record_canonical_sha256": "54d52a35f90ecab3c3dbe54ce0d1c0163bf61677b66f4162c001e1b01dcd7cc5",
+        "rate": 0.04,
+        "cusip": "67066G104",
+        "special": false,
+        "foreign": false,
+        "ex_date": "2022-03-02",
+        "record_date": "2022-03-03",
+        "payable_date": "2022-03-24",
+        "process_date": "2022-03-24",
+        "present_in_complete": 1,
+        "present_in_all": 1,
+        "identical_in_both_payloads": true,
+        "identity_assignment": [
+          {
+            "ca_type": "cash_dividends",
+            "entity": "NVDA",
+            "event_date": "2022-03-02",
+            "id": "13ca6ae3-efe8-461a-af9c-fa2490d56d9c",
+            "match": "cusip",
+            "role": "subject"
+          }
+        ],
+        "duplicate_groups_containing_record": [],
+        "events_with_same_entity_type_ex_date": 1,
+        "reference_quantity_rate_over_raw_close_p": 0.00017037952038165011,
+        "reference_quantity_note": "rate / raw close at p; shown for orientation only; assumes a multiplicative dividend adjustment whose method is unverified (v2.0 R1 Q4); not evidence under v2.0.3",
+        "interval_half_width_rel": 0.00042115364573896974
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection at the event session",
+          "result": "UNRESOLVED",
+          "detail": "1 lies inside [rho_min, rho_max]: no detected change -> event unconfirmed (no precision exemption, v2.0.3)"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: identity-resolved",
+          "result": "PASS",
+          "detail": "assignments=[('NVDA', 'cusip')]"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: present once and identical in both payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: not duplicated",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_REJECTED precondition: same-provider evidence from a different (later) snapshot",
+          "result": "not available",
+          "detail": "only one Stage R snapshot exists; no later acquisition"
+        },
+        {
+          "check": "v2.0.3 item 4 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "limitations": [
+        "Preconditions above are mechanical facts; they do not select an outcome.",
+        "The adjusted series' dividend-adjustment method is not documented by the provider (v2.0 R1 Q4)."
+      ],
+      "admissible_decisions": {
+        "EVENT_RETAINED": "RESOLVED; provider record stays authoritative for TR/accounting; requires record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated, plus written reasoning (mechanically re-checked)",
+        "EVENT_REJECTED": "event excluded from TR/accounting; requires same-provider evidence from a different (later) snapshot that the record is erroneous",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-NVDA-2022-03-02-13ca6ae3-efe8-461a-af9c-fa2490d56d9c",
+        "item_type": "UNCONFIRMED_EVENT",
+        "item_key": {
+          "entity": "NVDA",
+          "ex_date": "2022-03-02",
+          "ca_id": "13ca6ae3-efe8-461a-af9c-fa2490d56d9c"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=13ca6ae3-efe8-461a-af9c-fa2490d56d9c",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "cash_dividends record id=13ca6ae3-efe8-461a-af9c-fa2490d56d9c",
+            "relevance": "provider dividend record",
+            "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=13ca6ae3-efe8-461a-af9c-fa2490d56d9c",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "same record, data_quality=all payload",
+            "relevance": "payload consistency",
+            "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2022-03-01..2022-03-02",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2022-03-01 and 2022-03-02, column close",
+            "relevance": "raw closes",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2022-03-01..2022-03-02",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+            "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2022-03-01 and 2022-03-02, column close",
+            "relevance": "adjusted closes and displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    },
+    {
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2022-06-08",
+        "ca_id": "4ac972c2-d010-4c59-9bc5-3804d580e957"
+      },
+      "item_key_str": "UNCONFIRMED_EVENT|entity=NVDA|ex_date=2022-06-08|ca_id=4ac972c2-d010-4c59-9bc5-3804d580e957",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2022-06-07",
+        "k_session": "2022-06-08",
+        "raw_close": {
+          "p": 189.26,
+          "k": 186.48
+        },
+        "adjusted_close": {
+          "p": 18.85,
+          "k": 18.58
+        },
+        "displayed_decimals_adjusted": {
+          "p": 2,
+          "k": 2
+        },
+        "displayed_decimals_raw": {
+          "p": 2,
+          "k": 2
+        },
+        "delta": {
+          "p": 0.005,
+          "k": 0.005
+        },
+        "f": {
+          "p": 10.040318302387266,
+          "k": 10.036598493003229
+        },
+        "rho": 0.9996295128030799,
+        "abs_rho_minus_1": 0.0003704871969201218,
+        "rho_min": 0.9990954959279409,
+        "rho_max": 1.00016381717048,
+        "one_inside_interval": true,
+        "change_detected_v2_0_3": false,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "event_type": "cash_dividend",
+        "corporate_action_record": {
+          "ca_type": "cash_dividends",
+          "cusip": "67066G104",
+          "event_date": "2022-06-08",
+          "ex_date": "2022-06-08",
+          "foreign": false,
+          "id": "4ac972c2-d010-4c59-9bc5-3804d580e957",
+          "payable_date": "2022-07-01",
+          "process_date": "2022-07-01",
+          "rate": 0.04,
+          "record_date": "2022-06-09",
+          "special": false,
+          "symbol": "NVDA"
+        },
+        "record_canonical_sha256": "e1185de4cf8f538771887032c24b14cf5f45434aa2f442d9b1ae26a48ec62382",
+        "rate": 0.04,
+        "cusip": "67066G104",
+        "special": false,
+        "foreign": false,
+        "ex_date": "2022-06-08",
+        "record_date": "2022-06-09",
+        "payable_date": "2022-07-01",
+        "process_date": "2022-07-01",
+        "present_in_complete": 1,
+        "present_in_all": 1,
+        "identical_in_both_payloads": true,
+        "identity_assignment": [
+          {
+            "ca_type": "cash_dividends",
+            "entity": "NVDA",
+            "event_date": "2022-06-08",
+            "id": "4ac972c2-d010-4c59-9bc5-3804d580e957",
+            "match": "cusip",
+            "role": "subject"
+          }
+        ],
+        "duplicate_groups_containing_record": [],
+        "events_with_same_entity_type_ex_date": 1,
+        "reference_quantity_rate_over_raw_close_p": 0.0002113494663425975,
+        "reference_quantity_note": "rate / raw close at p; shown for orientation only; assumes a multiplicative dividend adjustment whose method is unverified (v2.0 R1 Q4); not evidence under v2.0.3",
+        "interval_half_width_rel": 0.0005341606212695971
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection at the event session",
+          "result": "UNRESOLVED",
+          "detail": "1 lies inside [rho_min, rho_max]: no detected change -> event unconfirmed (no precision exemption, v2.0.3)"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: identity-resolved",
+          "result": "PASS",
+          "detail": "assignments=[('NVDA', 'cusip')]"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: present once and identical in both payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: not duplicated",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_REJECTED precondition: same-provider evidence from a different (later) snapshot",
+          "result": "not available",
+          "detail": "only one Stage R snapshot exists; no later acquisition"
+        },
+        {
+          "check": "v2.0.3 item 4 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "limitations": [
+        "Preconditions above are mechanical facts; they do not select an outcome.",
+        "The adjusted series' dividend-adjustment method is not documented by the provider (v2.0 R1 Q4)."
+      ],
+      "admissible_decisions": {
+        "EVENT_RETAINED": "RESOLVED; provider record stays authoritative for TR/accounting; requires record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated, plus written reasoning (mechanically re-checked)",
+        "EVENT_REJECTED": "event excluded from TR/accounting; requires same-provider evidence from a different (later) snapshot that the record is erroneous",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-NVDA-2022-06-08-4ac972c2-d010-4c59-9bc5-3804d580e957",
+        "item_type": "UNCONFIRMED_EVENT",
+        "item_key": {
+          "entity": "NVDA",
+          "ex_date": "2022-06-08",
+          "ca_id": "4ac972c2-d010-4c59-9bc5-3804d580e957"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=4ac972c2-d010-4c59-9bc5-3804d580e957",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "cash_dividends record id=4ac972c2-d010-4c59-9bc5-3804d580e957",
+            "relevance": "provider dividend record",
+            "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=4ac972c2-d010-4c59-9bc5-3804d580e957",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "same record, data_quality=all payload",
+            "relevance": "payload consistency",
+            "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2022-06-07..2022-06-08",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2022-06-07 and 2022-06-08, column close",
+            "relevance": "raw closes",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2022-06-07..2022-06-08",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+            "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2022-06-07 and 2022-06-08, column close",
+            "relevance": "adjusted closes and displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    },
+    {
+      "item_type": "UNCONFIRMED_EVENT",
+      "item_key": {
+        "entity": "NVDA",
+        "ex_date": "2022-09-07",
+        "ca_id": "90e63976-7fbe-41e6-a747-98da5ec27d03"
+      },
+      "item_key_str": "UNCONFIRMED_EVENT|entity=NVDA|ex_date=2022-09-07|ca_id=90e63976-7fbe-41e6-a747-98da5ec27d03",
+      "status": "UNRESOLVED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "p_session": "2022-09-06",
+        "k_session": "2022-09-07",
+        "raw_close": {
+          "p": 134.65,
+          "k": 137.14
+        },
+        "adjusted_close": {
+          "p": 13.41,
+          "k": 13.66
+        },
+        "displayed_decimals_adjusted": {
+          "p": 2,
+          "k": 2
+        },
+        "displayed_decimals_raw": {
+          "p": 2,
+          "k": 2
+        },
+        "delta": {
+          "p": 0.005,
+          "k": 0.005
+        },
+        "f": {
+          "p": 10.041014168530948,
+          "k": 10.039531478770131
+        },
+        "rho": 0.9998523366528589,
+        "abs_rho_minus_1": 0.00014766334714111373,
+        "rho_min": 0.9991138277892201,
+        "rho_max": 1.0005913863505245,
+        "one_inside_interval": true,
+        "change_detected_v2_0_3": false,
+        "precision_degenerate": false,
+        "formula": "delta_x = 0.5*10^-max(d_x,2); rho_min = rho*(a_k/(a_k+delta_k))*((a_p-delta_p)/a_p); rho_max = rho*(a_k/(a_k-delta_k))*((a_p+delta_p)/a_p)",
+        "event_type": "cash_dividend",
+        "corporate_action_record": {
+          "ca_type": "cash_dividends",
+          "cusip": "67066G104",
+          "event_date": "2022-09-07",
+          "ex_date": "2022-09-07",
+          "foreign": false,
+          "id": "90e63976-7fbe-41e6-a747-98da5ec27d03",
+          "payable_date": "2022-09-29",
+          "process_date": "2022-09-29",
+          "rate": 0.04,
+          "record_date": "2022-09-08",
+          "special": false,
+          "symbol": "NVDA"
+        },
+        "record_canonical_sha256": "8b07f155aa71f450233c4cf67c6694ea51a601f4ff008ef4ee385d7c3efcdc41",
+        "rate": 0.04,
+        "cusip": "67066G104",
+        "special": false,
+        "foreign": false,
+        "ex_date": "2022-09-07",
+        "record_date": "2022-09-08",
+        "payable_date": "2022-09-29",
+        "process_date": "2022-09-29",
+        "present_in_complete": 1,
+        "present_in_all": 1,
+        "identical_in_both_payloads": true,
+        "identity_assignment": [
+          {
+            "ca_type": "cash_dividends",
+            "entity": "NVDA",
+            "event_date": "2022-09-07",
+            "id": "90e63976-7fbe-41e6-a747-98da5ec27d03",
+            "match": "cusip",
+            "role": "subject"
+          }
+        ],
+        "duplicate_groups_containing_record": [],
+        "events_with_same_entity_type_ex_date": 1,
+        "reference_quantity_rate_over_raw_close_p": 0.00029706646862235426,
+        "reference_quantity_note": "rate / raw close at p; shown for orientation only; assumes a multiplicative dividend adjustment whose method is unverified (v2.0 R1 Q4); not evidence under v2.0.3",
+        "interval_half_width_rel": 0.0007387792806521909
+      },
+      "mechanical_checks": [
+        {
+          "check": "v2.0.3 factor-change detection at the event session",
+          "result": "UNRESOLVED",
+          "detail": "1 lies inside [rho_min, rho_max]: no detected change -> event unconfirmed (no precision exemption, v2.0.3)"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: identity-resolved",
+          "result": "PASS",
+          "detail": "assignments=[('NVDA', 'cusip')]"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: present once and identical in both payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_RETAINED precondition: not duplicated",
+          "result": "PASS"
+        },
+        {
+          "check": "EVENT_REJECTED precondition: same-provider evidence from a different (later) snapshot",
+          "result": "not available",
+          "detail": "only one Stage R snapshot exists; no later acquisition"
+        },
+        {
+          "check": "v2.0.3 item 4 resolution",
+          "result": "UNRESOLVED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "limitations": [
+        "Preconditions above are mechanical facts; they do not select an outcome.",
+        "The adjusted series' dividend-adjustment method is not documented by the provider (v2.0 R1 Q4)."
+      ],
+      "admissible_decisions": {
+        "EVENT_RETAINED": "RESOLVED; provider record stays authoritative for TR/accounting; requires record identity-resolved, identical in both data_quality payloads, field-complete, not duplicated, plus written reasoning (mechanically re-checked)",
+        "EVENT_REJECTED": "event excluded from TR/accounting; requires same-provider evidence from a different (later) snapshot that the record is erroneous",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-NVDA-2022-09-07-90e63976-7fbe-41e6-a747-98da5ec27d03",
+        "item_type": "UNCONFIRMED_EVENT",
+        "item_key": {
+          "entity": "NVDA",
+          "ex_date": "2022-09-07",
+          "ca_id": "90e63976-7fbe-41e6-a747-98da5ec27d03"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=90e63976-7fbe-41e6-a747-98da5ec27d03",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "cash_dividends record id=90e63976-7fbe-41e6-a747-98da5ec27d03",
+            "relevance": "provider dividend record",
+            "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=90e63976-7fbe-41e6-a747-98da5ec27d03",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "same record, data_quality=all payload",
+            "relevance": "payload consistency",
+            "supports_check": "EVENT_RETAINED precondition: identical in both payloads"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_raw/NVDA.parquet#session=2022-09-06..2022-09-07",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+            "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2022-09-06 and 2022-09-07, column close",
+            "relevance": "raw closes",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/bars_all/NVDA.parquet#session=2022-09-06..2022-09-07",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+            "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+            "content_scope": "rows session_date=2022-09-06 and 2022-09-07, column close",
+            "relevance": "adjusted closes and displayed precision",
+            "supports_check": "factor change detection (v2.0.3 item 1)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    }
+  ],
+  "supporting_artifacts": [
+    {
+      "artifact": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_3__stage_r_20261007T093410Z/crosscheck.json",
+      "sha256": "98f3efd0388bcf2f9226268e1e9f3fcd8b3ea0ef5051816e35d5e99a62c8ff59",
+      "hash_scope": "SHA-256 of the entire file",
+      "kind": "DAY-18D v2.0.3 evaluation output (not provider evidence)",
+      "relevance": "v2.0.3 cross-check for NVDA (unconfirmed_event_records, precision_histogram)"
+    },
+    {
+      "artifact": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_3__stage_r_20261007T093410Z/identity.json",
+      "sha256": "a775e3db846f88c6ce888d918114fc8c6c291f50d613ea4b5e94fe7981aa48c9",
+      "hash_scope": "SHA-256 of the entire file",
+      "kind": "DAY-18D v2.0.3 evaluation output (not provider evidence)",
+      "relevance": "identity assignments"
+    },
+    {
+      "artifact": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_3__stage_r_20261007T093410Z/events_normalised.json",
+      "sha256": "e89b9c4361ba668df070d38d9139ddadcca968bf74cf3d582226dcb1341ef0e3",
+      "hash_scope": "SHA-256 of the entire file",
+      "kind": "DAY-18D v2.0.3 evaluation output (not provider evidence)",
+      "relevance": "normalised events and duplicate checks"
+    }
+  ],
+  "symbol_precision_histogram": {
+    "0": 3,
+    "1": 63,
+    "2": 651,
+    "3": 966,
+    "4": 79
+  },
+  "date_discrepancy_note": "The DAY-18E brief listed 2020-03-02 and 2020-06-01; the committed DAY-18D report (and its v2.0.3 evaluation) lists 2018-05-23 and 2019-08-28 instead. Per the brief, the committed report governs; these ten events are used."
+}

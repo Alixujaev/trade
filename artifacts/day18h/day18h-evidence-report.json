@@ -1,0 +1,65 @@
+{
+  "task": "DAY-18H",
+  "status": "EVIDENCE_DOSSIER_COMPLETE",
+  "evaluation_scope": "INVESTIGATION_ONLY_NO_DECISION",
+  "notice": "Evidence investigation only. No protocol-owner decision has been made.",
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+  "source_snapshot": {
+    "id": "stage_r_20261007T093410Z",
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+    "files_count": 64,
+    "verified_unchanged": true
+  },
+  "items_investigated": [
+    {
+      "symbol": "AMZN",
+      "session": "2016-02-22",
+      "interval": [
+        "2016-02-19",
+        "2016-02-22"
+      ],
+      "observed_rho": 0.9996343835052438,
+      "float_interval": [
+        0.999268897657797,
+        0.9999999999999998
+      ],
+      "exact_interval": [
+        "0.9992688976577970070698277894",
+        "1.0000000000000000000000000000"
+      ],
+      "reconciliation_event": "20:1 forward split of 2022-06-06 applying factor 20.0",
+      "mathematical_reconciliation": "EXACT (rho_max = 1.0)",
+      "v203_precondition_satisfied": true,
+      "evidence_classification": "PROTOCOL_GAP",
+      "evidence_file": "artifacts/day18h/amzn-evidence.json"
+    },
+    {
+      "symbol": "NFLX",
+      "session": "2018-11-29",
+      "interval": [
+        "2018-11-28",
+        "2018-11-29"
+      ],
+      "observed_rho": 0.9996500032096312,
+      "float_interval": [
+        0.9993001275883086,
+        0.9999999999999999
+      ],
+      "exact_interval": [
+        "0.9993001275883084439624843151",
+        "1.0000000000000000000000000000"
+      ],
+      "reconciliation_event": "10:1 forward split of 2025-11-17 applying factor 10.0",
+      "mathematical_reconciliation": "EXACT (rho_max = 1.0)",
+      "v203_precondition_satisfied": true,
+      "evidence_classification": "PROTOCOL_GAP",
+      "evidence_file": "artifacts/day18h/nflx-evidence.json"
+    }
+  ],
+  "review_records_created": 0,
+  "review_records_modified": 0,
+  "protocol_files_modified": 0,
+  "production_code_modified": 0,
+  "stage_r_reevaluation_performed": false,
+  "next_task": "DAY-18I: protocol-owner review of the DAY-18H evidence dossier and final decision on AMZN 2016-02-22 and NFLX 2018-11-29."
+}

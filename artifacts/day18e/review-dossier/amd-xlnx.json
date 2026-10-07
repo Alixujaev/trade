@@ -1,0 +1,191 @@
+{
+  "DRAFT_ONLY": true,
+  "not_a_review_record": true,
+  "do_not_place_under": "artifacts/reviews/stage_r/",
+  "snapshot": {
+    "id": "stage_r_20261007T093410Z",
+    "path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd"
+  },
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+  "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+  "items": [
+    {
+      "item_type": "IDENTITY_UNVERIFIED",
+      "item_key": {
+        "entity": "AMD",
+        "event_date": "2022-02-14",
+        "ca_id": "15459aa5-b297-4e33-9624-c9d59b75ba46"
+      },
+      "item_key_str": "IDENTITY_UNVERIFIED|entity=AMD|event_date=2022-02-14|ca_id=15459aa5-b297-4e33-9624-c9d59b75ba46",
+      "status": "IDENTITY_UNVERIFIED (BLOCKING)",
+      "decision_statement": "Decision: intentionally blank - protocol owner decision required.",
+      "facts": {
+        "corporate_action_record": {
+          "acquiree_cusip": "983919101",
+          "acquiree_rate": 1,
+          "acquiree_symbol": "XLNX",
+          "acquirer_cusip": "007903107",
+          "acquirer_rate": 1.7234,
+          "acquirer_symbol": "AMD",
+          "ca_type": "stock_mergers",
+          "effective_date": "2022-02-14",
+          "event_date": "2022-02-14",
+          "id": "15459aa5-b297-4e33-9624-c9d59b75ba46",
+          "process_date": "2022-02-14"
+        },
+        "record_canonical_sha256": "700dd15a35a9d3b4041d4215562d42331dcf450aade09bcdf5c638b6c1ba6a30",
+        "record_identical_in_both_payloads": true,
+        "role_of_entity": "acquirer",
+        "ca_type": "stock_mergers",
+        "event_date": "2022-02-14",
+        "acquirer_symbol": "AMD",
+        "acquirer_cusip": "007903107",
+        "acquiree_symbol": "XLNX",
+        "acquiree_cusip": "983919101",
+        "asset_metadata": {
+          "class": "us_equity",
+          "cusip": null,
+          "exchange": "NASDAQ",
+          "name": "Advanced Micro Devices, Inc. Common Stock",
+          "status": "active",
+          "symbol": "AMD",
+          "tradable": true
+        },
+        "asset_cusip_is_null": true,
+        "v2_0_3_identity_anchor": null,
+        "v2_0_3_anchor_source": "none (no CUSIP-bearing split/dividend or name-change record)",
+        "v2_0_3_cusip_set": [],
+        "other_snapshot_records_with_acquirer_cusip": 0,
+        "all_snapshot_records_referencing_entity_acquiree_or_their_cusips": [
+          {
+            "payload": "complete",
+            "id": "15459aa5-b297-4e33-9624-c9d59b75ba46",
+            "ca_type": "stock_mergers",
+            "event_date": "2022-02-14",
+            "record": {
+              "acquiree_cusip": "983919101",
+              "acquiree_rate": 1,
+              "acquiree_symbol": "XLNX",
+              "acquirer_cusip": "007903107",
+              "acquirer_rate": 1.7234,
+              "acquirer_symbol": "AMD",
+              "ca_type": "stock_mergers",
+              "effective_date": "2022-02-14",
+              "event_date": "2022-02-14",
+              "id": "15459aa5-b297-4e33-9624-c9d59b75ba46",
+              "process_date": "2022-02-14"
+            },
+            "record_canonical_sha256": "700dd15a35a9d3b4041d4215562d42331dcf450aade09bcdf5c638b6c1ba6a30"
+          },
+          {
+            "payload": "all",
+            "id": "15459aa5-b297-4e33-9624-c9d59b75ba46",
+            "ca_type": "stock_mergers",
+            "event_date": "2022-02-14",
+            "record": {
+              "acquiree_cusip": "983919101",
+              "acquiree_rate": 1,
+              "acquiree_symbol": "XLNX",
+              "acquirer_cusip": "007903107",
+              "acquirer_rate": 1.7234,
+              "acquirer_symbol": "AMD",
+              "ca_type": "stock_mergers",
+              "effective_date": "2022-02-14",
+              "event_date": "2022-02-14",
+              "id": "15459aa5-b297-4e33-9624-c9d59b75ba46",
+              "process_date": "2022-02-14"
+            },
+            "record_canonical_sha256": "700dd15a35a9d3b4041d4215562d42331dcf450aade09bcdf5c638b6c1ba6a30"
+          }
+        ]
+      },
+      "mechanical_checks": [
+        {
+          "check": "same-provider CUSIP anchor for the entity (v2.0.1 C2 rule 3)",
+          "result": "IDENTITY_UNVERIFIED",
+          "detail": "anchor_source = 'none (no CUSIP-bearing split/dividend or name-change record)'; asset cusip null"
+        },
+        {
+          "check": "record present and identical in both data_quality payloads",
+          "result": "PASS"
+        },
+        {
+          "check": "v2.0.3 item 5 resolution",
+          "result": "IDENTITY_UNVERIFIED",
+          "detail": "no committed review record exists"
+        }
+      ],
+      "provider_evidence": "only the corporate-action record and the asset metadata entry above; the snapshot holds no other record carrying the acquirer CUSIP",
+      "limitations": [
+        "The snapshot provides no same-provider record that independently links the acquirer CUSIP to the entity ticker (asset cusip is null; no name-change or split record for the entity).",
+        "No regulatory filing was collected in DAY-18E (no network allowed). A filing would have to be retrieved and hashed by the protocol owner if used.",
+        "The snapshot does not by itself establish either outcome; economic continuity is not identity evidence (v2.0.3)."
+      ],
+      "admissible_decisions": {
+        "SAME_ENTITY": "record processed as the entity's frozen \u00a73.4 review item (acquirer-side merger RESOLVED iff role acquirer and no open unexplained change on that date); requires >=1 same-provider record or primary regulatory filing tying the record CUSIP to the issuer (URL, retrieved_utc, sha256)",
+        "DIFFERENT_ENTITY": "record excluded from the entity; same evidence requirement",
+        "UNRESOLVED": "item stays BLOCKING"
+      },
+      "supporting_artifacts": [
+        {
+          "artifact": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_3__stage_r_20261007T093410Z/identity.json",
+          "sha256": "a775e3db846f88c6ce888d918114fc8c6c291f50d613ea4b5e94fe7981aa48c9",
+          "hash_scope": "SHA-256 of the entire file",
+          "kind": "DAY-18D v2.0.3 evaluation output (not provider evidence)",
+          "relevance": "v2.0.3 identity resolution: anchors, CUSIP sets, identity_unverified_records"
+        }
+      ],
+      "record_template": {
+        "DRAFT_NOT_A_REVIEW_RECORD": true,
+        "record_id": "DRAFT-AMD-2022-02-14-15459aa5-b297-4e33-9624-c9d59b75ba46",
+        "item_type": "IDENTITY_UNVERIFIED",
+        "item_key": {
+          "entity": "AMD",
+          "event_date": "2022-02-14",
+          "ca_id": "15459aa5-b297-4e33-9624-c9d59b75ba46"
+        },
+        "source_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+        "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+        "evidence": [
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_complete.json#id=15459aa5-b297-4e33-9624-c9d59b75ba46",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+            "content_scope": "the stock_mergers record id=15459aa5-b297-4e33-9624-c9d59b75ba46",
+            "relevance": "provider record carrying acquirer/acquiree symbols and CUSIPs",
+            "supports_check": "identity evidence (C2 rule 3 / v2.0.3 item 5)"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/corporate_actions_all.json#id=15459aa5-b297-4e33-9624-c9d59b75ba46",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9",
+            "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+            "content_scope": "the same record in the data_quality=all payload",
+            "relevance": "shows the record content in the audit payload",
+            "supports_check": "identity evidence; payload consistency"
+          },
+          {
+            "type": "same_provider_record",
+            "reference": "snapshot:stage_r_20261007T093410Z/assets.json#symbol=AMD",
+            "retrieved_utc": "2026-10-07T09:34:10.222521+00:00",
+            "sha256": "7e939e4a5bbffd0256c8145a1f28b8cf543d78cc10c15907108509a0fe0de8df",
+            "hash_scope": "SHA-256 of the entire original file assets.json (unmodified bytes)",
+            "content_scope": "asset metadata entry for AMD",
+            "relevance": "provider asset metadata; its cusip field is the would-be same-provider anchor",
+            "supports_check": "anchor availability (C2 rule 3)"
+          }
+        ],
+        "decision": null,
+        "reasoning": null,
+        "reviewer": null,
+        "decided_utc": null,
+        "supersedes": null,
+        "note": "Draft only. record_id is draft-only and must be replaced by the protocol owner; this file must not be placed under artifacts/reviews/stage_r/."
+      }
+    }
+  ]
+}

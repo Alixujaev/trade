@@ -1,0 +1,150 @@
+{
+  "dossier_version": "DAY-18H",
+  "status": "EVIDENCE_INVESTIGATION_ONLY",
+  "notice": "Evidence investigation only. No protocol-owner decision has been made.",
+  "item_type": "UNEXPLAINED_CHANGE",
+  "item_key": {
+    "entity": "NFLX",
+    "session": "2018-11-29"
+  },
+  "sessions": {
+    "p": "2018-11-28",
+    "k": "2018-11-29"
+  },
+  "source_snapshot": {
+    "id": "stage_r_20261007T093410Z",
+    "path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd"
+  },
+  "mechanical_calculation": {
+    "raw_close": {
+      "p": 282.65,
+      "k": 288.75
+    },
+    "adjusted_close": {
+      "p": 28.26,
+      "k": 28.88
+    },
+    "displayed_decimals_raw": {
+      "p": 2,
+      "k": 2
+    },
+    "displayed_decimals_adjusted": {
+      "p": 2,
+      "k": 2
+    },
+    "delta": {
+      "p": 0.005,
+      "k": 0.005
+    },
+    "implied_factors": {
+      "f_p": 10.001769285208775,
+      "f_k": 9.998268698060942
+    },
+    "rho_observed": 0.9996500032096312,
+    "abs_rho_minus_1": 0.000349996790368845,
+    "interval_float": {
+      "rho_min": 0.9993001275883086,
+      "rho_max": 0.9999999999999999,
+      "one_inside_interval": false,
+      "float_ulp_discrepancy": -1.1102230246251565e-16
+    },
+    "interval_exact_decimal": {
+      "rho_min": "0.9993001275883084439624843151",
+      "rho_max": "1.0000000000000000000000000000",
+      "one_inside_interval": true
+    }
+  },
+  "provider_queries": {
+    "query_a": {
+      "description": "Daily bars adjustment=all",
+      "endpoint": "https://data.alpaca.markets/v2/stocks/bars",
+      "params": {
+        "symbols": "NFLX",
+        "timeframe": "1Day",
+        "start": "2016-01-04T05:00:00Z",
+        "end": "2022-12-30T05:00:00Z",
+        "adjustment": "all",
+        "feed": "sip",
+        "asof": "2026-10-07"
+      },
+      "status": 200,
+      "snapshot_file": "bars_all/NFLX.parquet",
+      "sha256": "fc4686b6ec0d56e3e5eb7536e793fb1918f014cc7a65d877ed27147f74b2878b"
+    },
+    "query_b": {
+      "description": "Daily bars adjustment=raw",
+      "endpoint": "https://data.alpaca.markets/v2/stocks/bars",
+      "params": {
+        "symbols": "NFLX",
+        "timeframe": "1Day",
+        "start": "2016-01-04T05:00:00Z",
+        "end": "2022-12-30T05:00:00Z",
+        "adjustment": "raw",
+        "feed": "sip",
+        "asof": "2026-10-07"
+      },
+      "status": 200,
+      "snapshot_file": "bars_raw/NFLX.parquet",
+      "sha256": "6e7d2dd65dc556626d40e0429f2b7517980bdba30a2ab8dc91bc1cca8fb34c3c"
+    },
+    "corporate_actions_complete": {
+      "endpoint": "https://data.alpaca.markets/v1/corporate-actions",
+      "data_quality": "complete",
+      "records_in_interval": 0,
+      "snapshot_file": "corporate_actions_complete.json",
+      "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9"
+    },
+    "corporate_actions_all": {
+      "endpoint": "https://data.alpaca.markets/v1/corporate-actions",
+      "data_quality": "all",
+      "records_in_interval": 0,
+      "snapshot_file": "corporate_actions_all.json",
+      "sha256": "268b3a2c2ea8b4164e6e4488a06680fdf8dd7ab56e8e0be0ad5700e80d0ed8e9"
+    }
+  },
+  "corporate_actions_in_stage_r": [],
+  "external_authoritative_evidence": [
+    {
+      "source": "SEC EDGAR Form 4",
+      "url": "https://www.sec.gov/Archives/edgar/data/1065280/000106528018000592/0001065280-18-000592.txt",
+      "filing_date": "2018-11-26",
+      "retrieved_utc": "2026-10-07T13:55:45Z",
+      "bytes": 31902,
+      "sha256": "835253584f6fa1b3b2c0b39c54d2553286158b47e5a53c7602210da975bdeb65",
+      "proposition": "Officer insider stock option exercise / sale; no dividend, split, or capital distribution."
+    },
+    {
+      "source": "SEC EDGAR Form 8-K",
+      "url": "https://www.sec.gov/Archives/edgar/data/1065280/000106528018000619/0001065280-18-000619.txt",
+      "filing_date": "2018-12-28",
+      "retrieved_utc": "2026-10-07T13:55:45Z",
+      "bytes": 34326,
+      "sha256": "0f787f5698de8aa6a937ee80d45dcc21903f9bbe8cc86b07364bff59ac3e2455",
+      "proposition": "Item 5.02 Executive compensation / salary allocations; no dividend, split, or capital adjustment."
+    }
+  ],
+  "cross_vendor_diagnostic": {
+    "source": "Yahoo Finance (DIAGNOSTIC ONLY)",
+    "prices": {
+      "2018-11-28": 28.265,
+      "2018-11-29": 28.875
+    },
+    "implication": "Confirms exact 10:1 pre-split unrounded values ending in .005."
+  },
+  "mathematical_reconciliation": {
+    "candidate_event": "10:1 forward split of 2025-11-17 applying constant factor 10.0 to pre-split closes as-of 2026-10-07",
+    "rho_candidate": 1.0,
+    "exact_unrounded_adjusted_p": 28.265,
+    "exact_unrounded_adjusted_k": 28.875,
+    "stored_rounded_p": 28.26,
+    "stored_rounded_k": 28.88,
+    "rounding_rule_applied_by_provider": "round-half-to-even (IEEE 754)",
+    "exact_rho_max": 1.0,
+    "rho_observed_minus_candidate": -0.000349996790368845,
+    "reconciliation_status": "EXACT_UNDER_MATHEMATICAL_REAL_ARITHMETIC",
+    "detection_root_cause": "IMPLEMENTATION_NUMERICAL_ARTIFACT (IEEE 754 float epsilon error on rho_max)"
+  },
+  "evidence_classification": "PROTOCOL_GAP",
+  "summary_statement": "The v2.0.3 mechanical precondition for PROVIDER_ADJUSTMENT_ARTIFACT (0 corporate actions in complete/all) is satisfied. However, provider data is not erroneous; raw and adjusted prices represent exact 10:1 split values rounded to 2 decimals. The anomaly is caused by IEEE 754 binary floating-point evaluation in crosscheck.py evaluating rho_max as 1.0 - 1.11e-16, triggering a false-positive factor change detection when mathematically 1.0 in [rho_min, rho_max]."
+}
