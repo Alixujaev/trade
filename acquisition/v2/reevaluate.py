@@ -1,6 +1,11 @@
-"""acquisition/v2/reevaluate.py: DAY-18B offline re-evaluation of an existing Stage R snapshot under v2.0.2.
+"""acquisition/v2/reevaluate.py: offline re-evaluation of an existing Stage R snapshot (DAY-18B v2.0.2, DAY-18D v2.0.3).
 
-    python -m acquisition.v2.reevaluate --snapshot <snapshot_dir> --expect-manifest-sha256 <sha256>
+    python -m acquisition.v2.reevaluate --snapshot <snapshot_dir> --expect-manifest-sha256 <sha256> [--protocol v2.0.3]
+
+v2.0.3 (default): per-value precision (v2.0.3 item 1) and committed review records (items 2-5) loaded read-only
+from artifacts/reviews/stage_r/ by acquisition/v2/review_records.py; output <stage_r_root>/reviews/v2_0_3__<id>/.
+Every other existing review-output directory is hashed before and after and must stay unchanged.
+v2.0.2: reproduces the DAY-18B evaluation semantics; output <stage_r_root>/reviews/v2_0_2__<id>/.
 
 - OFFLINE: no HTTP client is imported and socket connections are refused for the whole run.
 - The source snapshot is READ ONLY: every file is hashed before and after; the manifest's own SHA-256 must equal
@@ -31,12 +36,16 @@ from acquisition.snapshot import _write_readonly
 from acquisition.v2 import crosscheck as cc
 from acquisition.v2 import events as ev
 from acquisition.v2 import identity as idn
+from acquisition.v2 import review_records as rr
 from acquisition.v2 import reviews as rv
 from acquisition.v2 import validation as val
 from acquisition.v2.contract import (
-    AMENDMENT_002_COMMIT, AMENDMENT_002_FILES, AMENDMENT_COMMIT, AMENDMENT_FILES, CA_QUERY_ALIASES, EVENT_DATE_MAX,
-    FORBIDDEN_WRITE_ROOTS, FREEZE_COMMIT, PROTOCOL_FILES, PROTOCOL_VERSION, REVIEW_SCHEMA_VERSION, STAGE_R_ROOT,
+    AMENDMENT_002_COMMIT, AMENDMENT_002_FILES, AMENDMENT_003_COMMIT, AMENDMENT_003_FILES, AMENDMENT_COMMIT,
+    AMENDMENT_FILES, CA_QUERY_ALIASES, EVENT_DATE_MAX, FORBIDDEN_WRITE_ROOTS, FREEZE_COMMIT, PROTOCOL_FILES,
+    PROTOCOL_VERSION, REVIEW_RECORDS_DIR, REVIEW_SCHEMA_VERSION, STAGE_R_ROOT,
 )
+
+PROTOCOLS = ("v2.0.3", "v2.0.2")
 from acquisition.v2.sessions import session_of_label, stage_r_sessions
 
 
@@ -112,19 +121,26 @@ def _write_json_once(path: Path, obj: Any) -> str:
     return hashlib.sha256(payload).hexdigest()
 
 
-def output_dir_for(snap: Path, stage_r_root: Path = STAGE_R_ROOT) -> Path:
-    return Path(stage_r_root) / "reviews" / f"v2_0_2__{Path(snap).name}"
+def output_dir_for(snap: Path, stage_r_root: Path = STAGE_R_ROOT, protocol: str = "v2.0.3") -> Path:
+    if protocol not in PROTOCOLS:
+        raise ValueError(f"protocol must be one of {PROTOCOLS}")
+    return Path(stage_r_root) / "reviews" / f"{protocol.replace('.', '_')}__{Path(snap).name}"
 
 
 def _git(*args: str) -> str:
     return subprocess.run(["git", *args], cwd=ROOT_DIR, capture_output=True, text=True, check=True).stdout.strip()
 
 
-def protocol_chain() -> dict[str, Any]:
-    out: dict[str, Any] = {"version": PROTOCOL_VERSION, "commits": {"v2.0 R1": FREEZE_COMMIT, "v2.0.1": AMENDMENT_COMMIT,
-                                                                   "v2.0.2": AMENDMENT_002_COMMIT}, "files": {}}
-    for path, commit in ([(p, FREEZE_COMMIT) for p in PROTOCOL_FILES] + [(p, AMENDMENT_COMMIT) for p in AMENDMENT_FILES]
-                         + [(p, AMENDMENT_002_COMMIT) for p in AMENDMENT_002_FILES]):
+def protocol_chain(protocol: str = "v2.0.3") -> dict[str, Any]:
+    commits = {"v2.0 R1": FREEZE_COMMIT, "v2.0.1": AMENDMENT_COMMIT, "v2.0.2": AMENDMENT_002_COMMIT}
+    pairs = ([(p, FREEZE_COMMIT) for p in PROTOCOL_FILES] + [(p, AMENDMENT_COMMIT) for p in AMENDMENT_FILES]
+             + [(p, AMENDMENT_002_COMMIT) for p in AMENDMENT_002_FILES])
+    if protocol == "v2.0.3":
+        commits["v2.0.3"] = AMENDMENT_003_COMMIT
+        pairs += [(p, AMENDMENT_003_COMMIT) for p in AMENDMENT_003_FILES]
+    out: dict[str, Any] = {"version": PROTOCOL_VERSION if protocol == "v2.0.3" else "2.0 R1 + 2.0.1 + 2.0.2",
+                           "evaluated_under": protocol, "commits": commits, "files": {}}
+    for path, commit in pairs:
         blob = subprocess.run(["git", "show", f"{commit}:{path}"], cwd=ROOT_DIR, capture_output=True, check=True).stdout
         wt = ROOT_DIR / path
         out["files"][path] = {"commit": commit, "blob_sha256": hashlib.sha256(blob).hexdigest(),
@@ -150,16 +166,26 @@ def _load(snap: Path) -> tuple[dict[str, dict[str, pd.DataFrame]], dict[str, lis
     return frames, ca, run
 
 
+def _guard_trees(stage_r_root: Path, out_dir: Path) -> dict[str, dict[str, str]]:
+    """Hash every existing review-output directory except the one being written (must stay unchanged)."""
+    base = Path(stage_r_root) / "reviews"
+    if not base.is_dir():
+        return {}
+    return {d.name: hash_tree(d) for d in sorted(base.iterdir()) if d.is_dir() and d.resolve() != out_dir.resolve()}
+
+
 def reevaluate(snap: Path, *, expect_manifest_sha256: str, stage_r_root: Path = STAGE_R_ROOT,
-               provenance: dict[str, Any] | None = None) -> dict[str, Any]:
+               provenance: dict[str, Any] | None = None, protocol: str = "v2.0.3",
+               records_dir: Path = REVIEW_RECORDS_DIR, repo_root: Path = ROOT_DIR) -> dict[str, Any]:
     snap = Path(snap)
     pre = verify_snapshot(snap, expect_manifest_sha256)
-    out_dir = output_dir_for(snap, stage_r_root)
+    out_dir = output_dir_for(snap, stage_r_root, protocol)
     _check_location(out_dir)
     if out_dir.exists():
         raise FileExistsError(f"re-evaluation directory already exists (write-once): {out_dir}")
     if out_dir.resolve().is_relative_to(snap.resolve()):
         raise ImmutabilityError("output directory lies inside the source snapshot")
+    guard_before = _guard_trees(stage_r_root, out_dir)
 
     frames, ca, run = _load(snap)
     symbols = sorted(frames["raw"])
@@ -181,27 +207,41 @@ def reevaluate(snap: Path, *, expect_manifest_sha256: str, stage_r_root: Path = 
     validation = {"per_series": per_series, "raw_vs_all": raw_vs_all,
                   "status_counts": {st: sum(1 for v in per_series.values() if v["status"] == st)
                                     for st in ("OK", "BLOCKING", "HARD_FAIL")}}
-    crosscheck = cc.crosscheck_all(frames["raw"], frames["all"], normalised["events"], session_of_label)
+    crosscheck = cc.crosscheck_all(frames["raw"], frames["all"], normalised["events"], session_of_label,
+                                   precision_model=protocol)
     ca_counts = run.get("ca_counts", {})
+    inventory = None
+    if protocol == "v2.0.3":
+        dup_ids = {i for b in normalised["blocking"] if b.get("kind") == "duplicate_records" for i in b.get("ids", [])}
+        inventory = rr.load(records_dir, repo_root=repo_root, stage_r_root=Path(stage_r_root), snapshot_id=snap.name,
+                            snapshot_manifest_sha256=pre["manifest_sha256"],
+                            open_items=rv.open_items(crosscheck, identity), ca_payloads=ca, identity=identity,
+                            duplicate_ids=dup_ids)
     reviews = rv.classify(records=ca["complete"], identity=identity, normalised=normalised, quality=quality,
-                          crosscheck=crosscheck, validation=validation, ca_counts=ca_counts)
+                          crosscheck=crosscheck, validation=validation, ca_counts=ca_counts,
+                          review_inventory=inventory)
     leak = assert_no_leakage(identity, normalised, crosscheck, reviews, quality)
 
     files: dict[str, str] = {}
-    for name, obj in {"identity.json": identity, "events_normalised.json": normalised,
-                      "data_quality_comparison.json": quality, "validation.json": validation,
-                      "crosscheck.json": crosscheck, "reviews.json": reviews}.items():
+    outputs = {"identity.json": identity, "events_normalised.json": normalised,
+               "data_quality_comparison.json": quality, "validation.json": validation,
+               "crosscheck.json": crosscheck, "reviews.json": reviews}
+    if inventory is not None:
+        outputs["review_records.json"] = inventory
+    for name, obj in outputs.items():
         files[name] = _write_json_once(out_dir / name, obj)
 
     post = verify_snapshot(snap, expect_manifest_sha256)
-    unchanged = post["files"] == pre["files"]
+    guard_after = _guard_trees(stage_r_root, out_dir)
+    unchanged = post["files"] == pre["files"] and guard_after == guard_before
     final = ("INVALID_REVIEW" if not unchanged else "USABLE_FOR_RESEARCH" if reviews["usable_for_research"]
              else "BLOCKED")
     summary = {
         "symbols_evaluated": len(symbols),
         "crosscheck_ok": sorted(s for s, v in crosscheck["per_symbol"].items() if v["status"] == "OK"),
         "crosscheck_blocking": crosscheck["blocking_symbols"],
-        "per_symbol": {s: {k: v.get(k) for k in ("status", "d", "delta", "common_sessions", "detected_changes",
+        "per_symbol": {s: {k: v.get(k) for k in ("status", "precision_model", "precision_histogram", "d", "delta",
+                                                  "common_sessions", "pairs_evaluated", "detected_changes",
                                                   "expected_events", "matched_events")}
                        | {"unexplained_changes": len(v.get("unexplained_changes", [])),
                           "unconfirmed_events": len(v.get("unconfirmed_events", [])),
@@ -213,18 +253,24 @@ def reevaluate(snap: Path, *, expect_manifest_sha256: str, stage_r_root: Path = 
         "first_session_untestable": crosscheck["first_session_untestable"],
         "identity_counts": identity["counts"],
         "review_status_counts": reviews["status_counts"],
-        "blocking_items": [{k: i.get(k) for k in ("item", "entity", "event_date", "status", "reason")}
+        "review_category_counts": reviews.get("category_counts"),
+        "review_records": (None if inventory is None else
+                           {"files_found": inventory["files_found"], "applied": len(inventory["applied"]),
+                            "invalid": len(inventory["invalid"]), "agent_created_records": 0}),
+        "blocking_items": [{k: i.get(k) for k in ("item", "entity", "event_date", "status", "category", "reason")}
                            for i in reviews["items"] if i["status"] in ("BLOCKING", "HARD_FAIL")],
         "spy": {"crosscheck": {k: crosscheck["per_symbol"].get("SPY", {}).get(k) for k in
                                ("status", "d", "detected_changes", "expected_events", "matched_events")},
                 "status": ("RESOLVED" if crosscheck["per_symbol"].get("SPY", {}).get("status") == "OK" else "BLOCKING")},
     }
     evaluation = {
-        "schema_version": REVIEW_SCHEMA_VERSION, "protocol_chain": protocol_chain(),
+        "schema_version": REVIEW_SCHEMA_VERSION, "protocol_chain": protocol_chain(protocol),
         "source_snapshot": {"path": str(snap.relative_to(ROOT_DIR)).replace("\\", "/") if snap.resolve().is_relative_to(ROOT_DIR) else str(snap),
                             "manifest_sha256": pre["manifest_sha256"], "file_count": pre["file_count"],
                             "tree_sha256_before": pre["tree_sha256"], "tree_sha256_after": post["tree_sha256"],
                             "unchanged": unchanged},
+        "other_review_outputs_unchanged": guard_after == guard_before,
+        "other_review_outputs_checked": sorted(guard_before),
         "evaluated_utc": datetime.now(timezone.utc).isoformat(), "offline": True, "network_calls": 0,
         "provenance": provenance or {}, "leakage_dates_checked": leak, "output_files_sha256": files,
         "summary": summary, "final_status": final, "usable_for_research": final == "USABLE_FOR_RESEARCH",
@@ -234,7 +280,7 @@ def reevaluate(snap: Path, *, expect_manifest_sha256: str, stage_r_root: Path = 
                                                  "source_manifest_sha256": pre["manifest_sha256"],
                                                  "final_status": final})
     if not unchanged:
-        raise ImmutabilityError("source snapshot changed during re-evaluation")
+        raise ImmutabilityError("source snapshot or an existing review output changed during re-evaluation")
     return {"out_dir": str(out_dir), "evaluation": evaluation}
 
 
@@ -243,21 +289,26 @@ def _refuse_network(*_a: Any, **_k: Any) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="DAY-18B offline Stage R re-evaluation under v2.0.2")
+    ap = argparse.ArgumentParser(description="Offline Stage R re-evaluation (v2.0.3 default; v2.0.2 for reproduction)")
     ap.add_argument("--snapshot", required=True)
     ap.add_argument("--expect-manifest-sha256", required=True)
+    ap.add_argument("--protocol", choices=PROTOCOLS, default="v2.0.3")
     a = ap.parse_args(argv)
     socket.socket.connect = _refuse_network            # offline guard for the whole run
     snap = Path(a.snapshot)
     if not snap.is_absolute():
         snap = ROOT_DIR / snap
-    res = reevaluate(snap, expect_manifest_sha256=a.expect_manifest_sha256, provenance=code_identity())
+    res = reevaluate(snap, expect_manifest_sha256=a.expect_manifest_sha256, provenance=code_identity(),
+                     protocol=a.protocol)
     e = res["evaluation"]
     print(json.dumps({"out_dir": res["out_dir"], "final_status": e["final_status"],
                       "snapshot_unchanged": e["source_snapshot"]["unchanged"],
                       "file_count": e["source_snapshot"]["file_count"],
                       "crosscheck_ok": e["summary"]["crosscheck_ok"], "crosscheck_blocking": e["summary"]["crosscheck_blocking"],
                       "review_status_counts": e["summary"]["review_status_counts"],
+                      "review_category_counts": e["summary"]["review_category_counts"],
+                      "review_records": e["summary"]["review_records"],
+                      "other_review_outputs_unchanged": e["other_review_outputs_unchanged"],
                       "identity_counts": e["summary"]["identity_counts"], "spy": e["summary"]["spy"],
                       "first_session_untestable": e["summary"]["first_session_untestable"]}, indent=2))
     return 0

@@ -1,0 +1,648 @@
+{
+  "schema_version": "1.0",
+  "task": "DAY-18D",
+  "starting_head": "d26b36ef802cf0810952b2e5c4e8e19d908b4555",
+  "protocol_chain": {
+    "v2.0 R1": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+    "v2.0.1": "ed034b3e9500cc4d9b33625de7e1883f572cd5a4",
+    "v2.0.2": "0ebb6065f6e981e324220bae2abd2222800b2228",
+    "v2.0.3": "d26b36ef802cf0810952b2e5c4e8e19d908b4555"
+  },
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3",
+  "protocol_files_verified": 9,
+  "source_snapshot": {
+    "path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+    "file_count": 64,
+    "unchanged": true,
+    "independent_sha256_check": "PASS (64/64)"
+  },
+  "v2_0_2_review_output_unchanged": {
+    "by_run": true,
+    "independent_sha256_check": "PASS (8/8)"
+  },
+  "review_output": {
+    "path": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_3__stage_r_20261007T093410Z",
+    "evaluation_sha256": "c0a0f240da77aec83798cc402689ce5b149ce6e6df6b9eceac3eb6ba18dd85b7",
+    "manifest_sha256": "8999961a059c73c5dbacd33f127a57092019e3a33ed1938108ee2fc81c4dabed",
+    "review_records_sha256": "140f7df96e5ed2142fbca0f4bf876815c603bbb191d8d44692b358f3fb1055f6"
+  },
+  "evaluated_utc": "2026-10-07T10:56:37.535264+00:00",
+  "offline": true,
+  "network_calls": 0,
+  "leakage_dates_checked": 1513,
+  "precision_rule": {
+    "status": "FROZEN (v2.0.3 item 1)",
+    "delta_k": "0.5*10^-max(d_k,2)",
+    "changed_after_results": false
+  },
+  "review_records": {
+    "directory_exists": false,
+    "present": 0,
+    "applied": 0,
+    "invalid": 0,
+    "agent_created": 0,
+    "agent_decisions": 0
+  },
+  "per_symbol": {
+    "AAPL": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 9,
+        "1": 168,
+        "2": 1585
+      },
+      "pairs": 1761,
+      "detected": 29,
+      "expected_events": 29,
+      "matched": 29,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [
+        true
+      ],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "ADBE": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 29,
+        "1": 196,
+        "2": 1534,
+        "3": 3
+      },
+      "pairs": 1761,
+      "detected": 0,
+      "expected_events": 0,
+      "matched": 0,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "AMAT": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 23,
+        "1": 170,
+        "2": 1569
+      },
+      "pairs": 1761,
+      "detected": 28,
+      "expected_events": 28,
+      "matched": 28,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "AMD": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 21,
+        "1": 179,
+        "2": 1529,
+        "3": 27,
+        "4": 6
+      },
+      "pairs": 1761,
+      "detected": 0,
+      "expected_events": 0,
+      "matched": 0,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "AMZN": {
+      "status": "BLOCKING",
+      "precision_histogram": {
+        "0": 29,
+        "1": 189,
+        "2": 1544
+      },
+      "pairs": 1761,
+      "detected": 2,
+      "expected_events": 1,
+      "matched": 1,
+      "unexplained": 1,
+      "unconfirmed": 0,
+      "split_checks": [
+        true
+      ],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "AVGO": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 18,
+        "1": 151,
+        "2": 1573,
+        "3": 20
+      },
+      "pairs": 1761,
+      "detected": 28,
+      "expected_events": 28,
+      "matched": 28,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "COST": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 16,
+        "1": 141,
+        "2": 1605
+      },
+      "pairs": 1761,
+      "detected": 30,
+      "expected_events": 30,
+      "matched": 30,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "CRM": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 14,
+        "1": 167,
+        "2": 1581
+      },
+      "pairs": 1761,
+      "detected": 0,
+      "expected_events": 0,
+      "matched": 0,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "CSCO": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 13,
+        "1": 159,
+        "2": 1590
+      },
+      "pairs": 1761,
+      "detected": 27,
+      "expected_events": 27,
+      "matched": 27,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 1
+    },
+    "GOOGL": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 17,
+        "1": 142,
+        "2": 1603
+      },
+      "pairs": 1761,
+      "detected": 1,
+      "expected_events": 1,
+      "matched": 1,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [
+        true
+      ],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "INTC": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 25,
+        "1": 136,
+        "2": 1601
+      },
+      "pairs": 1761,
+      "detected": 28,
+      "expected_events": 28,
+      "matched": 28,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "JNJ": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 19,
+        "1": 178,
+        "2": 1565
+      },
+      "pairs": 1761,
+      "detected": 28,
+      "expected_events": 28,
+      "matched": 28,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "JPM": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 21,
+        "1": 163,
+        "2": 1578
+      },
+      "pairs": 1761,
+      "detected": 27,
+      "expected_events": 27,
+      "matched": 27,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 1
+    },
+    "KO": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 13,
+        "1": 166,
+        "2": 1583
+      },
+      "pairs": 1761,
+      "detected": 28,
+      "expected_events": 28,
+      "matched": 28,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "META": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 14,
+        "1": 152,
+        "2": 1596
+      },
+      "pairs": 1761,
+      "detected": 0,
+      "expected_events": 0,
+      "matched": 0,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "MSFT": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 22,
+        "1": 146,
+        "2": 1594
+      },
+      "pairs": 1761,
+      "detected": 28,
+      "expected_events": 28,
+      "matched": 28,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "MU": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 20,
+        "1": 162,
+        "2": 1565,
+        "3": 15
+      },
+      "pairs": 1761,
+      "detected": 6,
+      "expected_events": 6,
+      "matched": 6,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "NFLX": {
+      "status": "BLOCKING",
+      "precision_histogram": {
+        "0": 23,
+        "1": 146,
+        "2": 1456,
+        "3": 137
+      },
+      "pairs": 1761,
+      "detected": 1,
+      "expected_events": 0,
+      "matched": 0,
+      "unexplained": 1,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "NVDA": {
+      "status": "BLOCKING",
+      "precision_histogram": {
+        "0": 3,
+        "1": 63,
+        "2": 651,
+        "3": 966,
+        "4": 79
+      },
+      "pairs": 1761,
+      "detected": 19,
+      "expected_events": 29,
+      "matched": 19,
+      "unexplained": 0,
+      "unconfirmed": 10,
+      "split_checks": [
+        true
+      ],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "ORCL": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 15,
+        "1": 147,
+        "2": 1600
+      },
+      "pairs": 1761,
+      "detected": 27,
+      "expected_events": 27,
+      "matched": 27,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 1
+    },
+    "PEP": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 12,
+        "1": 170,
+        "2": 1580
+      },
+      "pairs": 1761,
+      "detected": 28,
+      "expected_events": 28,
+      "matched": 28,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "QCOM": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 17,
+        "1": 150,
+        "2": 1595
+      },
+      "pairs": 1761,
+      "detected": 29,
+      "expected_events": 29,
+      "matched": 29,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "SPY": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 18,
+        "1": 144,
+        "2": 1600
+      },
+      "pairs": 1761,
+      "detected": 26,
+      "expected_events": 26,
+      "matched": 26,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "TSLA": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 30,
+        "1": 160,
+        "2": 1568,
+        "3": 4
+      },
+      "pairs": 1761,
+      "detected": 2,
+      "expected_events": 2,
+      "matched": 2,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [
+        true,
+        true
+      ],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "WMT": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 20,
+        "1": 172,
+        "2": 1570
+      },
+      "pairs": 1761,
+      "detected": 28,
+      "expected_events": 28,
+      "matched": 28,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    },
+    "XOM": {
+      "status": "PASS",
+      "precision_histogram": {
+        "0": 23,
+        "1": 176,
+        "2": 1563
+      },
+      "pairs": 1761,
+      "detected": 28,
+      "expected_events": 28,
+      "matched": 28,
+      "unexplained": 0,
+      "unconfirmed": 0,
+      "split_checks": [],
+      "degenerate": 0,
+      "first_session_untestable": 0
+    }
+  },
+  "unexplained_dates": {
+    "AMZN": [
+      "2016-02-22"
+    ],
+    "NFLX": [
+      "2018-11-29"
+    ]
+  },
+  "unconfirmed_event_dates": {
+    "NVDA": [
+      "2018-05-23",
+      "2019-08-28",
+      "2020-09-01",
+      "2020-12-03",
+      "2021-03-09",
+      "2021-06-09",
+      "2021-12-01",
+      "2022-03-02",
+      "2022-06-08",
+      "2022-09-07"
+    ]
+  },
+  "crosscheck_pass": [
+    "AAPL",
+    "ADBE",
+    "AMAT",
+    "AMD",
+    "AVGO",
+    "COST",
+    "CRM",
+    "CSCO",
+    "GOOGL",
+    "INTC",
+    "JNJ",
+    "JPM",
+    "KO",
+    "META",
+    "MSFT",
+    "MU",
+    "ORCL",
+    "PEP",
+    "QCOM",
+    "SPY",
+    "TSLA",
+    "WMT",
+    "XOM"
+  ],
+  "crosscheck_blocking": [
+    "AMZN",
+    "NFLX",
+    "NVDA"
+  ],
+  "first_session_untestable": [
+    "CSCO cash_dividend 2016-01-04",
+    "JPM cash_dividend 2016-01-04",
+    "ORCL cash_dividend 2016-01-04"
+  ],
+  "identity": {
+    "assigned": 493,
+    "assigned_by_cusip": 209,
+    "assigned_ticker_only": 284,
+    "conflicts": 0,
+    "foreign": 1,
+    "identity_unverified": 2,
+    "records": 496,
+    "unassigned": 0
+  },
+  "identity_unverified": [
+    "stock_and_cash_merger CRM<-WORK 2021-07-21 (BLOCKING)",
+    "stock_merger AMD<-XLNX 2022-02-14 (BLOCKING)"
+  ],
+  "resolved_items": [
+    "cash_mergers MSFT<-NUAN",
+    "cash_mergers CSCO<-ACIA",
+    "cash_mergers NVDA<-MLNX",
+    "name_change FB->META",
+    "foreign-entity name_changes META->METV"
+  ],
+  "spy": {
+    "status": "PASS",
+    "detected_changes": 26,
+    "expected_events": 26,
+    "matched_events": 26,
+    "unexplained_changes": 0,
+    "unconfirmed_events": 0
+  },
+  "review_status_counts": {
+    "BLOCKING": 14,
+    "FIRST_SESSION_UNTESTABLE": 3,
+    "HARD_FAIL": 0,
+    "RESOLVED": 4,
+    "RESOLVED_EXCLUDED": 1
+  },
+  "review_category_counts": {
+    "BLOCKING": 0,
+    "FIRST_SESSION_UNTESTABLE": 3,
+    "IDENTITY_UNVERIFIED": 2,
+    "PASS": 5,
+    "UNRESOLVED": 12
+  },
+  "blocker_inventory": {
+    "IDENTITY_UNVERIFIED": 2,
+    "UNRESOLVED_UNEXPLAINED_CHANGE": 2,
+    "UNRESOLVED_UNCONFIRMED_EVENT": 10,
+    "BLOCKING_OTHER": 0,
+    "total": 14
+  },
+  "blocking_items": [
+    "identity-unverified stock_mergers AMD<-XLNX",
+    "identity-unverified stock_and_cash_mergers CRM<-WORK",
+    "unexplained-change AMZN 2016-02-22",
+    "unexplained-change NFLX 2018-11-29",
+    "unconfirmed-event NVDA cash_dividend 2018-05-23",
+    "unconfirmed-event NVDA cash_dividend 2019-08-28",
+    "unconfirmed-event NVDA cash_dividend 2020-09-01",
+    "unconfirmed-event NVDA cash_dividend 2020-12-03",
+    "unconfirmed-event NVDA cash_dividend 2021-03-09",
+    "unconfirmed-event NVDA cash_dividend 2021-06-09",
+    "unconfirmed-event NVDA cash_dividend 2021-12-01",
+    "unconfirmed-event NVDA cash_dividend 2022-03-02",
+    "unconfirmed-event NVDA cash_dividend 2022-06-08",
+    "unconfirmed-event NVDA cash_dividend 2022-09-07"
+  ],
+  "comparison_with_v2_0_2": {
+    "AVGO": "BLOCKING(1400 unexplained) -> PASS",
+    "MU": "BLOCKING(1423) -> PASS",
+    "TSLA": "BLOCKING(1283) -> PASS",
+    "NFLX": "BLOCKING(1315) -> BLOCKING(1 unexplained 2018-11-29)",
+    "NVDA": "BLOCKING(1435 unexplained + 1 unconfirmed) -> BLOCKING(0 unexplained, 10 unconfirmed)",
+    "AMZN": "BLOCKING(1 unexplained 2016-02-22) -> unchanged"
+  },
+  "final_status": "BLOCKED",
+  "usable_for_research": false,
+  "tests": {
+    "focused": "66 passed (28 DAY-18D + 15 DAY-18B + 23 DAY-18)",
+    "full_suite": "1249 passed, 0 failed"
+  }
+}

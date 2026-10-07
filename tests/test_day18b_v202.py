@@ -52,7 +52,7 @@ def test_rounding_alone_detects_nothing_but_old_fixed_rule_would():
     adj = np.round(raw * 0.987654321, 2)
     f = raw / adj
     assert (np.abs(f[1:] / f[:-1] - 1) > 1e-6).sum() > 100          # the retired 1e-6 rule flags noise
-    r = cc.crosscheck_symbol(series(raw), series(adj), [])
+    r = cc.crosscheck_symbol(series(raw), series(adj), [], precision_model="v2.0.2")   # DAY-18D: pin v2.0.2 model
     assert r["status"] == "OK" and r["detected_changes"] == 0 and r["d"] == 2 and r["delta"] == 0.005
 
 
@@ -203,7 +203,7 @@ def _snapshot(tmp_path, sid="snap1"):
 def test_reevaluate_offline_writes_elsewhere_and_leaves_snapshot_unchanged(tmp_path):
     snap, msha = _snapshot(tmp_path)
     before = re_.hash_tree(snap)
-    res = re_.reevaluate(snap, expect_manifest_sha256=msha, stage_r_root=tmp_path)
+    res = re_.reevaluate(snap, expect_manifest_sha256=msha, stage_r_root=tmp_path, protocol="v2.0.2")
     out_dir = Path(res["out_dir"])
     assert out_dir == tmp_path / "reviews" / "v2_0_2__snap1" and not out_dir.is_relative_to(snap)
     assert re_.hash_tree(snap) == before
@@ -215,17 +215,17 @@ def test_reevaluate_offline_writes_elsewhere_and_leaves_snapshot_unchanged(tmp_p
         ["identity.json", "events_normalised.json", "data_quality_comparison.json", "validation.json",
          "crosscheck.json", "reviews.json", "evaluation.json", "manifest.json"])
     with pytest.raises(FileExistsError):
-        re_.reevaluate(snap, expect_manifest_sha256=msha, stage_r_root=tmp_path)
+        re_.reevaluate(snap, expect_manifest_sha256=msha, stage_r_root=tmp_path, protocol="v2.0.2")
     assert re_.hash_tree(snap) == before
 
 
 def test_reevaluate_refuses_wrong_manifest_hash_and_tampered_snapshot(tmp_path):
     snap, msha = _snapshot(tmp_path, "snap2")
     with pytest.raises(re_.ImmutabilityError):
-        re_.reevaluate(snap, expect_manifest_sha256="0" * 64, stage_r_root=tmp_path)
+        re_.reevaluate(snap, expect_manifest_sha256="0" * 64, stage_r_root=tmp_path, protocol="v2.0.2")
     victim = snap / "events_normalised.json"
     os.chmod(victim, stat.S_IWRITE | stat.S_IREAD)
     victim.write_text(victim.read_text() + " ", encoding="utf-8")
     with pytest.raises(re_.ImmutabilityError):
-        re_.reevaluate(snap, expect_manifest_sha256=msha, stage_r_root=tmp_path)
+        re_.reevaluate(snap, expect_manifest_sha256=msha, stage_r_root=tmp_path, protocol="v2.0.2")
     assert not (tmp_path / "reviews" / "v2_0_2__snap2").exists()

@@ -13,7 +13,7 @@ from typing import Any
 from acquisition.contract import ROOT_DIR
 from config.day_universe import get_day_universe
 
-PROTOCOL_VERSION = "2.0 R1 + 2.0.1 + 2.0.2"
+PROTOCOL_VERSION = "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3"
 SCHEMA_VERSION = "v2-stage-r-snapshot/1.0"
 REVIEW_SCHEMA_VERSION = "v2-stage-r-review/1.0"
 FREEZE_COMMIT = "ba3cefe54ccf2fe14c62f1c609f143d8a0904221"
@@ -23,6 +23,13 @@ AMENDMENT_002_FILES = (
     "artifacts/day18a/protocol-v2.0.2-amendment.md",
     "artifacts/day18a/protocol-v2.0.2-amendment.json",
 )
+AMENDMENT_003_COMMIT = "d26b36ef802cf0810952b2e5c4e8e19d908b4555"
+AMENDMENT_003_FILES = (
+    "artifacts/day18c/protocol-v2.0.3-amendment.md",
+    "artifacts/day18c/protocol-v2.0.3-amendment.json",
+)
+# v2.0.3 item 2: committed, human-decided review records (never created by code)
+REVIEW_RECORDS_DIR = ROOT_DIR / "artifacts" / "reviews" / "stage_r"
 PROTOCOL_FILES = (
     "artifacts/day16/research-protocol-v2.md",
     "artifacts/day16/research-protocol-v2.json",
