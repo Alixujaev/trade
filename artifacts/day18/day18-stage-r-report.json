@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "task": "DAY-18",
+  "date": "2026-10-07",
+  "protocol": {"version": "2.0 R1 + 2.0.1", "freeze_commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+               "amendment_commit": "ed034b3e9500cc4d9b33625de7e1883f572cd5a4", "modified": false},
+  "code_commit": "3fe0c92e18c70d35da73a5b4a799cfbb4c78bae4",
+  "snapshot": {"path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+               "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+               "files": 63, "usable_for_research": false},
+  "stage_r_status": "ACQUIRED - BLOCKED (protocol change required)",
+  "acquired": {
+    "symbols": 26, "bar_series": ["raw", "all"], "rows_per_symbol_per_series": 1762, "asof": "2026-10-07",
+    "bar_label_range": ["2016-01-04T05:00:00Z", "2022-12-30T05:00:00Z"],
+    "ca_retained": {"Q1_complete": 492, "Q1_all": 492, "Q2_complete": 4, "Q2_all": 4, "unique": 496},
+    "ca_discarded_after_stage_r": {"Q2_complete": 15, "Q2_all": 15},
+    "requests": 82, "all_http_200": true
+  },
+  "checks": {
+    "structural": {"series_ok": 52, "hard_fail": 0, "blocking": 0},
+    "raw_vs_all_session_sets_equal": 26,
+    "data_quality_difference": false,
+    "identity": {"records": 496, "assigned": 493, "by_cusip": 209, "ticker_only": 284, "foreign": 3, "unassigned": 0,
+                 "conflicts": 0, "anchors_defined": 22, "aliases": {"FB": "META"}},
+    "events": {"total": 489, "cash_dividends": 483, "forward_splits": 6, "normalisation_blockers": 0},
+    "crosscheck": {"unmatched_events_all_symbols": 0, "split_magnitude_ok": "6/6",
+                   "symbols_blocking": 24, "symbols_ok": ["ADBE", "AMD"], "uncheckable_events": 3},
+    "leakage": {"runtime_dates_checked": 3458, "beyond_boundary": 0, "independent_snapshot_scan": "no event/ex/effective date after 2022-12-30"}
+  },
+  "protocol_change_required": {
+    "rule": "v2.0 R1 §3.4 factor-change tolerance 1e-6",
+    "finding": "adjustment=all closes stored with 2-4 decimals; rounding of backward-adjusted history produces non-event ratio jitter",
+    "non_event_jitter_counts": {"gt_1e-6": "1475-1734 per affected symbol", "gt_1e-5": "904-1647", "gt_1e-4": "0-907", "gt_1e-3": "0 in every symbol"},
+    "event_date_dividends_gt_1e-3": "460/480", "nvda_dividends_le_1e-3": 20, "splits_gt_1e-2": "6/6",
+    "tolerance_changed": false
+  },
+  "reviews": [
+    {"item": "raw/all cross-check (24 symbols)", "status": "BLOCKING", "basis": "tolerance infeasible"},
+    {"item": "cash_merger NVDA<-MLNX", "status": "BLOCKING", "basis": "acquirer, CUSIP-matched; blocked only by cross-check"},
+    {"item": "cash_merger CSCO<-ACIA", "status": "BLOCKING", "basis": "same"},
+    {"item": "cash_merger MSFT<-NUAN", "status": "BLOCKING", "basis": "same"},
+    {"item": "name_change FB->META", "status": "BLOCKING", "basis": "pure rename; blocked only by cross-check"},
+    {"item": "name_change META->METV", "status": "RESOLVED_EXCLUDED", "basis": "foreign entity"},
+    {"item": "stock_and_cash_merger CRM<-WORK", "status": "RESOLVED_EXCLUDED", "basis": "anchor undefined -> classified foreign by C2 rule 4; economically neutral; reviewer confirmation advised"},
+    {"item": "stock_merger AMD<-XLNX", "status": "RESOLVED_EXCLUDED", "basis": "same as CRM"},
+    {"item": "dividends with ex_date 2016-01-04 (CSCO, JPM, ORCL)", "status": "BLOCKING", "basis": "uncheckable at first session; protocol silent; nil TR impact"},
+    {"item": "SPY completeness", "status": "BLOCKING", "basis": "undetermined until tolerance decision; 26/26 events matched; 0 non-event changes > 1e-3"},
+    {"item": "complete vs all difference", "status": "NOT APPLICABLE"},
+    {"item": "same-ex-date split + dividend", "status": "NOT APPLICABLE"},
+    {"item": "identity conflicts / unassigned", "status": "NOT APPLICABLE"}
+  ],
+  "tests": {"focused": "23 passed", "full_suite": "1206 passed, 0 failed"},
+  "process_event": "5 frozen Markdown artifacts in day13/day14 restored from committed blobs (CRLF->LF, byte-identical to integrity baseline; no content change; user-approved)",
+  "not_done": ["holdout/forward bars", "TR index", "signals", "returns", "backtests", "metrics", "tolerance change", "push"]
+}
