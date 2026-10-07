@@ -1,0 +1,734 @@
+{
+  "schema_version": "2.0",
+  "protocol_version": "2.0",
+  "status": "REVISED DRAFT (DAY-16R, revision R1) - PENDING REVIEW AND COMMIT",
+  "drafted": "2026-10-07",
+  "human_readable": "artifacts/day16/research-protocol-v2.md",
+  "checklist": "artifacts/day16/research-checklist.json",
+  "repository_head_at_drafting": "f5470b13142d8d48d12cc609ea925c6e11566018",
+  "branch_at_drafting": "feature/day-trading-research",
+  "parent_protocols": [
+    "artifacts/day14/research-protocol.md (v1.0)",
+    "artifacts/day15/protocol-v1.1.md (v1.1)"
+  ],
+  "freeze": {
+    "frozen": false,
+    "freeze_condition": "Frozen only after the three DAY-16 files are committed; first data task records commit SHA and file SHA-256.",
+    "freeze_commit_sha": null,
+    "freeze_commit_date": null,
+    "change_policy": "Any change after the freeze commit = new protocol version (v2.0.x clarification, v2.1 otherwise) and new experiment IDs."
+  },
+  "drafting_constraints": {
+    "market_data_requested": false,
+    "prices_read": false,
+    "backtest_run": false,
+    "metrics_computed": false,
+    "code_changed": false,
+    "prior_results_used_for_parameters": false,
+    "local_calendar_resolution_only": "exchange_calendars 4.13.2 XNYS",
+    "review_task": "DAY-16R (no data, no prices, no code, no backtest)"
+  },
+  "universe": {
+    "source": "config/day_universe.py::FROZEN_DAY_UNIVERSE",
+    "symbols": [
+      "AAPL",
+      "MSFT",
+      "NVDA",
+      "AMZN",
+      "META",
+      "GOOGL",
+      "TSLA",
+      "AVGO",
+      "AMD",
+      "QCOM",
+      "INTC",
+      "MU",
+      "AMAT",
+      "ADBE",
+      "CRM",
+      "ORCL",
+      "CSCO",
+      "COST",
+      "WMT",
+      "KO",
+      "PEP",
+      "NFLX",
+      "JNJ",
+      "JPM",
+      "XOM"
+    ],
+    "count": 25,
+    "shared_by_all_strategies": true,
+    "benchmark_only_symbols": [
+      "SPY"
+    ],
+    "unused": [
+      "QQQ"
+    ],
+    "dynamic_membership": false,
+    "point_in_time": false,
+    "selection_timestamp": "UNKNOWN / NOT RECORDED (first committed dcebe47, 2026-09-28)",
+    "survivorship_bias_solved": false,
+    "ticker_changes": [
+      {
+        "symbol": "META",
+        "former": "FB",
+        "until": "2022-06-09",
+        "status": "BLOCKING verification (Q3)"
+      }
+    ],
+    "missing_data": "symbol ineligible for that decision only; never imputed, replaced or removed for performance",
+    "survivorship_statement": "hindsight-selected universe; known limitation; B1 does not eliminate survivorship bias; no v2 result may be described as survivorship-safe"
+  },
+  "data": {
+    "provider": "Alpaca Market Data API v2 Historical Stock Bars",
+    "endpoint": "GET /v2/stocks/{symbol}/bars",
+    "feed": "sip",
+    "timeframe": "1Day",
+    "end_semantics": "inclusive",
+    "asof": "acquisition date, recorded",
+    "frequency_used_by_strategies": "daily only",
+    "calendar": {
+      "library": "exchange_calendars",
+      "version": "4.13.2",
+      "code": "XNYS",
+      "timezone": "America/New_York"
+    },
+    "close_available_after": "16:00 ET (13:00 ET on early closes) of the session",
+    "open_role": "fill price only for decisions made at or before the previous close",
+    "storage_root": "data/oos_cache/protocol_v2/",
+    "forbidden_roots": [
+      "data/cache/",
+      "data/oos_cache/protocol_v1.0/",
+      "data/oos_cache/protocol_v1.1/"
+    ],
+    "excluded_providers": [
+      "yfinance",
+      "Massive",
+      "any back-fill"
+    ],
+    "quality_checks": {
+      "hard_fail": [
+        "off-calendar bar",
+        "duplicate timestamp/session",
+        "non-monotonic or naive index",
+        "OHLC inconsistency or non-positive price",
+        "negative volume",
+        "raw vs all session-date set mismatch"
+      ],
+      "listed_not_imputed": [
+        "missing session"
+      ],
+      "blocking_review": [
+        "first bar later than 2016-01-04 + 5 sessions",
+        "symbol missing > 2% of sessions in an evaluated segment",
+        "corporate-action cross-check mismatch",
+        "unsupported corporate-action type"
+      ]
+    },
+    "acquisitions": [
+      {
+        "stage": "R",
+        "range": [
+          "2016-01-04",
+          "2022-12-30"
+        ],
+        "contents": [
+          "raw bars",
+          "all bars",
+          "events"
+        ],
+        "when": "after freeze commit"
+      },
+      {
+        "stage": "H",
+        "range": [
+          "2021-01-04",
+          "2026-06-02"
+        ],
+        "contents": [
+          "raw bars",
+          "all bars",
+          "events"
+        ],
+        "when": "only after research gate recorded for all families and >=1 RESEARCH-PASSED"
+      },
+      {
+        "stage": "F",
+        "range": [
+          "2025-01-02",
+          "last forward session"
+        ],
+        "contents": [
+          "raw bars",
+          "all bars",
+          "events"
+        ],
+        "when": "only after forward period ended (>=16:15 ET last session) and >=1 HOLDOUT-PASSED",
+        "interim_acquisition": false
+      }
+    ],
+    "snapshot_policy": "write-once; content and file SHA-256; one stage snapshot per run; raw bars and events compared IDENTICAL/DISCREPANCY on stage overlaps (R∩H 2021-01-04..2022-12-30, H∩F 2025-01-02..2026-06-02); adjustment=all levels excluded from overlap comparison (rebasing), implied factors re-checked per stage",
+    "bar_series": {
+      "raw": "adjustment=raw (execution, accounting, TR-index input)",
+      "all": "adjustment=all (audit only)"
+    },
+    "corporate_action_events": {
+      "source": "Alpaca corporate-actions endpoint (endpoint/version recorded at acquisition)",
+      "types_used": [
+        "forward split",
+        "reverse split",
+        "cash dividend (regular)",
+        "cash dividend (special)"
+      ],
+      "fields": [
+        "ex_date",
+        "split_ratio q (new per old)",
+        "cash_per_share d (per share held at previous close, pre-split basis)"
+      ],
+      "other_types": "BLOCKING data review before any run",
+      "coverage_status": "BLOCKING verification (Q16)"
+    },
+    "session_indexing": "all t-k indices are XNYS calendar indices; missing bar at a required index = missing (no nearest-row fallback)",
+    "event_available_from": "start of ex-date session (before its open)"
+  },
+  "timeline": {
+    "resolution": "exchange_calendars 4.13.2 XNYS, resolved locally 2026-10-07",
+    "segments": [
+      {
+        "id": "warmup",
+        "first": "2016-01-04",
+        "last": "2017-01-31",
+        "sessions": 272,
+        "role": "inputs only"
+      },
+      {
+        "id": "research",
+        "rule": "XNYS sessions in [2017-02-01, 2022-12-30]",
+        "first": "2017-02-01",
+        "last": "2022-12-30",
+        "sessions": 1490,
+        "role": "research gate"
+      },
+      {
+        "id": "holdout",
+        "rule": "XNYS sessions in [2023-01-03, 2026-06-02]",
+        "first": "2023-01-03",
+        "last": "2026-06-02",
+        "sessions": 856,
+        "role": "historical pseudo-OOS, one-shot gate"
+      },
+      {
+        "id": "excluded",
+        "rule": "XNYS sessions from 2026-06-03 to freeze-commit date inclusive",
+        "first": "2026-06-03",
+        "last": "freeze commit date",
+        "role": "formation history only; never evaluated"
+      },
+      {
+        "id": "forward_oos",
+        "rule": "252 XNYS sessions starting at first session strictly after freeze-commit date",
+        "sessions": 252,
+        "example_if_commit_2026-10-07": [
+          "2026-10-08",
+          "2027-10-08"
+        ],
+        "role": "true OOS, final gate"
+      }
+    ],
+    "embargo_sessions": 0,
+    "embargo_rationale": "segments simulated separately, start flat, liquidate at last close; no position or label crosses a boundary",
+    "segment_runs_start_flat": true
+  },
+  "execution": {
+    "signal_time": "close of session t",
+    "order_time": "after close t, market-on-open t+1",
+    "fill_price": "raw open O(t+1) (series A); never series B or C",
+    "same_bar_fill": false,
+    "partial_fills": false,
+    "missing_bar_at_execution": {
+      "buy": "cancelled; target weight stays cash until next scheduled decision (A/B) or slot's next signal (C)",
+      "sell": "pending sell retried at each later open with a bar until filled or superseded by a newer decision for the symbol",
+      "look_ahead": "retry is pre-committed; reads no information after the decision close"
+    },
+    "gaps": "fill at open regardless of gap; no stops or limits",
+    "orders_at_close": false,
+    "overnight_positions": true,
+    "max_positions_per_symbol_per_strategy": 1,
+    "cross_strategy_netting": false,
+    "order_of_operations": [
+      "apply events with ex-date t+1",
+      "compute E_open",
+      "derive trade notionals",
+      "sells at raw open, cash += proceeds*(1-s)",
+      "buys scaled by lambda = min(1, K/(B*(1+s))), cash -= lambda*B*(1+s)"
+    ],
+    "simultaneous_signals": "A/B one target vector per execution; C independent disjoint slots; sells then buys, ascending ticker",
+    "initial_portfolio": "each strategy evaluates its own signal formula at the session immediately before the segment start (even off-schedule) and executes at the segment's first open",
+    "segment_boundaries": "decisions at the segment's last close discarded; pending orders at segment end discarded"
+  },
+  "costs": {
+    "scenarios_bps_per_side": [
+      0,
+      5,
+      10
+    ],
+    "primary_scenario_bps": 5,
+    "formula": "cost = s * sum(|traded notional|), deducted at execution",
+    "charged_on": [
+      "initial build",
+      "rebalances",
+      "entries",
+      "exits",
+      "final liquidation"
+    ],
+    "separate_simulation_per_scenario": true,
+    "spread_or_impact_model": false,
+    "threshold_semantics": "friction scenario, not a profitability threshold"
+  },
+  "portfolio": {
+    "accounting": "E(k) = cash + sum shares*mark at each close; raw price basis only; independent simulation per (strategy or benchmark, segment, cost)",
+    "initial_capital": 100000,
+    "sizing": "E_open = cash + sum shares*v (v = raw open, or last mark if no bar); target notional = w*E_open (A/B) or slot capital (C)",
+    "fractional_shares": true,
+    "rounding": "none (float64)",
+    "leverage": false,
+    "shorting": false,
+    "max_gross_weight": 1.0,
+    "cash_return": 0.0,
+    "segment_end": "mark at last close; deduct s x sum(shares*mark); discard pending orders",
+    "turnover_definition": "TO = 0.5 * sum_i |executed trade notional_i| / E_open per execution; annual = sum(TO)/(sessions/252)",
+    "random_seeds": null,
+    "corporate_actions": {
+      "split": "shares *= q on ex-date (start of session)",
+      "cash_dividend": "cash += shares held at previous close * d on ex-date; not reinvested; pay-date lag ignored"
+    },
+    "marking": "raw close; if missing, last close / product of split ratios since that close",
+    "cash_nonnegative": true,
+    "max_positions": {
+      "V2-MOM": 5,
+      "V2-STR": 5,
+      "V2-LRV": 5,
+      "B1": 25,
+      "B2": 1
+    }
+  },
+  "strategies": {
+    "V2-MOM": {
+      "name": "Cross-sectional momentum 12-1",
+      "signal_session": "last XNYS session of each calendar month",
+      "signal": "TR(t-21)/TR(t-252) - 1",
+      "includes_bar_t": false,
+      "rank": "descending; ties ascending ticker",
+      "eligibility": "TR(t-21) and TR(t-252) defined at those exact calendar indices",
+      "select": 5,
+      "weight": 0.2,
+      "execution": "market-on-open t+1",
+      "exit": "not selected at rebalance, or segment end",
+      "literature": [
+        "Jegadeesh & Titman (1993)",
+        "Fama-French UMD (2-12)"
+      ],
+      "series": "TR (series B)",
+      "existing_holdings": "still selected -> resized to 0.20 of E_open; not selected -> sold in full; new -> bought to 0.20",
+      "cash_between_rebalances": "allowed: unselected weight, cancelled buys, lambda, dividends; not reinvested until next rebalance"
+    },
+    "V2-STR": {
+      "name": "Weekly short-term reversal, long-only",
+      "signal_session": "last XNYS session of each ISO week",
+      "r5": "TR(t)/TR(t-5) - 1",
+      "sigma": "std(ddof=1) of the 60 daily returns R(k), k=t-59..t (daily volatility; includes R(t); rolling, recomputed each signal)",
+      "signal": "z = (r5_i - mean_j r5_j) / (sigma_i * sqrt(5))",
+      "includes_bar_t": true,
+      "rank": "ascending z; ties ascending ticker",
+      "eligibility": "61 TR closes t-60..t defined and sigma > 0",
+      "select": 5,
+      "weight": 0.2,
+      "absolute_entry_threshold": null,
+      "execution": "market-on-open t+1",
+      "exit": "not selected at rebalance, or segment end",
+      "literature": [
+        "Lehmann (1990)",
+        "Lo & MacKinlay (1990)",
+        "Jegadeesh (1990)"
+      ],
+      "series": "TR (series B)",
+      "daily_returns": "R(k) = TR(k)/TR(k-1) - 1",
+      "centring": "cross-sectional mean of r5 over eligible symbols at the same t (not historical)",
+      "existing_holdings": "still selected -> resized to 0.20 of E_open; not selected -> sold in full; new -> bought to 0.20"
+    },
+    "V2-LRV": {
+      "name": "Long-only relative value (distance method, lagging leg only)",
+      "not": [
+        "classical pairs trading",
+        "market-neutral"
+      ],
+      "formation_sessions": 252,
+      "trading_period_sessions": 126,
+      "cycles": "sequential non-overlapping; next formation close = p125; first cycle t_F = session before segment start; last cycle truncated",
+      "eligibility": "all 252 formation closes present",
+      "normalised_price": "N_i(k) = TR_i(k)/TR_i(F0), k in F",
+      "distance": "SSD_ij = sum_{k in F} (N_i(k)-N_j(k))^2, ticker_i < ticker_j",
+      "pair_selection": "ascending SSD, ties lexicographic; greedy disjoint; 5 pairs",
+      "sigma": "std(ddof=1) of D_ij(k)=N_i(k)-N_j(k) over F; frozen for the trading period",
+      "trading_normalisation": "M_i(t) = TR_i(t)/TR_i(t_F)",
+      "spread": "S_ij(t) = M_i(t) - M_j(t), ticker_i < ticker_j (GGR convention: sigma on formation-normalised D, spread rebased at t_F)",
+      "entry": "slot flat with no pending order and trigger holds -> buy lagging member with entire slot capital",
+      "entry_threshold_sigma": 2.0,
+      "exit": [
+        "convergence: s0*S(t) <= 0 at close t in p0..p124 -> sell at open t+1",
+        "period end: position open after close p125 -> sell at open p126 (first session of next cycle)",
+        "segment end: liquidation mark (portfolio.segment_end)"
+      ],
+      "re_entry": true,
+      "slots": 5,
+      "slot_capital": "E_open(p0) after previous-cycle exits and costs / 5; evolves with own P&L, costs and dividends; no cross-slot lending",
+      "missing_data": "no signal if either member's TR undefined at close; existing position held and marked per portfolio.marking",
+      "residual_market_exposure": "single-stock long (beta ~1, not estimated) or cash; not market-neutral; exposure reported every session",
+      "deviations_from_GGR": [
+        "long-only lagging leg",
+        "5 pairs",
+        "disjoint selection",
+        "non-overlapping cycles"
+      ],
+      "literature": [
+        "Gatev, Goetzmann & Rouwenhorst (2006)"
+      ],
+      "series": "TR (series B)",
+      "notation": "trading period p0..p125; t_F = session before p0; formation F = t_F-251..t_F; F0 = t_F-251",
+      "trigger": "strict |S_ij(t)| > 2*sigma_ij at close t",
+      "lagging_member": "j if S>0, i if S<0",
+      "entry_window": "closes p0..p124; execute at next open",
+      "same_close_exit_and_entry": "no entry evaluated for a slot on a close where its exit fires",
+      "holding_while_signal": "further triggers for an occupied slot ignored; other slots independent",
+      "simultaneous_triggers": "independent disjoint slots; sells before buys",
+      "pair_composition_frozen": true
+    }
+  },
+  "benchmarks": {
+    "B1": {
+      "definition": "equal-weight buy-and-hold of the 25 universe symbols with a bar at the segment's first open, same engine and accounting as strategies, never rebalanced, splits adjust shares, dividends credited as cash and not reinvested, same lambda rule and costs on initial buy and final liquidation",
+      "role": "primary comparison; economic gate"
+    },
+    "B2": {
+      "definition": "SPY buy-and-hold, 100% target weight at segment first open, same engine, accounting and costs",
+      "role": "reference only; not gated"
+    }
+  },
+  "metrics": {
+    "primary": {
+      "name": "net_cagr_5bps",
+      "formula": "(E_T/E_0)^(252/N) - 1, 5 bps simulation, E_T post-liquidation"
+    },
+    "secondary": [
+      "gross_cagr",
+      "net_cagr_10bps",
+      "volatility",
+      "sharpe_rf0",
+      "sortino",
+      "max_drawdown",
+      "calmar",
+      "turnover_per_execution",
+      "annual_turnover",
+      "executions",
+      "cost_per_execution",
+      "cost_drag_5bps",
+      "cost_drag_10bps",
+      "position_episodes",
+      "mean_positions",
+      "exposure_mean_min_max",
+      "episode_win_rate",
+      "episode_mean",
+      "episode_median",
+      "episode_profit_factor",
+      "b1_cagr",
+      "b2_cagr",
+      "cagr_minus_b1",
+      "tracking_error_b1",
+      "information_ratio_b1",
+      "worst_month",
+      "worst_year",
+      "calendar_year_subperiods",
+      "symbol_breadth",
+      "top2_concentration",
+      "weight_hhi",
+      "hac_tstat_active_vs_b1",
+      "holm_adjusted_p",
+      "mean_lambda",
+      "min_lambda",
+      "dividend_cash_total"
+    ],
+    "annualisation_sessions": 252,
+    "risk_free": 0.0,
+    "hac": {
+      "method": "Newey-West",
+      "lag": 5
+    },
+    "undefined_policy": "mathematically undefined metric reported as 'undefined' with reason; never imputed"
+  },
+  "gate": {
+    "applies": "per strategy, independently and identically to all three families; research, then unchanged on holdout and forward",
+    "A_methodological_hard_fail": [
+      "look-ahead (future-mutation / truncation / fill-source / index test)",
+      "data corruption / structural failure / unresolved BLOCKING data review / manifest mismatch",
+      "non-deterministic results",
+      "incomplete reproducibility block",
+      "future information in formation/ranking/estimation/sizing/weighting",
+      "execution or accounting semantics violated (incl. any non-raw fill or mark)",
+      "incomplete required dataset"
+    ],
+    "B_economic": {
+      "all_of": [
+        "net_cagr_5bps >= 0",
+        "net_cagr_5bps >= b1_net_cagr_5bps"
+      ],
+      "margin": 0.0,
+      "sufficiency": "necessary minimum only; not evidence of an edge",
+      "comparison": "unrounded float64; equality passes; same engine/sessions/exclusions/cost for B1"
+    },
+    "C_robustness": "completeness only: every robustness item present (value or 'undefined (reason)') for 0/5/10 bps; no thresholds; never causes PASS/FAIL by value; never used to choose, modify or rank; missing item = FAIL",
+    "not_predefined_thresholds": [
+      "minimum Sharpe",
+      "minimum trades/rebalances",
+      "maximum drawdown",
+      "minimum breadth",
+      "concentration limit",
+      "benchmark margin > 0",
+      "significance level"
+    ],
+    "outcomes": [
+      "RESEARCH-PASSED",
+      "RESEARCH-FAILED (methodological)",
+      "RESEARCH-FAILED (economic)",
+      "RESEARCH-FAILED (incomplete)"
+    ]
+  },
+  "multiple_testing": {
+    "families": [
+      "V2-MOM",
+      "V2-STR",
+      "V2-LRV"
+    ],
+    "experiment_id_pattern": "<family>-R001 | -H001 | -F001",
+    "variants_per_family": 1,
+    "allowed_variants": [],
+    "new_experiment_trigger": "any change to any frozen value",
+    "derived_label": "DERIVED FROM PRIOR OBSERVATION",
+    "derived_confirmable_on_used_segment": false,
+    "record_all_runs": true,
+    "winner_selection": "prohibited",
+    "cumulative_preregistered_configurations": 3,
+    "diagnostic": "HAC t-stat vs B1 with Holm across families; diagnostic only: cannot pass, fail or rescue a family, override the gate, or select among families",
+    "failed_families": "recorded as failed; never silently modified; any modified version is a new DERIVED experiment"
+  },
+  "graduation": {
+    "sequence": [
+      "research",
+      "holdout",
+      "forward_oos"
+    ],
+    "advance": "all families passing a stage advance together",
+    "holdout_run_after": "research gate recorded for all three families",
+    "holdout_one_shot": true,
+    "forward_interim_inspection": false,
+    "spec_identity": "strategy-config SHA-256 identical across stages",
+    "stop_rules": [
+      "no research pass -> stop",
+      "no holdout pass -> stop"
+    ],
+    "statuses": {
+      "RESEARCH-PASSED": "minimum in-sample viability",
+      "HOLDOUT-PASSED": "survived historical pseudo-OOS",
+      "FORWARD-PASSED": "validated under v2, limitations attached"
+    },
+    "holdout_acquisition": "Stage H only after research gate recorded for all three families and >=1 passed",
+    "holdout_restrictions": [
+      "no tuning",
+      "no parameter selection",
+      "no strategy modification",
+      "no winner selection",
+      "intentionally not blind"
+    ],
+    "no_rescue": "research-failed families are never run on the holdout; no holdout result rescues them",
+    "post_freeze_data": "no data dated after the freeze commit acquired or inspected before the forward period ends"
+  },
+  "robustness": {
+    "frozen_checks": [
+      "costs 0/5/10",
+      "calendar-year subperiods",
+      "breadth and concentration",
+      "turnover, lambda and cost drag",
+      "exposure and benchmark-relative",
+      "drawdown profile",
+      "statistical diagnostic"
+    ],
+    "parameter_search_allowed": false
+  },
+  "reproducibility": {
+    "required": [
+      "protocol version + SHA-256 of DAY-16 files + freeze commit",
+      "git commit + dirty flag",
+      "python/platform/exchange_calendars/distributions + SHA-256",
+      "stage + snapshot ID + file hashes (raw, all, events) + manifest + CA endpoint/version",
+      "adjustment basis date + asof",
+      "strategy-config SHA-256 (canonical JSON)",
+      "seeds: none",
+      "exact command + cwd",
+      "UTC start/end",
+      "result artifact SHA-256"
+    ],
+    "determinism": "two identical runs -> byte-identical allocation/fill logs and metrics",
+    "strategy_config_hash": "SHA-256 of canonical JSON (sorted keys, UTF-8, compact separators) of strategies.<family> + price_series + execution + costs + portfolio blocks"
+  },
+  "open_questions": [
+    {
+      "id": "Q1",
+      "topic": "1Day bar semantics (auction prints, extended hours, timestamp)",
+      "status": "BLOCKING"
+    },
+    {
+      "id": "Q2",
+      "topic": "SIP 1Day coverage from 2016-01-04 and entitlement",
+      "status": "BLOCKING"
+    },
+    {
+      "id": "Q3",
+      "topic": "META/FB asof mapping for bars and events",
+      "status": "BLOCKING"
+    },
+    {
+      "id": "Q4",
+      "topic": "adjustment=all content and method (audit series only)",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q5",
+      "topic": "survivorship / hindsight universe",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q6",
+      "topic": "market-on-open fill realism",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q7",
+      "topic": "cash earns 0%",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q8",
+      "topic": "fractional shares",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q9",
+      "topic": "dividends credited as cash on ex-date, not reinvested, pay-date lag ignored (signal index assumes reinvestment)",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q10",
+      "topic": "V2-LRV residual market exposure",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q11",
+      "topic": "statistical power / short forward OOS",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q12",
+      "topic": "forward start depends on commit date",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q13",
+      "topic": "2027 calendar resolution",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q14",
+      "topic": "portfolio engine, bar + corporate-action acquisition, TR-index builder, loader, PIT tests, registry not implemented",
+      "status": "NOT YET IMPLEMENTED"
+    },
+    {
+      "id": "Q15",
+      "topic": "2% missing-session review heuristic",
+      "status": "NON-BLOCKING"
+    },
+    {
+      "id": "Q16",
+      "topic": "Alpaca corporate-actions endpoint coverage from 2016, field semantics, entitlement",
+      "status": "BLOCKING"
+    }
+  ],
+  "not_yet_implemented": [
+    "v2 1Day bar acquisition (raw + all, asof)",
+    "corporate-action event acquisition",
+    "staged acquisition (R/H/F) and overlap comparison",
+    "v2 segment resolver",
+    "daily structural checks",
+    "implied-factor cross-check",
+    "PIT total-return index builder",
+    "v2 data loader",
+    "portfolio engine (raw accounting, events, lambda)",
+    "strategy modules V2-MOM/V2-STR/V2-LRV",
+    "PIT future-mutation/truncation/fill-source/index tests",
+    "portfolio metrics",
+    "experiment registry"
+  ],
+  "revision": "R1",
+  "revision_log": [
+    {
+      "rev": "R0",
+      "task": "DAY-16",
+      "change": "initial draft"
+    },
+    {
+      "rev": "R1",
+      "task": "DAY-16R",
+      "change": "execution/accounting on raw OHLC + Alpaca corporate-action events; signals on PIT total-return index; adjustment=all audit-only; staged acquisition; exact sizing/lambda, pending orders, boundaries, initial portfolio, calendar indexing, V2-LRV mechanics, gate-C completeness, holdout/diagnostic wording; Q4 -> NON-BLOCKING; Q16 added BLOCKING. No strategy parameter, universe, date, cost, benchmark or gate threshold changed."
+    }
+  ],
+  "price_series": {
+    "A_execution_accounting": {
+      "series": "raw OHLC",
+      "uses": [
+        "fill price = raw open",
+        "mark = raw close",
+        "shares",
+        "costs",
+        "equity",
+        "benchmarks"
+      ]
+    },
+    "B_signal": {
+      "series": "PIT total-return index TR",
+      "definition": "TR(k0)=1; TR(k)=TR(p)*(C(k)*Q(p,k)+D(p,k))/C(p), p = previous session with a bar; Q = product of split ratios with ex-date in (p,k]; D = sum of dividends with ex-date e in (p,k] times product of split ratios in (e,k]; undefined where C(k) missing",
+      "uses": [
+        "all strategy signals",
+        "ranking",
+        "volatility",
+        "pair formation",
+        "spreads"
+      ],
+      "forbidden": [
+        "fills",
+        "marks",
+        "accounting",
+        "price levels"
+      ],
+      "pit_property": "depends only on raw closes and events with ex-date <= k"
+    },
+    "C_audit": {
+      "series": "adjustment=all bars + event list",
+      "uses": [
+        "implied-factor cross-check f(k)=C_raw/C_all"
+      ],
+      "forbidden": [
+        "any signal, fill, mark, weight or P&L input"
+      ],
+      "cross_check": "every f change (> 1e-6 relative) must match an event and vice versa; split ratio within 0.1%; mismatch = BLOCKING data review"
+    }
+  }
+}

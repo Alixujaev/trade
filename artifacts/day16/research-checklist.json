@@ -1,0 +1,865 @@
+{
+  "schema_version": "2.0",
+  "protocol_version": "2.0",
+  "revision": "R1 (DAY-16R)",
+  "phase": "DAY-16/DAY-16R (protocol design and review only; no implementation, no data acquisition, no backtest)",
+  "freeze": {
+    "documents_sha256": {
+      "artifacts/day16/research-protocol-v2.md": "57cc368d80a0a3c89af78fe5fd1a6b95962859a3f494ae79a759fb7406a86fb1",
+      "artifacts/day16/research-protocol-v2.json": "ed21cfa508ac9aadcb6600b227014a084cbbfd6a9a5546433bd5327f5154e037"
+    },
+    "frozen": false,
+    "freeze_condition": "Frozen only after the DAY-16 files are committed; record the commit SHA in the first v2 data task.",
+    "research_data_acquired": false,
+    "holdout_data_inspected": false,
+    "forward_data_acquired": false
+  },
+  "status_vocabulary": [
+    "PREDEFINED",
+    "OPEN",
+    "NOT APPLICABLE",
+    "NOT YET IMPLEMENTED"
+  ],
+  "status_semantics": {
+    "PREDEFINED": "fully specified by the protocol",
+    "OPEN": "unresolved; see open questions",
+    "NOT APPLICABLE": "deliberately not part of v2 (reason in evidence)",
+    "NOT YET IMPLEMENTED": "specified, but required code does not exist yet"
+  },
+  "status_counts": {
+    "NOT APPLICABLE": 4,
+    "NOT YET IMPLEMENTED": 5,
+    "OPEN": 10,
+    "PREDEFINED": 83
+  },
+  "blocking_for_run": [
+    "DATA-08",
+    "DATA-09",
+    "DATA-17",
+    "DATA-18",
+    "UNIV-07",
+    "STRAT-ALL-01",
+    "PIT-05",
+    "PORT-07",
+    "REPRO-04",
+    "SNOOP-06"
+  ],
+  "items": [
+    {
+      "id": "DATA-01",
+      "section": "data",
+      "requirement": "Provider Alpaca v2 historical bars, feed=sip, unchanged provider",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.1",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-02",
+      "section": "data",
+      "requirement": "Timeframe 1Day; strategies use daily data only",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.1, 3.2",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-03",
+      "section": "data",
+      "requirement": "Three-series roles: raw = execution/accounting, PIT TR index = signals, adjustment=all = audit only",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.4",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-04",
+      "section": "data",
+      "requirement": "Inclusive end, explicit start/end UTC RFC-3339",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.1",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-05",
+      "section": "data",
+      "requirement": "Storage root data/oos_cache/protocol_v2/, write-once; forbidden roots listed",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.1, 3.9",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-06",
+      "section": "data",
+      "requirement": "Calendar exchange_calendars 4.13.2 XNYS, America/New_York",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.3",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-07",
+      "section": "data",
+      "requirement": "Close usable after 16:00 ET (13:00 early close); open is fill-only",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.3",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-08",
+      "section": "data",
+      "requirement": "1Day bar semantics (auction prints, extended hours, timestamp label) verified",
+      "status": "OPEN",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.3, 20 Q1",
+      "blocking_for_run": true
+    },
+    {
+      "id": "DATA-09",
+      "section": "data",
+      "requirement": "SIP 1Day coverage from 2016-01-04 and entitlement for 25 symbols + SPY verified",
+      "status": "OPEN",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.5, 20 Q2",
+      "blocking_for_run": true
+    },
+    {
+      "id": "DATA-10",
+      "section": "data",
+      "requirement": "Content/method of adjustment=all verified (audit series only)",
+      "status": "OPEN",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.4, 20 Q4",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-11",
+      "section": "data",
+      "requirement": "Implied-factor cross-check rule (events vs raw/all factor; tolerances; mismatch = blocking review)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.4",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-12",
+      "section": "data",
+      "requirement": "Structural checks and hard-fail list",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.8",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-13",
+      "section": "data",
+      "requirement": "Missing-bar policy: listed, never imputed; >2% missing = blocking review",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.8",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-14",
+      "section": "data",
+      "requirement": "Duplicate-bar policy: hard fail",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.8",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-15",
+      "section": "data",
+      "requirement": "Data revision: write-once snapshots, IDENTICAL/DISCREPANCY, one snapshot per run",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.9",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-16",
+      "section": "data",
+      "requirement": "Staged acquisition R/H/F: ranges, preconditions, one snapshot per run, overlap comparison",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.9",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-17",
+      "section": "data",
+      "requirement": "v2 bar and corporate-action acquisition implementation",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#1.3, 20 Q14",
+      "blocking_for_run": true
+    },
+    {
+      "id": "DATA-18",
+      "section": "data",
+      "requirement": "Alpaca corporate-actions endpoint coverage/semantics/entitlement verified",
+      "status": "OPEN",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.4, 20 Q16",
+      "blocking_for_run": true
+    },
+    {
+      "id": "DATA-19",
+      "section": "data",
+      "requirement": "Corporate-action event definitions (q, d, ex-date availability, unsupported types = blocking review)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.3, 3.4",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-20",
+      "section": "data",
+      "requirement": "PIT total-return index formula (chain-linked, events with ex-date <= k)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.4",
+      "blocking_for_run": false
+    },
+    {
+      "id": "DATA-21",
+      "section": "data",
+      "requirement": "XNYS calendar-index semantics for all t-k references; no nearest-row fallback",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.3",
+      "blocking_for_run": false
+    },
+    {
+      "id": "UNIV-01",
+      "section": "universe",
+      "requirement": "Exact 25-symbol universe and canonical storage",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#2",
+      "blocking_for_run": false
+    },
+    {
+      "id": "UNIV-02",
+      "section": "universe",
+      "requirement": "Same universe for all strategies and B1; SPY benchmark-only",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#2",
+      "blocking_for_run": false
+    },
+    {
+      "id": "UNIV-03",
+      "section": "universe",
+      "requirement": "Static membership; no entry/exit",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#2",
+      "blocking_for_run": false
+    },
+    {
+      "id": "UNIV-04",
+      "section": "universe",
+      "requirement": "Missing-data symbol handling",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#2, 8.6",
+      "blocking_for_run": false
+    },
+    {
+      "id": "UNIV-05",
+      "section": "universe",
+      "requirement": "Point-in-time membership",
+      "status": "OPEN",
+      "evidence": "artifacts/day16/research-protocol-v2.md#2, 20 Q5",
+      "blocking_for_run": false
+    },
+    {
+      "id": "UNIV-06",
+      "section": "universe",
+      "requirement": "Survivorship bias solved",
+      "status": "OPEN",
+      "evidence": "artifacts/day16/research-protocol-v2.md#2, 20 Q5",
+      "blocking_for_run": false
+    },
+    {
+      "id": "UNIV-07",
+      "section": "universe",
+      "requirement": "META/FB ticker mapping verified",
+      "status": "OPEN",
+      "evidence": "artifacts/day16/research-protocol-v2.md#2, 20 Q3",
+      "blocking_for_run": true
+    },
+    {
+      "id": "UNIV-08",
+      "section": "universe",
+      "requirement": "Delisting handling",
+      "status": "NOT APPLICABLE",
+      "evidence": "artifacts/day16/research-protocol-v2.md#2 (none by construction; disclosed as bias)",
+      "blocking_for_run": false
+    },
+    {
+      "id": "UNIV-09",
+      "section": "universe",
+      "requirement": "Hindsight-universe statement: B1 does not eliminate bias; no survivorship-safe claims",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#2",
+      "blocking_for_run": false
+    },
+    {
+      "id": "TIME-01",
+      "section": "timing",
+      "requirement": "Warmup 2016-01-04 -> 2017-01-31 (272 sessions), inputs only",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.5, 3.6",
+      "blocking_for_run": false
+    },
+    {
+      "id": "TIME-02",
+      "section": "timing",
+      "requirement": "Research 2017-02-01 -> 2022-12-30 (1490 sessions)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.6",
+      "blocking_for_run": false
+    },
+    {
+      "id": "TIME-03",
+      "section": "timing",
+      "requirement": "Holdout 2023-01-03 -> 2026-06-02 (856 sessions), pseudo-OOS, one-shot",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.6",
+      "blocking_for_run": false
+    },
+    {
+      "id": "TIME-04",
+      "section": "timing",
+      "requirement": "Excluded 2026-06-03 -> freeze-commit date, never evaluated",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.6",
+      "blocking_for_run": false
+    },
+    {
+      "id": "TIME-05",
+      "section": "timing",
+      "requirement": "Forward OOS = 252 sessions after freeze-commit date (rule fixed)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.6",
+      "blocking_for_run": false
+    },
+    {
+      "id": "TIME-06",
+      "section": "timing",
+      "requirement": "Forward OOS concrete dates (depend on commit date)",
+      "status": "OPEN",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.6, 20 Q12",
+      "blocking_for_run": false
+    },
+    {
+      "id": "TIME-07",
+      "section": "timing",
+      "requirement": "Embargo = 0 sessions with rationale; segments start flat",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#3.7",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-MOM-01",
+      "section": "strategy.V2-MOM",
+      "requirement": "Signal TR(t-21)/TR(t-252)-1 at monthly last session; close t not used",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#4",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-MOM-02",
+      "section": "strategy.V2-MOM",
+      "requirement": "Ranking, ties, eligibility, top 5, equal weight 0.20",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#4",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-MOM-03",
+      "section": "strategy.V2-MOM",
+      "requirement": "Existing holdings resized/sold/bought; holding interval; cash between rebalances; turnover/costs",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#4, 8, 9, 11",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-STR-01",
+      "section": "strategy.V2-STR",
+      "requirement": "Signal z=(r5-cross-sectional mean r5)/(daily sigma60*sqrt5), weekly last session; samples and current-bar inclusion stated",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#5",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-STR-02",
+      "section": "strategy.V2-STR",
+      "requirement": "Ranking, ties, eligibility, bottom 5, equal weight 0.20",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#5",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-STR-03",
+      "section": "strategy.V2-STR",
+      "requirement": "Entry/exit/holding/turnover/costs first-class",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#5, 9, 12",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-LRV-01",
+      "section": "strategy.V2-LRV",
+      "requirement": "Long-only relative-value definition and non-market-neutral disclosure",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#6.1",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-LRV-02",
+      "section": "strategy.V2-LRV",
+      "requirement": "Formation 252 / trading 126, normalisation, SSD, greedy disjoint 5 pairs, frozen sigma",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#6.2 rows 1-7, 23",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-LRV-03",
+      "section": "strategy.V2-LRV",
+      "requirement": "Spread sign, strict 2 sigma trigger, lagging member, entry window, convergence/period-end exit, re-entry",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#6.2 rows 8-15, 24",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-LRV-05",
+      "section": "strategy.V2-LRV",
+      "requirement": "Same-close exit/entry, occupied slots, simultaneous triggers, slot capital, cycle boundaries",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#6.2 rows 16-22",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-LRV-04",
+      "section": "strategy.V2-LRV",
+      "requirement": "Residual market exposure quantified (reported, not hedged)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#6.1, 12",
+      "blocking_for_run": false
+    },
+    {
+      "id": "STRAT-ALL-01",
+      "section": "strategy",
+      "requirement": "Strategy modules implemented",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#20 Q14",
+      "blocking_for_run": true
+    },
+    {
+      "id": "PIT-01",
+      "section": "formation_evaluation",
+      "requirement": "Every input known at close t; execution at open t+1",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#7",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PIT-02",
+      "section": "formation_evaluation",
+      "requirement": "Current-bar inclusion stated per input",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#7",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PIT-03",
+      "section": "formation_evaluation",
+      "requirement": "LRV pairs/sigma frozen during trading period",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#6.2, 6.3",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PIT-04",
+      "section": "formation_evaluation",
+      "requirement": "Future-mutation, truncation, fill-source and TR-index tests defined",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#7",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PIT-06",
+      "section": "formation_evaluation",
+      "requirement": "Rolling vs frozen status of every estimated quantity",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#7",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PIT-05",
+      "section": "formation_evaluation",
+      "requirement": "PIT tests implemented",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#7, 20 Q14",
+      "blocking_for_run": true
+    },
+    {
+      "id": "EXEC-01",
+      "section": "execution",
+      "requirement": "Signal/order timestamps, market-on-open fill at RAW open t+1",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#8",
+      "blocking_for_run": false
+    },
+    {
+      "id": "EXEC-02",
+      "section": "execution",
+      "requirement": "No same-bar fills; no partial fills",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#8",
+      "blocking_for_run": false
+    },
+    {
+      "id": "EXEC-03",
+      "section": "execution",
+      "requirement": "Missing bar at execution: buy cancelled, sell pending/retried/superseded; no look-ahead",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#8.6",
+      "blocking_for_run": false
+    },
+    {
+      "id": "EXEC-06",
+      "section": "execution",
+      "requirement": "Order of operations at open; sizing on E_open; lambda buy scaling",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#8.4, 11.3",
+      "blocking_for_run": false
+    },
+    {
+      "id": "EXEC-07",
+      "section": "execution",
+      "requirement": "Initial portfolio (off-schedule signal before segment start) and segment-boundary order handling",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#8.14, 8.15",
+      "blocking_for_run": false
+    },
+    {
+      "id": "EXEC-04",
+      "section": "execution",
+      "requirement": "Gaps, close handling, forced exits, overnight, overlap, conflicts",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#8",
+      "blocking_for_run": false
+    },
+    {
+      "id": "EXEC-05",
+      "section": "execution",
+      "requirement": "Fill realism of daily open vs opening auction",
+      "status": "OPEN",
+      "evidence": "artifacts/day16/research-protocol-v2.md#20 Q6",
+      "blocking_for_run": false
+    },
+    {
+      "id": "COST-01",
+      "section": "costs",
+      "requirement": "0/5/10 bps per side on traded notional, separate simulations",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#9",
+      "blocking_for_run": false
+    },
+    {
+      "id": "COST-02",
+      "section": "costs",
+      "requirement": "Initial build and final liquidation charged; benchmarks charged identically",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#9, 10, 11.6",
+      "blocking_for_run": false
+    },
+    {
+      "id": "COST-03",
+      "section": "costs",
+      "requirement": "5 bps is a friction scenario, not a profitability threshold",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#9",
+      "blocking_for_run": false
+    },
+    {
+      "id": "COST-04",
+      "section": "costs",
+      "requirement": "Spread / market-impact model",
+      "status": "NOT APPLICABLE",
+      "evidence": "artifacts/day16/research-protocol-v2.md#9 (not modelled; disclosed)",
+      "blocking_for_run": false
+    },
+    {
+      "id": "BENCH-01",
+      "section": "benchmark",
+      "requirement": "B1 equal-weight buy-and-hold same universe, same engine/accounting/sessions/exclusions/costs; dividends to cash",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#10",
+      "blocking_for_run": false
+    },
+    {
+      "id": "BENCH-02",
+      "section": "benchmark",
+      "requirement": "B2 SPY buy-and-hold, reference only",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#10",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PORT-01",
+      "section": "portfolio",
+      "requirement": "Initial capital 100,000; daily close-marked equity",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#11",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PORT-02",
+      "section": "portfolio",
+      "requirement": "Sizing, fractional shares, no rounding, no leverage/shorting",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#11",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PORT-03",
+      "section": "portfolio",
+      "requirement": "Cash earns 0%",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#11.5, 20 Q7",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PORT-04",
+      "section": "portfolio",
+      "requirement": "Turnover definition",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#11.4",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PORT-05",
+      "section": "portfolio",
+      "requirement": "Segment start flat / end liquidation",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#11.6",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PORT-06",
+      "section": "portfolio",
+      "requirement": "Corporate actions on raw holdings: split adjusts shares, cash dividend credited on ex-date",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#11.2, 3.4",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PORT-08",
+      "section": "portfolio",
+      "requirement": "Single raw price basis; series B/C never enter accounting",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#11",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PORT-09",
+      "section": "portfolio",
+      "requirement": "Marking with missing close (split-adjusted last close)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#11.5",
+      "blocking_for_run": false
+    },
+    {
+      "id": "PORT-07",
+      "section": "portfolio",
+      "requirement": "Portfolio engine implemented",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#1.2, 20 Q14",
+      "blocking_for_run": true
+    },
+    {
+      "id": "MET-01",
+      "section": "metrics",
+      "requirement": "Primary metric net CAGR @5 bps with formula",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#12",
+      "blocking_for_run": false
+    },
+    {
+      "id": "MET-02",
+      "section": "metrics",
+      "requirement": "Secondary metric definitions (risk, turnover, costs, benchmark, breadth, concentration, subperiods)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#12",
+      "blocking_for_run": false
+    },
+    {
+      "id": "MET-03",
+      "section": "metrics",
+      "requirement": "Statistical diagnostic HAC t-stat + Holm (not gated)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#12, 14",
+      "blocking_for_run": false
+    },
+    {
+      "id": "GATE-01",
+      "section": "acceptance_gate",
+      "requirement": "Methodological hard-fail list",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#13.A",
+      "blocking_for_run": false
+    },
+    {
+      "id": "GATE-02",
+      "section": "acceptance_gate",
+      "requirement": "Economic gate: net CAGR@5 >= 0 AND >= B1 net CAGR@5 (margin 0)",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#13.B",
+      "blocking_for_run": false
+    },
+    {
+      "id": "GATE-03",
+      "section": "acceptance_gate",
+      "requirement": "Robustness = reporting completeness only; 'undefined (reason)' counts as present; never a selection criterion",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#13.C, 12",
+      "blocking_for_run": false
+    },
+    {
+      "id": "GATE-05",
+      "section": "acceptance_gate",
+      "requirement": "Gate comparison on unrounded float64; equality passes; identical for all families",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#13.B",
+      "blocking_for_run": false
+    },
+    {
+      "id": "GATE-04",
+      "section": "acceptance_gate",
+      "requirement": "Minimum Sharpe / trade count / drawdown / breadth thresholds",
+      "status": "NOT APPLICABLE",
+      "evidence": "artifacts/day16/research-protocol-v2.md#13.B (deliberately NOT PREDEFINED)",
+      "blocking_for_run": false
+    },
+    {
+      "id": "OOS-01",
+      "section": "oos_gate",
+      "requirement": "Research -> holdout -> forward sequence; all passing families advance",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#15",
+      "blocking_for_run": false
+    },
+    {
+      "id": "OOS-02",
+      "section": "oos_gate",
+      "requirement": "Holdout data not acquired before all research gates recorded; holdout one-shot",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#15, 3.9",
+      "blocking_for_run": false
+    },
+    {
+      "id": "OOS-03",
+      "section": "oos_gate",
+      "requirement": "No forward interim inspection; single acquisition after period end; no post-freeze data inspected earlier",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#15, 3.6, 3.9",
+      "blocking_for_run": false
+    },
+    {
+      "id": "OOS-06",
+      "section": "oos_gate",
+      "requirement": "Holdout restrictions (no tuning/selection/modification/winner; not blind) and no rescue of research-failed families",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#15",
+      "blocking_for_run": false
+    },
+    {
+      "id": "OOS-04",
+      "section": "oos_gate",
+      "requirement": "Spec identity across stages via strategy-config SHA-256",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#15, 17",
+      "blocking_for_run": false
+    },
+    {
+      "id": "OOS-05",
+      "section": "oos_gate",
+      "requirement": "Stop rules if none pass",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#15",
+      "blocking_for_run": false
+    },
+    {
+      "id": "REPRO-01",
+      "section": "reproducibility",
+      "requirement": "Protocol version/SHA, git commit, environment, data manifests, config hash, command, timestamps, result hashes",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#17",
+      "blocking_for_run": false
+    },
+    {
+      "id": "REPRO-02",
+      "section": "reproducibility",
+      "requirement": "Determinism: byte-identical repeated runs",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#17",
+      "blocking_for_run": false
+    },
+    {
+      "id": "REPRO-03",
+      "section": "reproducibility",
+      "requirement": "Random seeds",
+      "status": "NOT APPLICABLE",
+      "evidence": "artifacts/day16/research-protocol-v2.md#11.12, 17 (no randomness)",
+      "blocking_for_run": false
+    },
+    {
+      "id": "REPRO-04",
+      "section": "reproducibility",
+      "requirement": "Freeze commit SHA and file hashes recorded",
+      "status": "OPEN",
+      "evidence": "artifacts/day16/research-protocol-v2.md#0 (pending commit)",
+      "blocking_for_run": true
+    },
+    {
+      "id": "SNOOP-01",
+      "section": "data_snooping",
+      "requirement": "Family IDs and experiment ID scheme",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#14",
+      "blocking_for_run": false
+    },
+    {
+      "id": "SNOOP-02",
+      "section": "data_snooping",
+      "requirement": "One variant per family; no allowed variants; new-experiment trigger",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#14",
+      "blocking_for_run": false
+    },
+    {
+      "id": "SNOOP-03",
+      "section": "data_snooping",
+      "requirement": "All runs recorded including failures",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#14",
+      "blocking_for_run": false
+    },
+    {
+      "id": "SNOOP-04",
+      "section": "data_snooping",
+      "requirement": "Winner selection prohibited; best-among-tested vs validated distinction",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#14, 15",
+      "blocking_for_run": false
+    },
+    {
+      "id": "SNOOP-05",
+      "section": "data_snooping",
+      "requirement": "No parameter derived from DAY-04..15H results",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#0, 4-6 rationales",
+      "blocking_for_run": false
+    },
+    {
+      "id": "SNOOP-06",
+      "section": "data_snooping",
+      "requirement": "Experiment registry implemented",
+      "status": "NOT YET IMPLEMENTED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#18",
+      "blocking_for_run": true
+    },
+    {
+      "id": "SNOOP-07",
+      "section": "data_snooping",
+      "requirement": "Statistical diagnostic cannot pass, fail, rescue or select; failed families never silently modified",
+      "status": "PREDEFINED",
+      "evidence": "artifacts/day16/research-protocol-v2.md#14",
+      "blocking_for_run": false
+    }
+  ]
+}
