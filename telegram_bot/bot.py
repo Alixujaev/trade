@@ -1,6 +1,6 @@
 """Bot ilovasini yig'ish va ishga tushirish.
 
-Ishga tushirish: smc-scanner/ papkasidan `python -m telegram_bot.bot`
+Ishga tushirish: loyiha ildizidan (trade/) `python -m telegram_bot.bot`
 (TELEGRAM_BOT_TOKEN va TELEGRAM_ALLOWED_USER_ID .env faylda bo'lishi shart)."""
 
 from __future__ import annotations

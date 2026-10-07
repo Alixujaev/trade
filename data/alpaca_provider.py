@@ -134,7 +134,7 @@ class AlpacaProvider(DataProvider):
             if not api_key or not secret_key:
                 raise ValueError(
                     "ALPACA_API_KEY va ALPACA_SECRET_KEY .env faylida topilmadi. "
-                    ".env.example'ga qarab smc-scanner/.env yarating."
+                    ".env.example'ga qarab .env (loyiha ildizi) yarating."
                 )
             self._client = StockHistoricalDataClient(api_key, secret_key)
         return self._client

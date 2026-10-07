@@ -133,7 +133,7 @@ def main() -> int:
     dirty = [ln[3:].strip() for ln in status if ln.strip()]
     repro = {
         "git_commit": _git("rev-parse", "HEAD"), "git_dirty": bool(dirty),
-        "uncommitted_files": {p: _sha(ROOT.parent / p) if (ROOT.parent / p).is_file() else
+        "uncommitted_files": {p: _sha(ROOT / p) if (ROOT / p).is_file() else
                               (_sha(ROOT / p) if (ROOT / p).is_file() else None) for p in dirty},
         "protocol": {"path": PROTOCOL_DOC, "sha256": _sha(ROOT / PROTOCOL_DOC),
                      "commit": _git("log", "-1", "--format=%H", "--", PROTOCOL_DOC)},
