@@ -96,6 +96,82 @@
    "artifacts": "artifacts/day19/v2/V2-B2-research/",
    "run_summary_sha256": "698b8c3bbea9ca304a9a2d7f1095e82e0de7fb137a2fc7d1e06ad88bface32cf",
    "technical_reruns": "run 1 aborted before writing run_summary.json by a JSON serialisation error (numpy bool); identical configuration re-run after the fix; then a determinism re-run to a scratchpad"
+  },
+  {
+   "experiment_id": "V2-MOM-H001",
+   "family": "V2-MOM",
+   "segment": "holdout",
+   "task": "DAY-21",
+   "stage": "H",
+   "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; unchanged)",
+   "snapshot": "stage_h_20261008T100604Z",
+   "strategy_config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+   "net_cagr": {
+    "0bps": 0.7177913957601592,
+    "5bps": 0.7124610715568995,
+    "10bps": 0.7071510888097017
+   },
+   "status": "HOLDOUT-PASSED",
+   "artifacts": "artifacts/day21/v2/V2-MOM-H001/",
+   "run_summary_sha256": "019095d42644fd5e00d4855e744b60602249ed73147637edf502949bf98b9d36",
+   "technical_reruns": "none (one evaluation run plus one determinism re-run to a scratchpad)"
+  },
+  {
+   "experiment_id": "V2-STR-H001",
+   "family": "V2-STR",
+   "segment": "holdout",
+   "task": "DAY-21",
+   "stage": "H",
+   "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; unchanged)",
+   "snapshot": "stage_h_20261008T100604Z",
+   "strategy_config_sha256": "0fc76b8a9ba8250c8fa1b399871ca6f511d5e0283f0ffe94f9085f0e38aa600e",
+   "net_cagr": {
+    "0bps": 0.2723037506355628,
+    "5bps": 0.22187154409624155,
+    "10bps": 0.17344672700845432
+   },
+   "status": "HOLDOUT-FAILED (economic)",
+   "artifacts": "artifacts/day21/v2/V2-STR-H001/",
+   "run_summary_sha256": "019095d42644fd5e00d4855e744b60602249ed73147637edf502949bf98b9d36",
+   "technical_reruns": "none (one evaluation run plus one determinism re-run to a scratchpad)"
+  },
+  {
+   "experiment_id": "V2-B1-holdout",
+   "family": "B1",
+   "segment": "holdout",
+   "task": "DAY-21",
+   "stage": "H",
+   "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; unchanged)",
+   "snapshot": "stage_h_20261008T100604Z",
+   "strategy_config_sha256": null,
+   "net_cagr": {
+    "0bps": 0.5328363188782443,
+    "5bps": 0.5323880517105726,
+    "10bps": 0.5319399183151041
+   },
+   "status": "BENCHMARK (gate reference)",
+   "artifacts": "artifacts/day21/v2/V2-B1-holdout/",
+   "run_summary_sha256": "019095d42644fd5e00d4855e744b60602249ed73147637edf502949bf98b9d36",
+   "technical_reruns": "none (one evaluation run plus one determinism re-run to a scratchpad)"
+  },
+  {
+   "experiment_id": "V2-B2-holdout",
+   "family": "B2",
+   "segment": "holdout",
+   "task": "DAY-21",
+   "stage": "H",
+   "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; unchanged)",
+   "snapshot": "stage_h_20261008T100604Z",
+   "strategy_config_sha256": null,
+   "net_cagr": {
+    "0bps": 0.23271939951439635,
+    "5bps": 0.23236183330369142,
+    "10bps": 0.2320043758388477
+   },
+   "status": "BENCHMARK (not gated)",
+   "artifacts": "artifacts/day21/v2/V2-B2-holdout/",
+   "run_summary_sha256": "019095d42644fd5e00d4855e744b60602249ed73147637edf502949bf98b9d36",
+   "technical_reruns": "none (one evaluation run plus one determinism re-run to a scratchpad)"
   }
  ]
 }

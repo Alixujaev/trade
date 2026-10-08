@@ -1,0 +1,328 @@
+{
+ "config_identical_to_research": {
+  "V2-MOM": true,
+  "V2-STR": true
+ },
+ "decision_counts": {
+  "V2-MOM": 42,
+  "V2-STR": 179
+ },
+ "determinism_in_process": {
+  "B1@0bps": true,
+  "B1@10bps": true,
+  "B1@5bps": true,
+  "B2@0bps": true,
+  "B2@10bps": true,
+  "B2@5bps": true,
+  "V2-MOM@0bps": true,
+  "V2-MOM@10bps": true,
+  "V2-MOM@5bps": true,
+  "V2-STR@0bps": true,
+  "V2-STR@10bps": true,
+  "V2-STR@5bps": true
+ },
+ "families_not_run": {
+  "V2-LRV": "RESEARCH-FAILED (economic); never run on the holdout (\u00a715.3)"
+ },
+ "gate_A_checks": {
+  "complete_dataset": true,
+  "data_integrity": true,
+  "deterministic": true,
+  "execution_accounting_semantics": true,
+  "look_ahead_tests_pass": true,
+  "reproducibility_block_complete": true
+ },
+ "gates": {
+  "V2-MOM": {
+   "A_methodological": "PASS",
+   "B1_net_cagr_5bps_ge_0": true,
+   "B2_net_cagr_5bps_ge_B1": true,
+   "B_economic": "PASS",
+   "C_completeness": "PASS",
+   "C_missing_items": {
+    "0bps": [],
+    "10bps": [],
+    "5bps": []
+   },
+   "b1_net_cagr_5bps": 0.5323880517105726,
+   "net_cagr_5bps": 0.7124610715568995,
+   "status": "HOLDOUT-PASSED"
+  },
+  "V2-STR": {
+   "A_methodological": "PASS",
+   "B1_net_cagr_5bps_ge_0": true,
+   "B2_net_cagr_5bps_ge_B1": false,
+   "B_economic": "FAIL",
+   "C_completeness": "PASS",
+   "C_missing_items": {
+    "0bps": [],
+    "10bps": [],
+    "5bps": []
+   },
+   "b1_net_cagr_5bps": 0.5323880517105726,
+   "net_cagr_5bps": 0.22187154409624155,
+   "status": "HOLDOUT-FAILED (economic)"
+  }
+ },
+ "headline": {
+  "0bps": {
+   "B1": {
+    "cagr": 0.5328363188782443,
+    "ending_equity": 426674.59336522804,
+    "total_return": 3.26674593365228
+   },
+   "B2": {
+    "cagr": 0.23271939951439635,
+    "ending_equity": 203540.07310664203,
+    "total_return": 1.0354007310664204
+   },
+   "V2-MOM": {
+    "cagr": 0.7177913957601592,
+    "ending_equity": 628280.3841434743,
+    "total_return": 5.282803841434743
+   },
+   "V2-STR": {
+    "cagr": 0.2723037506355628,
+    "ending_equity": 226608.7686865109,
+    "total_return": 1.266087686865109
+   }
+  },
+  "10bps": {
+   "B1": {
+    "cagr": 0.5319399183151041,
+    "ending_equity": 425827.6157052686,
+    "total_return": 3.258276157052686
+   },
+   "B2": {
+    "cagr": 0.2320043758388477,
+    "ending_equity": 203139.31950922354,
+    "total_return": 1.0313931950922353
+   },
+   "V2-MOM": {
+    "cagr": 0.7071510888097017,
+    "ending_equity": 615158.8701731006,
+    "total_return": 5.151588701731006
+   },
+   "V2-STR": {
+    "cagr": 0.17344672700845432,
+    "ending_equity": 172169.00373960397,
+    "total_return": 0.7216900373960398
+   }
+  },
+  "5bps": {
+   "B1": {
+    "cagr": 0.5323880517105726,
+    "ending_equity": 426250.8928966526,
+    "total_return": 3.2625089289665254
+   },
+   "B2": {
+    "cagr": 0.23236183330369142,
+    "ending_equity": 203339.5961696026,
+    "total_return": 1.033395961696026
+   },
+   "V2-MOM": {
+    "cagr": 0.7124610715568995,
+    "ending_equity": 621682.6585024017,
+    "total_return": 5.216826585024017
+   },
+   "V2-STR": {
+    "cagr": 0.22187154409624155,
+    "ending_equity": 197519.78350185242,
+    "total_return": 0.9751978350185242
+   }
+  }
+ },
+ "holdout_or_forward_data_read": false,
+ "last_session_loaded": "2026-06-02",
+ "pit_tests": {
+  "V2-MOM": {
+   "decision_sessions_sampled": 6,
+   "future_deletion_test": true,
+   "future_mutation_test": true,
+   "truncation_test": true
+  },
+  "V2-STR": {
+   "decision_sessions_sampled": 19,
+   "future_deletion_test": true,
+   "future_mutation_test": true,
+   "truncation_test": true
+  },
+  "all_pass": true,
+  "execution_timing_test": {
+   "pass": true,
+   "rule": "every fill at the open after its decision close (LRV period-end exits at the next cycle start); all fills inside the segment"
+  },
+  "fill_source_test": {
+   "fills_checked": 1850,
+   "pass": true,
+   "series": "raw open (series A)"
+  },
+  "index_test": {
+   "pass": true,
+   "sessions_checked": 29
+  }
+ },
+ "reproducibility": {
+  "data": {
+   "bars_raw_sha256": {
+    "bars_raw/AAPL.parquet": "585d1d79302fd44fce3efb4a99e548af61c57d99ec588fed72ac015cb25e0c9d",
+    "bars_raw/ADBE.parquet": "a10843b83bfddfa682c05bf0885eb63288873a20e3ffe3946c342cf24daad653",
+    "bars_raw/AMAT.parquet": "5ed054027f599068da575f797bf28f847491d8304ce9a7c09e3645a0267fd8da",
+    "bars_raw/AMD.parquet": "acb728579597084ceba24c1df6597708a0f4d428779b584defd26da0147f7305",
+    "bars_raw/AMZN.parquet": "f2daa6d100865fda67e5d6868d5520d2096873788beebd659357e496dcecfe42",
+    "bars_raw/AVGO.parquet": "bfebdd8b68e20135d92f767b147d788e39c42c8a784125d719ff3f99544c682c",
+    "bars_raw/COST.parquet": "31831d0290c0228a91ca6ecdc5945bda4cf6054963bc6b6bb3b7ae4dca8cda67",
+    "bars_raw/CRM.parquet": "fd4698a3ebd6c842ab011170443a87bd03442d1203d9173f4edb4354eb9d4855",
+    "bars_raw/CSCO.parquet": "9ea8c2e3f69b8a5a20c605d9a1fa2e12063ffdbe973f536675e579d5278a6b5b",
+    "bars_raw/GOOGL.parquet": "2aad73f9a70dd01253cf7952c0924d8c11fde29fee663c73de837b3bb8fc4c50",
+    "bars_raw/INTC.parquet": "dd685a3053406c62f8f1805f1b175cf80dc6a7079754b4109162fe9d3c13cbf5",
+    "bars_raw/JNJ.parquet": "20e93d98bb371f223a2d0f1e968ffabed7decc1254944c863f9b65a24890f796",
+    "bars_raw/JPM.parquet": "f486252aa64a59c6ea2841ce919b93557f95c21b62835de607a7a4e550ab73b6",
+    "bars_raw/KO.parquet": "1155fb6c8607584f2639e8b87bedbd21e815e820cb6221bc6f1b970b39bfc09a",
+    "bars_raw/META.parquet": "12b4ef959ca5309a50b18b78a6aad3352fd8da7570657a409c7bcc243665d4f5",
+    "bars_raw/MSFT.parquet": "e2008648f0ba0329b35216203c35a202232cdc033e2b93cb12a5350802776f6b",
+    "bars_raw/MU.parquet": "f4643de8d027aca49d8c42dc65ae856df1bd9f7b268a2e2c2157972c6bcac188",
+    "bars_raw/NFLX.parquet": "502643c1f040629fd6e0f552792e116be551c95988e13afc3d2efced872309c3",
+    "bars_raw/NVDA.parquet": "181727a411a9fd30a2ab8de2980bdeb7671d4646315ddb2eeb73f40c3c66a4b0",
+    "bars_raw/ORCL.parquet": "5ad2902b31a77aec23613e7b679bbd1f1d3e98e542aca86739b7ee2f38e007d7",
+    "bars_raw/PEP.parquet": "3ed9259a918edf31c39d6c703bbb52ee3d13a39c0fa2fe2e2752cde79a070f51",
+    "bars_raw/QCOM.parquet": "7afe69e5a1778011006460bdbd212b1abc8ea0c34ea7acbb2caac3aa15c1ebdc",
+    "bars_raw/SPY.parquet": "d1acafd2b8d17710ddaa8a8e65c2d4872dbea6b91c196e418121d52f1f6840a2",
+    "bars_raw/TSLA.parquet": "304a43efd6a04a1366aca0814e34d3cf51f4cc909fdeff2a55f03aee5f042002",
+    "bars_raw/WMT.parquet": "785869b1201f014db2d4da4d45e84dd6697b86d5f7994e588e313edd20b38e81",
+    "bars_raw/XOM.parquet": "904742d10867f0463419de0ca4660448fa9058305ed455fa1d0ff6e6f44da8ba"
+   },
+   "corporate_action_endpoint": "/v1/corporate-actions (Stage H acquisition, DAY-20)",
+   "events": {
+    "events_total": 415,
+    "events_used": 414,
+    "excluded_by_review": [],
+    "excluded_first_session": [
+     "ba50d815-d70c-4eb9-9b11-bcaf89a75331"
+    ],
+    "readiness": "data/oos_cache/protocol_v2/stage_h/validation__stage_h_20261008T100604Z__day20a (manifest e2a7d5a72d5a12342554edff34efb3e398b10eb8db101716dbc806592f82530f)",
+    "source": "data/oos_cache/protocol_v2/stage_h/stage_h_20261008T100604Z/events_normalised.json"
+   },
+   "file_count": 63,
+   "first_session": "2021-01-04",
+   "last_session": "2026-06-02",
+   "manifest_sha256": "eff959594658303c9aafeb81d18a159b742071821a4fe081e462691455be4a34",
+   "missing_bars": 0,
+   "series_A_only": true,
+   "series_C_loaded": false,
+   "sessions": 1359,
+   "snapshot_id": "stage_h_20261008T100604Z",
+   "stage": "H",
+   "tree_sha256": "8a51463b335f0f4e2acf776bd4fdfb36ca07cf52eb2d5878f3f0251d328c5556"
+  },
+  "engine_sha256": {
+   "backtest/v2/__init__.py": "20902cb2834ec70eb552c542dd47cf0378ff9a36fda5344f2d86079227b463b0",
+   "backtest/v2/data.py": "20134c90d661edc6a2a73641cb451ed8116d5c3820e35e0f9249c71ec05b597b",
+   "backtest/v2/engine.py": "35b43d952400ffeb79e05a90cb75fa582aeca8bb97809dc4223d7578999fc59e",
+   "backtest/v2/metrics.py": "42c7e02153a2b3bcfa8ec9545367380dd1c1c3b9f156e81fe3764c52591ab6fa",
+   "backtest/v2/run.py": "0a12c5b080e108fb4bdfa77de0d4f1ec2e008fce699bf440c2c2d90073d5c439",
+   "backtest/v2/signals.py": "8838044b17a5ea2d9f0f1b61b6417d686315849ff2423640262963862155db55"
+  },
+  "freeze_commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+  "git_commit": "5ed3d0ab5c2d205707d321494086bc7734f213d0",
+  "predeclared_definitions_sha256": "926e4926e7be0b20c2f4943d0b7309e3c8b2aeee1fd1888f8b52b7f209c9cfcd",
+  "protocol_files_sha256": {
+   "artifacts/day16/research-checklist.json": "7142f02ca243c08163385b5e5e1560024d3b71b87d3aaabf449d41f8ddf40eb3",
+   "artifacts/day16/research-protocol-v2.json": "ed21cfa508ac9aadcb6600b227014a084cbbfd6a9a5546433bd5327f5154e037",
+   "artifacts/day16/research-protocol-v2.md": "57cc368d80a0a3c89af78fe5fd1a6b95962859a3f494ae79a759fb7406a86fb1"
+  },
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4",
+  "random_seeds": null,
+  "strategy_config_sha256": {
+   "V2-MOM": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+   "V2-STR": "0fc76b8a9ba8250c8fa1b399871ca6f511d5e0283f0ffe94f9085f0e38aa600e"
+  }
+ },
+ "result_files_sha256": {
+  "V2-B1-holdout/0bps/decisions.json": "a8afc0068be26c2277bcec0391596cf393f5e72512427f51ea0d150194d904f5",
+  "V2-B1-holdout/0bps/episodes.json": "8d7bce03472478349c0fae8c3fcc74e5ca43c536db7c853833e79baf42744c16",
+  "V2-B1-holdout/0bps/equity.csv": "b3288b8998bda2e3b809b7ec390737c0ff038c05bcdc5bac999ff40266f07c6c",
+  "V2-B1-holdout/0bps/executions.json": "b31df98d7e87035f8d3ec0618f7719d2839c8eeaafedb0c1a560592620968058",
+  "V2-B1-holdout/0bps/fills.csv": "a40ec02b1df60760afe3551550e19d35345cb05962262536a5baeb269590907f",
+  "V2-B1-holdout/0bps/metrics.json": "fde0df3ca25913093aca1b6e1014a7baba0590745b40e7cadfbc33df43c36d13",
+  "V2-B1-holdout/10bps/decisions.json": "a8afc0068be26c2277bcec0391596cf393f5e72512427f51ea0d150194d904f5",
+  "V2-B1-holdout/10bps/episodes.json": "79ec507991abe48436603fd55d7457c5c974d68eea1e95a0bfa1dd2b403445e0",
+  "V2-B1-holdout/10bps/equity.csv": "b9065380a5b2b76462a40450baca380066f79a82e650161c952eff6ecd9e239e",
+  "V2-B1-holdout/10bps/executions.json": "bc87bc81e61cdf8c89bd3c9da460aa022034ff206f85064f33fc7170481071e5",
+  "V2-B1-holdout/10bps/fills.csv": "54eae397aba7a209f8998511ac9907af94ada89b961717f918cb71a302b1ed1e",
+  "V2-B1-holdout/10bps/metrics.json": "35a5719749ebd1f5d9d66f5ed507317f948570bc1286089d4af649162d27507a",
+  "V2-B1-holdout/5bps/decisions.json": "a8afc0068be26c2277bcec0391596cf393f5e72512427f51ea0d150194d904f5",
+  "V2-B1-holdout/5bps/episodes.json": "2d90b7a8f010a0f73e0ecd81e7b42fc04f3d8fd1364a5efd722cec05c7e445cd",
+  "V2-B1-holdout/5bps/equity.csv": "18119199c1fd0aea4bb688a21f3677e01c4e772cff1a4ca55e6a64bb55809746",
+  "V2-B1-holdout/5bps/executions.json": "51d5414248af056e74239a3dae39be94899ce02cb98bc1f96173464f415c541c",
+  "V2-B1-holdout/5bps/fills.csv": "ab22f219d31d70c3ad324af79bfdf0b528c81eacd3b7f7efb8949ec3abe90084",
+  "V2-B1-holdout/5bps/metrics.json": "a5b6b625ec16719ab3698d173985140cc9bba21033854a2043ed4c8bca559e8a",
+  "V2-B2-holdout/0bps/decisions.json": "ed33bd968f58bdf3af3d9317ddb4cdfd98f55ac40ca2bdfd7c327e42eb881f33",
+  "V2-B2-holdout/0bps/episodes.json": "13c685fc7aae73ffd37d7d3e4cfd13ce128acbbdd2e0a1da79381bb76e573aa8",
+  "V2-B2-holdout/0bps/equity.csv": "e64d44a606b5a28195be814013afdaed2c11310be3f68c4b5728679fb4ca37d0",
+  "V2-B2-holdout/0bps/executions.json": "6e01ae008a5c82b6c31330c4e9cdc9b7787910e81855558c6ae9df857ad5a45f",
+  "V2-B2-holdout/0bps/fills.csv": "ee0f70d8123832dccd2a1402c1db18c9f159efd2e3310b76688df19d1f99b23c",
+  "V2-B2-holdout/0bps/metrics.json": "048302185bf65d7f47a87caeca3e91057c7f241b02faa4a0fd7a436fa01e7ab7",
+  "V2-B2-holdout/10bps/decisions.json": "ed33bd968f58bdf3af3d9317ddb4cdfd98f55ac40ca2bdfd7c327e42eb881f33",
+  "V2-B2-holdout/10bps/episodes.json": "e68fe154939a0c361676c4ceb69577826451a5c3a390615a8d2b0d658ad90c07",
+  "V2-B2-holdout/10bps/equity.csv": "b7011a7ef7fda35a1bf103233c905cb40c13195ae6805bc65279dabd6aac4821",
+  "V2-B2-holdout/10bps/executions.json": "b1c2cc8538b439db804e79e27c5513a9619f68cc2a4cf2500f9c26328704b456",
+  "V2-B2-holdout/10bps/fills.csv": "a5b56d923baea12a70f14c53253b5ab61e16fc668cd15325ad33e4b1ae1af0e9",
+  "V2-B2-holdout/10bps/metrics.json": "2afe094b80308a8bc549395a1e2d08f02d16c8f2b580e35c2ac474c87ae8a488",
+  "V2-B2-holdout/5bps/decisions.json": "ed33bd968f58bdf3af3d9317ddb4cdfd98f55ac40ca2bdfd7c327e42eb881f33",
+  "V2-B2-holdout/5bps/episodes.json": "146135264b9d381697ab3e3326ee1a4c56a1a5dee1ecf27cb3d9956fc0baa892",
+  "V2-B2-holdout/5bps/equity.csv": "0633d37f5e9d14f76bbca3c743e15e9002310a66d61017d22528ff2755b2b161",
+  "V2-B2-holdout/5bps/executions.json": "4bcfa87c032b2e6bfcb82b633d89c57784a03c2a04dd26b50a6a3ea8ea271cf4",
+  "V2-B2-holdout/5bps/fills.csv": "0c5f939f08209a0ddefe6404574e75c2bb15ae14514aa200b02870741de52ea4",
+  "V2-B2-holdout/5bps/metrics.json": "be1512cedf22f8cf4efd1e0fe6df58ae5101436d958d60cfb5302dec46b9c753",
+  "V2-MOM-H001/0bps/decisions.json": "bc35fc0363ac8725274a35954e57489db98bfdcba770225295e5bc8ef574bdf1",
+  "V2-MOM-H001/0bps/episodes.json": "a4afeeab13b1283575fcb1462c62d7ff3b8fb0ea0172ebd11948de2e824fc7cb",
+  "V2-MOM-H001/0bps/equity.csv": "4214a360422c3d6bd950a458e5b58cda09f551411d61ba94b44469a130bf00a9",
+  "V2-MOM-H001/0bps/executions.json": "0536347c23b1bd07a9145494618d705a8292dd2155e0797e5644db37ae946d8c",
+  "V2-MOM-H001/0bps/fills.csv": "361b52bd2775d7b601b42a562b6a5b844b183afedbdfa235d966e6fd6e52bdeb",
+  "V2-MOM-H001/0bps/metrics.json": "9ff1e730ad43ae49891e43badb231a6932f1ded1c01c5e944ada8e755a417b7e",
+  "V2-MOM-H001/10bps/decisions.json": "bc35fc0363ac8725274a35954e57489db98bfdcba770225295e5bc8ef574bdf1",
+  "V2-MOM-H001/10bps/episodes.json": "54a74a6563096f17235f52954659294466e4f55bc083c00226739c675a2be4a3",
+  "V2-MOM-H001/10bps/equity.csv": "8f82ec33b5e8735b4084199fffe310ace6ea5d95a5ae1a023d94562d82a9e77b",
+  "V2-MOM-H001/10bps/executions.json": "df8bcb0170a277ef96b5f5ef70e85b2f807cbc4709e26461fa62e042160e38f1",
+  "V2-MOM-H001/10bps/fills.csv": "32fa6f525d378fdf8bc20efadbd9180ba1665963483c2f349d257579c1278e32",
+  "V2-MOM-H001/10bps/metrics.json": "331260cabfe25c3a707a13113331dcbf28d9f1e8278260ce15184f29fd85411c",
+  "V2-MOM-H001/5bps/decisions.json": "bc35fc0363ac8725274a35954e57489db98bfdcba770225295e5bc8ef574bdf1",
+  "V2-MOM-H001/5bps/episodes.json": "0a4e88a30a7460e5d0886c1991e4fdc74501d7d94589b32474e72403294eddff",
+  "V2-MOM-H001/5bps/equity.csv": "36fa0c994e33878005ce7ab5057401dc091f757eb077b1c05543059f7f52f2bc",
+  "V2-MOM-H001/5bps/executions.json": "503ca794cd635886ec1bdf9a778e013e2ddfc0002f78079bd45f80a64e58cedb",
+  "V2-MOM-H001/5bps/fills.csv": "e0a34d918e38704409f164b8e104525e364ef73aa98c986d57e8b926e502554d",
+  "V2-MOM-H001/5bps/metrics.json": "61737c9c82d061e4115b44b067922e46a58ac9a668e8007a4317cd731b075014",
+  "V2-STR-H001/0bps/decisions.json": "27ab5ad545505aa97ec9a270e4129e33636c2cd6d64cbf4a1b8da4bf15350018",
+  "V2-STR-H001/0bps/episodes.json": "d484bf4d7cc5a5b1b4ce54ea17efd5ffccfbc7aafd2ddfe1c5731577c7458763",
+  "V2-STR-H001/0bps/equity.csv": "59c4814eadcf6299866b4acc800a15760b5c82169a8933b3c726a02528987ef4",
+  "V2-STR-H001/0bps/executions.json": "595968809b61d1c2eafe9edf6fd3b8448dbaf02a9ac1dd65e718bc238d9ad6be",
+  "V2-STR-H001/0bps/fills.csv": "31507a3c9595b3264bb42a6693f1a2acfe84c96d4a83400b89fe52059518b950",
+  "V2-STR-H001/0bps/metrics.json": "d0139559ac3529541a3a16775eae0f837f1c92d4933b1706723ad70acaa1c210",
+  "V2-STR-H001/10bps/decisions.json": "27ab5ad545505aa97ec9a270e4129e33636c2cd6d64cbf4a1b8da4bf15350018",
+  "V2-STR-H001/10bps/episodes.json": "0456104dbbc4d2e9915c9ca4be9079a3b8df0100ec01f5a10c6a24aab62457df",
+  "V2-STR-H001/10bps/equity.csv": "34efce03a62803a8fcc3e14c4a72f811c6c3615d06e48fdd03dd038d4f2e2126",
+  "V2-STR-H001/10bps/executions.json": "10bb3177b1a5e710f6050ab4433f127295fd83d596e0374e3ec8e589c1d35076",
+  "V2-STR-H001/10bps/fills.csv": "1f513fe037662a1e64b35346650a1192b52a7d815d8c1815dcadbd75bb76098e",
+  "V2-STR-H001/10bps/metrics.json": "642144a8e67247e87c1c6b5cda50447f179ea6347eaf6fd4a41efb293d51ace9",
+  "V2-STR-H001/5bps/decisions.json": "27ab5ad545505aa97ec9a270e4129e33636c2cd6d64cbf4a1b8da4bf15350018",
+  "V2-STR-H001/5bps/episodes.json": "b8160217dcc45224ce8e05cfefbd90850c1b01af6325a14cd13e39754bf499b5",
+  "V2-STR-H001/5bps/equity.csv": "bcee902ffb5ad032f49b720b77d9535e400c51d804919d3c993d87e6e205db2c",
+  "V2-STR-H001/5bps/executions.json": "9b4393045e5139a2fad87aadcd98045853d0c5722a2bfaac9a40e6a497fb7b49",
+  "V2-STR-H001/5bps/fills.csv": "c60063d9ae39bf180b6578c324d503ea2a9657d3c7d70a3ae98e13b42935b7fa",
+  "V2-STR-H001/5bps/metrics.json": "a7f4ac29ffa45125a672c9039e0a49db63e06db526251c6abad8fbfeda445864"
+ },
+ "schema_version": "1.0",
+ "segment": {
+  "first": "2023-01-03",
+  "id": "holdout",
+  "last": "2026-06-02",
+  "sessions": 856
+ },
+ "task": "DAY-21",
+ "warmup": {
+  "first": "2021-01-04",
+  "last": "2022-12-30",
+  "sessions": 503
+ }
+}

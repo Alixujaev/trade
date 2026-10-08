@@ -1,0 +1,108 @@
+{
+ "annual_turnover": 0.147196261682243,
+ "cagr": 0.23271939951439635,
+ "calendar_years": {
+  "2023": {
+   "cagr": 0.25612512088217576,
+   "label": "full",
+   "max_drawdown": 0.09877070166646329,
+   "return": 0.25385387257069914,
+   "sessions": 250,
+   "sharpe": 1.8141817386812011,
+   "sortino": 2.806862597340966,
+   "volatility": 0.13041613465928587
+  },
+  "2024": {
+   "cagr": 0.24449953878752484,
+   "label": "full",
+   "max_drawdown": 0.08259577952197161,
+   "return": 0.24449953878752484,
+   "sessions": 252,
+   "sharpe": 1.833287949186424,
+   "sortino": 2.6580576603515533,
+   "volatility": 0.1235162668921211
+  },
+  "2025": {
+   "cagr": 0.17342030944381404,
+   "label": "full",
+   "max_drawdown": 0.18312988853068324,
+   "return": 0.1719319153788199,
+   "sessions": 250,
+   "sharpe": 0.9374770052884078,
+   "sortino": 1.4171307203547676,
+   "volatility": 0.18951774843722569
+  },
+  "2026": {
+   "cagr": 0.2962456800176967,
+   "label": "full",
+   "max_drawdown": 0.0861487609013295,
+   "return": 0.1130274594686993,
+   "sessions": 104,
+   "sharpe": 2.082556983981752,
+   "sortino": 3.2328122291518886,
+   "volatility": 0.12858351265176535
+  }
+ },
+ "calmar": 1.2707887356978558,
+ "cash_exposure": {
+  "max": 0.03478745184099574,
+  "mean": 0.01800435869018202,
+  "min": 0.0
+ },
+ "cost_drag": 0.0,
+ "cost_per_execution": 0.0,
+ "dividend_cash_total": 5925.7951973358995,
+ "ending_equity": 203540.07310664203,
+ "episodes": {
+  "mean": 1.0354007310664204,
+  "median": 1.0354007310664204,
+  "profit_factor": {
+   "undefined": "no losing episode"
+  },
+  "win_rate": 1.0
+ },
+ "executions": 1,
+ "exposure": {
+  "max": 1.0,
+  "mean": 0.981995641309818,
+  "min": 0.9652125481590043
+ },
+ "max_drawdown": 0.18312988853068335,
+ "mean_lambda": 1.0,
+ "mean_positions": 1.0,
+ "min_lambda": 1.0,
+ "position_episodes": 1,
+ "pre_liquidation_equity": 203540.07310664203,
+ "rebalances": 1,
+ "sessions": 856,
+ "sharpe": 1.488307034473724,
+ "sortino": 2.243079399641125,
+ "starting_capital": 100000.0,
+ "symbol_breadth": 1.0,
+ "symbol_pnl_contribution": {
+  "SPY": 103540.07310664206
+ },
+ "symbols_held": {
+  "distinct_ever_held": 1,
+  "max": 1,
+  "mean": 1.0,
+  "min": 1
+ },
+ "top2_concentration": 1.0,
+ "total_costs": 0.0,
+ "total_return": 1.0354007310664204,
+ "trades": 1,
+ "turnover_per_execution_mean": 0.5,
+ "turnover_total": 0.5,
+ "volatility": 0.14794396787246916,
+ "weight_hhi": 1.0,
+ "worst_month": {
+  "month": "2025-03",
+  "return": -0.05444254531420578
+ },
+ "worst_year": {
+  "note": "2017 is partial (from 2017-02-01)",
+  "return": 0.1130274594686993,
+  "year": "2026"
+ }
+}

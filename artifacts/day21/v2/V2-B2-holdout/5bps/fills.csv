@@ -1,0 +1,2 @@
+session,ticker,side,shares,price,notional,cost,lambda,slot
+2023-01-03,SPY,buy,np.float64(260.03596791504606),np.float64(384.37),np.float64(99950.02498750624),np.float64(49.97501249375312),np.float64(0.9995002498750625),

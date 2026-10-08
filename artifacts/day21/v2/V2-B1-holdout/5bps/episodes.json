@@ -1,0 +1,202 @@
+[
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 9667.944658312537,
+  "inflow": 9775.35180828376,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "AAPL"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 3079.115957073204,
+  "inflow": 3079.115957073204,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "ADBE"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 19627.55116377864,
+  "inflow": 19848.34885353755,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "AMAT"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 31577.84906449772,
+  "inflow": 31577.84906449772,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "AMD"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 11994.552220730262,
+  "inflow": 11994.552220730262,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "AMZN"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 34059.37491431275,
+  "inflow": 34564.96282832035,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "AVGO"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 8325.905737087787,
+  "inflow": 8599.044276988143,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "COST"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 5936.51188312198,
+  "inflow": 6046.051018428947,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "CRM"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 10687.176261430504,
+  "inflow": 11154.974121798272,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "CSCO"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 16140.574017283376,
+  "inflow": 16213.763966930977,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "GOOGL"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 15947.069541583433,
+  "inflow": 16111.897462250572,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "INTC"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 5056.022284044172,
+  "inflow": 5450.693250105192,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "JNJ"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 8892.61136955923,
+  "inflow": 9401.082363284491,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "JPM"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 4929.617947476859,
+  "inflow": 5329.040640158209,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "KO"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 19444.151397676836,
+  "inflow": 19594.703055572038,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "META"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 7254.713025254692,
+  "inflow": 7437.113186043148,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "MSFT"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 84100.98352722373,
+  "inflow": 84221.96733911525,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "MU"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 11171.805897359984,
+  "inflow": 11171.805897359984,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "NFLX"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 59954.828995844815,
+  "inflow": 59981.749748652706,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "NVDA"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 11850.881155760182,
+  "inflow": 12142.720200467245,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "ORCL"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 3142.1024633593825,
+  "inflow": 3525.5421738159102,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "PEP"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 8642.991660882628,
+  "inflow": 9034.713177762265,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "QCOM"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 14292.782029682381,
+  "inflow": 14292.782029682381,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "TSLA"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 9507.989884398383,
+  "inflow": 9762.510116390418,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "WMT"
+ },
+ {
+  "end": "2026-06-02 (segment end)",
+  "final_net_mark": 5443.997622249178,
+  "inflow": 5938.558139403608,
+  "outflow": 4000.0,
+  "start": "2023-01-03",
+  "ticker": "XOM"
+ }
+]
