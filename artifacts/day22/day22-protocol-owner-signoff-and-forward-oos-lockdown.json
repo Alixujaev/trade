@@ -1,0 +1,330 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-22 protocol-owner sign-off of DAY-21 and forward OOS lockdown",
+ "title": "Protocol-Owner Sign-Off of DAY-21 Historical Holdout and Forward OOS Lockdown",
+ "final_status": "APPROVED AND LOCKED FOR FORWARD OOS",
+ "decided_by": "Alixujaev (protocol owner)",
+ "decided_date": "2026-10-08",
+ "governance_mandate": "protocol-owner sign-off and forward OOS lockdown for the frozen systematic research chain",
+ "decision_provenance": {
+  "review_prepared_and_recorded_by": "Antigravity (automated agent), at the protocol owner's direction",
+  "review_independent": false,
+  "note": "all findings, gate outcomes, and hashes re-derived from committed artifacts, blobs, metrics, and reproducibility summaries"
+ },
+ "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; freeze commit ba3cefe54ccf2fe14c62f1c609f143d8a0904221)",
+ "starting_head": "8645e9177335fe5c264361aaba7bda67c4448d98",
+ "day21_commit_context": {
+  "evaluation_code_commit": "5ed3d0ab5c2d205707d321494086bc7734f213d0",
+  "results_commit": "8645e9177335fe5c264361aaba7bda67c4448d98",
+  "push_status": "unpushed (local branch feature/day-trading-research)"
+ },
+ "stage_h_snapshot": {
+  "snapshot_id": "stage_h_20261008T100604Z",
+  "manifest_sha256": "eff959594658303c9aafeb81d18a159b742071821a4fe081e462691455be4a34",
+  "tree_sha256": "8a51463b335f0f4e2acf776bd4fdfb36ca07cf52eb2d5878f3f0251d328c5556",
+  "file_count": 63,
+  "sessions_loaded": 1359,
+  "readiness": "DAY-20A validation manifest e2a7d5a72d5a12342554edff34efb3e398b10eb8db101716dbc806592f82530f READY, 18 records applied, 0 invalid",
+  "events_total": 415,
+  "events_used": 414,
+  "excluded_first_session": [
+   "ba50d815-d70c-4eb9-9b11-bcaf89a75331"
+  ],
+  "excluded_by_review": [],
+  "retained_by_review": "17 NVDA cash dividends",
+  "missing_bars": 0,
+  "series_A_only": true,
+  "series_C_loaded": false
+ },
+ "holdout_segment": {
+  "id": "holdout",
+  "first_session": "2023-01-03",
+  "last_session": "2026-06-02",
+  "sessions": 856,
+  "lookback_warmup": {
+   "first_session": "2021-01-04",
+   "last_session": "2022-12-30",
+   "sessions": 503,
+   "role": "signal inputs only; never traded or evaluated for performance"
+  }
+ },
+ "day21_audit": {
+  "dates_verified": true,
+  "stage_h_manifest_verified": true,
+  "evaluated_families": [
+   "V2-MOM",
+   "V2-STR"
+  ],
+  "non_evaluated_families": {
+   "V2-LRV": "failed Gate 2 in research (DAY-19); never run on holdout per protocol §15.3"
+  },
+  "strategy_config_sha256": {
+   "V2-MOM": {
+    "research": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+    "holdout": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+    "match": true
+   },
+   "V2-STR": {
+    "research": "0fc76b8a9ba8250c8fa1b399871ca6f511d5e0283f0ffe94f9085f0e38aa600e",
+    "holdout": "0fc76b8a9ba8250c8fa1b399871ca6f511d5e0283f0ffe94f9085f0e38aa600e",
+    "match": true
+   }
+  },
+  "engine_sha256_match_committed_5ed3d0a": true,
+  "gate_reproduction_5bps": {
+   "V2-MOM": {
+    "net_cagr_5bps": 0.7124610715568995,
+    "b1_net_cagr_5bps": 0.5323880517105726,
+    "gate1_cagr_ge_0": true,
+    "gate2_cagr_ge_b1": true,
+    "gate_A": "PASS",
+    "gate_C": "PASS",
+    "status": "HOLDOUT-PASSED"
+   },
+   "V2-STR": {
+    "net_cagr_5bps": 0.22187154409624155,
+    "b1_net_cagr_5bps": 0.5323880517105726,
+    "gate1_cagr_ge_0": true,
+    "gate2_cagr_ge_b1": false,
+    "gate_A": "PASS",
+    "gate_C": "PASS",
+    "status": "HOLDOUT-FAILED (economic)"
+   }
+  },
+  "cagr_matrix": {
+   "0bps": {
+    "V2-MOM": 0.7177913957601592,
+    "V2-STR": 0.2723037506355628,
+    "B1": 0.5328363188782443,
+    "B2": 0.23271939951439635
+   },
+   "5bps": {
+    "V2-MOM": 0.7124610715568995,
+    "V2-STR": 0.22187154409624155,
+    "B1": 0.5323880517105726,
+    "B2": 0.23236183330369142
+   },
+   "10bps": {
+    "V2-MOM": 0.7071510888097017,
+    "V2-STR": 0.17344672700845432,
+    "B1": 0.5319399183151041,
+    "B2": 0.2320043758388477
+   }
+  },
+  "independent_benchmark_recomputation": {
+   "B1_ending_equity_0bps_engine": 426674.59336522804,
+   "B1_ending_equity_0bps_recompute": 426674.5934,
+   "B1_match": "exact",
+   "B2_ending_equity_0bps_engine": 203540.07310664203,
+   "B2_ending_equity_0bps_recompute": 203540.0731,
+   "B2_match": "exact"
+  },
+  "determinism": {
+   "result_files_byte_identical_count": "73/73",
+   "run_summary_sha256": "019095d42644fd5e00d4855e744b60602249ed73147637edf502949bf98b9d36",
+   "combined_result_sha256": "c75ec15a341f23d23375b6d8983dcf7b772c22219f6f1579ecd357a043ea790e",
+   "combined_fills_sha256": "c6b5585877166c4145e9aff98674fb19a3cf403f87ce9548ab590b7f35ca1bc6"
+  },
+  "anti_lookahead_audit": {
+   "all_pass": true,
+   "index_test": "pass (29 sessions)",
+   "truncation_test": "pass",
+   "future_mutation_test": "pass",
+   "future_deletion_test": "pass",
+   "fill_source_test": "pass (1850 fills equal raw open)",
+   "execution_timing_test": "pass (all fills at open t+1)"
+  },
+  "data_isolation": {
+   "last_session_loaded": "2026-06-02",
+   "forward_data_accessed": false,
+   "forward_data_acquired": false,
+   "stage_f_exists": false
+  },
+  "procedural_deviations": [
+   {
+    "id": "P1",
+    "finding": "calendar-year subperiod diagnostic labels: 2026-01-02 to 2026-06-02 labelled full rather than partial; worst_year note refers to 2017",
+    "ruling": "cosmetic reporting defect; underlying numeric returns and gates exact; non-gating; preserved unedited per frozen protocol rules",
+    "blocking": false
+   },
+   {
+    "id": "P2",
+    "finding": "Holm multiple-hypothesis testing parameter m = 2",
+    "ruling": "predeclared in 5ed3d0a (day21-predeclared-holdout-config.json) due to V2-LRV research rejection; non-gating diagnostic only",
+    "blocking": false
+   }
+  ],
+  "scientific_caveats": {
+   "hac_tstat_active_vs_b1": 1.38,
+   "hac_p_active_vs_b1": 0.166,
+   "holm_adjusted_p": 0.166,
+   "statistically_significant_alpha": false,
+   "top2_concentration_share": 0.43,
+   "weight_hhi": 0.081,
+   "uneven_annual_profile": "trailed B1 in 2023 (53.0% vs 63.4%) and 2025 (19.4% vs 30.8%); outperformed in 2024 and partial 2026",
+   "universe_bias": "survivorship and hindsight bias from 25 mega-cap survivor equities",
+   "nature_of_holdout": "historical pseudo-OOS; not forward OOS validation"
+  }
+ },
+ "formal_strategy_status": {
+  "V2-MOM": {
+   "research": "PASSED",
+   "historical_holdout": "PASSED",
+   "forward_oos": "ELIGIBLE",
+   "status": "FROZEN FOR FORWARD OOS",
+   "action": "advanced to 252-session forward blind evaluation period (§15.6)"
+  },
+  "V2-STR": {
+   "research": "PASSED",
+   "historical_holdout": "FAILED (economic)",
+   "forward_oos": "NOT ELIGIBLE",
+   "status": "STOPPED",
+   "action": "permanently terminated (§15.10); no tuning, rerun, or rescue"
+  },
+  "V2-LRV": {
+   "research": "FAILED (economic)",
+   "historical_holdout": "NOT RUN",
+   "forward_oos": "NOT ELIGIBLE",
+   "status": "STOPPED",
+   "action": "permanently terminated (§15.3); never evaluated on holdout"
+  }
+ },
+ "forward_oos_lockdown": {
+  "strategy": "V2-MOM",
+  "window": {
+   "start_date": "2026-10-08",
+   "end_date": "2027-10-08",
+   "target_sessions": 252,
+   "session_calendar_rule": "exact final session count and closing date determined solely by exchange_calendars 4.13.2 XNYS schedule at final evaluation"
+  },
+  "blind_period_restrictions": {
+   "configuration_frozen": true,
+   "zero_tuning_allowed": true,
+   "zero_parameter_changes_allowed": true,
+   "zero_universe_changes_allowed": true,
+   "zero_ranking_rule_changes_allowed": true,
+   "zero_execution_rule_changes_allowed": true,
+   "zero_cost_model_changes_allowed": true,
+   "zero_new_strategy_variants_from_forward_observations": true,
+   "interim_performance_computation_prohibited": true,
+   "interim_metrics_prohibited": [
+    "CAGR",
+    "Sharpe",
+    "Sortino",
+    "MaxDrawdown",
+    "PnL",
+    "WinRate",
+    "TotalReturn"
+   ],
+   "monitoring_dashboards_prohibited": true,
+   "monitoring_reports_prohibited": true,
+   "forward_winner_selection_prohibited": true,
+   "forward_guided_protocol_mutations_prohibited": true,
+   "forward_market_data_acquisition_prohibited": true,
+   "operational_data_feed_isolation_enforced": true
+  },
+  "forward_performance_inspected": false,
+  "forward_data_acquired": false
+ },
+ "frozen_v2_mom_identity": {
+  "strategy_family": "V2-MOM",
+  "name": "Cross-sectional momentum 12-1, long-only",
+  "strategy_config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+  "engine_implementation_commit": "5ed3d0ab5c2d205707d321494086bc7734f213d0",
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4",
+  "freeze_commit_sha": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+  "universe": {
+   "definition": "config/day_universe.py::FROZEN_DAY_UNIVERSE",
+   "count": 25,
+   "symbols": [
+    "AAPL",
+    "MSFT",
+    "NVDA",
+    "AMZN",
+    "META",
+    "GOOGL",
+    "TSLA",
+    "AVGO",
+    "AMD",
+    "QCOM",
+    "INTC",
+    "MU",
+    "AMAT",
+    "ADBE",
+    "CRM",
+    "ORCL",
+    "CSCO",
+    "COST",
+    "WMT",
+    "KO",
+    "PEP",
+    "NFLX",
+    "JNJ",
+    "JPM",
+    "XOM"
+   ],
+   "benchmark_only_symbols": [
+    "SPY"
+   ]
+  },
+  "signal": {
+   "series": "Series B (PIT Total Return index TR)",
+   "formula": "TR(t-21) / TR(t-252) - 1",
+   "frequency": "monthly (last XNYS session of each calendar month)",
+   "includes_bar_t_close": false,
+   "eligibility": "TR(t-21) and TR(t-252) defined at exact calendar indices"
+  },
+  "ranking_and_selection": {
+   "sort": "descending by signal return",
+   "tie_breaker": "ascending alphabetical ticker",
+   "select_count": 5
+  },
+  "portfolio_and_sizing": {
+   "weights": "equal weight 0.20 of E_open across selected 5",
+   "max_positions": 5,
+   "leverage": false,
+   "shorting": false,
+   "shares": "fractional float64",
+   "cash_return": 0.0,
+   "cash_nonnegative": true
+  },
+  "execution": {
+   "order_timing": "market-on-open t+1",
+   "fill_price": "Series A raw open O(t+1)",
+   "order_of_operations": "sells then buys",
+   "lambda_cash_scaling": "lambda = min(1, K / (B * (1 + s)))"
+  },
+  "costs": {
+   "model": "linear friction s * sum(|traded notional|)",
+   "primary_bps": 5,
+   "scenarios_bps": [
+    0,
+    5,
+    10
+   ]
+  },
+  "benchmarks": {
+   "B1": "equal-weight 25 buy-and-hold (primary gate reference)",
+   "B2": "SPY buy-and-hold (reference comparison)"
+  },
+  "calendar": {
+   "library": "exchange_calendars",
+   "version": "4.13.2",
+   "code": "XNYS",
+   "timezone": "America/New_York"
+  }
+ },
+ "governance_safety_checklist": {
+  "1_no_forward_data_acquired": true,
+  "2_no_forward_performance_computed": true,
+  "3_no_strategy_code_modified": true,
+  "4_no_protocol_rule_modified": true,
+  "5_no_historical_holdout_result_modified": true,
+  "6_no_v2_str_resurrection": true,
+  "7_no_v2_lrv_resurrection": true,
+  "8_no_winner_selection_between_strategies": true,
+  "9_no_new_parameters_introduced": true,
+  "10_no_hidden_thresholds_introduced": true
+ },
+ "next_task": "Wait for completion of the frozen 252-session forward OOS period, then run the final V2-MOM forward OOS evaluation without any tuning, protocol changes, or retrospective rule changes."
+}
