@@ -56,14 +56,15 @@ def normalize_daily(bars: list[dict[str, Any]]) -> tuple[pd.DataFrame, int]:
 
 
 class DailyBarsClient:
-    def __init__(self, http: HttpClient, *, asof: str, config: DailyBarsConfig | None = None) -> None:
+    def __init__(self, http: HttpClient, *, asof: str, config: DailyBarsConfig | None = None,
+                 first_session=STAGE_R_FIRST_SESSION, last_session=STAGE_R_LAST_SESSION) -> None:
         if not asof or len(asof) != 10:
             raise ValueError("asof must be an explicit YYYY-MM-DD date")
         self.http = http
         self.asof = asof
         self.config = config or DailyBarsConfig()
-        self.min_label = label_for(STAGE_R_FIRST_SESSION)
-        self.max_label = label_for(STAGE_R_LAST_SESSION)
+        self.min_label = label_for(first_session)       # hard request bounds (Stage R default; Stage H via stage_h)
+        self.max_label = label_for(last_session)
 
     def fetch(self, symbol: str, adjustment: str, start: pd.Timestamp | None = None,
               end: pd.Timestamp | None = None) -> tuple[pd.DataFrame, dict[str, Any]]:
@@ -74,7 +75,7 @@ class DailyBarsClient:
         if s.tzinfo is None or e.tzinfo is None:
             raise RequestGuardError("start/end must be timezone-aware")
         if s < self.min_label or e > self.max_label or e < s:
-            raise RequestGuardError(f"bar request {s}..{e} outside Stage R {self.min_label}..{self.max_label}")
+            raise RequestGuardError(f"bar request {s}..{e} outside the stage bounds {self.min_label}..{self.max_label}")
         params: dict[str, Any] = {"symbols": symbol, "timeframe": self.config.timeframe, "start": _z(s),
                                   "end": _z(e), "feed": self.config.feed, "adjustment": adjustment,
                                   "asof": self.asof, "limit": self.config.limit, "sort": self.config.sort,

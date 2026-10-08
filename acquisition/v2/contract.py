@@ -59,6 +59,18 @@ CA_Q2 = ("2022-12-31", "2023-03-31")
 CA_WINDOWS = {"Q1": CA_Q1, "Q2": CA_Q2}
 EVENT_DATE_MIN = STAGE_R_FIRST_SESSION.isoformat()
 EVENT_DATE_MAX = STAGE_R_LAST_SESSION.isoformat()
+
+# Stage H (historical holdout; frozen §3.9 range; DAY-20 protocol-owner decisions eb7abf7)
+STAGE_H_FIRST_SESSION = date(2021, 1, 4)
+STAGE_H_LAST_SESSION = date(2026, 6, 2)
+STAGE_H_EXPECTED_SESSIONS = 1359          # exchange_calendars 4.13.2: 503 lookback + 856 holdout
+HOLDOUT_FIRST_SESSION = date(2023, 1, 3)
+HOLDOUT_EXPECTED_SESSIONS = 856
+CA_WINDOWS_H = {"Q1": ("2021-01-01", "2026-06-02"), "Q2": ("2026-06-03", "2026-08-31")}   # mirror of v2.0.1 C1
+EVENT_DATE_MIN_H = STAGE_H_FIRST_SESSION.isoformat()
+EVENT_DATE_MAX_H = STAGE_H_LAST_SESSION.isoformat()
+STAGE_H_ASOF = "2026-10-07"               # freeze date (acquisition date 2026-10-08 is forward OOS)
+DAY20_DECISIONS_COMMIT = "eb7abf7"
 CA_DATA_QUALITY = ("complete", "all")      # canonical, audit (v2.0.1 C4)
 CA_TYPES = ("reverse_split", "forward_split", "unit_split", "cash_dividend", "stock_dividend", "spin_off",
             "cash_merger", "stock_merger", "stock_and_cash_merger", "redemption", "name_change",
@@ -77,6 +89,8 @@ MISSING_SESSION_REVIEW_FRACTION = 0.02
 
 V2_ROOT = ROOT_DIR / "data" / "oos_cache" / "protocol_v2"
 STAGE_R_ROOT = V2_ROOT / "stage_r"
+STAGE_H_ROOT = V2_ROOT / "stage_h"
+REVIEW_RECORDS_DIR_H = ROOT_DIR / "artifacts" / "reviews" / "stage_h"
 FORBIDDEN_WRITE_ROOTS = (
     ROOT_DIR / "data" / "cache",
     ROOT_DIR / "artifacts",

@@ -27,21 +27,23 @@ def event_date(record: dict[str, Any]) -> str | None:
     return None
 
 
-def boundary_filter(type_records: list[tuple[str, dict[str, Any]]]) -> tuple[list[dict[str, Any]], dict[str, int]]:
-    """Keep records with EVENT_DATE_MIN <= event_date <= EVENT_DATE_MAX. Returns kept records (each tagged with
-    'ca_type' and 'event_date') and aggregate counts only."""
+def boundary_filter(type_records: list[tuple[str, dict[str, Any]]], event_min: str = EVENT_DATE_MIN,
+                    event_max: str = EVENT_DATE_MAX, stage: str = "stage_r") -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """Keep records with event_min <= event_date <= event_max (Stage R bounds by default; Stage H via stage_h).
+    Returns kept records (each tagged with 'ca_type' and 'event_date') and aggregate counts only."""
     kept: list[dict[str, Any]] = []
-    counts = {"kept": 0, "discarded_after_stage_r": 0, "discarded_before_stage_r": 0, "discarded_no_date": 0}
+    after, before = f"discarded_after_{stage}", f"discarded_before_{stage}"
+    counts = {"kept": 0, after: 0, before: 0, "discarded_no_date": 0}
     for typ, rec in type_records:
         ed = event_date(rec)
         if ed is None:
             counts["discarded_no_date"] += 1
             continue
-        if ed > EVENT_DATE_MAX:
-            counts["discarded_after_stage_r"] += 1
+        if ed > event_max:
+            counts[after] += 1
             continue
-        if ed < EVENT_DATE_MIN:
-            counts["discarded_before_stage_r"] += 1
+        if ed < event_min:
+            counts[before] += 1
             continue
         out = dict(rec)
         out["ca_type"] = typ
@@ -56,17 +58,19 @@ class CorporateActionsClient:
         self.http = http
         self.config = config or CorporateActionsConfig()
 
-    def fetch_window(self, window: str, data_quality: str, symbols: list[str]) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-        if window not in CA_WINDOWS:
-            raise RequestGuardError(f"window {window!r} not in frozen {sorted(CA_WINDOWS)}")
+    def fetch_window(self, window: str, data_quality: str, symbols: list[str], *, windows: dict = CA_WINDOWS,
+                     event_min: str = EVENT_DATE_MIN, event_max: str = EVENT_DATE_MAX,
+                     stage: str = "stage_r") -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        if window not in windows:
+            raise RequestGuardError(f"window {window!r} not in frozen {sorted(windows)}")
         if data_quality not in CA_DATA_QUALITY:
             raise RequestGuardError(f"data_quality {data_quality!r} not in {CA_DATA_QUALITY}")
-        start, end = CA_WINDOWS[window]
+        start, end = windows[window]
         params: dict[str, Any] = {"symbols": ",".join(symbols), "types": ",".join(CA_TYPES), "start": start,
                                   "end": end, "limit": self.config.limit, "sort": self.config.sort,
                                   "data_quality": data_quality}
         kept: list[dict[str, Any]] = []
-        totals = {"kept": 0, "discarded_after_stage_r": 0, "discarded_before_stage_r": 0, "discarded_no_date": 0}
+        totals = {"kept": 0, f"discarded_after_{stage}": 0, f"discarded_before_{stage}": 0, "discarded_no_date": 0}
         pages: list[dict[str, Any]] = []
         token: str | None = None
         for _ in range(MAX_PAGES):
@@ -74,7 +78,7 @@ class CorporateActionsClient:
             body, info = self.http.get_json(self.config.url, p)
             ca = body.get("corporate_actions") or {}
             flat = [(typ, rec) for typ, items in ca.items() for rec in (items or [])]
-            page_kept, counts = boundary_filter(flat)
+            page_kept, counts = boundary_filter(flat, event_min, event_max, stage)
             del flat, ca                       # nothing outside the boundary survives this iteration
             kept.extend(page_kept)
             for k, v in counts.items():

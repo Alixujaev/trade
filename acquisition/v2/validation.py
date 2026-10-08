@@ -20,7 +20,9 @@ from acquisition.v2.sessions import session_of_label
 RESEARCH_FIRST_SESSION = date(2017, 2, 1)   # protocol §3.6 (evaluated segment inside Stage R)
 
 
-def check_series(df: pd.DataFrame, sessions: list[date]) -> dict[str, Any]:
+def check_series(df: pd.DataFrame, sessions: list[date], segment_first: date = RESEARCH_FIRST_SESSION) -> dict[str, Any]:
+    """segment_first: first session of the evaluated segment for the 2 % rule (Research by default; Stage H passes
+    the holdout's first session)."""
     hard: list[str] = []
     blocking: list[str] = []
     idx = df.index
@@ -62,11 +64,12 @@ def check_series(df: pd.DataFrame, sessions: list[date]) -> dict[str, Any]:
             hard.append(f"{name}={n}")
     present = set(dates) & sset
     missing = sorted(sset - present)
-    research = [s for s in sessions if s >= RESEARCH_FIRST_SESSION]
-    research_missing = [s for s in missing if s >= RESEARCH_FIRST_SESSION]
+    research = [s for s in sessions if s >= segment_first]
+    research_missing = [s for s in missing if s >= segment_first]
     frac = len(research_missing) / len(research) if research else 0.0
     if frac > MISSING_SESSION_REVIEW_FRACTION:
-        blocking.append(f"research-segment missing fraction {len(research_missing)}/{len(research)} > 2%")
+        seg = "research-segment" if segment_first == RESEARCH_FIRST_SESSION else "evaluated-segment"
+        blocking.append(f"{seg} missing fraction {len(research_missing)}/{len(research)} > 2%")
     first_bar = min(present) if present else None
     if first_bar is None or first_bar > sessions[FIRST_BAR_MAX_LAG_SESSIONS]:
         blocking.append(f"first bar {first_bar} later than {sessions[FIRST_BAR_MAX_LAG_SESSIONS]}")

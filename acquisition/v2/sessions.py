@@ -36,6 +36,21 @@ def stage_r_sessions() -> list[date]:
     return out
 
 
+def stage_h_sessions() -> list[date]:
+    """Stage H XNYS sessions 2021-01-04 .. 2026-06-02 (frozen §3.9); calendar rule only, no market data."""
+    from acquisition.v2.contract import STAGE_H_EXPECTED_SESSIONS, STAGE_H_FIRST_SESSION, STAGE_H_LAST_SESSION
+    try:
+        import exchange_calendars as xcals
+    except ImportError as exc:
+        raise CalendarUnavailableError("exchange_calendars is not installed") from exc
+    cal = xcals.get_calendar(CALENDAR_NAME, start="2020-12-01", end="2026-12-31")
+    days = cal.sessions_in_range(pd.Timestamp(STAGE_H_FIRST_SESSION), pd.Timestamp(STAGE_H_LAST_SESSION))
+    out = [d.date() for d in days]
+    if len(out) != STAGE_H_EXPECTED_SESSIONS or out[0] != STAGE_H_FIRST_SESSION or out[-1] != STAGE_H_LAST_SESSION:
+        raise SessionResolutionError(f"Stage H resolved {len(out)} sessions; expected {STAGE_H_EXPECTED_SESSIONS}")
+    return out
+
+
 def label_for(session: date) -> pd.Timestamp:
     """UTC timestamp of the 1Day bar label: 00:00 America/New_York on the session date."""
     return pd.Timestamp(session.isoformat()).tz_localize(EXCHANGE_TZ).tz_convert("UTC")
