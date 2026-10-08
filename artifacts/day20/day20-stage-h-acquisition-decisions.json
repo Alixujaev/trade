@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "task": "DAY-20",
+  "title": "Stage H acquisition decisions (protocol-owner clarifications, recorded and committed before any Stage H network request)",
+  "decided_by": "Alixujaev (protocol owner)",
+  "decided": "2026-10-08, DAY-20 planning, before any Stage H request",
+  "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; unchanged)",
+  "frozen_basis": {
+    "stage_h_range": "frozen §3.9 / JSON data.acquisitions[H]: bars and events 2021-01-04 -> 2026-06-02 (>= 252 sessions of lookback before 2023-01-03)",
+    "holdout_segment": "2023-01-03 -> 2026-06-02 (856 XNYS sessions); lookback 2021-01-04 -> 2022-12-30 (503 sessions, inside R∩H)",
+    "trigger": "research gate recorded for all three families; V2-MOM and V2-STR RESEARCH-PASSED; DAY-19 sign-off 48ce878",
+    "series_roles": "raw = execution/accounting and TR input; adjustment=all = audit only (implied-factor cross-check); never a signal, fill, mark or P&L input (§3.4)",
+    "overlap_control": "raw bars and events compared cell by cell on R∩H 2021-01-04..2022-12-30: IDENTICAL or DISCREPANCY; adjustment=all levels excluded (rebasing); implied factors re-checked per stage (§3.9)"
+  },
+  "clarifications": {
+    "C1_H_corporate_action_windows": {
+      "gap": "v2.0.1 C1 defines process_date windows for Stage R only; the endpoint filters by process_date while Stage H events are defined by event_date",
+      "decision": "mirror v2.0.1 C1",
+      "Q1_process_date": ["2021-01-01", "2026-06-02"],
+      "Q2_process_date": ["2026-06-03", "2026-08-31"],
+      "event_date_boundary": ["2021-01-04", "2026-06-02"],
+      "event_date_definition": "ex_date, else effective_date, else process_date (v2.0.1 C1 rule 1)",
+      "out_of_range_records": "discarded in memory inside the acquisition filter before persistence; only total counts per query are logged; never written, printed, displayed or used (C1 rules 4-5 analog)",
+      "forward_isolation": "Q2 ends 2026-08-31, before the freeze commit date 2026-10-07; no forward-dated (>= 2026-10-08) process_date is requested",
+      "data_quality": "each window queried with complete (canonical) and all (audit) (v2.0.1 C4)",
+      "query_keys": "25 universe symbols + SPY + FB (v2.0.1 C2 rule 2); a name change from an unqueried alias to a universe symbol is a DATA VALIDATION ISSUE (stop)"
+    },
+    "asof": {
+      "gap": "frozen §3.1 sets asof = acquisition date; the acquisition date 2026-10-08 is the first forward-OOS session (freeze commit 2026-10-07)",
+      "decision": "asof = 2026-10-07 (the freeze date; identical to the Stage R asof); no post-freeze symbology is used"
+    },
+    "recording": "this record is committed before any Stage H network request"
+  },
+  "conservative_choices": {
+    "no_assets_endpoint": "the /v2/assets endpoint is not called for Stage H: it returns current (forward-dated) metadata and its cusip field is null (v2.0.1 C2 evidence)",
+    "no_bars_after_boundary": "bar requests are hard-guarded to start >= label(2021-01-04) and end <= label(2026-06-02)"
+  },
+  "disclosures": {
+    "adjustment_all_basis": "provider adjustment=all levels are adjusted up to request time; inherent to the frozen design (audit-only series; rebasing between stages expected; levels never compared or used)",
+    "no_strategy_evaluation": "DAY-20 computes no signal, TR index, return, portfolio, metric or gate"
+  }
+}
