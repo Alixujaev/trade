@@ -1,0 +1,101 @@
+{
+ "schema_version": "1.0",
+ "rule": "append-only (protocol v2 \u00a714); nothing is deleted",
+ "entries": [
+  {
+   "experiment_id": "V2-MOM-R001",
+   "family": "V2-MOM",
+   "segment": "research",
+   "task": "DAY-19",
+   "stage": "R",
+   "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; DAY-18L sign-off 8b8b586)",
+   "snapshot": "stage_r_20261007T093410Z",
+   "strategy_config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+   "net_cagr": {
+    "0bps": 0.2921441610035611,
+    "5bps": 0.28816164633146335,
+    "10bps": 0.284193607440552
+   },
+   "status": "RESEARCH-PASSED",
+   "artifacts": "artifacts/day19/v2/V2-MOM-R001/",
+   "run_summary_sha256": "698b8c3bbea9ca304a9a2d7f1095e82e0de7fb137a2fc7d1e06ad88bface32cf",
+   "technical_reruns": "run 1 aborted before writing run_summary.json by a JSON serialisation error (numpy bool); identical configuration re-run after the fix; then a determinism re-run to a scratchpad"
+  },
+  {
+   "experiment_id": "V2-STR-R001",
+   "family": "V2-STR",
+   "segment": "research",
+   "task": "DAY-19",
+   "stage": "R",
+   "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; DAY-18L sign-off 8b8b586)",
+   "snapshot": "stage_r_20261007T093410Z",
+   "strategy_config_sha256": "0fc76b8a9ba8250c8fa1b399871ca6f511d5e0283f0ffe94f9085f0e38aa600e",
+   "net_cagr": {
+    "0bps": 0.3018004032012387,
+    "5bps": 0.24978852160383114,
+    "10bps": 0.19986283987868858
+   },
+   "status": "RESEARCH-PASSED",
+   "artifacts": "artifacts/day19/v2/V2-STR-R001/",
+   "run_summary_sha256": "698b8c3bbea9ca304a9a2d7f1095e82e0de7fb137a2fc7d1e06ad88bface32cf",
+   "technical_reruns": "run 1 aborted before writing run_summary.json by a JSON serialisation error (numpy bool); identical configuration re-run after the fix; then a determinism re-run to a scratchpad"
+  },
+  {
+   "experiment_id": "V2-LRV-R001",
+   "family": "V2-LRV",
+   "segment": "research",
+   "task": "DAY-19",
+   "stage": "R",
+   "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; DAY-18L sign-off 8b8b586)",
+   "snapshot": "stage_r_20261007T093410Z",
+   "strategy_config_sha256": "0beffbe1ca5de4d52100fc34c6d42fe03b6bdce5a597d8d1fb17b38429105864",
+   "net_cagr": {
+    "0bps": 0.13627805482591326,
+    "5bps": 0.13344464778558618,
+    "10bps": 0.1306189869796046
+   },
+   "status": "RESEARCH-FAILED (economic)",
+   "artifacts": "artifacts/day19/v2/V2-LRV-R001/",
+   "run_summary_sha256": "698b8c3bbea9ca304a9a2d7f1095e82e0de7fb137a2fc7d1e06ad88bface32cf",
+   "technical_reruns": "run 1 aborted before writing run_summary.json by a JSON serialisation error (numpy bool); identical configuration re-run after the fix; then a determinism re-run to a scratchpad"
+  },
+  {
+   "experiment_id": "V2-B1-research",
+   "family": "B1",
+   "segment": "research",
+   "task": "DAY-19",
+   "stage": "R",
+   "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; DAY-18L sign-off 8b8b586)",
+   "snapshot": "stage_r_20261007T093410Z",
+   "strategy_config_sha256": null,
+   "net_cagr": {
+    "0bps": 0.1846029638879516,
+    "5bps": 0.1844074874473387,
+    "10bps": 0.18421204790480217
+   },
+   "status": "BENCHMARK (gate reference)",
+   "artifacts": "artifacts/day19/v2/V2-B1-research/",
+   "run_summary_sha256": "698b8c3bbea9ca304a9a2d7f1095e82e0de7fb137a2fc7d1e06ad88bface32cf",
+   "technical_reruns": "run 1 aborted before writing run_summary.json by a JSON serialisation error (numpy bool); identical configuration re-run after the fix; then a determinism re-run to a scratchpad"
+  },
+  {
+   "experiment_id": "V2-B2-research",
+   "family": "B2",
+   "segment": "research",
+   "task": "DAY-19",
+   "stage": "R",
+   "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; DAY-18L sign-off 8b8b586)",
+   "snapshot": "stage_r_20261007T093410Z",
+   "strategy_config_sha256": null,
+   "net_cagr": {
+    "0bps": 0.1061402046162172,
+    "5bps": 0.10596036763366401,
+    "10bps": 0.10578056674813974
+   },
+   "status": "BENCHMARK (not gated)",
+   "artifacts": "artifacts/day19/v2/V2-B2-research/",
+   "run_summary_sha256": "698b8c3bbea9ca304a9a2d7f1095e82e0de7fb137a2fc7d1e06ad88bface32cf",
+   "technical_reruns": "run 1 aborted before writing run_summary.json by a JSON serialisation error (numpy bool); identical configuration re-run after the fix; then a determinism re-run to a scratchpad"
+  }
+ ]
+}

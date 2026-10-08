@@ -1,0 +1,1367 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-19",
+ "title": "Frozen v2 research execution (Stage R, Research segment)",
+ "starting_head": "8b8b586495ce99002d055e37f87e40c029c9da56",
+ "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; DAY-18L sign-off 8b8b586)",
+ "protocol_owner_decisions_before_results": {
+  "file": "artifacts/day19/day19-predeclared-definitions.json",
+  "sha256": "926e4926e7be0b20c2f4943d0b7309e3c8b2aeee1fd1888f8b52b7f209c9cfcd",
+  "LRV_slot_lambda": "per-slot lambda (K = slot cash): resolves frozen \u00a76.2 'no cross-slot lending' vs \u00a78.4 global lambda; V2-LRV only",
+  "diagnostic_definitions": "predeclared for non-gated \u00a712 diagnostics (episode return, HHI, HAC p-value, drawdown series, worst periods, subperiods)"
+ },
+ "segment": {
+  "first": "2017-02-01",
+  "id": "research",
+  "last": "2022-12-30",
+  "sessions": 1490
+ },
+ "warmup": {
+  "first": "2016-01-04",
+  "last": "2017-01-31",
+  "sessions": 272
+ },
+ "decision_counts": {
+  "V2-LRV_cycles": 12,
+  "V2-MOM": 71,
+  "V2-STR": 309
+ },
+ "data": {
+  "snapshot_id": "stage_r_20261007T093410Z",
+  "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+  "file_count": 64,
+  "tree_sha256": "c5d786359adef89f86156c97aab6d579e2e54f5b22fe3161ed1d4ce76dc54590",
+  "events": {
+   "events_total": 489,
+   "events_used": 486,
+   "excluded_by_review": [],
+   "excluded_first_session": [
+    "5f4e63f8-2c22-4ffc-b5f6-5f3480764ef4",
+    "7e160c0c-d477-4010-b5f3-bc6d2737c04b",
+    "a9cb677a-9c85-4db0-8674-2fd47f3ac3a0"
+   ],
+   "review_output": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_4__stage_r_20261007T093410Z",
+   "review_output_manifest_sha256": "755c905e0adae6c7cac924aa8146384defe7053784b526675e7b51d714f6d698"
+  },
+  "missing_bars": 0,
+  "series_A_only": true,
+  "series_C_loaded": false
+ },
+ "holdout_or_forward_data_read": false,
+ "last_session_loaded": "2022-12-30",
+ "results": {
+  "V2-MOM": {
+   "0bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 455143.3399808013,
+    "total_return": 3.5514333998080128,
+    "cagr": 0.2921441610035611,
+    "volatility": 0.34342276546582384,
+    "max_drawdown": 0.3602904803993232,
+    "sharpe": 0.919463773167981,
+    "sortino": 1.292813418928343,
+    "calmar": 0.8108572857094836,
+    "turnover_per_execution_mean": 0.2552809619875344,
+    "annual_turnover": 3.0654274979066884,
+    "trades": 435,
+    "executions": 71,
+    "rebalances": 71,
+    "mean_lambda": 0.9999999999999992,
+    "min_lambda": 0.999999999999992,
+    "total_costs": 0.0,
+    "cost_per_execution": 0.0,
+    "cost_drag": 0.0,
+    "dividend_cash_total": 17779.84297224951,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.999579525855123,
+     "min": 0.9957772075413136
+    },
+    "cash_exposure": {
+     "max": 0.004222792458686397,
+     "mean": 0.0004204741448770033,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 25,
+     "max": 5,
+     "mean": 5.0,
+     "min": 5
+    },
+    "position_episodes": 85,
+    "episodes": {
+     "mean": 0.08087887850854865,
+     "median": 0.025369729876236535,
+     "profit_factor": 2.5045519230648625,
+     "win_rate": 0.611764705882353
+    },
+    "worst_month": {
+     "month": "2018-10",
+     "return": -0.20438371828666724
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.16823069557029435,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.72,
+    "top2_concentration": 0.4641609041538347,
+    "weight_hhi": 0.06559594630007418,
+    "b1_cagr": 0.1846029638879516,
+    "b2_cagr": 0.1061402046162172,
+    "b1_total_return": 1.7227882386996494,
+    "b2_total_return": 0.8156677045409739,
+    "cagr_minus_b1": 0.1075411971156095,
+    "cagr_minus_b2": 0.1860039563873439,
+    "total_return_minus_b1": 1.8286451611083634,
+    "total_return_minus_b2": 2.735765695267039,
+    "tracking_error_b1": 0.15727911238255055,
+    "information_ratio_b1": 0.6928159636641542,
+    "active_return_vs_b1_annualised": 0.10896547980955956,
+    "hac_tstat_active_vs_b1": 1.6853400505298999,
+    "hac_p_value": 0.0919229827715986,
+    "holm_adjusted_p": 0.2757689483147958
+   },
+   "5bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 446911.57057257363,
+    "total_return": 3.469115705725736,
+    "cagr": 0.28816164633146335,
+    "volatility": 0.34340418227180736,
+    "max_drawdown": 0.360403310987524,
+    "sharpe": 0.9104977594427651,
+    "sortino": 1.279761822053997,
+    "calmar": 0.799553271422189,
+    "turnover_per_execution_mean": 0.255159206507524,
+    "annual_turnover": 3.0639654515655157,
+    "trades": 435,
+    "executions": 71,
+    "rebalances": 71,
+    "mean_lambda": 0.9990091511276797,
+    "min_lambda": 0.9990004997501156,
+    "total_costs": 5753.872475510628,
+    "cost_per_execution": 81.04045740155814,
+    "cost_drag": 0.003982514672097759,
+    "dividend_cash_total": 17549.917154680224,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.9995795779756143,
+     "min": 0.9957775909621349
+    },
+    "cash_exposure": {
+     "max": 0.0042224090378650825,
+     "mean": 0.00042042202438574705,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 25,
+     "max": 5,
+     "mean": 5.0,
+     "min": 5
+    },
+    "position_episodes": 85,
+    "episodes": {
+     "mean": 0.07987572754592928,
+     "median": 0.024310452329609378,
+     "profit_factor": 2.4746500948382355,
+     "win_rate": 0.6
+    },
+    "worst_month": {
+     "month": "2018-10",
+     "return": -0.20467657234962422
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.17174284373964166,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.72,
+    "top2_concentration": 0.46526437666360115,
+    "weight_hhi": 0.06560100355590123,
+    "b1_cagr": 0.1844074874473387,
+    "b2_cagr": 0.10596036763366401,
+    "b1_total_return": 1.7201327456468944,
+    "b2_total_return": 0.8139230176811005,
+    "cagr_minus_b1": 0.10375415888412465,
+    "cagr_minus_b2": 0.18220127869779934,
+    "total_return_minus_b1": 1.7489829600788416,
+    "total_return_minus_b2": 2.6551926880446355,
+    "tracking_error_b1": 0.1572542204598664,
+    "information_ratio_b1": 0.6742886838342524,
+    "active_return_vs_b1_annualised": 0.10603474134126467,
+    "hac_tstat_active_vs_b1": 1.6401747347825237,
+    "hac_p_value": 0.10096884091476,
+    "holm_adjusted_p": 0.30290652274428
+   },
+   "10bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 438833.12942247366,
+    "total_return": 3.388331294224737,
+    "cagr": 0.284193607440552,
+    "volatility": 0.3433888439749106,
+    "max_drawdown": 0.36051617925743296,
+    "sharpe": 0.9015305947943639,
+    "sortino": 1.2667172155089081,
+    "calmar": 0.7882964033012747,
+    "turnover_per_execution_mean": 0.25503828630522857,
+    "annual_turnover": 3.062513435283993,
+    "trades": 435,
+    "executions": 71,
+    "rebalances": 71,
+    "mean_lambda": 0.9980192923728082,
+    "min_lambda": 0.998001998001992,
+    "total_costs": 11374.365160424399,
+    "cost_per_execution": 160.20232620316054,
+    "cost_drag": 0.00795055356300911,
+    "dividend_cash_total": 17323.45668675523,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.999579630173025,
+     "min": 0.9957779746216012
+    },
+    "cash_exposure": {
+     "max": 0.004222025378398775,
+     "mean": 0.00042036982697502,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 25,
+     "max": 5,
+     "mean": 5.0,
+     "min": 5
+    },
+    "position_episodes": 85,
+    "episodes": {
+     "mean": 0.07887238316755142,
+     "median": 0.02325234219955452,
+     "profit_factor": 2.4452553345072294,
+     "win_rate": 0.6
+    },
+    "worst_month": {
+     "month": "2018-10",
+     "return": -0.20496913408200357
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.1752391029665481,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.72,
+    "top2_concentration": 0.46636801922528764,
+    "weight_hhi": 0.06560606395531846,
+    "b1_cagr": 0.18421204790480217,
+    "b2_cagr": 0.10578056674813974,
+    "b1_total_return": 1.7174799054343528,
+    "b2_total_return": 0.8121800737651435,
+    "cagr_minus_b1": 0.09998155953574983,
+    "cagr_minus_b2": 0.17841304069241226,
+    "total_return_minus_b1": 1.6708513887903842,
+    "total_return_minus_b2": 2.5761512204595935,
+    "tracking_error_b1": 0.15723586406187473,
+    "information_ratio_b1": 0.6557459534940462,
+    "active_return_vs_b1_annualised": 0.10310678160271425,
+    "hac_tstat_active_vs_b1": 1.5949882019409853,
+    "hac_p_value": 0.11071487410038938,
+    "holm_adjusted_p": 0.33214462230116815
+   }
+  },
+  "V2-STR": {
+   "0bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 475627.0020873176,
+    "total_return": 3.756270020873176,
+    "cagr": 0.3018004032012387,
+    "volatility": 0.28059565882425447,
+    "max_drawdown": 0.34858852524033523,
+    "sharpe": 1.0811376076783346,
+    "sortino": 1.5808691939374349,
+    "calmar": 0.865778364314091,
+    "turnover_per_execution_mean": 0.778756981834764,
+    "annual_turnover": 40.69815346410027,
+    "trades": 2735,
+    "executions": 309,
+    "rebalances": 309,
+    "mean_lambda": 1.0,
+    "min_lambda": 0.9999999999999992,
+    "total_costs": 0.0,
+    "cost_per_execution": 0.0,
+    "cost_drag": 0.0,
+    "dividend_cash_total": 33308.9985437165,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.9998715244005145,
+     "min": 0.9952064271363507
+    },
+    "cash_exposure": {
+     "max": 0.004793572863649342,
+     "mean": 0.00012847559948547804,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 25,
+     "max": 5,
+     "mean": 5.0,
+     "min": 5
+    },
+    "position_episodes": 1195,
+    "episodes": {
+     "mean": 0.007769196006135074,
+     "median": 0.00797314309693653,
+     "profit_factor": 1.3029486973054918,
+     "win_rate": 0.5924686192468619
+    },
+    "worst_month": {
+     "month": "2018-10",
+     "return": -0.141060632999076
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.2142230303438898,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.76,
+    "top2_concentration": 0.2207708846923657,
+    "weight_hhi": 0.04370172952460322,
+    "b1_cagr": 0.1846029638879516,
+    "b2_cagr": 0.1061402046162172,
+    "b1_total_return": 1.7227882386996494,
+    "b2_total_return": 0.8156677045409739,
+    "cagr_minus_b1": 0.11719743931328708,
+    "cagr_minus_b2": 0.19566019858502148,
+    "total_return_minus_b1": 2.0334817821735265,
+    "total_return_minus_b2": 2.940602316332202,
+    "tracking_error_b1": 0.15592786112120052,
+    "information_ratio_b1": 0.6192812926080867,
+    "active_return_vs_b1_annualised": 0.09656320738875128,
+    "hac_tstat_active_vs_b1": 1.5218699326015783,
+    "hac_p_value": 0.12804167437203162,
+    "holm_adjusted_p": 0.2757689483147958
+   },
+   "5bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 373736.2357631235,
+    "total_return": 2.737362357631235,
+    "cagr": 0.24978852160383114,
+    "volatility": 0.2805698329391831,
+    "max_drawdown": 0.3523922207262745,
+    "sharpe": 0.9357782941550505,
+    "sortino": 1.3593696178115073,
+    "calmar": 0.7088366510731172,
+    "turnover_per_execution_mean": 0.7783705444472048,
+    "annual_turnover": 40.67795809061405,
+    "trades": 2735,
+    "executions": 309,
+    "rebalances": 309,
+    "mean_lambda": 0.9990023514841435,
+    "min_lambda": 0.9990004997501237,
+    "total_costs": 66653.48075171835,
+    "cost_per_execution": 215.7070574489267,
+    "cost_drag": 0.05201188159740755,
+    "dividend_cash_total": 28786.358535270036,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.9998715235056642,
+     "min": 0.9952064271363507
+    },
+    "cash_exposure": {
+     "max": 0.004793572863649342,
+     "mean": 0.000128476494335783,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 25,
+     "max": 5,
+     "mean": 5.0,
+     "min": 5
+    },
+    "position_episodes": 1195,
+    "episodes": {
+     "mean": 0.0067609769462828985,
+     "median": 0.006967896664340945,
+     "profit_factor": 1.254442373617774,
+     "win_rate": 0.5782426778242677
+    },
+    "worst_month": {
+     "month": "2018-10",
+     "return": -0.14452413139827547
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.24675123627876094,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.76,
+    "top2_concentration": 0.22615788799486408,
+    "weight_hhi": 0.04370272652683405,
+    "b1_cagr": 0.1844074874473387,
+    "b2_cagr": 0.10596036763366401,
+    "b1_total_return": 1.7201327456468944,
+    "b2_total_return": 0.8139230176811005,
+    "cagr_minus_b1": 0.06538103415649243,
+    "cagr_minus_b2": 0.14382815397016713,
+    "total_return_minus_b1": 1.0172296119843405,
+    "total_return_minus_b2": 1.9234393399501344,
+    "tracking_error_b1": 0.15610743717664116,
+    "information_ratio_b1": 0.3581966591087727,
+    "active_return_vs_b1_annualised": 0.05591716245870548,
+    "hac_tstat_active_vs_b1": 0.8834602575508561,
+    "hac_p_value": 0.37698764616259894,
+    "holm_adjusted_p": 0.6710367124830112
+   },
+   "10bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 293684.6888158133,
+    "total_return": 1.9368468881581329,
+    "cagr": 0.19986283987868858,
+    "volatility": 0.2806405422683348,
+    "max_drawdown": 0.3561728978194828,
+    "sharpe": 0.7902643207678458,
+    "sortino": 1.1405523931059658,
+    "calmar": 0.5611399438370069,
+    "turnover_per_execution_mean": 0.7779844933637309,
+    "annual_turnover": 40.657782905534894,
+    "trades": 2735,
+    "executions": 309,
+    "rebalances": 309,
+    "mean_lambda": 0.9980056996201107,
+    "min_lambda": 0.9980019980019976,
+    "total_costs": 115058.14129942376,
+    "cost_per_execution": 372.35644433470475,
+    "cost_drag": 0.1019375633225501,
+    "dividend_cash_total": 24986.53085349893,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.999871522605624,
+     "min": 0.9952064271363505
+    },
+    "cash_exposure": {
+     "max": 0.0047935728636494535,
+     "mean": 0.00012847739437604755,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 25,
+     "max": 5,
+     "mean": 5.0,
+     "min": 5
+    },
+    "position_episodes": 1195,
+    "episodes": {
+     "mean": 0.005753767942154554,
+     "median": 0.005963654473935431,
+     "profit_factor": 1.2066020569599427,
+     "win_rate": 0.5682008368200837
+    },
+    "worst_month": {
+     "month": "2018-10",
+     "return": -0.14797298472610365
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.27792819771669597,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.68,
+    "top2_concentration": 0.22872172889653586,
+    "weight_hhi": 0.0437037242263482,
+    "b1_cagr": 0.18421204790480217,
+    "b2_cagr": 0.10578056674813974,
+    "b1_total_return": 1.7174799054343528,
+    "b2_total_return": 0.8121800737651435,
+    "cagr_minus_b1": 0.015650791973886413,
+    "cagr_minus_b2": 0.09408227313054884,
+    "total_return_minus_b1": 0.21936698272378008,
+    "total_return_minus_b2": 1.1246668143929894,
+    "tracking_error_b1": 0.15645963186852493,
+    "information_ratio_b1": 0.09786192247170801,
+    "active_return_vs_b1_annualised": 0.015311440363869559,
+    "hac_tstat_active_vs_b1": 0.2424486113959566,
+    "hac_p_value": 0.8084325712367935,
+    "holm_adjusted_p": 0.8084325712367935
+   }
+  },
+  "V2-LRV": {
+   "0bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 212845.17987005733,
+    "total_return": 1.1284517987005733,
+    "cagr": 0.13627805482591326,
+    "volatility": 0.13119377737443483,
+    "max_drawdown": 0.1731217839122523,
+    "sharpe": 1.0396149238448396,
+    "sortino": 1.5468005329178574,
+    "calmar": 0.7871802828405842,
+    "turnover_per_execution_mean": 0.1338369595466314,
+    "annual_turnover": 2.3993643378588043,
+    "trades": 139,
+    "executions": 106,
+    "rebalances": 12,
+    "mean_lambda": 1.0,
+    "min_lambda": 1.0,
+    "total_costs": 0.0,
+    "cost_per_execution": 0.0,
+    "cost_drag": 0.0,
+    "dividend_cash_total": 5275.014738367683,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.4471934138639773,
+     "min": 0.0
+    },
+    "cash_exposure": {
+     "max": 1.0,
+     "mean": 0.5528065861360227,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 22,
+     "max": 5,
+     "mean": 2.242281879194631,
+     "min": 0
+    },
+    "position_episodes": 72,
+    "episodes": {
+     "mean": 0.05656984689189056,
+     "median": 0.04142045242653436,
+     "profit_factor": 2.6971023495177615,
+     "win_rate": 0.6944444444444444
+    },
+    "worst_month": {
+     "month": "2022-01",
+     "return": -0.09487492331569158
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.07506753332266836,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.6818181818181818,
+    "top2_concentration": 0.24641920520637198,
+    "weight_hhi": 0.05993228889199285,
+    "b1_cagr": 0.1846029638879516,
+    "b2_cagr": 0.1061402046162172,
+    "b1_total_return": 1.7227882386996494,
+    "b2_total_return": 0.8156677045409739,
+    "cagr_minus_b1": -0.048324909062038346,
+    "cagr_minus_b2": 0.03013785020969606,
+    "total_return_minus_b1": -0.594336439999076,
+    "total_return_minus_b2": 0.3127840941595994,
+    "tracking_error_b1": 0.2054632998514998,
+    "information_ratio_b1": -0.34268067871136915,
+    "active_return_vs_b1_annualised": -0.07040830304338949,
+    "hac_tstat_active_vs_b1": -0.9319677282136138,
+    "hac_p_value": 0.3513532036746765,
+    "holm_adjusted_p": 0.3513532036746765
+   },
+   "5bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 209726.18758666405,
+    "total_return": 1.0972618758666406,
+    "cagr": 0.13344464778558618,
+    "volatility": 0.131173216417429,
+    "max_drawdown": 0.1733089029249184,
+    "sharpe": 1.0207154526541067,
+    "sortino": 1.5174578949689663,
+    "calmar": 0.7699814927764999,
+    "turnover_per_execution_mean": 0.13380666633340765,
+    "annual_turnover": 2.3988212557704593,
+    "trades": 139,
+    "executions": 106,
+    "rebalances": 12,
+    "mean_lambda": 0.9995002498750629,
+    "min_lambda": 0.9995002498750625,
+    "total_costs": 2247.3209103344643,
+    "cost_per_execution": 21.201140663532684,
+    "cost_drag": 0.002833407040327085,
+    "dividend_cash_total": 5236.290005972295,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.4471426721696584,
+     "min": 0.0
+    },
+    "cash_exposure": {
+     "max": 1.0,
+     "mean": 0.5528573278303416,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 22,
+     "max": 5,
+     "mean": 2.242281879194631,
+     "min": 0
+    },
+    "position_episodes": 72,
+    "episodes": {
+     "mean": 0.055515122868272586,
+     "median": 0.04038248056853089,
+     "profit_factor": 2.651015022476334,
+     "win_rate": 0.6944444444444444
+    },
+    "worst_month": {
+     "month": "2022-01",
+     "return": -0.09482519765892372
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.07735805857027067,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.6818181818181818,
+    "top2_concentration": 0.24665905782092895,
+    "weight_hhi": 0.05993551505016104,
+    "b1_cagr": 0.1844074874473387,
+    "b2_cagr": 0.10596036763366401,
+    "b1_total_return": 1.7201327456468944,
+    "b2_total_return": 0.8139230176811005,
+    "cagr_minus_b1": -0.050962839661752524,
+    "cagr_minus_b2": 0.02748428015192217,
+    "total_return_minus_b1": -0.6228708697802539,
+    "total_return_minus_b2": 0.28333885818554005,
+    "tracking_error_b1": 0.20549133008097653,
+    "information_ratio_b1": -0.3539977487138467,
+    "active_return_vs_b1_annualised": -0.07274346822887966,
+    "hac_tstat_active_vs_b1": -0.9630581219095192,
+    "hac_p_value": 0.3355183562415056,
+    "holm_adjusted_p": 0.6710367124830112
+   },
+   "10bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 206653.63626509657,
+    "total_return": 1.0665363626509659,
+    "cagr": 0.1306189869796046,
+    "volatility": 0.13115616250716072,
+    "max_drawdown": 0.17349585642769838,
+    "sharpe": 1.001791557931867,
+    "sortino": 1.4881130253921373,
+    "calmar": 0.7528651673248345,
+    "turnover_per_execution_mean": 0.13377639827851126,
+    "annual_turnover": 2.398278624708451,
+    "trades": 139,
+    "executions": 106,
+    "rebalances": 12,
+    "mean_lambda": 0.999000999000999,
+    "min_lambda": 0.999000999000999,
+    "total_costs": 4455.93263784102,
+    "cost_per_execution": 42.03710035699075,
+    "cost_drag": 0.005659067846308652,
+    "dividend_cash_total": 5197.970691985287,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.4470919669115483,
+     "min": 0.0
+    },
+    "cash_exposure": {
+     "max": 1.0,
+     "mean": 0.5529080330884517,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 22,
+     "max": 5,
+     "mean": 2.242281879194631,
+     "min": 0
+    },
+    "position_episodes": 72,
+    "episodes": {
+     "mean": 0.05446145251500792,
+     "median": 0.039345545645450786,
+     "profit_factor": 2.6056794056503727,
+     "win_rate": 0.6944444444444444
+    },
+    "worst_month": {
+     "month": "2022-01",
+     "return": -0.09477549649244887
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.07964248590378065,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.6818181818181818,
+    "top2_concentration": 0.24690913974509415,
+    "weight_hhi": 0.05993874338140803,
+    "b1_cagr": 0.18421204790480217,
+    "b2_cagr": 0.10578056674813974,
+    "b1_total_return": 1.7174799054343528,
+    "b2_total_return": 0.8121800737651435,
+    "cagr_minus_b1": -0.053593060925197555,
+    "cagr_minus_b2": 0.024838420231464875,
+    "total_return_minus_b1": -0.650943542783387,
+    "total_return_minus_b2": 0.2543562888858224,
+    "tracking_error_b1": 0.20552158776209656,
+    "information_ratio_b1": -0.36530289396279436,
+    "active_return_vs_b1_annualised": -0.07507763078132228,
+    "hac_tstat_active_vs_b1": -0.9941331861045646,
+    "hac_p_value": 0.3201580307455072,
+    "holm_adjusted_p": 0.6403160614910144
+   }
+  },
+  "B1": {
+   "0bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 272278.8238699649,
+    "total_return": 1.7227882386996494,
+    "cagr": 0.1846029638879516,
+    "volatility": 0.2726542927791202,
+    "max_drawdown": 0.4459458728561486,
+    "sharpe": 0.7584671042937126,
+    "sortino": 1.0570789516752572,
+    "calmar": 0.41395822929277354,
+    "turnover_per_execution_mean": 0.5,
+    "annual_turnover": 0.08456375838926174,
+    "trades": 25,
+    "executions": 1,
+    "rebalances": 1,
+    "mean_lambda": 1.0,
+    "min_lambda": 1.0,
+    "total_costs": 0.0,
+    "cost_per_execution": 0.0,
+    "cost_drag": 0.0,
+    "dividend_cash_total": 13193.487883698188,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.975804329121155,
+     "min": 0.9501290885812773
+    },
+    "cash_exposure": {
+     "max": 0.049870911418722685,
+     "mean": 0.024195670878845,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 25,
+     "max": 25,
+     "mean": 25.0,
+     "min": 25
+    },
+    "position_episodes": 25,
+    "episodes": {
+     "mean": 1.7227882386996498,
+     "median": 1.1421547799696512,
+     "profit_factor": 261.1565943288427,
+     "win_rate": 0.92
+    },
+    "worst_month": {
+     "month": "2022-04",
+     "return": -0.16268245687158933
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.40429231138874644,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.92,
+    "top2_concentration": 0.25895282475232234,
+    "weight_hhi": 0.04669000911038976
+   },
+   "5bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 272013.27456468943,
+    "total_return": 1.7201327456468944,
+    "cagr": 0.1844074874473387,
+    "volatility": 0.27265373572468893,
+    "max_drawdown": 0.44594587285614873,
+    "sharpe": 0.7578623364586455,
+    "sortino": 1.056233926099216,
+    "calmar": 0.4135198881116769,
+    "turnover_per_execution_mean": 0.49975012493753107,
+    "annual_turnover": 0.08452149764044149,
+    "trades": 25,
+    "executions": 1,
+    "rebalances": 1,
+    "mean_lambda": 0.9995002498750625,
+    "min_lambda": 0.9995002498750625,
+    "total_costs": 179.45294152237219,
+    "cost_per_execution": 179.45294152237219,
+    "cost_drag": 0.00019547644061290725,
+    "dividend_cash_total": 13186.894436479944,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.975804329121155,
+     "min": 0.9501290885812774
+    },
+    "cash_exposure": {
+     "max": 0.049870911418722574,
+     "mean": 0.024195670878845,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 25,
+     "max": 25,
+     "mean": 25.0,
+     "min": 25
+    },
+    "position_episodes": 25,
+    "episodes": {
+     "mean": 1.7201327456468944,
+     "median": 1.1400136957318003,
+     "profit_factor": 258.07044595023746,
+     "win_rate": 0.92
+    },
+    "worst_month": {
+     "month": "2022-04",
+     "return": -0.1626824568715899
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.40457573248712664,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.92,
+    "top2_concentration": 0.25902351258753537,
+    "weight_hhi": 0.04669000911038976
+   },
+   "10bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 271747.99054343527,
+    "total_return": 1.7174799054343528,
+    "cagr": 0.18421204790480217,
+    "volatility": 0.27265347527007927,
+    "max_drawdown": 0.4459458728561485,
+    "sharpe": 0.7572570529211723,
+    "sortino": 1.0553893333145332,
+    "calmar": 0.413081629671735,
+    "turnover_per_execution_mean": 0.49950049950049974,
+    "annual_turnover": 0.08447927911015163,
+    "trades": 25,
+    "executions": 1,
+    "rebalances": 1,
+    "mean_lambda": 0.9990009990009991,
+    "min_lambda": 0.9990009990009991,
+    "total_costs": 358.7266093768899,
+    "cost_per_execution": 358.7266093768899,
+    "cost_drag": 0.0003909159831494424,
+    "dividend_cash_total": 13180.307576122079,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.975804329121155,
+     "min": 0.9501290885812773
+    },
+    "cash_exposure": {
+     "max": 0.049870911418722685,
+     "mean": 0.024195670878845,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 25,
+     "max": 25,
+     "mean": 25.0,
+     "min": 25
+    },
+    "position_episodes": 25,
+    "episodes": {
+     "mean": 1.7174799054343524,
+     "median": 1.1378747504392424,
+     "profit_factor": 255.05043812406618,
+     "win_rate": 0.92
+    },
+    "worst_month": {
+     "month": "2022-04",
+     "return": -0.16268245687158978
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.40485915358550617,
+     "year": "2022"
+    },
+    "symbol_breadth": 0.92,
+    "top2_concentration": 0.2590943350806346,
+    "weight_hhi": 0.046690009110389764
+   }
+  },
+  "B2": {
+   "0bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 181566.7704540974,
+    "total_return": 0.8156677045409739,
+    "cagr": 0.1061402046162172,
+    "volatility": 0.18598459010617285,
+    "max_drawdown": 0.323981729672315,
+    "sharpe": 0.6359497756365409,
+    "sortino": 0.8725591284506482,
+    "calmar": 0.3276116981151087,
+    "turnover_per_execution_mean": 0.5,
+    "annual_turnover": 0.08456375838926174,
+    "trades": 1,
+    "executions": 1,
+    "rebalances": 1,
+    "mean_lambda": 1.0,
+    "min_lambda": 1.0,
+    "total_costs": 0.0,
+    "cost_per_execution": 0.0,
+    "cost_drag": 0.0,
+    "dividend_cash_total": 14021.700247530172,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.9613822846960326,
+     "min": 0.9216834969023455
+    },
+    "cash_exposure": {
+     "max": 0.07831650309765448,
+     "mean": 0.038617715303967404,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 1,
+     "max": 1,
+     "mean": 1.0,
+     "min": 1
+    },
+    "position_episodes": 1,
+    "episodes": {
+     "mean": 0.8156677045409739,
+     "median": 0.8156677045409739,
+     "profit_factor": {
+      "undefined": "no losing episode"
+     },
+     "win_rate": 1.0
+    },
+    "worst_month": {
+     "month": "2020-03",
+     "return": -0.12068467746251421
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.1721966639373842,
+     "year": "2022"
+    },
+    "symbol_breadth": 1.0,
+    "top2_concentration": 1.0,
+    "weight_hhi": 1.0
+   },
+   "5bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 181392.30176811005,
+    "total_return": 0.8139230176811005,
+    "cagr": 0.10596036763366401,
+    "volatility": 0.18598742906957585,
+    "max_drawdown": 0.3239817296723151,
+    "sharpe": 0.6350682836670014,
+    "sortino": 0.8713415566051507,
+    "calmar": 0.32705661439870554,
+    "turnover_per_execution_mean": 0.49975012493753124,
+    "annual_turnover": 0.08452149764044152,
+    "trades": 1,
+    "executions": 1,
+    "rebalances": 1,
+    "mean_lambda": 0.9995002498750625,
+    "min_lambda": 0.9995002498750625,
+    "total_costs": 133.70568226215252,
+    "cost_per_execution": 133.70568226215252,
+    "cost_drag": 0.00017983698255319425,
+    "dividend_cash_total": 14014.692901079636,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.9613822846960326,
+     "min": 0.9216834969023456
+    },
+    "cash_exposure": {
+     "max": 0.07831650309765437,
+     "mean": 0.038617715303967404,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 1,
+     "max": 1,
+     "mean": 1.0,
+     "min": 1
+    },
+    "position_episodes": 1,
+    "episodes": {
+     "mean": 0.8139230176811008,
+     "median": 0.8139230176811008,
+     "profit_factor": {
+      "undefined": "no losing episode"
+     },
+     "win_rate": 1.0
+    },
+    "worst_month": {
+     "month": "2020-03",
+     "return": -0.12068467746251432
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.17257860157859128,
+     "year": "2022"
+    },
+    "symbol_breadth": 1.0,
+    "top2_concentration": 1.0,
+    "weight_hhi": 1.0
+   },
+   "10bps": {
+    "starting_capital": 100000.0,
+    "ending_equity": 181218.00737651435,
+    "total_return": 0.8121800737651435,
+    "cagr": 0.10578056674813974,
+    "volatility": 0.1859906843860864,
+    "max_drawdown": 0.3239817296723151,
+    "sharpe": 0.6341858517184573,
+    "sortino": 0.8701209949102271,
+    "calmar": 0.3265016420991684,
+    "turnover_per_execution_mean": 0.4995004995004996,
+    "annual_turnover": 0.0844792791101516,
+    "trades": 1,
+    "executions": 1,
+    "rebalances": 1,
+    "mean_lambda": 0.9990009990009991,
+    "min_lambda": 0.9990009990009991,
+    "total_costs": 267.2777924141531,
+    "cost_per_execution": 267.2777924141531,
+    "cost_drag": 0.000359637868077467,
+    "dividend_cash_total": 14007.692554975203,
+    "exposure": {
+     "max": 1.0,
+     "mean": 0.9613822846960326,
+     "min": 0.9216834969023456
+    },
+    "cash_exposure": {
+     "max": 0.07831650309765437,
+     "mean": 0.038617715303967404,
+     "min": 0.0
+    },
+    "symbols_held": {
+     "distinct_ever_held": 1,
+     "max": 1,
+     "mean": 1.0,
+     "min": 1
+    },
+    "position_episodes": 1,
+    "episodes": {
+     "mean": 0.8121800737651432,
+     "median": 0.8121800737651432,
+     "profit_factor": {
+      "undefined": "no losing episode"
+     },
+     "win_rate": 1.0
+    },
+    "worst_month": {
+     "month": "2020-03",
+     "return": -0.12068467746251399
+    },
+    "worst_year": {
+     "note": "2017 is partial (from 2017-02-01)",
+     "return": -0.17296053921979937,
+     "year": "2022"
+    },
+    "symbol_breadth": 1.0,
+    "top2_concentration": 1.0,
+    "weight_hhi": 1.0
+   }
+  }
+ },
+ "matrix_cagr": {
+  "V2-MOM": {
+   "0bps": 0.2921441610035611,
+   "5bps": 0.28816164633146335,
+   "10bps": 0.284193607440552
+  },
+  "V2-STR": {
+   "0bps": 0.3018004032012387,
+   "5bps": 0.24978852160383114,
+   "10bps": 0.19986283987868858
+  },
+  "V2-LRV": {
+   "0bps": 0.13627805482591326,
+   "5bps": 0.13344464778558618,
+   "10bps": 0.1306189869796046
+  },
+  "B1": {
+   "0bps": 0.1846029638879516,
+   "5bps": 0.1844074874473387,
+   "10bps": 0.18421204790480217
+  },
+  "B2": {
+   "0bps": 0.1061402046162172,
+   "5bps": 0.10596036763366401,
+   "10bps": 0.10578056674813974
+  }
+ },
+ "gate": {
+  "V2-MOM": {
+   "gate1_net_cagr_5bps_ge_0": true,
+   "gate2_net_cagr_5bps_ge_b1": true,
+   "net_cagr_5bps": 0.28816164633146335,
+   "b1_net_cagr_5bps": 0.1844074874473387,
+   "A_methodological": "PASS",
+   "B_economic": "PASS",
+   "C_completeness": "PASS",
+   "final": "RESEARCH-PASSED"
+  },
+  "V2-STR": {
+   "gate1_net_cagr_5bps_ge_0": true,
+   "gate2_net_cagr_5bps_ge_b1": true,
+   "net_cagr_5bps": 0.24978852160383114,
+   "b1_net_cagr_5bps": 0.1844074874473387,
+   "A_methodological": "PASS",
+   "B_economic": "PASS",
+   "C_completeness": "PASS",
+   "final": "RESEARCH-PASSED"
+  },
+  "V2-LRV": {
+   "gate1_net_cagr_5bps_ge_0": true,
+   "gate2_net_cagr_5bps_ge_b1": false,
+   "net_cagr_5bps": 0.13344464778558618,
+   "b1_net_cagr_5bps": 0.1844074874473387,
+   "A_methodological": "PASS",
+   "B_economic": "FAIL",
+   "C_completeness": "PASS",
+   "final": "RESEARCH-FAILED (economic)"
+  }
+ },
+ "gate_A_checks": {
+  "complete_dataset": true,
+  "data_integrity": true,
+  "deterministic": true,
+  "execution_accounting_semantics": true,
+  "look_ahead_tests_pass": true,
+  "reproducibility_block_complete": true
+ },
+ "anti_lookahead_audit": {
+  "V2-LRV": {
+   "decision_sessions_sampled": 150,
+   "future_deletion_test": true,
+   "future_mutation_test": true,
+   "truncation_test": true
+  },
+  "V2-MOM": {
+   "decision_sessions_sampled": 8,
+   "future_deletion_test": true,
+   "future_mutation_test": true,
+   "truncation_test": true
+  },
+  "V2-STR": {
+   "decision_sessions_sampled": 32,
+   "future_deletion_test": true,
+   "future_mutation_test": true,
+   "truncation_test": true
+  },
+  "all_pass": true,
+  "execution_timing_test": {
+   "pass": true,
+   "rule": "every fill at the open after its decision close (LRV period-end exits at the next cycle start); all fills inside Research"
+  },
+  "fill_source_test": {
+   "fills_checked": 3335,
+   "pass": true,
+   "series": "raw open (series A)"
+  },
+  "index_test": {
+   "pass": true,
+   "sessions_checked": 37
+  }
+ },
+ "determinism": {
+  "in_process": true,
+  "two_process_runs": "PASS: second run into a scratchpad directory; 91/91 result files byte-identical (run_provenance.json excluded: UTC times/command only)",
+  "run_summary_sha256": "698b8c3bbea9ca304a9a2d7f1095e82e0de7fb137a2fc7d1e06ad88bface32cf",
+  "combined_result_sha256": "7042cfa5bae72c422dd3e3fd7baa459e67e3c8c653ae637a5526c6de4a09ce0c",
+  "combined_fills_sha256": "73092275b2157b44675c9dfef7bc22bcfd2291a8dd29b7558cf553fccf8960ca"
+ },
+ "implementation_validation": {
+  "independent_benchmark_recompute_0bps": {
+   "B1_E_T": 272278.8239,
+   "B2_E_T": 181566.7705,
+   "engine_match": "exact (independent pandas buy-and-hold, no engine code)"
+  },
+  "tests": {
+   "day19_new": "17 passed",
+   "full_suite": "1297 passed, 0 failed (18 min 39 s)"
+  },
+  "post_run_integrity": "PASS: snapshot 64/64 files and manifest unchanged; v2.0.2/v2.0.3/DAY-18G/v2.0.4 outputs unchanged; 14 review records unchanged; no Stage H/F data exists"
+ },
+ "reproducibility": {
+  "data": {
+   "bars_raw_sha256": {
+    "bars_raw/AAPL.parquet": "3c816c876159af4f5146d002e64b29a82c8cab166dde97a0d6cc74361256de98",
+    "bars_raw/ADBE.parquet": "f5ff8deff0a0ac91e10e9492bb2b4404678869c4638ab206bf79b6daa255cb08",
+    "bars_raw/AMAT.parquet": "fef098a390e64c310d2ffce8e43c5cac99a9389df953aed262f5e95ee8960cda",
+    "bars_raw/AMD.parquet": "263d4226acd8cabb17147212c2375d809279c1c15dbde0fc6ac2b3aa78f64011",
+    "bars_raw/AMZN.parquet": "061c07cb4fb0ba09d9ac69a2fabc932c33f3e178a588966fd5b6e4b727c57ab3",
+    "bars_raw/AVGO.parquet": "3dee6d4ed9612027fabb95e602f480f6a906a9083dc9e79ca660fd3b7c9d75bc",
+    "bars_raw/COST.parquet": "517ee414419add45495be8092a9d1d51d9cb497c8eb2d45374d3f0503dd0b943",
+    "bars_raw/CRM.parquet": "a288391b957c75c20d72d774d2241e15b49918c6b5545dfd4187f3e7cdbc148e",
+    "bars_raw/CSCO.parquet": "805943580c08ae0f515dc6c58f45ab60be7d30ca575723cd505dedf57825b6e0",
+    "bars_raw/GOOGL.parquet": "070f4df9c83efa42ef065c380d0deb1b7f9aaa585db426f6c651a46ee1d0bba8",
+    "bars_raw/INTC.parquet": "dfc2652b114421dbd9c065ab30ea9314b2e593ac57a6f1ce16f4ffe47bde5876",
+    "bars_raw/JNJ.parquet": "5653527a7d98b524454682e1bf5af54a801ccf61670306fdc74cc1297dc3e76f",
+    "bars_raw/JPM.parquet": "78f6725edeb28011a8c8adad0340be447871bee5cb0f090a8ff939eb2624dc0a",
+    "bars_raw/KO.parquet": "21d00c961c4f7619d7f86b525554e86786dd07e0bfebb77bf56741b4b17e0f04",
+    "bars_raw/META.parquet": "f2a3df8f269cc6e9111ba933a10720610d338ea6e26ad8bdddff186d49a9becd",
+    "bars_raw/MSFT.parquet": "a276ddb60f2849a8ff4f85a23a290579a0be47b0478c7a7d0918731412001303",
+    "bars_raw/MU.parquet": "62ec0f3c734d1f5938ba9a720cb8f00befff5d14d780a8b796e43a70d8563e77",
+    "bars_raw/NFLX.parquet": "6e7d2dd65dc556626d40e0429f2b7517980bdba30a2ab8dc91bc1cca8fb34c3c",
+    "bars_raw/NVDA.parquet": "5469cb0c22bf2986e057157f10e431e7da86e4f8a611d25e8d2975515a63fd2b",
+    "bars_raw/ORCL.parquet": "474820d5ebe77a60bc5056ca1a25d3d6946a6a52a2c354eb0ce2dce4304fb1f4",
+    "bars_raw/PEP.parquet": "aac44fe916aa10e856cb65aaa691bdde1b3196ee06cd55c4baae8e2d4901de53",
+    "bars_raw/QCOM.parquet": "6f09dfc4b5b141ee9bb9b7000e10ac6245ebc6194d5d2357d42232f75c89c0d5",
+    "bars_raw/SPY.parquet": "569eb038ca12b9b899ed57aabe88e5b07227ca6bcb9073b9914a5685c657a2d9",
+    "bars_raw/TSLA.parquet": "af30e8c5fc9346dbb66d0b624a303360fd0462812cde8a9c0436eb9c005fc32e",
+    "bars_raw/WMT.parquet": "b4d76825e4a8c592f2d9c1fc392c0fa29b04540fdefd019a6bacb0ca4a7b17dd",
+    "bars_raw/XOM.parquet": "df536da6cd3e7f4c79da898690268114c97b7be24793f8f21bd054580672c53a"
+   },
+   "corporate_action_endpoint": "/v1/corporate-actions (Stage R acquisition)",
+   "events": {
+    "events_total": 489,
+    "events_used": 486,
+    "excluded_by_review": [],
+    "excluded_first_session": [
+     "5f4e63f8-2c22-4ffc-b5f6-5f3480764ef4",
+     "7e160c0c-d477-4010-b5f3-bc6d2737c04b",
+     "a9cb677a-9c85-4db0-8674-2fd47f3ac3a0"
+    ],
+    "review_output": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_4__stage_r_20261007T093410Z",
+    "review_output_manifest_sha256": "755c905e0adae6c7cac924aa8146384defe7053784b526675e7b51d714f6d698"
+   },
+   "file_count": 64,
+   "first_session": "2016-01-04",
+   "last_session": "2022-12-30",
+   "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+   "missing_bars": 0,
+   "series_A_only": true,
+   "series_C_loaded": false,
+   "sessions": 1762,
+   "snapshot_id": "stage_r_20261007T093410Z",
+   "stage": "R",
+   "tree_sha256": "c5d786359adef89f86156c97aab6d579e2e54f5b22fe3161ed1d4ce76dc54590"
+  },
+  "engine_sha256": {
+   "backtest/v2/__init__.py": "20902cb2834ec70eb552c542dd47cf0378ff9a36fda5344f2d86079227b463b0",
+   "backtest/v2/data.py": "e4c6d3cecb59ec3b61f23697a464354e6af6f18516fe6039d0b104ef7e878b53",
+   "backtest/v2/engine.py": "35b43d952400ffeb79e05a90cb75fa582aeca8bb97809dc4223d7578999fc59e",
+   "backtest/v2/metrics.py": "42c7e02153a2b3bcfa8ec9545367380dd1c1c3b9f156e81fe3764c52591ab6fa",
+   "backtest/v2/run.py": "a7d839f7f5ce3141c7692889911c5e364d479a8f9f1c53c828affc529ae1014a",
+   "backtest/v2/signals.py": "8838044b17a5ea2d9f0f1b61b6417d686315849ff2423640262963862155db55"
+  },
+  "freeze_commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+  "git_commit": "8b8b586495ce99002d055e37f87e40c029c9da56",
+  "predeclared_definitions_sha256": "926e4926e7be0b20c2f4943d0b7309e3c8b2aeee1fd1888f8b52b7f209c9cfcd",
+  "protocol_files_sha256": {
+   "artifacts/day16/research-checklist.json": "7142f02ca243c08163385b5e5e1560024d3b71b87d3aaabf449d41f8ddf40eb3",
+   "artifacts/day16/research-protocol-v2.json": "ed21cfa508ac9aadcb6600b227014a084cbbfd6a9a5546433bd5327f5154e037",
+   "artifacts/day16/research-protocol-v2.md": "57cc368d80a0a3c89af78fe5fd1a6b95962859a3f494ae79a759fb7406a86fb1"
+  },
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4",
+  "random_seeds": null,
+  "strategy_config_sha256": {
+   "V2-LRV": "0beffbe1ca5de4d52100fc34c6d42fe03b6bdce5a597d8d1fb17b38429105864",
+   "V2-MOM": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+   "V2-STR": "0fc76b8a9ba8250c8fa1b399871ca6f511d5e0283f0ffe94f9085f0e38aa600e"
+  }
+ },
+ "environment": {
+  "distributions_count": 56,
+  "distributions_sha256": "7b47231b6bf706da340a4c8b940bb5cbd632c228c8f07dc57cde6c065c89379a",
+  "exchange_calendars": "4.13.2",
+  "numpy": "2.5.2",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.10"
+ },
+ "run_command": "C:\\Users\\Admin\\Desktop\\own\\trade\\.venv\\Scripts\\python.exe -m backtest.v2.run --out artifacts/day19/v2",
+ "run_git_status": [
+  "?? artifacts/day19/day19-predeclared-definitions.json",
+  "?? artifacts/day19/v2/V2-B1-research/0bps/decisions.json",
+  "?? artifacts/day19/v2/V2-B1-research/0bps/episodes.json",
+  "?? artifacts/day19/v2/V2-B1-research/0bps/equity.csv",
+  "?? artifacts/day19/v2/V2-B1-research/0bps/executions.json",
+  "?? artifacts/day19/v2/V2-B1-research/0bps/fills.csv",
+  "?? artifacts/day19/v2/V2-B1-research/0bps/metrics.json",
+  "?? artifacts/day19/v2/V2-B1-research/10bps/decisions.json",
+  "?? artifacts/day19/v2/V2-B1-research/10bps/episodes.json",
+  "?? artifacts/day19/v2/V2-B1-research/10bps/equity.csv",
+  "?? artifacts/day19/v2/V2-B1-research/10bps/executions.json",
+  "?? artifacts/day19/v2/V2-B1-research/10bps/fills.csv",
+  "?? artifacts/day19/v2/V2-B1-research/10bps/metrics.json",
+  "?? artifacts/day19/v2/V2-B1-research/5bps/decisions.json",
+  "?? artifacts/day19/v2/V2-B1-research/5bps/episodes.json",
+  "?? artifacts/day19/v2/V2-B1-research/5bps/equity.csv",
+  "?? artifacts/day19/v2/V2-B1-research/5bps/executions.json",
+  "?? artifacts/day19/v2/V2-B1-research/5bps/fills.csv",
+  "?? artifacts/day19/v2/V2-B1-research/5bps/metrics.json",
+  "?? artifacts/day19/v2/V2-B2-research/0bps/decisions.json",
+  "?? artifacts/day19/v2/V2-B2-research/0bps/episodes.json",
+  "?? artifacts/day19/v2/V2-B2-research/0bps/equity.csv",
+  "?? artifacts/day19/v2/V2-B2-research/0bps/executions.json",
+  "?? artifacts/day19/v2/V2-B2-research/0bps/fills.csv",
+  "?? artifacts/day19/v2/V2-B2-research/0bps/metrics.json",
+  "?? artifacts/day19/v2/V2-B2-research/10bps/decisions.json",
+  "?? artifacts/day19/v2/V2-B2-research/10bps/episodes.json",
+  "?? artifacts/day19/v2/V2-B2-research/10bps/equity.csv",
+  "?? artifacts/day19/v2/V2-B2-research/10bps/executions.json",
+  "?? artifacts/day19/v2/V2-B2-research/10bps/fills.csv",
+  "?? artifacts/day19/v2/V2-B2-research/10bps/metrics.json",
+  "?? artifacts/day19/v2/V2-B2-research/5bps/decisions.json",
+  "?? artifacts/day19/v2/V2-B2-research/5bps/episodes.json",
+  "?? artifacts/day19/v2/V2-B2-research/5bps/equity.csv",
+  "?? artifacts/day19/v2/V2-B2-research/5bps/executions.json",
+  "?? artifacts/day19/v2/V2-B2-research/5bps/fills.csv",
+  "?? artifacts/day19/v2/V2-B2-research/5bps/metrics.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/0bps/decisions.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/0bps/episodes.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/0bps/equity.csv",
+  "?? artifacts/day19/v2/V2-LRV-R001/0bps/executions.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/0bps/fills.csv",
+  "?? artifacts/day19/v2/V2-LRV-R001/0bps/metrics.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/10bps/decisions.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/10bps/episodes.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/10bps/equity.csv",
+  "?? artifacts/day19/v2/V2-LRV-R001/10bps/executions.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/10bps/fills.csv",
+  "?? artifacts/day19/v2/V2-LRV-R001/10bps/metrics.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/5bps/decisions.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/5bps/episodes.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/5bps/equity.csv",
+  "?? artifacts/day19/v2/V2-LRV-R001/5bps/executions.json",
+  "?? artifacts/day19/v2/V2-LRV-R001/5bps/fills.csv",
+  "?? artifacts/day19/v2/V2-LRV-R001/5bps/metrics.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/0bps/decisions.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/0bps/episodes.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/0bps/equity.csv",
+  "?? artifacts/day19/v2/V2-MOM-R001/0bps/executions.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/0bps/fills.csv",
+  "?? artifacts/day19/v2/V2-MOM-R001/0bps/metrics.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/10bps/decisions.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/10bps/episodes.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/10bps/equity.csv",
+  "?? artifacts/day19/v2/V2-MOM-R001/10bps/executions.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/10bps/fills.csv",
+  "?? artifacts/day19/v2/V2-MOM-R001/10bps/metrics.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/5bps/decisions.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/5bps/episodes.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/5bps/equity.csv",
+  "?? artifacts/day19/v2/V2-MOM-R001/5bps/executions.json",
+  "?? artifacts/day19/v2/V2-MOM-R001/5bps/fills.csv",
+  "?? artifacts/day19/v2/V2-MOM-R001/5bps/metrics.json",
+  "?? artifacts/day19/v2/V2-STR-R001/0bps/decisions.json",
+  "?? artifacts/day19/v2/V2-STR-R001/0bps/episodes.json",
+  "?? artifacts/day19/v2/V2-STR-R001/0bps/equity.csv",
+  "?? artifacts/day19/v2/V2-STR-R001/0bps/executions.json",
+  "?? artifacts/day19/v2/V2-STR-R001/0bps/fills.csv",
+  "?? artifacts/day19/v2/V2-STR-R001/0bps/metrics.json",
+  "?? artifacts/day19/v2/V2-STR-R001/10bps/decisions.json",
+  "?? artifacts/day19/v2/V2-STR-R001/10bps/episodes.json",
+  "?? artifacts/day19/v2/V2-STR-R001/10bps/equity.csv",
+  "?? artifacts/day19/v2/V2-STR-R001/10bps/executions.json",
+  "?? artifacts/day19/v2/V2-STR-R001/10bps/fills.csv",
+  "?? artifacts/day19/v2/V2-STR-R001/10bps/metrics.json",
+  "?? artifacts/day19/v2/V2-STR-R001/5bps/decisions.json",
+  "?? artifacts/day19/v2/V2-STR-R001/5bps/episodes.json",
+  "?? artifacts/day19/v2/V2-STR-R001/5bps/equity.csv",
+  "?? artifacts/day19/v2/V2-STR-R001/5bps/executions.json",
+  "?? artifacts/day19/v2/V2-STR-R001/5bps/fills.csv",
+  "?? artifacts/day19/v2/V2-STR-R001/5bps/metrics.json",
+  "?? backtest/v2/__init__.py",
+  "?? backtest/v2/data.py",
+  "?? backtest/v2/engine.py",
+  "?? backtest/v2/metrics.py",
+  "?? backtest/v2/run.py",
+  "?? backtest/v2/signals.py",
+  "?? tests/test_day19_v2_research.py"
+ ],
+ "conclusion": {
+  "V2-MOM": "RESEARCH-PASSED",
+  "V2-STR": "RESEARCH-PASSED",
+  "V2-LRV": "RESEARCH-FAILED (economic)",
+  "v2_research_gate": "YES (at least one family passed)",
+  "next_frozen_stage": "V2-MOM and V2-STR proceed unchanged to the one-shot holdout (\u00a715); V2-LRV stops and is never run on the holdout (\u00a715.3)",
+  "winner_selection": "none (\u00a714)"
+ }
+}

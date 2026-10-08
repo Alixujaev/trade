@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "task": "DAY-19",
+  "written": "2026-10-08, before any DAY-19 code was run and before any strategy, benchmark or metric value existed",
+  "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; signed off DAY-18L 8b8b586)",
+  "decided_by": "Alixujaev (protocol owner), DAY-19 planning, before results",
+  "protocol_owner_clarifications": {
+    "LRV_slot_lambda": {
+      "conflict": "frozen §6.2 rows 13/20 and JSON strategies.V2-LRV.slot_capital ('entire slot capital'; 'evolves with own P&L, costs and dividends; no cross-slot lending') vs frozen §8.4 single portfolio-wide lambda = min(1, K/(B*(1+s))) with K = total cash",
+      "decision": "for V2-LRV the §8.4 formula is applied per entering slot with K = that slot's own cash and B = its slot capital, i.e. lambda_slot = min(1, slot_cash/(B*(1+s))) = 1/(1+s) when B = slot_cash; the slot ends with zero cash; no cross-slot lending",
+      "scope": "V2-LRV only; V2-MOM, V2-STR, B1 and B2 use the global §8.4 lambda exactly as written",
+      "effect_at_0_bps": "none (both readings identical)",
+      "decided_before_results": true
+    }
+  },
+  "diagnostic_definitions": {
+    "applies_to": "non-gated §12 diagnostics whose exact formula the frozen text leaves open; none affects any trade, the economic gate (net CAGR @5 bps vs B1) or Gate C completeness",
+    "daily_returns": "r_d = E(d)/E(d-1) - 1 for d = 1..N, E(0) = E_0 = 100000, E(N) = post-liquidation E_T (frozen §12)",
+    "max_drawdown": "max over d of (1 - E(d)/max_{u<=d} E(u)) on the series [E_0, E(1..N-1), E_T] (the same series as r_d); reported as a positive fraction",
+    "worst_month": "minimum over calendar months of prod(1 + r_d) - 1 over the month's sessions",
+    "worst_year": "minimum over calendar years of prod(1 + r_d) - 1 over the year's sessions (2017 partial, labelled)",
+    "calendar_year_subperiods": "per calendar year: return = prod(1+r_d)-1; CAGR = (1+return)^(252/n_y)-1; volatility, Sharpe, Sortino, max drawdown on that year's r_d slice (drawdown restarted at the year's start equity); B1/B2 return for the same slice; 2017 labelled partial (starts 2017-02-01)",
+    "position_episode": "a maximal run of sessions over which a strategy holds a non-zero share quantity of one symbol (resizing does not break an episode)",
+    "episode_net_return": "(sum of sell proceeds net of costs + dividends received + final mark value net of the liquidation cost if still held at segment end) / (sum of gross buy notional plus buy costs) - 1",
+    "episode_profit_factor": "sum of positive episode P&L / |sum of negative episode P&L|; undefined if no losing episode",
+    "symbol_pnl_contribution": "per symbol: sell proceeds net of costs + dividends + final net mark - gross buy notional - buy costs, over the segment",
+    "symbol_breadth": "share of symbols ever held with symbol_pnl_contribution > 0",
+    "top2_concentration": "sum of the two largest |symbol_pnl_contribution| / sum of all |symbol_pnl_contribution|",
+    "weight_hhi": "time-averaged weights wbar_i = mean over sessions of shares_i*mark_i/E; renormalised p_i = wbar_i / sum_j wbar_j; HHI = sum p_i^2 (undefined if never invested)",
+    "exposure": "daily sum_i shares_i*mark_i / E at each close (frozen §12); cash exposure = 1 - exposure",
+    "symbols_held": "mean, min and max number of symbols with non-zero shares at each close; distinct symbols ever held",
+    "tracking_error_b1": "std(r_d - r_d^B1, ddof=1)*sqrt(252) (frozen)",
+    "information_ratio_b1": "mean(r_d - r_d^B1)/std(r_d - r_d^B1, ddof=1)*sqrt(252)",
+    "hac_tstat_active_vs_b1": "a_d = r_d - r_d^B1; t = mean(a)/sqrt(V_NW/N), V_NW = gamma_0 + 2*sum_{l=1..5} (1 - l/6)*gamma_l with gamma_l = (1/N)*sum (a_d - mean)(a_{d-l} - mean) (Newey-West, Bartlett, lag 5); annualised active return = mean(a)*252",
+    "hac_p_value": "two-sided, standard normal: p = 2*(1 - Phi(|t|))",
+    "holm": "Holm step-down adjusted p-values across the three families V2-MOM, V2-STR, V2-LRV for the same cost scenario (diagnostic only)",
+    "executions": "count of opens with at least one fill (frozen); rebalances = count of scheduled decisions executed (A/B) or of cycles started (C)",
+    "trades": "number of individual fills (buy or sell of one symbol at one open)",
+    "cost_per_execution": "total costs / executions; undefined at 0 bps reported as 0",
+    "cost_drag": "gross CAGR - net CAGR (5 and 10 bps)"
+  },
+  "pit_test_sample": "deterministic, no randomness (frozen §11.12): every 10th decision session of each family's schedule in the Research segment, plus its first and last decision",
+  "never_changed_after_results": true
+}

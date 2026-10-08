@@ -1,0 +1,578 @@
+[
+ {
+  "end": "2017-06-21",
+  "final_net_mark": 0.0,
+  "inflow": 21190.747976338276,
+  "outflow": 20000.0,
+  "start": "2017-05-04",
+  "ticker": "PEP"
+ },
+ {
+  "end": "2017-08-02",
+  "final_net_mark": 0.0,
+  "inflow": 21056.71199688084,
+  "outflow": 21190.747976338276,
+  "start": "2017-07-26",
+  "ticker": "PEP"
+ },
+ {
+  "end": "2017-08-02",
+  "final_net_mark": 0.0,
+  "inflow": 20048.29956281164,
+  "outflow": 20000.0,
+  "start": "2017-07-26",
+  "ticker": "JNJ"
+ },
+ {
+  "end": "2017-08-02",
+  "final_net_mark": 0.0,
+  "inflow": 20991.873162131382,
+  "outflow": 20000.0,
+  "start": "2017-07-11",
+  "ticker": "COST"
+ },
+ {
+  "end": "2017-08-02",
+  "final_net_mark": 0.0,
+  "inflow": 20709.859044487108,
+  "outflow": 20000.0,
+  "start": "2017-02-10",
+  "ticker": "INTC"
+ },
+ {
+  "end": "2017-08-02",
+  "final_net_mark": 0.0,
+  "inflow": 19478.65095803832,
+  "outflow": 20000.0,
+  "start": "2017-07-26",
+  "ticker": "GOOGL"
+ },
+ {
+  "end": "2017-12-13",
+  "final_net_mark": 0.0,
+  "inflow": 22681.565159774073,
+  "outflow": 20457.078944869856,
+  "start": "2017-10-30",
+  "ticker": "CSCO"
+ },
+ {
+  "end": "2018-01-29",
+  "final_net_mark": 0.0,
+  "inflow": 25806.686303434544,
+  "outflow": 22681.565159774073,
+  "start": "2018-01-16",
+  "ticker": "INTC"
+ },
+ {
+  "end": "2018-02-01",
+  "final_net_mark": 0.0,
+  "inflow": 21236.756500599062,
+  "outflow": 20457.078944869856,
+  "start": "2017-10-12",
+  "ticker": "KO"
+ },
+ {
+  "end": "2018-02-01",
+  "final_net_mark": 0.0,
+  "inflow": 22548.168879971265,
+  "outflow": 20457.078944869856,
+  "start": "2017-10-03",
+  "ticker": "PEP"
+ },
+ {
+  "end": "2018-02-01",
+  "final_net_mark": 0.0,
+  "inflow": 21542.24289795012,
+  "outflow": 20457.078944869856,
+  "start": "2017-11-06",
+  "ticker": "META"
+ },
+ {
+  "end": "2018-02-01",
+  "final_net_mark": 0.0,
+  "inflow": 20707.781086745177,
+  "outflow": 20457.078944869856,
+  "start": "2017-08-29",
+  "ticker": "AVGO"
+ },
+ {
+  "end": "2018-07-18",
+  "final_net_mark": 0.0,
+  "inflow": 25243.638478652865,
+  "outflow": 22368.327133740033,
+  "start": "2018-04-23",
+  "ticker": "PEP"
+ },
+ {
+  "end": "2018-08-02",
+  "final_net_mark": 0.0,
+  "inflow": 25820.65122115097,
+  "outflow": 22368.327133740033,
+  "start": "2018-03-02",
+  "ticker": "MSFT"
+ },
+ {
+  "end": "2018-08-02",
+  "final_net_mark": 0.0,
+  "inflow": 21359.27433054733,
+  "outflow": 22368.327133740033,
+  "start": "2018-05-03",
+  "ticker": "AVGO"
+ },
+ {
+  "end": "2018-08-02",
+  "final_net_mark": 0.0,
+  "inflow": 22311.364353057164,
+  "outflow": 22368.327133740033,
+  "start": "2018-03-15",
+  "ticker": "JPM"
+ },
+ {
+  "end": "2018-10-25",
+  "final_net_mark": 0.0,
+  "inflow": 23541.039227149533,
+  "outflow": 23420.65110342967,
+  "start": "2018-09-26",
+  "ticker": "PEP"
+ },
+ {
+  "end": "2018-12-03",
+  "final_net_mark": 0.0,
+  "inflow": 21154.136830277817,
+  "outflow": 23420.65110342967,
+  "start": "2018-08-31",
+  "ticker": "GOOGL"
+ },
+ {
+  "end": "2018-12-17",
+  "final_net_mark": 0.0,
+  "inflow": 25294.55254787467,
+  "outflow": 23420.65110342967,
+  "start": "2018-09-19",
+  "ticker": "KO"
+ },
+ {
+  "end": "2018-12-28",
+  "final_net_mark": 0.0,
+  "inflow": 27831.93329244065,
+  "outflow": 23420.65110342967,
+  "start": "2018-11-20",
+  "ticker": "CRM"
+ },
+ {
+  "end": "2019-02-04",
+  "final_net_mark": 0.0,
+  "inflow": 25634.770877973613,
+  "outflow": 25294.55254787467,
+  "start": "2018-12-18",
+  "ticker": "JNJ"
+ },
+ {
+  "end": "2019-02-04",
+  "final_net_mark": 0.0,
+  "inflow": 24478.477842193075,
+  "outflow": 21154.136830277817,
+  "start": "2019-01-04",
+  "ticker": "AAPL"
+ },
+ {
+  "end": "2019-02-04",
+  "final_net_mark": 0.0,
+  "inflow": 27575.037758603357,
+  "outflow": 27831.933292440655,
+  "start": "2019-02-01",
+  "ticker": "MSFT"
+ },
+ {
+  "end": "2019-02-04",
+  "final_net_mark": 0.0,
+  "inflow": 18454.638058692635,
+  "outflow": 23420.65110342967,
+  "start": "2018-10-25",
+  "ticker": "QCOM"
+ },
+ {
+  "end": "2019-04-15",
+  "final_net_mark": 0.0,
+  "inflow": 26782.891241004847,
+  "outflow": 23936.792752922447,
+  "start": "2019-03-26",
+  "ticker": "JPM"
+ },
+ {
+  "end": "2019-05-30",
+  "final_net_mark": 0.0,
+  "inflow": 25918.024212785254,
+  "outflow": 23936.792752922447,
+  "start": "2019-02-19",
+  "ticker": "KO"
+ },
+ {
+  "end": "2019-07-18",
+  "final_net_mark": 0.0,
+  "inflow": 27537.506992398583,
+  "outflow": 23936.792752922447,
+  "start": "2019-04-26",
+  "ticker": "COST"
+ },
+ {
+  "end": "2019-08-01",
+  "final_net_mark": 0.0,
+  "inflow": 27218.695595323763,
+  "outflow": 26782.891241004847,
+  "start": "2019-07-11",
+  "ticker": "JPM"
+ },
+ {
+  "end": "2019-08-05",
+  "final_net_mark": 0.0,
+  "inflow": 25011.343836795215,
+  "outflow": 25918.024212785254,
+  "start": "2019-07-15",
+  "ticker": "JNJ"
+ },
+ {
+  "end": "2019-08-05",
+  "final_net_mark": 0.0,
+  "inflow": 20352.5411867529,
+  "outflow": 23936.792752922447,
+  "start": "2019-05-01",
+  "ticker": "CRM"
+ },
+ {
+  "end": "2019-08-05",
+  "final_net_mark": 0.0,
+  "inflow": 22603.536212079922,
+  "outflow": 23936.792752922447,
+  "start": "2019-07-29",
+  "ticker": "XOM"
+ },
+ {
+  "end": "2019-11-26",
+  "final_net_mark": 0.0,
+  "inflow": 27132.15199496977,
+  "outflow": 24544.72476467008,
+  "start": "2019-08-29",
+  "ticker": "MSFT"
+ },
+ {
+  "end": "2019-12-26",
+  "final_net_mark": 0.0,
+  "inflow": 29750.4085316224,
+  "outflow": 24544.72476467008,
+  "start": "2019-10-29",
+  "ticker": "ADBE"
+ },
+ {
+  "end": "2020-02-04",
+  "final_net_mark": 0.0,
+  "inflow": 28060.435157476968,
+  "outflow": 27132.151994969772,
+  "start": "2019-12-30",
+  "ticker": "COST"
+ },
+ {
+  "end": "2020-02-04",
+  "final_net_mark": 0.0,
+  "inflow": 25503.18213562969,
+  "outflow": 24544.72476467008,
+  "start": "2019-08-26",
+  "ticker": "ORCL"
+ },
+ {
+  "end": "2020-02-04",
+  "final_net_mark": 0.0,
+  "inflow": 28067.561005778203,
+  "outflow": 24544.72476467008,
+  "start": "2019-10-16",
+  "ticker": "AMZN"
+ },
+ {
+  "end": "2020-03-24",
+  "final_net_mark": 0.0,
+  "inflow": 24981.712457118127,
+  "outflow": 27185.262319035468,
+  "start": "2020-03-10",
+  "ticker": "CRM"
+ },
+ {
+  "end": "2020-05-01",
+  "final_net_mark": 0.0,
+  "inflow": 35944.53173279296,
+  "outflow": 27185.262319035468,
+  "start": "2020-03-16",
+  "ticker": "META"
+ },
+ {
+  "end": "2020-05-12",
+  "final_net_mark": 0.0,
+  "inflow": 31425.022312600835,
+  "outflow": 27185.262319035468,
+  "start": "2020-04-07",
+  "ticker": "GOOGL"
+ },
+ {
+  "end": "2020-06-15",
+  "final_net_mark": 0.0,
+  "inflow": 38367.676935860414,
+  "outflow": 35944.53173279296,
+  "start": "2020-05-27",
+  "ticker": "ADBE"
+ },
+ {
+  "end": "2020-06-16",
+  "final_net_mark": 0.0,
+  "inflow": 30150.76072954215,
+  "outflow": 24981.71245711813,
+  "start": "2020-03-31",
+  "ticker": "CRM"
+ },
+ {
+  "end": "2020-07-17",
+  "final_net_mark": 0.0,
+  "inflow": 32009.961233648784,
+  "outflow": 30150.760729542155,
+  "start": "2020-07-02",
+  "ticker": "JNJ"
+ },
+ {
+  "end": "2020-08-03",
+  "final_net_mark": 0.0,
+  "inflow": 46168.79536897206,
+  "outflow": 38367.676935860414,
+  "start": "2020-06-29",
+  "ticker": "META"
+ },
+ {
+  "end": "2020-08-04",
+  "final_net_mark": 0.0,
+  "inflow": 28493.47720080069,
+  "outflow": 27185.262319035468,
+  "start": "2020-03-10",
+  "ticker": "PEP"
+ },
+ {
+  "end": "2020-08-04",
+  "final_net_mark": 0.0,
+  "inflow": 29898.679042806725,
+  "outflow": 31425.022312600835,
+  "start": "2020-07-27",
+  "ticker": "INTC"
+ },
+ {
+  "end": "2020-08-04",
+  "final_net_mark": 0.0,
+  "inflow": 33514.382556536104,
+  "outflow": 27185.262319035468,
+  "start": "2020-03-24",
+  "ticker": "ORCL"
+ },
+ {
+  "end": "2020-09-30",
+  "final_net_mark": 0.0,
+  "inflow": 33882.15064229148,
+  "outflow": 34017.05908055288,
+  "start": "2020-09-02",
+  "ticker": "COST"
+ },
+ {
+  "end": "2020-12-02",
+  "final_net_mark": 0.0,
+  "inflow": 37052.99059573522,
+  "outflow": 34017.05908055288,
+  "start": "2020-08-27",
+  "ticker": "GOOGL"
+ },
+ {
+  "end": "2020-12-14",
+  "final_net_mark": 0.0,
+  "inflow": 48644.02949746409,
+  "outflow": 34017.05908055288,
+  "start": "2020-09-01",
+  "ticker": "AMAT"
+ },
+ {
+  "end": "2021-01-26",
+  "final_net_mark": 0.0,
+  "inflow": 35436.09896269009,
+  "outflow": 34017.05908055288,
+  "start": "2020-08-27",
+  "ticker": "MSFT"
+ },
+ {
+  "end": "2021-02-03",
+  "final_net_mark": 0.0,
+  "inflow": 38488.33984672536,
+  "outflow": 37052.99059573522,
+  "start": "2020-12-03",
+  "ticker": "CRM"
+ },
+ {
+  "end": "2021-02-03",
+  "final_net_mark": 0.0,
+  "inflow": 52474.055587563205,
+  "outflow": 48644.02949746409,
+  "start": "2021-01-13",
+  "ticker": "QCOM"
+ },
+ {
+  "end": "2021-02-03",
+  "final_net_mark": 0.0,
+  "inflow": 33718.69466406309,
+  "outflow": 34017.05908055288,
+  "start": "2021-01-28",
+  "ticker": "PEP"
+ },
+ {
+  "end": "2021-08-04",
+  "final_net_mark": 0.0,
+  "inflow": 40110.380397103916,
+  "outflow": 38799.86794066665,
+  "start": "2021-07-16",
+  "ticker": "JNJ"
+ },
+ {
+  "end": "2021-08-04",
+  "final_net_mark": 0.0,
+  "inflow": 53378.49630112546,
+  "outflow": 38799.86794066665,
+  "start": "2021-03-16",
+  "ticker": "ADBE"
+ },
+ {
+  "end": "2021-08-04",
+  "final_net_mark": 0.0,
+  "inflow": 39569.702530721945,
+  "outflow": 38799.86794066665,
+  "start": "2021-05-10",
+  "ticker": "WMT"
+ },
+ {
+  "end": "2021-11-09",
+  "final_net_mark": 0.0,
+  "inflow": 62137.768091759084,
+  "outflow": 42131.66302205693,
+  "start": "2021-08-20",
+  "ticker": "AMD"
+ },
+ {
+  "end": "2022-02-02",
+  "final_net_mark": 0.0,
+  "inflow": 38949.58513818559,
+  "outflow": 42131.66302205693,
+  "start": "2021-12-14",
+  "ticker": "AMZN"
+ },
+ {
+  "end": "2022-02-02",
+  "final_net_mark": 0.0,
+  "inflow": 46409.07028777358,
+  "outflow": 42131.66302205693,
+  "start": "2021-09-13",
+  "ticker": "KO"
+ },
+ {
+  "end": "2022-02-02",
+  "final_net_mark": 0.0,
+  "inflow": 44619.82122134915,
+  "outflow": 42131.66302205693,
+  "start": "2021-10-15",
+  "ticker": "JNJ"
+ },
+ {
+  "end": "2022-02-02",
+  "final_net_mark": 0.0,
+  "inflow": 42842.6051799152,
+  "outflow": 62137.76809175909,
+  "start": "2021-12-01",
+  "ticker": "NFLX"
+ },
+ {
+  "end": "2022-02-02",
+  "final_net_mark": 0.0,
+  "inflow": 35369.78747620256,
+  "outflow": 42131.66302205693,
+  "start": "2021-12-10",
+  "ticker": "ADBE"
+ },
+ {
+  "end": "2022-05-18",
+  "final_net_mark": 0.0,
+  "inflow": 41163.834460250626,
+  "outflow": 41638.173860685216,
+  "start": "2022-04-19",
+  "ticker": "JNJ"
+ },
+ {
+  "end": "2022-07-12",
+  "final_net_mark": 0.0,
+  "inflow": 42467.703822827745,
+  "outflow": 41638.173860685216,
+  "start": "2022-05-12",
+  "ticker": "AAPL"
+ },
+ {
+  "end": "2022-08-04",
+  "final_net_mark": 0.0,
+  "inflow": 44456.871504650495,
+  "outflow": 41163.834460250626,
+  "start": "2022-05-19",
+  "ticker": "WMT"
+ },
+ {
+  "end": "2022-08-04",
+  "final_net_mark": 0.0,
+  "inflow": 43071.34349852965,
+  "outflow": 41638.173860685216,
+  "start": "2022-04-21",
+  "ticker": "NFLX"
+ },
+ {
+  "end": "2022-10-28",
+  "final_net_mark": 0.0,
+  "inflow": 49213.8115114969,
+  "outflow": 42654.45330947566,
+  "start": "2022-10-19",
+  "ticker": "AMAT"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 38112.70413419203,
+  "inflow": 38639.30633082497,
+  "outflow": 42654.45330947566,
+  "start": "2022-09-14",
+  "ticker": "INTC"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 49752.897965999364,
+  "inflow": 50097.21845362944,
+  "outflow": 42654.45330947566,
+  "start": "2022-10-13",
+  "ticker": "KO"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 36536.84056210272,
+  "inflow": 36536.84056210272,
+  "outflow": 42654.45330947566,
+  "start": "2022-10-25",
+  "ticker": "GOOGL"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 44661.27687623969,
+  "inflow": 44661.27687623969,
+  "outflow": 49213.8115114969,
+  "start": "2022-11-03",
+  "ticker": "AMZN"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 39791.545363867255,
+  "inflow": 39791.545363867255,
+  "outflow": 42654.45330947566,
+  "start": "2022-12-14",
+  "ticker": "COST"
+ }
+]

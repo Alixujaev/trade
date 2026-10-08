@@ -1,0 +1,3092 @@
+[
+ {
+  "close": "2017-01-31",
+  "targets": {
+   "GOOGL": 0.2,
+   "INTC": 0.2,
+   "QCOM": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-02-03",
+  "targets": {
+   "AMZN": 0.2,
+   "GOOGL": 0.2,
+   "INTC": 0.2,
+   "MSFT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-02-10",
+  "targets": {
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-02-17",
+  "targets": {
+   "META": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-02-24",
+  "targets": {
+   "JPM": 0.2,
+   "MSFT": 0.2,
+   "NVDA": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-03-03",
+  "targets": {
+   "AMD": 0.2,
+   "COST": 0.2,
+   "INTC": 0.2,
+   "NFLX": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2017-03-10",
+  "targets": {
+   "COST": 0.2,
+   "JPM": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-03-17",
+  "targets": {
+   "AVGO": 0.2,
+   "CRM": 0.2,
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "MSFT": 0.2
+  }
+ },
+ {
+  "close": "2017-03-24",
+  "targets": {
+   "GOOGL": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "NFLX": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2017-03-31",
+  "targets": {
+   "AMAT": 0.2,
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2017-04-07",
+  "targets": {
+   "AMD": 0.2,
+   "CSCO": 0.2,
+   "JPM": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2017-04-13",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2017-04-21",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "QCOM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-04-28",
+  "targets": {
+   "AAPL": 0.2,
+   "INTC": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2017-05-05",
+  "targets": {
+   "AMD": 0.2,
+   "JNJ": 0.2,
+   "META": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2017-05-12",
+  "targets": {
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "KO": 0.2,
+   "MSFT": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2017-05-19",
+  "targets": {
+   "AAPL": 0.2,
+   "CRM": 0.2,
+   "CSCO": 0.2,
+   "JPM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2017-05-26",
+  "targets": {
+   "AAPL": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-06-02",
+  "targets": {
+   "CRM": 0.2,
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-06-09",
+  "targets": {
+   "AAPL": 0.2,
+   "ADBE": 0.2,
+   "AMAT": 0.2,
+   "CRM": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2017-06-16",
+  "targets": {
+   "AAPL": 0.2,
+   "AMAT": 0.2,
+   "COST": 0.2,
+   "NFLX": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2017-06-23",
+  "targets": {
+   "COST": 0.2,
+   "INTC": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-06-30",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "GOOGL": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2017-07-07",
+  "targets": {
+   "COST": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "ORCL": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2017-07-14",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2017-07-21",
+  "targets": {
+   "COST": 0.2,
+   "CRM": 0.2,
+   "JPM": 0.2,
+   "QCOM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-07-28",
+  "targets": {
+   "ADBE": 0.2,
+   "AMAT": 0.2,
+   "GOOGL": 0.2,
+   "JNJ": 0.2,
+   "MU": 0.2
+  }
+ },
+ {
+  "close": "2017-08-04",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "KO": 0.2,
+   "MU": 0.2
+  }
+ },
+ {
+  "close": "2017-08-11",
+  "targets": {
+   "AMD": 0.2,
+   "JPM": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2017-08-18",
+  "targets": {
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "QCOM": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-08-25",
+  "targets": {
+   "AMAT": 0.2,
+   "AMZN": 0.2,
+   "COST": 0.2,
+   "INTC": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2017-09-01",
+  "targets": {
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-09-08",
+  "targets": {
+   "AAPL": 0.2,
+   "AMD": 0.2,
+   "AVGO": 0.2,
+   "JPM": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2017-09-15",
+  "targets": {
+   "CRM": 0.2,
+   "GOOGL": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2017-09-22",
+  "targets": {
+   "AAPL": 0.2,
+   "ADBE": 0.2,
+   "AVGO": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2017-09-29",
+  "targets": {
+   "CRM": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2017-10-06",
+  "targets": {
+   "COST": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-10-13",
+  "targets": {
+   "CRM": 0.2,
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-10-20",
+  "targets": {
+   "AMZN": 0.2,
+   "AVGO": 0.2,
+   "NFLX": 0.2,
+   "PEP": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2017-10-27",
+  "targets": {
+   "AMD": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2017-11-03",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-11-10",
+  "targets": {
+   "AVGO": 0.2,
+   "CSCO": 0.2,
+   "JPM": 0.2,
+   "NFLX": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2017-11-17",
+  "targets": {
+   "AAPL": 0.2,
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-11-24",
+  "targets": {
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2017-12-01",
+  "targets": {
+   "AMAT": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2017-12-08",
+  "targets": {
+   "ADBE": 0.2,
+   "AMD": 0.2,
+   "AVGO": 0.2,
+   "INTC": 0.2,
+   "KO": 0.2
+  }
+ },
+ {
+  "close": "2017-12-15",
+  "targets": {
+   "JPM": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2,
+   "ORCL": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2017-12-22",
+  "targets": {
+   "COST": 0.2,
+   "CRM": 0.2,
+   "JNJ": 0.2,
+   "ORCL": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2017-12-29",
+  "targets": {
+   "AAPL": 0.2,
+   "AMD": 0.2,
+   "GOOGL": 0.2,
+   "MU": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2018-01-05",
+  "targets": {
+   "COST": 0.2,
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2018-01-12",
+  "targets": {
+   "AVGO": 0.2,
+   "INTC": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2018-01-19",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-01-26",
+  "targets": {
+   "AAPL": 0.2,
+   "AVGO": 0.2,
+   "JNJ": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2018-02-02",
+  "targets": {
+   "AAPL": 0.2,
+   "AMAT": 0.2,
+   "GOOGL": 0.2,
+   "INTC": 0.2,
+   "JNJ": 0.2
+  }
+ },
+ {
+  "close": "2018-02-09",
+  "targets": {
+   "AMD": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-02-16",
+  "targets": {
+   "JNJ": 0.2,
+   "META": 0.2,
+   "PEP": 0.2,
+   "QCOM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-02-23",
+  "targets": {
+   "COST": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "QCOM": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2018-03-02",
+  "targets": {
+   "GOOGL": 0.2,
+   "JPM": 0.2,
+   "META": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2018-03-09",
+  "targets": {
+   "COST": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-03-16",
+  "targets": {
+   "AMAT": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "NFLX": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2018-03-23",
+  "targets": {
+   "CRM": 0.2,
+   "GOOGL": 0.2,
+   "META": 0.2,
+   "ORCL": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2018-03-29",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "MU": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2018-04-06",
+  "targets": {
+   "AMAT": 0.2,
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2018-04-13",
+  "targets": {
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2018-04-20",
+  "targets": {
+   "AAPL": 0.2,
+   "AMAT": 0.2,
+   "JNJ": 0.2,
+   "PEP": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2018-04-27",
+  "targets": {
+   "AAPL": 0.2,
+   "AMAT": 0.2,
+   "GOOGL": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2018-05-04",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-05-11",
+  "targets": {
+   "COST": 0.2,
+   "CSCO": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2018-05-18",
+  "targets": {
+   "AMAT": 0.2,
+   "AVGO": 0.2,
+   "CSCO": 0.2,
+   "GOOGL": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2018-05-25",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-06-01",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2018-06-08",
+  "targets": {
+   "AMAT": 0.2,
+   "CSCO": 0.2,
+   "GOOGL": 0.2,
+   "INTC": 0.2,
+   "META": 0.2
+  }
+ },
+ {
+  "close": "2018-06-15",
+  "targets": {
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2,
+   "ORCL": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-06-22",
+  "targets": {
+   "ADBE": 0.2,
+   "INTC": 0.2,
+   "NVDA": 0.2,
+   "ORCL": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2018-06-29",
+  "targets": {
+   "AVGO": 0.2,
+   "INTC": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2018-07-06",
+  "targets": {
+   "COST": 0.2,
+   "CSCO": 0.2,
+   "JPM": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2018-07-13",
+  "targets": {
+   "AVGO": 0.2,
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2018-07-20",
+  "targets": {
+   "GOOGL": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-07-27",
+  "targets": {
+   "CRM": 0.2,
+   "INTC": 0.2,
+   "META": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2018-08-03",
+  "targets": {
+   "ADBE": 0.2,
+   "CRM": 0.2,
+   "GOOGL": 0.2,
+   "NFLX": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-08-10",
+  "targets": {
+   "AVGO": 0.2,
+   "COST": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2018-08-17",
+  "targets": {
+   "AMAT": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2018-08-24",
+  "targets": {
+   "AAPL": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2018-08-31",
+  "targets": {
+   "GOOGL": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2018-09-07",
+  "targets": {
+   "AMAT": 0.2,
+   "GOOGL": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2018-09-14",
+  "targets": {
+   "AMAT": 0.2,
+   "COST": 0.2,
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2018-09-21",
+  "targets": {
+   "AAPL": 0.2,
+   "ADBE": 0.2,
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2018-09-28",
+  "targets": {
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "PEP": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2018-10-05",
+  "targets": {
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "COST": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2018-10-12",
+  "targets": {
+   "AMAT": 0.2,
+   "CSCO": 0.2,
+   "JPM": 0.2,
+   "NVDA": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2018-10-19",
+  "targets": {
+   "AMD": 0.2,
+   "AVGO": 0.2,
+   "CRM": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2018-10-26",
+  "targets": {
+   "AMD": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-11-02",
+  "targets": {
+   "AAPL": 0.2,
+   "ADBE": 0.2,
+   "GOOGL": 0.2,
+   "MSFT": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2018-11-09",
+  "targets": {
+   "AMAT": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2018-11-16",
+  "targets": {
+   "AAPL": 0.2,
+   "AMZN": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2018-11-23",
+  "targets": {
+   "AAPL": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2018-11-30",
+  "targets": {
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2018-12-07",
+  "targets": {
+   "AAPL": 0.2,
+   "AMAT": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2018-12-14",
+  "targets": {
+   "AMAT": 0.2,
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-12-21",
+  "targets": {
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2018-12-28",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "MSFT": 0.2,
+   "ORCL": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-01-04",
+  "targets": {
+   "AAPL": 0.2,
+   "AVGO": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2019-01-11",
+  "targets": {
+   "GOOGL": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-01-18",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2019-01-25",
+  "targets": {
+   "COST": 0.2,
+   "INTC": 0.2,
+   "NFLX": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2019-02-01",
+  "targets": {
+   "AMZN": 0.2,
+   "MSFT": 0.2,
+   "NVDA": 0.2,
+   "QCOM": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2019-02-08",
+  "targets": {
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-02-15",
+  "targets": {
+   "AAPL": 0.2,
+   "AMAT": 0.2,
+   "KO": 0.2,
+   "META": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2019-02-22",
+  "targets": {
+   "AMAT": 0.2,
+   "AVGO": 0.2,
+   "GOOGL": 0.2,
+   "KO": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2019-03-01",
+  "targets": {
+   "AMAT": 0.2,
+   "AVGO": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2019-03-08",
+  "targets": {
+   "ADBE": 0.2,
+   "AMD": 0.2,
+   "AVGO": 0.2,
+   "CRM": 0.2,
+   "MU": 0.2
+  }
+ },
+ {
+  "close": "2019-03-15",
+  "targets": {
+   "JNJ": 0.2,
+   "META": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2019-03-22",
+  "targets": {
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2019-03-29",
+  "targets": {
+   "AMD": 0.2,
+   "CRM": 0.2,
+   "GOOGL": 0.2,
+   "NFLX": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2019-04-05",
+  "targets": {
+   "ADBE": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2019-04-12",
+  "targets": {
+   "COST": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2,
+   "QCOM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-04-18",
+  "targets": {
+   "ADBE": 0.2,
+   "CRM": 0.2,
+   "JNJ": 0.2,
+   "NFLX": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-04-26",
+  "targets": {
+   "AVGO": 0.2,
+   "INTC": 0.2,
+   "NVDA": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2019-05-03",
+  "targets": {
+   "CRM": 0.2,
+   "CSCO": 0.2,
+   "GOOGL": 0.2,
+   "ORCL": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-05-10",
+  "targets": {
+   "AAPL": 0.2,
+   "AMAT": 0.2,
+   "INTC": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2019-05-17",
+  "targets": {
+   "AAPL": 0.2,
+   "AVGO": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2019-05-24",
+  "targets": {
+   "AMAT": 0.2,
+   "AVGO": 0.2,
+   "NVDA": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2019-05-31",
+  "targets": {
+   "JNJ": 0.2,
+   "NVDA": 0.2,
+   "ORCL": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-06-07",
+  "targets": {
+   "ADBE": 0.2,
+   "AMZN": 0.2,
+   "GOOGL": 0.2,
+   "JPM": 0.2,
+   "META": 0.2
+  }
+ },
+ {
+  "close": "2019-06-14",
+  "targets": {
+   "AMD": 0.2,
+   "AVGO": 0.2,
+   "CRM": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2019-06-21",
+  "targets": {
+   "AMD": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2019-06-28",
+  "targets": {
+   "CSCO": 0.2,
+   "GOOGL": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2019-07-05",
+  "targets": {
+   "AMAT": 0.2,
+   "AVGO": 0.2,
+   "JNJ": 0.2,
+   "NVDA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-07-12",
+  "targets": {
+   "AAPL": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "NFLX": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2019-07-19",
+  "targets": {
+   "JNJ": 0.2,
+   "NFLX": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-07-26",
+  "targets": {
+   "AMZN": 0.2,
+   "COST": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-08-02",
+  "targets": {
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "AVGO": 0.2,
+   "CRM": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2019-08-09",
+  "targets": {
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2019-08-16",
+  "targets": {
+   "ADBE": 0.2,
+   "AMD": 0.2,
+   "CSCO": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-08-23",
+  "targets": {
+   "AMD": 0.2,
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "NFLX": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2019-08-30",
+  "targets": {
+   "ADBE": 0.2,
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "ORCL": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-09-06",
+  "targets": {
+   "ADBE": 0.2,
+   "CRM": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2019-09-13",
+  "targets": {
+   "ADBE": 0.2,
+   "COST": 0.2,
+   "KO": 0.2,
+   "MSFT": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2019-09-20",
+  "targets": {
+   "AMZN": 0.2,
+   "INTC": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2019-09-27",
+  "targets": {
+   "AMZN": 0.2,
+   "AVGO": 0.2,
+   "CRM": 0.2,
+   "META": 0.2,
+   "MU": 0.2
+  }
+ },
+ {
+  "close": "2019-10-04",
+  "targets": {
+   "CSCO": 0.2,
+   "GOOGL": 0.2,
+   "JPM": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-10-11",
+  "targets": {
+   "AMZN": 0.2,
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2019-10-18",
+  "targets": {
+   "ADBE": 0.2,
+   "CRM": 0.2,
+   "JNJ": 0.2,
+   "ORCL": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-10-25",
+  "targets": {
+   "COST": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2019-11-01",
+  "targets": {
+   "COST": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2019-11-08",
+  "targets": {
+   "AMZN": 0.2,
+   "KO": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2019-11-15",
+  "targets": {
+   "AMZN": 0.2,
+   "CSCO": 0.2,
+   "QCOM": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-11-22",
+  "targets": {
+   "AMAT": 0.2,
+   "GOOGL": 0.2,
+   "MU": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2019-11-29",
+  "targets": {
+   "COST": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2019-12-06",
+  "targets": {
+   "AMZN": 0.2,
+   "COST": 0.2,
+   "CRM": 0.2,
+   "CSCO": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2019-12-13",
+  "targets": {
+   "COST": 0.2,
+   "KO": 0.2,
+   "META": 0.2,
+   "NFLX": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2019-12-20",
+  "targets": {
+   "COST": 0.2,
+   "GOOGL": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2019-12-27",
+  "targets": {
+   "AVGO": 0.2,
+   "COST": 0.2,
+   "GOOGL": 0.2,
+   "NFLX": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-01-03",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "NFLX": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-01-10",
+  "targets": {
+   "AVGO": 0.2,
+   "JPM": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-01-17",
+  "targets": {
+   "AMZN": 0.2,
+   "JPM": 0.2,
+   "ORCL": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-01-24",
+  "targets": {
+   "JPM": 0.2,
+   "META": 0.2,
+   "ORCL": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-01-31",
+  "targets": {
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-02-07",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-02-14",
+  "targets": {
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-02-21",
+  "targets": {
+   "AAPL": 0.2,
+   "AMAT": 0.2,
+   "AVGO": 0.2,
+   "INTC": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-02-28",
+  "targets": {
+   "COST": 0.2,
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2020-03-06",
+  "targets": {
+   "CRM": 0.2,
+   "JPM": 0.2,
+   "META": 0.2,
+   "ORCL": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-03-13",
+  "targets": {
+   "AVGO": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-03-20",
+  "targets": {
+   "AMAT": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2020-03-27",
+  "targets": {
+   "AMZN": 0.2,
+   "COST": 0.2,
+   "GOOGL": 0.2,
+   "JNJ": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-04-03",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "CRM": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2
+  }
+ },
+ {
+  "close": "2020-04-09",
+  "targets": {
+   "COST": 0.2,
+   "CSCO": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-04-17",
+  "targets": {
+   "JPM": 0.2,
+   "KO": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-04-24",
+  "targets": {
+   "CRM": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2020-05-01",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "JNJ": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-05-08",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-05-15",
+  "targets": {
+   "JPM": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "QCOM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-05-22",
+  "targets": {
+   "JNJ": 0.2,
+   "NFLX": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-05-29",
+  "targets": {
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "META": 0.2,
+   "NFLX": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-06-05",
+  "targets": {
+   "AMD": 0.2,
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "NFLX": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-06-12",
+  "targets": {
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-06-19",
+  "targets": {
+   "COST": 0.2,
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-06-26",
+  "targets": {
+   "AMD": 0.2,
+   "GOOGL": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "META": 0.2
+  }
+ },
+ {
+  "close": "2020-07-02",
+  "targets": {
+   "AAPL": 0.2,
+   "JPM": 0.2,
+   "META": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-07-10",
+  "targets": {
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-07-17",
+  "targets": {
+   "ADBE": 0.2,
+   "AMZN": 0.2,
+   "CRM": 0.2,
+   "MSFT": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2020-07-24",
+  "targets": {
+   "AAPL": 0.2,
+   "INTC": 0.2,
+   "META": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2020-07-31",
+  "targets": {
+   "COST": 0.2,
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-08-07",
+  "targets": {
+   "AMAT": 0.2,
+   "MU": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-08-14",
+  "targets": {
+   "COST": 0.2,
+   "CRM": 0.2,
+   "CSCO": 0.2,
+   "MU": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2020-08-21",
+  "targets": {
+   "AMAT": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2020-08-28",
+  "targets": {
+   "COST": 0.2,
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-09-04",
+  "targets": {
+   "ADBE": 0.2,
+   "CRM": 0.2,
+   "JNJ": 0.2,
+   "MSFT": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2020-09-11",
+  "targets": {
+   "AMAT": 0.2,
+   "AMZN": 0.2,
+   "GOOGL": 0.2,
+   "META": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2020-09-18",
+  "targets": {
+   "AAPL": 0.2,
+   "AMZN": 0.2,
+   "GOOGL": 0.2,
+   "META": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2020-09-25",
+  "targets": {
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-10-02",
+  "targets": {
+   "JNJ": 0.2,
+   "MSFT": 0.2,
+   "MU": 0.2,
+   "ORCL": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-10-09",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "META": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-10-16",
+  "targets": {
+   "CRM": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-10-23",
+  "targets": {
+   "AAPL": 0.2,
+   "AMAT": 0.2,
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2020-10-30",
+  "targets": {
+   "ADBE": 0.2,
+   "AMD": 0.2,
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "META": 0.2
+  }
+ },
+ {
+  "close": "2020-11-06",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-11-13",
+  "targets": {
+   "ADBE": 0.2,
+   "AMZN": 0.2,
+   "META": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2020-11-20",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "MSFT": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2020-11-27",
+  "targets": {
+   "CRM": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "QCOM": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-12-04",
+  "targets": {
+   "AMZN": 0.2,
+   "COST": 0.2,
+   "CRM": 0.2,
+   "MSFT": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-12-11",
+  "targets": {
+   "GOOGL": 0.2,
+   "INTC": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2020-12-18",
+  "targets": {
+   "AMAT": 0.2,
+   "COST": 0.2,
+   "GOOGL": 0.2,
+   "INTC": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2020-12-24",
+  "targets": {
+   "AMD": 0.2,
+   "INTC": 0.2,
+   "NFLX": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2020-12-31",
+  "targets": {
+   "CRM": 0.2,
+   "MSFT": 0.2,
+   "ORCL": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-01-08",
+  "targets": {
+   "COST": 0.2,
+   "KO": 0.2,
+   "NFLX": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2021-01-15",
+  "targets": {
+   "ADBE": 0.2,
+   "AMD": 0.2,
+   "GOOGL": 0.2,
+   "KO": 0.2,
+   "META": 0.2
+  }
+ },
+ {
+  "close": "2021-01-22",
+  "targets": {
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-01-29",
+  "targets": {
+   "AAPL": 0.2,
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "META": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2021-02-05",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "PEP": 0.2,
+   "QCOM": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-02-12",
+  "targets": {
+   "AMZN": 0.2,
+   "COST": 0.2,
+   "CSCO": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2021-02-19",
+  "targets": {
+   "AAPL": 0.2,
+   "ADBE": 0.2,
+   "CSCO": 0.2,
+   "ORCL": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-02-26",
+  "targets": {
+   "COST": 0.2,
+   "CRM": 0.2,
+   "NVDA": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-03-05",
+  "targets": {
+   "ADBE": 0.2,
+   "AMD": 0.2,
+   "COST": 0.2,
+   "NVDA": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2021-03-12",
+  "targets": {
+   "GOOGL": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2021-03-19",
+  "targets": {
+   "AMD": 0.2,
+   "MSFT": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-03-26",
+  "targets": {
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "CRM": 0.2,
+   "META": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2021-04-01",
+  "targets": {
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-04-09",
+  "targets": {
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-04-16",
+  "targets": {
+   "AMAT": 0.2,
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "META": 0.2,
+   "MU": 0.2
+  }
+ },
+ {
+  "close": "2021-04-23",
+  "targets": {
+   "INTC": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2021-04-30",
+  "targets": {
+   "AAPL": 0.2,
+   "CSCO": 0.2,
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "MSFT": 0.2
+  }
+ },
+ {
+  "close": "2021-05-07",
+  "targets": {
+   "ADBE": 0.2,
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "CRM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2021-05-14",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "MU": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2021-05-21",
+  "targets": {
+   "AAPL": 0.2,
+   "COST": 0.2,
+   "CSCO": 0.2,
+   "MSFT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-05-28",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-06-04",
+  "targets": {
+   "AMZN": 0.2,
+   "JNJ": 0.2,
+   "NFLX": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-06-11",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-06-18",
+  "targets": {
+   "CSCO": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-06-25",
+  "targets": {
+   "AMZN": 0.2,
+   "CRM": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2021-07-02",
+  "targets": {
+   "COST": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-07-09",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "META": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-07-16",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "NVDA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-07-23",
+  "targets": {
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "NFLX": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-07-30",
+  "targets": {
+   "AAPL": 0.2,
+   "AMZN": 0.2,
+   "CRM": 0.2,
+   "META": 0.2,
+   "MSFT": 0.2
+  }
+ },
+ {
+  "close": "2021-08-06",
+  "targets": {
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2021-08-13",
+  "targets": {
+   "AMAT": 0.2,
+   "AMZN": 0.2,
+   "INTC": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2021-08-20",
+  "targets": {
+   "AMD": 0.2,
+   "JPM": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-08-27",
+  "targets": {
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-09-03",
+  "targets": {
+   "AMD": 0.2,
+   "GOOGL": 0.2,
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-09-10",
+  "targets": {
+   "AAPL": 0.2,
+   "CRM": 0.2,
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2
+  }
+ },
+ {
+  "close": "2021-09-17",
+  "targets": {
+   "AAPL": 0.2,
+   "CSCO": 0.2,
+   "META": 0.2,
+   "ORCL": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2021-09-24",
+  "targets": {
+   "ADBE": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "META": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-10-01",
+  "targets": {
+   "ADBE": 0.2,
+   "AMAT": 0.2,
+   "COST": 0.2,
+   "NVDA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-10-08",
+  "targets": {
+   "AMAT": 0.2,
+   "CRM": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2021-10-15",
+  "targets": {
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2021-10-22",
+  "targets": {
+   "AMZN": 0.2,
+   "CSCO": 0.2,
+   "GOOGL": 0.2,
+   "INTC": 0.2,
+   "KO": 0.2
+  }
+ },
+ {
+  "close": "2021-10-29",
+  "targets": {
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-11-05",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "NFLX": 0.2,
+   "ORCL": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-11-12",
+  "targets": {
+   "AAPL": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-11-19",
+  "targets": {
+   "CSCO": 0.2,
+   "JPM": 0.2,
+   "KO": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2021-11-26",
+  "targets": {
+   "AMAT": 0.2,
+   "AMZN": 0.2,
+   "AVGO": 0.2,
+   "CRM": 0.2,
+   "GOOGL": 0.2
+  }
+ },
+ {
+  "close": "2021-12-03",
+  "targets": {
+   "ADBE": 0.2,
+   "CRM": 0.2,
+   "META": 0.2,
+   "NFLX": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-12-10",
+  "targets": {
+   "AMD": 0.2,
+   "AMZN": 0.2,
+   "JPM": 0.2,
+   "NVDA": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2021-12-17",
+  "targets": {
+   "ADBE": 0.2,
+   "MSFT": 0.2,
+   "NVDA": 0.2,
+   "ORCL": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2021-12-23",
+  "targets": {
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2021-12-31",
+  "targets": {
+   "AMZN": 0.2,
+   "GOOGL": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2022-01-07",
+  "targets": {
+   "ADBE": 0.2,
+   "AVGO": 0.2,
+   "CRM": 0.2,
+   "MSFT": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2022-01-14",
+  "targets": {
+   "AVGO": 0.2,
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "JPM": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2022-01-21",
+  "targets": {
+   "AMAT": 0.2,
+   "AMZN": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2022-01-28",
+  "targets": {
+   "AMD": 0.2,
+   "INTC": 0.2,
+   "MU": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2022-02-04",
+  "targets": {
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "META": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2022-02-11",
+  "targets": {
+   "ADBE": 0.2,
+   "AMD": 0.2,
+   "GOOGL": 0.2,
+   "META": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2022-02-18",
+  "targets": {
+   "ADBE": 0.2,
+   "CRM": 0.2,
+   "INTC": 0.2,
+   "ORCL": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2022-02-25",
+  "targets": {
+   "AAPL": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2022-03-04",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2022-03-11",
+  "targets": {
+   "ADBE": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "PEP": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2022-03-18",
+  "targets": {
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2022-03-25",
+  "targets": {
+   "ADBE": 0.2,
+   "COST": 0.2,
+   "CRM": 0.2,
+   "CSCO": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2022-04-01",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2022-04-08",
+  "targets": {
+   "AVGO": 0.2,
+   "CRM": 0.2,
+   "GOOGL": 0.2,
+   "NVDA": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2022-04-14",
+  "targets": {
+   "AMD": 0.2,
+   "CSCO": 0.2,
+   "GOOGL": 0.2,
+   "MSFT": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2022-04-22",
+  "targets": {
+   "CRM": 0.2,
+   "GOOGL": 0.2,
+   "META": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2022-04-29",
+  "targets": {
+   "AMZN": 0.2,
+   "COST": 0.2,
+   "JPM": 0.2,
+   "NFLX": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2022-05-06",
+  "targets": {
+   "AMZN": 0.2,
+   "COST": 0.2,
+   "CRM": 0.2,
+   "JNJ": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2022-05-13",
+  "targets": {
+   "AAPL": 0.2,
+   "JPM": 0.2,
+   "MSFT": 0.2,
+   "NVDA": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2022-05-20",
+  "targets": {
+   "COST": 0.2,
+   "CSCO": 0.2,
+   "KO": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2022-05-27",
+  "targets": {
+   "CRM": 0.2,
+   "GOOGL": 0.2,
+   "JNJ": 0.2,
+   "META": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2022-06-03",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2022-06-10",
+  "targets": {
+   "AMAT": 0.2,
+   "AMZN": 0.2,
+   "INTC": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2
+  }
+ },
+ {
+  "close": "2022-06-17",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "MU": 0.2,
+   "QCOM": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2022-06-24",
+  "targets": {
+   "CSCO": 0.2,
+   "JPM": 0.2,
+   "ORCL": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2022-07-01",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "CRM": 0.2,
+   "GOOGL": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2022-07-08",
+  "targets": {
+   "AMAT": 0.2,
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2022-07-15",
+  "targets": {
+   "ADBE": 0.2,
+   "CRM": 0.2,
+   "GOOGL": 0.2,
+   "MSFT": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2022-07-22",
+  "targets": {
+   "GOOGL": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "MU": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2022-07-29",
+  "targets": {
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "META": 0.2,
+   "QCOM": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2022-08-05",
+  "targets": {
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "WMT": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2022-08-12",
+  "targets": {
+   "AMD": 0.2,
+   "COST": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2022-08-19",
+  "targets": {
+   "ADBE": 0.2,
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "META": 0.2,
+   "MU": 0.2
+  }
+ },
+ {
+  "close": "2022-08-26",
+  "targets": {
+   "ADBE": 0.2,
+   "CRM": 0.2,
+   "MSFT": 0.2,
+   "NFLX": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2022-09-02",
+  "targets": {
+   "AMAT": 0.2,
+   "AMD": 0.2,
+   "CRM": 0.2,
+   "INTC": 0.2,
+   "NVDA": 0.2
+  }
+ },
+ {
+  "close": "2022-09-09",
+  "targets": {
+   "AAPL": 0.2,
+   "INTC": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2
+  }
+ },
+ {
+  "close": "2022-09-16",
+  "targets": {
+   "ADBE": 0.2,
+   "AMD": 0.2,
+   "META": 0.2,
+   "MU": 0.2,
+   "ORCL": 0.2
+  }
+ },
+ {
+  "close": "2022-09-23",
+  "targets": {
+   "AMD": 0.2,
+   "COST": 0.2,
+   "JPM": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2022-09-30",
+  "targets": {
+   "AAPL": 0.2,
+   "INTC": 0.2,
+   "KO": 0.2,
+   "ORCL": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2022-10-07",
+  "targets": {
+   "AMD": 0.2,
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2022-10-14",
+  "targets": {
+   "AMAT": 0.2,
+   "AMZN": 0.2,
+   "AVGO": 0.2,
+   "QCOM": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2022-10-21",
+  "targets": {
+   "JNJ": 0.2,
+   "KO": 0.2,
+   "META": 0.2,
+   "PEP": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2022-10-28",
+  "targets": {
+   "AMZN": 0.2,
+   "GOOGL": 0.2,
+   "META": 0.2,
+   "MSFT": 0.2,
+   "MU": 0.2
+  }
+ },
+ {
+  "close": "2022-11-04",
+  "targets": {
+   "AAPL": 0.2,
+   "ADBE": 0.2,
+   "AMZN": 0.2,
+   "CRM": 0.2,
+   "QCOM": 0.2
+  }
+ },
+ {
+  "close": "2022-11-11",
+  "targets": {
+   "CSCO": 0.2,
+   "JNJ": 0.2,
+   "PEP": 0.2,
+   "TSLA": 0.2,
+   "WMT": 0.2
+  }
+ },
+ {
+  "close": "2022-11-18",
+  "targets": {
+   "AMAT": 0.2,
+   "AMZN": 0.2,
+   "CRM": 0.2,
+   "MU": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2022-11-25",
+  "targets": {
+   "AAPL": 0.2,
+   "AMZN": 0.2,
+   "GOOGL": 0.2,
+   "INTC": 0.2,
+   "NFLX": 0.2
+  }
+ },
+ {
+  "close": "2022-12-02",
+  "targets": {
+   "COST": 0.2,
+   "CRM": 0.2,
+   "JPM": 0.2,
+   "MU": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2022-12-09",
+  "targets": {
+   "AMD": 0.2,
+   "CRM": 0.2,
+   "GOOGL": 0.2,
+   "TSLA": 0.2,
+   "XOM": 0.2
+  }
+ },
+ {
+  "close": "2022-12-16",
+  "targets": {
+   "AAPL": 0.2,
+   "COST": 0.2,
+   "MU": 0.2,
+   "NFLX": 0.2,
+   "TSLA": 0.2
+  }
+ },
+ {
+  "close": "2022-12-23",
+  "targets": {
+   "AMAT": 0.2,
+   "INTC": 0.2,
+   "MU": 0.2,
+   "NVDA": 0.2,
+   "TSLA": 0.2
+  }
+ }
+]

@@ -1,0 +1,2 @@
+session,ticker,side,shares,price,notional,cost,lambda,slot
+2017-02-01,SPY,buy,np.float64(438.1065036910473),np.float64(228.255),np.float64(100000.0),np.float64(0.0),1.0,

@@ -1,0 +1,202 @@
+[
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 16324.85949804386,
+  "inflow": 16911.258699597674,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "AAPL"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 11856.239074666399,
+  "inflow": 11856.239074666399,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "ADBE"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 11238.558492678181,
+  "inflow": 11788.45670085913,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "AMAT"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 23699.57448600895,
+  "inflow": 23699.57448600895,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "AMD"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 8087.907076100658,
+  "inflow": 8087.907076100658,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "AMZN"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 11036.101006533641,
+  "inflow": 12400.570900051742,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "AVGO"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 11115.289102480323,
+  "inflow": 11919.364563463378,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "COST"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 6707.645921433783,
+  "inflow": 6707.645921433783,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "CRM"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 6180.671457239545,
+  "inflow": 7211.814509832062,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "CSCO"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 8551.49900175697,
+  "inflow": 8551.49900175697,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "GOOGL"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 2856.9935344915043,
+  "inflow": 3690.9821832648813,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "INTC"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 6269.454229980546,
+  "inflow": 7094.731371047161,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "JNJ"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 6258.221553989616,
+  "inflow": 7128.989785057122,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "JPM"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 6115.887003170241,
+  "inflow": 7051.367707437072,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "KO"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 3632.978870250164,
+  "inflow": 3632.978870250164,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "META"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 14875.12984219013,
+  "inflow": 15628.261111169752,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "MSFT"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 8157.013877373649,
+  "inflow": 8262.386836385202,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "MU"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 8335.079775425313,
+  "inflow": 8335.079775425313,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "NFLX"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 21099.379757015595,
+  "inflow": 21234.50818003838,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "NVDA"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 8113.0465755030655,
+  "inflow": 8677.375334759721,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "ORCL"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 6960.681052371045,
+  "inflow": 7860.94862573967,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "PEP"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 8181.979094730773,
+  "inflow": 9367.221890711824,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "QCOM"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 29149.6726479338,
+  "inflow": 29149.6726479338,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "TSLA"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 8521.933351201644,
+  "inflow": 9294.42192856827,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "WMT"
+ },
+ {
+  "end": "2022-12-30 (segment end)",
+  "final_net_mark": 5241.8866847438285,
+  "inflow": 6204.73336187622,
+  "outflow": 4000.000000000001,
+  "start": "2017-02-01",
+  "ticker": "XOM"
+ }
+]
