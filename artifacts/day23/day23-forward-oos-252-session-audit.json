@@ -1,0 +1,214 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-23 audit of the frozen 252-session forward OOS requirement",
+ "title": "Audit of the Frozen 252-Session Forward OOS Requirement",
+ "audit_date": "2026-10-08",
+ "governance_mandate": "protocol-audit task only; no strategy evaluation; no forward data acquired, inspected, or calculated",
+ "audited_strategy": {
+  "family": "V2-MOM",
+  "name": "Cross-sectional momentum 12-1, long-only",
+  "config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+  "status": "FROZEN FOR FORWARD OOS"
+ },
+ "starting_head": "287e2caf08d1a72258959d6cd8f07a4e8298716e",
+ "core_question": "Why exactly is the forward OOS window 252 XNYS sessions, and is there a defensible methodological reason that requires 252 rather than a shorter predeclared window?",
+ "executive_conclusion": {
+  "summary": "The 252-session forward OOS requirement originated as a calendar convention representing 'one year' across three multi-strategy families (including V2-LRV's 126-session pair trading period). For standalone V2-MOM, there is zero technical necessity for 252 future sessions, zero statistical power calculation justifying 252, and its multi-strategy rationale is obsolete following the elimination of V2-LRV and V2-STR. A shorter predeclared window (e.g. 63 or 126 sessions) maintains identical blindness and anti-snooping guarantees if frozen before forward data acquisition.",
+  "classification": [
+   "D (Conservative Design Choice)",
+   "E (Historical/Legacy Choice)",
+   "F (Insufficiently Justified for Standalone V2-MOM)"
+  ],
+  "verdict": "PROTOCOL AMENDMENT MAY BE WARRANTED"
+ },
+ "origin_of_252": {
+  "earliest_artifact": "artifacts/day16/research-protocol-v2.md",
+  "companion_artifacts": [
+   "artifacts/day16/research-protocol-v2.json",
+   "artifacts/day16/research-checklist.json"
+  ],
+  "earliest_commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+  "commit_date_utc": "2026-10-07T07:55:35Z",
+  "commit_subject": "docs: freeze DAY-16 research protocol v2",
+  "sections": [
+   "Section 3.6 (table and rationale 5)",
+   "Section 15 (item 11)",
+   "Section 20 (Q11)"
+  ],
+  "checklist_item": "TIME-05",
+  "exact_wording_section_3_6": "Forward OOS is the only true OOS: its sessions do not exist when the protocol is frozen. 252 sessions ≈ one year: 12 momentum rebalances, ≈ 52 reversal rebalances, exactly 2 relative-value trading periods. It is short (§20 Q11); its length is fixed now and is never extended or shortened after looking. No data dated after the freeze commit may be acquired or inspected before the forward period has ended (§3.9).",
+  "nature_of_choice": {
+   "mathematically_derived": false,
+   "statistically_justified": false,
+   "inherited_from_other_methodology": true,
+   "convention": true,
+   "convenience": false,
+   "protocol_owner_judgment": true,
+   "explained": "explained only as calendar correspondence (252 sessions ≈ 1 year across 3 families), but not quantitatively or statistically derived"
+  }
+ },
+ "technical_necessity_analysis": {
+  "lookback_vs_forward_duration": {
+   "lookback_length": 252,
+   "lookback_role": "historical inputs for TR(t-21)/TR(t-252)-1 calculation",
+   "lookback_source": "Stage F warmup bars (2025-01-02 to 2026-10-07); available at session 1 of forward period",
+   "forward_duration_role": "evaluation window for strategy execution and accounting",
+   "independent_quantities": true
+  },
+  "component_breakdown": {
+   "signal_calculation": "technically independent of forward duration N; uses historical warmup",
+   "monthly_rebalance": "technically independent of forward duration N; triggers on month-ends",
+   "portfolio_accounting": "technically independent of forward duration N; evaluates per execution",
+   "cost_calculation": "technically independent of forward duration N; linear friction per trade",
+   "cagr_calculation": "technically independent of forward duration N; formula (E_T/E_0)^(252/N) - 1 explicitly normalizes by N",
+   "benchmark_comparison": "technically independent of forward duration N; evaluated over identical N",
+   "gates": "technically independent of forward duration N; sign comparisons of unrounded float64",
+   "anti_lookahead_suite": "technically independent of forward duration N; runs on sampled sessions",
+   "determinism": "technically independent of forward duration N; bitwise reproducibility"
+  },
+  "technical_necessity_verdict": "V2-MOM has ZERO technical necessity for 252 future sessions"
+ },
+ "statistical_rationale_analysis": {
+  "power_calculation_present": false,
+  "sample_size_threshold_present": false,
+  "minimum_trade_count_threshold_present": false,
+  "sharpe_precision_target_present": false,
+  "statistical_significance_gate_present": false,
+  "hac_significance_required": false,
+  "protocol_disclosure_q11": "Statistical power: ≈ 71 monthly / ≈ 309 weekly rebalances in Research; forward OOS = 1 year; the families are correlated with each other and with B1 | NON-BLOCKING | diagnostic HAC + Holm reported; no significance gate",
+  "monthly_sample_size_in_252_sessions": 12,
+  "power_assessment": "Sample size N=12 has negligible statistical power to distinguish alpha from noise at p<0.05. DAY-21 holdout with N=42 monthly decisions and +18.01 pp excess CAGR yielded HAC p=0.166. A 252-session forward window cannot establish statistical significance under protocol diagnostics.",
+  "statistical_rationale_verdict": "252 is frozen but not quantitatively justified by the protocol"
+ },
+ "historical_60_session_comparison": {
+  "protocol_v1_origin": "In protocol v1.0, OOS was defined to equal the research window (60 sessions). Sourced from yfinance download limit for intraday 5m bars, not a statistical requirement.",
+  "day15d_staged_redesign": "DAY-15D audited the 11-week waiting time of 60 sessions and recommended Timeline T6: Stage 1 = 20 sessions (with hard negative return kill rule) + Stage 2 = 40 sessions. Demonstrated defensibility of shorter predeclared windows.",
+  "protocol_v2_expansion": "Protocol v2 shifted from intraday day-trading to daily equity factors. Research expanded to 1,490 sessions, holdout to 856 sessions, and forward OOS to 252 sessions.",
+  "multi_strategy_sizing_context": "252 sessions was chosen to accommodate 3 heterogeneous strategies: V2-MOM (monthly), V2-STR (weekly), and V2-LRV (pairs trading with 126-session trading periods, requiring 2x126 = 252 sessions).",
+  "current_obsolescence": "V2-LRV (failed research DAY-19) and V2-STR (failed holdout DAY-21) are permanently stopped. The 126-session pair-cycle requirement is obsolete."
+ },
+ "existing_evidence_summary": {
+  "research_stage_r": {
+   "period": "2017-02-01 -> 2022-12-30",
+   "sessions": 1490,
+   "monthly_decisions": 71,
+   "v2_mom_net_cagr_5bps": 0.28816164633146335,
+   "b1_net_cagr_5bps": 0.1844074874473387,
+   "status": "PASSED"
+  },
+  "holdout_stage_h": {
+   "period": "2023-01-03 -> 2026-06-02",
+   "sessions": 856,
+   "monthly_decisions": 42,
+   "v2_mom_net_cagr_5bps": 0.7124610715568995,
+   "b1_net_cagr_5bps": 0.5323880517105726,
+   "status": "PASSED"
+  },
+  "total_historical_testing": {
+   "total_sessions": 2346,
+   "total_years": 9.5,
+   "total_monthly_decisions": 113,
+   "conclusion": "Long-term factor drift, cost resilience, and algorithmic integrity thoroughly demonstrated."
+  },
+  "forward_oos_additional_value": "Provides true blindness and zero hindsight. Resolves universe survivor bias (Q5) and researcher historical knowledge by testing on data generated strictly post-freeze."
+ },
+ "alternative_window_analysis": [
+  {
+   "sessions": 20,
+   "calendar_duration": "~1 month",
+   "v2_mom_rebalances": 1,
+   "evidence_provided": "Operational smoke test: live MOO fills, splits, dividends, cash non-negativity",
+   "limitations": "Single return draw; high noise; vulnerable to 1-month shock",
+   "protocol_compatibility": "Fully compatible with CAGR formula; economically noisy"
+  },
+  {
+   "sessions": 40,
+   "calendar_duration": "~2 months",
+   "v2_mom_rebalances": 2,
+   "evidence_provided": "Tests rebalance transition across consecutive months",
+   "limitations": "Sensitive to short-term sentiment; small sample",
+   "protocol_compatibility": "Fully compatible with CAGR formula"
+  },
+  {
+   "sessions": 60,
+   "calendar_duration": "~3 months",
+   "v2_mom_rebalances": 3,
+   "evidence_provided": "Spans quarterly earnings cycle; direct continuity with DAY-14/15 baseline",
+   "limitations": "Small sample for t-tests",
+   "protocol_compatibility": "Direct historical continuity with protocol v1.0/v1.1"
+  },
+  {
+   "sessions": 63,
+   "calendar_duration": "Exactly 1 quarter (252 / 4)",
+   "v2_mom_rebalances": 3,
+   "evidence_provided": "Standard institutional quarterly review cycle; exact quarter sub-multiple of 252; full earnings season",
+   "limitations": "Cannot observe multi-year macroeconomic regime changes",
+   "protocol_compatibility": "Highly defensible institutional convention; exact sub-multiple of 252"
+  },
+  {
+   "sessions": 84,
+   "calendar_duration": "~4 months (252 / 3)",
+   "v2_mom_rebalances": 4,
+   "evidence_provided": "Spans across two corporate earnings reporting seasons",
+   "limitations": "Non-standard calendar interval",
+   "protocol_compatibility": "Fully compatible with CAGR formula"
+  },
+  {
+   "sessions": 126,
+   "calendar_duration": "Exactly 6 months (252 / 2)",
+   "v2_mom_rebalances": 6,
+   "evidence_provided": "Semi-annual institutional review cycle; spans multiple earnings seasons; exactly 1 trading period of V2-LRV in protocol v2",
+   "limitations": "Extrapolates 6 months to annual CAGR",
+   "protocol_compatibility": "Strongest mid-term compromise; already defined as formal unit in protocol v2 (§5.3)"
+  },
+  {
+   "sessions": 252,
+   "calendar_duration": "1 full year",
+   "v2_mom_rebalances": 12,
+   "evidence_provided": "Full annual seasonal cycle; 12 monthly rebalances",
+   "limitations": "Imposes 11-month idle latency; still has low statistical power (§20 Q11)",
+   "protocol_compatibility": "Current frozen requirement"
+  }
+ ],
+ "blindness_and_anti_snooping_analysis": {
+  "sources_of_snooping": [
+   "Adaptive early stopping (stopping when performance peaks)",
+   "Post-hoc window selection (choosing window that maximizes return)",
+   "Parameter tuning after seeing forward data",
+   "Variant selection on forward data"
+  ],
+  "predeclared_shortening_validity": "If a shorter duration N* is frozen and locked ex-ante before acquiring or inspecting forward data, and evaluated exactly once without interim peeking, the anti-snooping and blindness guarantees remain 100% intact. Scientific validity derives from ex-ante pre-commitment, not calendar length."
+ },
+ "separation_of_concepts": {
+  "signal_lookback": "252 sessions (historical parameter; sourced from pre-forward warmup)",
+  "historical_holdout": "856 sessions (calendar-bound historical pseudo-OOS segment)",
+  "forward_oos_duration": "Policy choice determining blind evaluation window length; independent of lookback and holdout"
+ },
+ "classification_evaluation": {
+  "A_technically_required": false,
+  "B_statistically_justified": false,
+  "C_governance_anti_snooping_requirement": "partially (predeclared window required, but not 252)",
+  "D_conservative_design_choice": true,
+  "E_historical_legacy_choice": true,
+  "F_insufficiently_justified": true,
+  "summary_classification": "D (Conservative Design Choice) + E (Historical/Legacy Choice) + F (Insufficiently Justified for Standalone V2-MOM)"
+ },
+ "governance_verdict": {
+  "status": "PROTOCOL AMENDMENT MAY BE WARRANTED",
+  "protocol_amended_in_day23": false,
+  "rationale": "252 forward sessions is an obsolete multi-strategy legacy heuristic without technical or statistical justification for standalone V2-MOM. A predeclared institutional window (such as 63 sessions / 1 quarter or 126 sessions / 2 quarters) would preserve complete blindness while eliminating excessive idle delay. In adherence to strict governance rules, no change is made in DAY-23."
+ },
+ "safety_affirmation": {
+  "forward_data_acquired": false,
+  "forward_data_inspected": false,
+  "forward_returns_computed": false,
+  "forward_cagr_computed": false,
+  "forward_oos_simulated": false,
+  "v2_mom_modified": false,
+  "v2_str_resurrected": false,
+  "v2_lrv_resurrected": false,
+  "protocol_rule_changed_in_day23": false,
+  "forward_window_changed_in_day23": false
+ },
+ "next_task": "Design a predeclared forward-OOS duration amendment that preserves blindness and anti-snooping guarantees, without using any forward performance."
+}
