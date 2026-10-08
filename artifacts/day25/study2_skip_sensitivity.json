@@ -1,0 +1,67 @@
+{
+ "description": "Skip-lag sensitivity on Stage R (5 bps)",
+ "fixed": {
+  "lookback": 252,
+  "select": 5
+ },
+ "grid": [
+  0,
+  10,
+  21,
+  42
+ ],
+ "rows": [
+  {
+   "active_return": 0.10987257656264915,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.2938327202679756,
+   "is_frozen": false,
+   "lookback_sessions": 252,
+   "max_drawdown": -0.39629341031515086,
+   "n_trades": 435,
+   "segment": "research",
+   "select_n": 5,
+   "skip_sessions": 0,
+   "total_return": 3.5867137957805335
+  },
+  {
+   "active_return": 0.1170235874701735,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.3009837311754999,
+   "is_frozen": false,
+   "lookback_sessions": 252,
+   "max_drawdown": -0.395320190543052,
+   "n_trades": 428,
+   "segment": "research",
+   "select_n": 5,
+   "skip_sessions": 10,
+   "total_return": 3.7386548724793114
+  },
+  {
+   "active_return": 0.09774364265864599,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.2817037863639724,
+   "is_frozen": true,
+   "lookback_sessions": 252,
+   "max_drawdown": -0.360403310987524,
+   "n_trades": 435,
+   "segment": "research",
+   "select_n": 5,
+   "skip_sessions": 21,
+   "total_return": 3.3382639236633898
+  },
+  {
+   "active_return": 0.14161069938187043,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.32557084308719686,
+   "is_frozen": false,
+   "lookback_sessions": 252,
+   "max_drawdown": -0.34415862037885053,
+   "n_trades": 436,
+   "segment": "research",
+   "select_n": 5,
+   "skip_sessions": 42,
+   "total_return": 4.293363106495105
+  }
+ ]
+}

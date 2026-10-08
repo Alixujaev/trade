@@ -1,0 +1,67 @@
+{
+ "description": "Selection-size sensitivity on Stage R (5 bps)",
+ "fixed": {
+  "lookback": 252,
+  "skip": 21
+ },
+ "grid": [
+  3,
+  5,
+  7,
+  10
+ ],
+ "rows": [
+  {
+   "active_return": 0.03787952115498827,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.2218396648603147,
+   "is_frozen": false,
+   "lookback_sessions": 252,
+   "max_drawdown": -0.26426589386532306,
+   "n_trades": 270,
+   "segment": "research",
+   "select_n": 3,
+   "skip_sessions": 21,
+   "total_return": 2.2695564368943053
+  },
+  {
+   "active_return": 0.09774364265864599,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.2817037863639724,
+   "is_frozen": true,
+   "lookback_sessions": 252,
+   "max_drawdown": -0.360403310987524,
+   "n_trades": 435,
+   "segment": "research",
+   "select_n": 5,
+   "skip_sessions": 21,
+   "total_return": 3.3382639236633898
+  },
+  {
+   "active_return": 0.07764865642241392,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.26160880012774035,
+   "is_frozen": false,
+   "lookback_sessions": 252,
+   "max_drawdown": -0.3340346108017638,
+   "n_trades": 589,
+   "segment": "research",
+   "select_n": 7,
+   "skip_sessions": 21,
+   "total_return": 2.9512760374673843
+  },
+  {
+   "active_return": 0.10432142710147563,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.28828157080680206,
+   "is_frozen": false,
+   "lookback_sessions": 252,
+   "max_drawdown": -0.3340449378798902,
+   "n_trades": 816,
+   "segment": "research",
+   "select_n": 10,
+   "skip_sessions": 21,
+   "total_return": 3.471576323201729
+  }
+ ]
+}

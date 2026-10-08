@@ -1,0 +1,268 @@
+{
+ "environment": {
+  "distributions_count": 56,
+  "distributions_sha256": "7b47231b6bf706da340a4c8b940bb5cbd632c228c8f07dc57cde6c065c89379a",
+  "exchange_calendars": "4.13.2",
+  "numpy": "2.5.2",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.10"
+ },
+ "finished_utc": "2026-10-08T12:47:45.086664+00:00",
+ "governance": {
+  "forward_data_accessed": false,
+  "frozen_mom_config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+  "last_allowed_session": "2026-10-07",
+  "segments_used": [
+   "stage_r (2017-02-01..2022-12-30, 1490 sessions)",
+   "stage_h (2023-01-03..2026-06-02, 856 sessions)"
+  ],
+  "strategy_modified": false
+ },
+ "reference_runs": {
+  "holdout_B1_5bps_cagr": 0.5388272897685664,
+  "holdout_V2-MOM_5bps_cagr": 0.7154483046746216,
+  "research_B1_5bps_cagr": 0.18396014370532643,
+  "research_V2-MOM_5bps_cagr": 0.2817037863639724
+ },
+ "schema_version": "1.0",
+ "started_utc": "2026-10-08T12:47:36.972071+00:00",
+ "studies": {
+  "study1_lookback": {
+   "description": "Lookback sensitivity (126, 189, 252, 315 sessions)",
+   "frozen_beats_b1_count": 4,
+   "n_variants": 4,
+   "rows_summary": [
+    {
+     "active_return": 0.1288173830408701,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.3127775267461965,
+     "is_frozen": false,
+     "lookback_sessions": 126,
+     "max_drawdown": -0.3612063090775573,
+     "n_trades": 470,
+     "select_n": 5,
+     "skip_sessions": 21,
+     "total_return": 3.9983714511322273
+    },
+    {
+     "active_return": 0.07949028598761165,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.2634504296929381,
+     "is_frozen": false,
+     "lookback_sessions": 189,
+     "max_drawdown": -0.3977116906426577,
+     "n_trades": 449,
+     "select_n": 5,
+     "skip_sessions": 21,
+     "total_return": 2.9855021888098507
+    },
+    {
+     "active_return": 0.09774364265864599,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.2817037863639724,
+     "is_frozen": true,
+     "lookback_sessions": 252,
+     "max_drawdown": -0.360403310987524,
+     "n_trades": 435,
+     "select_n": 5,
+     "skip_sessions": 21,
+     "total_return": 3.3382639236633898
+    },
+    {
+     "active_return": 0.20193198359903541,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.38589212730436184,
+     "is_frozen": false,
+     "lookback_sessions": 315,
+     "max_drawdown": -0.3694098007986168,
+     "n_trades": 408,
+     "select_n": 5,
+     "skip_sessions": 21,
+     "total_return": 5.8865762793655065
+    }
+   ]
+  },
+  "study2_skip": {
+   "description": "Skip-lag sensitivity (0, 10, 21, 42 sessions)",
+   "frozen_beats_b1_count": 4,
+   "n_variants": 4,
+   "rows_summary": [
+    {
+     "active_return": 0.10987257656264915,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.2938327202679756,
+     "is_frozen": false,
+     "lookback_sessions": 252,
+     "max_drawdown": -0.39629341031515086,
+     "n_trades": 435,
+     "select_n": 5,
+     "skip_sessions": 0,
+     "total_return": 3.5867137957805335
+    },
+    {
+     "active_return": 0.1170235874701735,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.3009837311754999,
+     "is_frozen": false,
+     "lookback_sessions": 252,
+     "max_drawdown": -0.395320190543052,
+     "n_trades": 428,
+     "select_n": 5,
+     "skip_sessions": 10,
+     "total_return": 3.7386548724793114
+    },
+    {
+     "active_return": 0.09774364265864599,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.2817037863639724,
+     "is_frozen": true,
+     "lookback_sessions": 252,
+     "max_drawdown": -0.360403310987524,
+     "n_trades": 435,
+     "select_n": 5,
+     "skip_sessions": 21,
+     "total_return": 3.3382639236633898
+    },
+    {
+     "active_return": 0.14161069938187043,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.32557084308719686,
+     "is_frozen": false,
+     "lookback_sessions": 252,
+     "max_drawdown": -0.34415862037885053,
+     "n_trades": 436,
+     "select_n": 5,
+     "skip_sessions": 42,
+     "total_return": 4.293363106495105
+    }
+   ]
+  },
+  "study3_select": {
+   "description": "Selection-size sensitivity (3, 5, 7, 10 stocks)",
+   "frozen_beats_b1_count": 4,
+   "n_variants": 4,
+   "rows_summary": [
+    {
+     "active_return": 0.03787952115498827,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.2218396648603147,
+     "is_frozen": false,
+     "lookback_sessions": 252,
+     "max_drawdown": -0.26426589386532306,
+     "n_trades": 270,
+     "select_n": 3,
+     "skip_sessions": 21,
+     "total_return": 2.2695564368943053
+    },
+    {
+     "active_return": 0.09774364265864599,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.2817037863639724,
+     "is_frozen": true,
+     "lookback_sessions": 252,
+     "max_drawdown": -0.360403310987524,
+     "n_trades": 435,
+     "select_n": 5,
+     "skip_sessions": 21,
+     "total_return": 3.3382639236633898
+    },
+    {
+     "active_return": 0.07764865642241392,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.26160880012774035,
+     "is_frozen": false,
+     "lookback_sessions": 252,
+     "max_drawdown": -0.3340346108017638,
+     "n_trades": 589,
+     "select_n": 7,
+     "skip_sessions": 21,
+     "total_return": 2.9512760374673843
+    },
+    {
+     "active_return": 0.10432142710147563,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.28828157080680206,
+     "is_frozen": false,
+     "lookback_sessions": 252,
+     "max_drawdown": -0.3340449378798902,
+     "n_trades": 816,
+     "select_n": 10,
+     "skip_sessions": 21,
+     "total_return": 3.471576323201729
+    }
+   ]
+  },
+  "study4_universe_drop": {
+   "all_beat_b1": true,
+   "all_beat_full_mom": true,
+   "description": "Leave-one-out universe drop stability (25 variants)",
+   "least_impactful_drop": {
+    "active_return": 0.10136569313661625,
+    "b1_cagr_5bps": 0.18396014370532643,
+    "cagr_5bps": 0.2853258368419427,
+    "delta_vs_b1": 0.10136569313661625,
+    "delta_vs_full_mom": 0.0036220504779702622,
+    "drop": "INTC",
+    "full_mom_cagr_5bps": 0.2817037863639724,
+    "max_drawdown": -0.3604033109875239,
+    "n_trades": 433,
+    "segment": "research",
+    "total_return": 3.411257366878461
+   },
+   "max_delta_vs_full_mom": 0.06165147119753023,
+   "min_delta_vs_full_mom": -0.031146982126063705,
+   "most_impactful_drop": {
+    "active_return": 0.15939511385617622,
+    "b1_cagr_5bps": 0.18396014370532643,
+    "cagr_5bps": 0.34335525756150265,
+    "delta_vs_b1": 0.15939511385617622,
+    "delta_vs_full_mom": 0.06165147119753023,
+    "drop": "AMAT",
+    "full_mom_cagr_5bps": 0.2817037863639724,
+    "max_drawdown": -0.35881509372486264,
+    "n_trades": 434,
+    "segment": "research",
+    "total_return": 4.727353761921583
+   },
+   "n_variants": 25
+  },
+  "study5_rolling_persistence": {
+   "description": "252-session rolling active return on Stage R",
+   "max_active_cagr": 0.7527276977382802,
+   "mean_active_cagr": 0.07542402036322829,
+   "min_active_cagr": -0.2973271428926103,
+   "n_windows": 1239,
+   "pct_windows_beat_b1": 59.16
+  },
+  "study6_cross_segment": {
+   "description": "Research vs Holdout cross-segment summary",
+   "summary": {
+    "combined_observation": {
+     "both_segments_beat_b1": true,
+     "total_sessions": 2346,
+     "total_trades_r_plus_h": 688
+    },
+    "holdout_2023_2026h1": {
+     "active_return": 0.1766210149060552,
+     "b1_cagr_5bps": 0.5388272897685664,
+     "cagr_5bps": 0.7154483046746216,
+     "max_drawdown": -0.2688098297767905,
+     "n_sessions": 856,
+     "n_trades": 253,
+     "total_return": 5.253741177248118
+    },
+    "research_2017_2022": {
+     "active_return": 0.09774364265864599,
+     "b1_cagr_5bps": 0.18396014370532643,
+     "cagr_5bps": 0.2817037863639724,
+     "max_drawdown": -0.360403310987524,
+     "n_sessions": 1490,
+     "n_trades": 435,
+     "total_return": 3.3382639236633898
+    }
+   }
+  }
+ },
+ "task": "DAY-25",
+ "task_description": "V2-MOM Pre-forward Robustness & Universe-Stability Research"
+}

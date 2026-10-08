@@ -1,0 +1,28 @@
+{
+ "description": "Cross-segment robustness: Research vs Holdout",
+ "summary": {
+  "combined_observation": {
+   "both_segments_beat_b1": true,
+   "total_sessions": 2346,
+   "total_trades_r_plus_h": 688
+  },
+  "holdout_2023_2026h1": {
+   "active_return": 0.1766210149060552,
+   "b1_cagr_5bps": 0.5388272897685664,
+   "cagr_5bps": 0.7154483046746216,
+   "max_drawdown": -0.2688098297767905,
+   "n_sessions": 856,
+   "n_trades": 253,
+   "total_return": 5.253741177248118
+  },
+  "research_2017_2022": {
+   "active_return": 0.09774364265864599,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.2817037863639724,
+   "max_drawdown": -0.360403310987524,
+   "n_sessions": 1490,
+   "n_trades": 435,
+   "total_return": 3.3382639236633898
+  }
+ }
+}

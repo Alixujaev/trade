@@ -1,0 +1,67 @@
+{
+ "description": "Lookback sensitivity on Stage R (5 bps)",
+ "fixed": {
+  "select": 5,
+  "skip": 21
+ },
+ "grid": [
+  126,
+  189,
+  252,
+  315
+ ],
+ "rows": [
+  {
+   "active_return": 0.1288173830408701,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.3127775267461965,
+   "is_frozen": false,
+   "lookback_sessions": 126,
+   "max_drawdown": -0.3612063090775573,
+   "n_trades": 470,
+   "segment": "research",
+   "select_n": 5,
+   "skip_sessions": 21,
+   "total_return": 3.9983714511322273
+  },
+  {
+   "active_return": 0.07949028598761165,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.2634504296929381,
+   "is_frozen": false,
+   "lookback_sessions": 189,
+   "max_drawdown": -0.3977116906426577,
+   "n_trades": 449,
+   "segment": "research",
+   "select_n": 5,
+   "skip_sessions": 21,
+   "total_return": 2.9855021888098507
+  },
+  {
+   "active_return": 0.09774364265864599,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.2817037863639724,
+   "is_frozen": true,
+   "lookback_sessions": 252,
+   "max_drawdown": -0.360403310987524,
+   "n_trades": 435,
+   "segment": "research",
+   "select_n": 5,
+   "skip_sessions": 21,
+   "total_return": 3.3382639236633898
+  },
+  {
+   "active_return": 0.20193198359903541,
+   "b1_cagr_5bps": 0.18396014370532643,
+   "cagr_5bps": 0.38589212730436184,
+   "is_frozen": false,
+   "lookback_sessions": 315,
+   "max_drawdown": -0.3694098007986168,
+   "n_trades": 408,
+   "segment": "research",
+   "select_n": 5,
+   "skip_sessions": 21,
+   "total_return": 5.8865762793655065
+  }
+ ]
+}
