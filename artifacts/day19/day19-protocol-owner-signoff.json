@@ -1,0 +1,461 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-19 protocol-owner review and sign-off",
+ "final_status": "APPROVED FOR HISTORICAL HOLDOUT",
+ "decided_by": "Alixujaev (protocol owner)",
+ "decided_in": "DAY-19 sign-off, 2026-10-08",
+ "decision_provenance": {
+  "review_prepared_and_recorded_by": "Claude (automated agent), at the protocol owner's direction",
+  "review_independent": false,
+  "note": "the reviewing agent also implemented and ran DAY-19; every claim was re-derived from hashes, committed blobs, metrics files and a clean-tree reproduction"
+ },
+ "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; freeze commit ba3cefe; DAY-18L sign-off 8b8b586)",
+ "starting_head": "fee0e9effbf7620e33c2b7fda5c56c3ebd184d26",
+ "day19_run_commit_context": {
+  "day19_starting_head": "8b8b586495ce99002d055e37f87e40c029c9da56",
+  "day19_commit": "fee0e9e"
+ },
+ "stage_r_snapshot": {
+  "id": "stage_r_20261007T093410Z",
+  "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+  "files": 64,
+  "unchanged": true
+ },
+ "research_period": {
+  "first": "2017-02-01",
+  "id": "research",
+  "last": "2022-12-30",
+  "sessions": 1490
+ },
+ "warmup": {
+  "first": "2016-01-04",
+  "last": "2017-01-31",
+  "sessions": 272
+ },
+ "isolation": {
+  "holdout_2023-01-03_to_2026-06-02": "not acquired, not loaded, not inspected",
+  "forward_oos": "not acquired, not loaded, not inspected",
+  "last_session_loaded": "2022-12-30",
+  "stage_h_or_stage_f_directories_exist": false,
+  "calendar_note": "the next XNYS session date after 2022-12-30 (2023-01-03) was read from the exchange calendar (rule-based, no market data) only to flag 2022-12-30 as a month/ISO-week end"
+ },
+ "gates": {
+  "V2-MOM": {
+   "net_cagr_5bps": 0.28816164633146335,
+   "b1_net_cagr_5bps": 0.1844074874473387,
+   "gate1_cagr_ge_0": true,
+   "gate2_cagr_ge_b1": true,
+   "gate_A": "PASS",
+   "gate_C": "PASS",
+   "status": "RESEARCH-PASSED",
+   "verified_against_metrics_files": true
+  },
+  "V2-STR": {
+   "net_cagr_5bps": 0.24978852160383114,
+   "b1_net_cagr_5bps": 0.1844074874473387,
+   "gate1_cagr_ge_0": true,
+   "gate2_cagr_ge_b1": true,
+   "gate_A": "PASS",
+   "gate_C": "PASS",
+   "status": "RESEARCH-PASSED",
+   "verified_against_metrics_files": true
+  },
+  "V2-LRV": {
+   "net_cagr_5bps": 0.13344464778558618,
+   "b1_net_cagr_5bps": 0.1844074874473387,
+   "gate1_cagr_ge_0": true,
+   "gate2_cagr_ge_b1": false,
+   "gate_A": "PASS",
+   "gate_C": "PASS",
+   "status": "RESEARCH-FAILED (economic)",
+   "verified_against_metrics_files": true
+  }
+ },
+ "cagr_matrix": {
+  "V2-MOM": {
+   "0bps": 0.2921441610035611,
+   "5bps": 0.28816164633146335,
+   "10bps": 0.284193607440552
+  },
+  "V2-STR": {
+   "0bps": 0.3018004032012387,
+   "5bps": 0.24978852160383114,
+   "10bps": 0.19986283987868858
+  },
+  "V2-LRV": {
+   "0bps": 0.13627805482591326,
+   "5bps": 0.13344464778558618,
+   "10bps": 0.1306189869796046
+  },
+  "B1": {
+   "0bps": 0.1846029638879516,
+   "5bps": 0.1844074874473387,
+   "10bps": 0.18421204790480217
+  },
+  "B2": {
+   "0bps": 0.1061402046162172,
+   "5bps": 0.10596036763366401,
+   "10bps": 0.10578056674813974
+  }
+ },
+ "pre_run_decisions": {
+  "file": "artifacts/day19/day19-predeclared-definitions.json",
+  "sha256": "926e4926e7be0b20c2f4943d0b7309e3c8b2aeee1fd1888f8b52b7f209c9cfcd",
+  "file_mtime_utc": "2026-10-08T06:39:19Z",
+  "first_stage_r_invocation_utc": "about 2026-10-08T07:08Z (crashed at serialisation)",
+  "recorded_run_started_utc": "2026-10-08T07:09:38.919391+00:00",
+  "sha_recorded_by_run": "926e4926e7be0b20c2f4943d0b7309e3c8b2aeee1fd1888f8b52b7f209c9cfcd",
+  "timing_evidence": "file mtime + SHA embedded in the run's reproducibility block + session record; NOT a pre-run commit (disclosed deviation D4)",
+  "LRV_per_slot_lambda": {
+   "decision": "per-slot lambda (K = slot cash); V2-LRV only",
+   "implementation_matches": "backtest/v2/engine.py simulate_lrv: lam = min(1, slot_cash/(B(1+s))), B = slot cash; tested by test_lrv_per_slot_lambda_never_lends_across_slots",
+   "mom_str_unaffected": "simulate_targets uses the global \u00a78.4 lambda (_buy_all)",
+   "lrv_failure_robust": "identical under both readings at 0 bps; LRV gross CAGR 0.1363 < B1 0.1846, total LRV costs at 5 bps 2247.32"
+  },
+  "diagnostic_formulas": {
+   "fixed_before_results": true,
+   "reported": "artifacts/day19/day19-predeclared-definitions.json",
+   "can_affect_gates": false,
+   "evidence": "gate logic in backtest/v2/run.py reads only net CAGR, B1 CAGR, PIT/determinism/integrity flags and Gate C presence; no diagnostic value enters it"
+  }
+ },
+ "lookahead": {
+  "V2-LRV": {
+   "decision_sessions_sampled": 150,
+   "future_deletion_test": true,
+   "future_mutation_test": true,
+   "truncation_test": true
+  },
+  "V2-MOM": {
+   "decision_sessions_sampled": 8,
+   "future_deletion_test": true,
+   "future_mutation_test": true,
+   "truncation_test": true
+  },
+  "V2-STR": {
+   "decision_sessions_sampled": 32,
+   "future_deletion_test": true,
+   "future_mutation_test": true,
+   "truncation_test": true
+  },
+  "all_pass": true,
+  "execution_timing_test": {
+   "pass": true,
+   "rule": "every fill at the open after its decision close (LRV period-end exits at the next cycle start); all fills inside Research"
+  },
+  "fill_source_test": {
+   "fills_checked": 3335,
+   "pass": true,
+   "series": "raw open (series A)"
+  },
+  "index_test": {
+   "pass": true,
+   "sessions_checked": 37
+  }
+ },
+ "determinism": {
+  "two_runs_day19": "91/91 result files byte-identical (run_provenance excluded)",
+  "clean_tree_reproduction_signoff": "from committed HEAD fee0e9e, git_dirty=false: 90/91 byte-identical; run_summary.json differs only in reproducibility.git_commit (8b8b586 -> fee0e9e)",
+  "run_summary_sha256": "698b8c3bbea9ca304a9a2d7f1095e82e0de7fb137a2fc7d1e06ad88bface32cf",
+  "engine_sha256_equal_committed": true
+ },
+ "tests": {
+  "day19_new": "17 passed (re-run on committed HEAD in sign-off)",
+  "full_suite_day19": "1297 passed, 0 failed",
+  "post_suite_change": "2-line JSON serialisation (numpy bool) in backtest/v2/run.py; no calculation path; exercised by the clean-tree reproduction"
+ },
+ "gate_C_robustness": {
+  "status": "COMPLETE (all \u00a716 items for 0/5/10 bps)",
+  "missing_items": {
+   "0bps": [],
+   "10bps": [],
+   "5bps": []
+  },
+  "calendar_year_subperiod_scope": "as predeclared (return, CAGR, volatility, Sharpe, Sortino, max drawdown, B1/B2 return)"
+ },
+ "engineering_chronology": [
+  "test development: V2-LRV sign() failed on numpy floats -> fixed (signals.py) before any Stage R run",
+  "test development: PIT semantics -> LRV formation moved to the t_F close before any Stage R run",
+  "code review: V2-LRV dividends missing from the turnover denominator (book.cash re-sync) -> fixed; full suite restarted",
+  "full suite 1297 passed (07:0x-07:2xZ)",
+  "Stage R run 1 (~07:08Z): all simulations completed, per-experiment files written, crashed writing run_summary.json (numpy bool not JSON-serialisable); values not inspected",
+  "fix: _jsonable handles numpy bool (serialisation only)",
+  "Stage R run (07:09:38Z): identical configuration; overwrote run 1 files; result recorded",
+  "determinism run 2 to scratchpad: 91/91 identical; commit fee0e9e; engine hashes equal committed blobs"
+ ],
+ "reproducibility_addendum": {
+  "purpose": "cures literal \u00a717 block gaps (D2); every item hash-verified",
+  "distributions": [
+   "Pygments==2.21.0",
+   "alpaca-py==0.44.0",
+   "annotated-types==0.8.0",
+   "anyio==4.14.2",
+   "beautifulsoup4==4.15.0",
+   "certifi==2026.7.22",
+   "cffi==2.1.1",
+   "charset-normalizer==3.5.1",
+   "colorama==0.4.6",
+   "contourpy==1.3.3",
+   "curl_cffi==0.16.1",
+   "cycler==0.12.1",
+   "exchange_calendars==4.13.2",
+   "fonttools==4.63.0",
+   "h11==0.16.0",
+   "httpcore==1.0.9",
+   "httpx==0.28.1",
+   "idna==3.19",
+   "iniconfig==2.3.0",
+   "kiwisolver==1.5.0",
+   "korean_lunar_calendar==0.4.0",
+   "lxml==6.1.2",
+   "matplotlib==3.11.1",
+   "msgpack==1.2.1",
+   "multitasking==0.0.13",
+   "numpy==2.5.2",
+   "packaging==26.3",
+   "pandas==3.0.5",
+   "peewee==4.4.0",
+   "pillow==12.3.0",
+   "pip==26.2.1",
+   "platformdirs==4.11.4",
+   "pluggy==1.6.0",
+   "protobuf==7.36.0",
+   "pyarrow==25.0.1",
+   "pycparser==3.0",
+   "pydantic==2.13.4",
+   "pydantic_core==2.46.4",
+   "pyluach==2.3.0",
+   "pyparsing==3.3.2",
+   "pytest==9.1.1",
+   "python-dateutil==2.9.0.post0",
+   "python-dotenv==1.2.3",
+   "python-telegram-bot==22.8",
+   "pytz==2026.3.post1",
+   "requests==2.34.2",
+   "six==1.17.0",
+   "soupsieve==2.9.2",
+   "sseclient-py==1.9.0",
+   "toolz==1.1.0",
+   "typing-inspection==0.4.4",
+   "typing_extensions==4.16.0",
+   "tzdata==2026.3",
+   "urllib3==2.7.0",
+   "websockets==17.0.1",
+   "yfinance==1.6.0"
+  ],
+  "distributions_sha256": "7b47231b6bf706da340a4c8b940bb5cbd632c228c8f07dc57cde6c065c89379a",
+  "asof": "2026-10-07",
+  "corporate_actions_windows": {
+   "Q1": [
+    "2016-01-01",
+    "2022-12-30"
+   ],
+   "Q2": [
+    "2022-12-31",
+    "2023-03-31"
+   ]
+  },
+  "corporate_action_endpoint": "/v1/corporate-actions (Stage R acquisition; run.json pinned by snapshot manifest)",
+  "snapshot_run_json_sha256": "f2f2466e0c11de8ab11a1ed7fb44b273db3a41a4ab09b08b25117558237a007e",
+  "bars_all_sha256": {
+   "bars_all/AAPL.parquet": "ecba25d22c79ed16ce5d9e6c11cc33265fbd02aa48cad677d06dd19899f52912",
+   "bars_all/ADBE.parquet": "f5ff8deff0a0ac91e10e9492bb2b4404678869c4638ab206bf79b6daa255cb08",
+   "bars_all/AMAT.parquet": "8f6a9030c13c8e84418c86700a0768c36f183ef19a78a934e6d2b99f4ed5def7",
+   "bars_all/AMD.parquet": "263d4226acd8cabb17147212c2375d809279c1c15dbde0fc6ac2b3aa78f64011",
+   "bars_all/AMZN.parquet": "24ae996bd7fcea9420cb919725ea3fa8ab5d301a1f09e1a69e8fa1c174526649",
+   "bars_all/AVGO.parquet": "183268c9392da58fc66910ef142ef531e05c5dd7b87ef92938753055e8d1a494",
+   "bars_all/COST.parquet": "46cc7c29edc77d2d09269d7491960eaf95885d68cf5e786ace956e9e7b076388",
+   "bars_all/CRM.parquet": "05a911605ce93adc81e0b58563918888da88f705f232c744e1656f80c0aff75c",
+   "bars_all/CSCO.parquet": "ecc01805948bf877b2f50bdc7a74710f4452439ab61368525163f862ac530f0f",
+   "bars_all/GOOGL.parquet": "2aec88d43239768585776dca8531c34d3286d8603efaaf4e9a5576b55ad86e53",
+   "bars_all/INTC.parquet": "b8157597e446d4b1c3612ac3101d526f5e3bfc9b427bc6e1bc4348a3415e7a5e",
+   "bars_all/JNJ.parquet": "628d4ee8ea44599d854c4f542c4e18693949997334b08ea268997fab163522e3",
+   "bars_all/JPM.parquet": "c7189a249728a562b9fe7ed96705a1848b1c036e6f72e1f859cb54dd8d0919e0",
+   "bars_all/KO.parquet": "c8a26742e4bd638f708fcf603e19925576dfbe145e82f9168b46571996c0da79",
+   "bars_all/META.parquet": "ea0340083abbcd6d1ae15e7bfccd3d4e8b9ec340393a37339e7b78967bdcc5bc",
+   "bars_all/MSFT.parquet": "6afd8a6d88cc44d1255012d332e969a5cb8d9cb64c72a8c1346d253be7cf120e",
+   "bars_all/MU.parquet": "07562588a0c0fd62507d00483e7351a96d8b5818b193daa9cb74467cb9df1c70",
+   "bars_all/NFLX.parquet": "fc4686b6ec0d56e3e5eb7536e793fb1918f014cc7a65d877ed27147f74b2878b",
+   "bars_all/NVDA.parquet": "cc446f83b2569d8f241029c9eeec9ac7cc9fd02fe4ee3c42e3155d08d3283bd7",
+   "bars_all/ORCL.parquet": "70997d24b89ad6355d2f8c49b5f1876393cd25b48c22f91d79d35b5131a8d617",
+   "bars_all/PEP.parquet": "c699e127350956eca78a5414346f9b2b3a123dfbac3056b4a3fd17a70729c4ff",
+   "bars_all/QCOM.parquet": "4f3818af1d3b45798cbc4880db885edba2d8d29c9a53e62b2f3c7d3ac4ff0d1e",
+   "bars_all/SPY.parquet": "2a53d2a845f628bfd6ef3478f94d100f1ade6c3d656ab62e8662c5d89edaecb7",
+   "bars_all/TSLA.parquet": "74fdfbbebed996beebc1011249c1b9995e6971cae424c399f6bc00e4e81ad76a",
+   "bars_all/WMT.parquet": "69e3af8e05a1cf780f29361846b79673aad2da8095cd0b660eec2f0aacac3650",
+   "bars_all/XOM.parquet": "f9dcbc35c5144413f9f08a147afe7489c2de1d0b1f7739f4eda400850adaa96d"
+  },
+  "events_file": {
+   "review_output_manifest_sha256": "755c905e0adae6c7cac924aa8146384defe7053784b526675e7b51d714f6d698"
+  },
+  "files_dirty_at_run_time_sha256_equal_committed": {
+   "artifacts/day19/day19-predeclared-definitions.json": "926e4926e7be0b20c2f4943d0b7309e3c8b2aeee1fd1888f8b52b7f209c9cfcd",
+   "artifacts/day19/v2/V2-B1-research/0bps/decisions.json": "d747ddbed779afd5dcd8496e5ce55c28c4a59f27d39fe60ad8b98e3000fcd766",
+   "artifacts/day19/v2/V2-B1-research/0bps/episodes.json": "f27d7eb19ce6a39f7179e20b607cd8ee43b984d5b090927b1e43d264cc50663e",
+   "artifacts/day19/v2/V2-B1-research/0bps/equity.csv": "47b724dedba936007ab0b66f52a1f1a3164c59062fc5d1428264f6d3b55887ff",
+   "artifacts/day19/v2/V2-B1-research/0bps/executions.json": "38fd8dcd8f902bcadcec5af6fc275e6b2c4b387ccdf70acac0b48414592a363a",
+   "artifacts/day19/v2/V2-B1-research/0bps/fills.csv": "a9ae1d15e9394761f45067a5ba0ab72ff5d5ea4aff37f4785ad515efb2729550",
+   "artifacts/day19/v2/V2-B1-research/0bps/metrics.json": "0fb008c0a7b2918032a2b7402cee4c72a7123049002f37b0b189b3c0e3b472e8",
+   "artifacts/day19/v2/V2-B1-research/10bps/decisions.json": "d747ddbed779afd5dcd8496e5ce55c28c4a59f27d39fe60ad8b98e3000fcd766",
+   "artifacts/day19/v2/V2-B1-research/10bps/episodes.json": "36c67478c12cf4cca9577c586f57791d6603fff72c71fd0404c7b86a65acfd1f",
+   "artifacts/day19/v2/V2-B1-research/10bps/equity.csv": "508f19f1cd471e75cde45a13d815b6c4d51bdc8e4135580b60d41a8d9f7f80ad",
+   "artifacts/day19/v2/V2-B1-research/10bps/executions.json": "f6c879148cef81af008cf0fa0e69940e5ed803247b4e83ebd6475b1d5d13ab14",
+   "artifacts/day19/v2/V2-B1-research/10bps/fills.csv": "0bb5bb38fee9a58316b66258e29b461580669993b63ecb42e5b2e24530f88f71",
+   "artifacts/day19/v2/V2-B1-research/10bps/metrics.json": "bc1e549f5c97d5c94eb043f06e54a8a777a9f5cb4262a2fdde5829cc88c3ecc1",
+   "artifacts/day19/v2/V2-B1-research/5bps/decisions.json": "d747ddbed779afd5dcd8496e5ce55c28c4a59f27d39fe60ad8b98e3000fcd766",
+   "artifacts/day19/v2/V2-B1-research/5bps/episodes.json": "440cc2ed0dbc17a371e50ba94afef21d7c9256f7d1b22cf08201f9f4c4238841",
+   "artifacts/day19/v2/V2-B1-research/5bps/equity.csv": "01f702e02c0515dfa96e47b1b0aaca9c96d7a030ab8c4a6486291c3c68235930",
+   "artifacts/day19/v2/V2-B1-research/5bps/executions.json": "3db3aa886bdccde06685c41dfae4d2fb7ebff708e0b0285b04b155f3c7d9bae5",
+   "artifacts/day19/v2/V2-B1-research/5bps/fills.csv": "f9d09d44d066013db653ae713f751892c448aa5a57eed00d6819693fe55728cf",
+   "artifacts/day19/v2/V2-B1-research/5bps/metrics.json": "3cc1c9d3e2b0fb6d1040a89bfe40302706973e2987ecd580203c72a054667eb6",
+   "artifacts/day19/v2/V2-B2-research/0bps/decisions.json": "f001f9af6517e3ffae5fb9063450f3f5584a4f12b2ceb0e1049651a3a4b56907",
+   "artifacts/day19/v2/V2-B2-research/0bps/episodes.json": "73ac2ed295761eb398e67cbd228d295a86324504dcb31c7b37cfaf654b6c6fa8",
+   "artifacts/day19/v2/V2-B2-research/0bps/equity.csv": "2251f7864e520e8acea8226a9968f4105bf69f421ff2b1fc192408d8abe05ab1",
+   "artifacts/day19/v2/V2-B2-research/0bps/executions.json": "37afb41db7ca70042b8c92cec0851716df31b18dec4062debe42ca9de75f3915",
+   "artifacts/day19/v2/V2-B2-research/0bps/fills.csv": "51e38371987037e7e3a64270f5bdc48ddd8fb5ce30f45b0ad23aca5a67e99147",
+   "artifacts/day19/v2/V2-B2-research/0bps/metrics.json": "004698b55f2e59e4c1432a9e3a4c88f0fc70dc21fede6980c50f7128723527b4",
+   "artifacts/day19/v2/V2-B2-research/10bps/decisions.json": "f001f9af6517e3ffae5fb9063450f3f5584a4f12b2ceb0e1049651a3a4b56907",
+   "artifacts/day19/v2/V2-B2-research/10bps/episodes.json": "3fa6312d54ff475a29b14fa3b216cf1523d2790df109c6f2cfd39167962e0759",
+   "artifacts/day19/v2/V2-B2-research/10bps/equity.csv": "991a43a848a3788377ef7397a3c74edd35559f11b158162ed09acd8649cd8afa",
+   "artifacts/day19/v2/V2-B2-research/10bps/executions.json": "a3bd09fd6234fe3c4a57b9bbf74fe13659ebcb700ba2b48d1b43070b7090bc00",
+   "artifacts/day19/v2/V2-B2-research/10bps/fills.csv": "4ce7267aa19fa449081a4aa89954e0449a756ffbfabc19d510606c0d63a7e6b9",
+   "artifacts/day19/v2/V2-B2-research/10bps/metrics.json": "a68faf2a9fe17927f1b2660e4f217ed6a1b6a309fba46e1a30f439205107ca1e",
+   "artifacts/day19/v2/V2-B2-research/5bps/decisions.json": "f001f9af6517e3ffae5fb9063450f3f5584a4f12b2ceb0e1049651a3a4b56907",
+   "artifacts/day19/v2/V2-B2-research/5bps/episodes.json": "6c1d19dacb53616832ff1cbffe40575c567efb58de48ccf92f556ac3f9844bc6",
+   "artifacts/day19/v2/V2-B2-research/5bps/equity.csv": "188a70348256575b28a7252c0809f0f70310e65ba8facf7f003b9afb5c4b506a",
+   "artifacts/day19/v2/V2-B2-research/5bps/executions.json": "6c597870224b08e18384f12aa62d785d418b6ed39371029e410353dfac9af830",
+   "artifacts/day19/v2/V2-B2-research/5bps/fills.csv": "42598fb6e3bba94f48b8d57de63ef6f84c91a6e910d90f4f6b948789460c78de",
+   "artifacts/day19/v2/V2-B2-research/5bps/metrics.json": "731ef910098de208ebdda6a7691fd3fe437b56008fb06f7a611239683f660fc6",
+   "artifacts/day19/v2/V2-LRV-R001/0bps/decisions.json": "6b0f5133997c68a873566f7c42500e8de591a93c52d8918598ae88d0e23234ba",
+   "artifacts/day19/v2/V2-LRV-R001/0bps/episodes.json": "a6144ccc355d2187ff94567d08fedab485e9f48eafa5777f6861d362b272af21",
+   "artifacts/day19/v2/V2-LRV-R001/0bps/equity.csv": "176078d30eebd8240b36e855fc39920522928c81594aa6bcc5843a19ca364cef",
+   "artifacts/day19/v2/V2-LRV-R001/0bps/executions.json": "371be14a70619b323edf22e2b1283d93bc137b28bbe68476e31f26b581c48d69",
+   "artifacts/day19/v2/V2-LRV-R001/0bps/fills.csv": "874f6e39650fe0c3fa8913680f99cd855ca475c4fde8e0eab750085db7016925",
+   "artifacts/day19/v2/V2-LRV-R001/0bps/metrics.json": "5c119dcb29d1643905c77f5b749301fa68229d05f3396840ae2be06ab893ec7e",
+   "artifacts/day19/v2/V2-LRV-R001/10bps/decisions.json": "6b0f5133997c68a873566f7c42500e8de591a93c52d8918598ae88d0e23234ba",
+   "artifacts/day19/v2/V2-LRV-R001/10bps/episodes.json": "3c87bf6181fad88c1c5f792075ee47a5789be380315356ab3aa6edc0b785b49a",
+   "artifacts/day19/v2/V2-LRV-R001/10bps/equity.csv": "92d8958fb74877f415ef35eba6c36cdecf0f2263d721eed551e4e24aba988751",
+   "artifacts/day19/v2/V2-LRV-R001/10bps/executions.json": "44dc8c4c3a54e90d3ddb9331e6d9244d87e63057c7945da5910b77d8efe07584",
+   "artifacts/day19/v2/V2-LRV-R001/10bps/fills.csv": "4340a12a93f94b43d4485a914c02c7758e494d0179f3244899e95fd5dafbaadb",
+   "artifacts/day19/v2/V2-LRV-R001/10bps/metrics.json": "e1f401b39c8d157f68f50f1fe4ef03e6551e0879d52b5d3253429028d909322a",
+   "artifacts/day19/v2/V2-LRV-R001/5bps/decisions.json": "6b0f5133997c68a873566f7c42500e8de591a93c52d8918598ae88d0e23234ba",
+   "artifacts/day19/v2/V2-LRV-R001/5bps/episodes.json": "436788533f70537c60cd44d11481730b5c7a69611e96a25e61b65e73d1bef691",
+   "artifacts/day19/v2/V2-LRV-R001/5bps/equity.csv": "5cdade075f129d9e01b0200d5ea5f9001bda10f62479728dd3601b519c381535",
+   "artifacts/day19/v2/V2-LRV-R001/5bps/executions.json": "55030807823e5731844c5256fc18c12da97c3d30ba548471ea4dae0282fdd2c3",
+   "artifacts/day19/v2/V2-LRV-R001/5bps/fills.csv": "340a1f943e505fdb7d06eb0ac8d7ff4f0a493c48eb326e124cf102689006fd8e",
+   "artifacts/day19/v2/V2-LRV-R001/5bps/metrics.json": "774aba06c5cbfd604eb896d7efb69f60490ca112370c7fe1f851e58de0455a11",
+   "artifacts/day19/v2/V2-MOM-R001/0bps/decisions.json": "8562033051b9fed9a664c2324988d915c8d5e75670b4d8a062ce4dacfda24e50",
+   "artifacts/day19/v2/V2-MOM-R001/0bps/episodes.json": "e520f4e71d6b31aaadf39319cd1e5b3abd47aeb638f3740087e25e88a30987f2",
+   "artifacts/day19/v2/V2-MOM-R001/0bps/equity.csv": "ff5754da55a492a4cb658202cee8de544bd5beaf9709a98c34f75f63a5ef1f18",
+   "artifacts/day19/v2/V2-MOM-R001/0bps/executions.json": "02c571a9aca5ea9654aef809015e4abd2e9cab7f1679a10be56b2073985b7f10",
+   "artifacts/day19/v2/V2-MOM-R001/0bps/fills.csv": "9f36fe9bfb653443abcea6f28a298e94c1b1611fa03cd597cc71757c2589b0c5",
+   "artifacts/day19/v2/V2-MOM-R001/0bps/metrics.json": "6821be52726e82a8c0014072174b71692256f0e34312018b4acc619b79fb91ae",
+   "artifacts/day19/v2/V2-MOM-R001/10bps/decisions.json": "8562033051b9fed9a664c2324988d915c8d5e75670b4d8a062ce4dacfda24e50",
+   "artifacts/day19/v2/V2-MOM-R001/10bps/episodes.json": "642fd7ae0971573b60436b7675c61ac0f9a979556d9ddd324a2af088108e24cb",
+   "artifacts/day19/v2/V2-MOM-R001/10bps/equity.csv": "9a3edf937a9a5208139567f5d9fa9bbfcee024291d8e2fd1d234ee462e42c4c7",
+   "artifacts/day19/v2/V2-MOM-R001/10bps/executions.json": "d6c9335e16ef3e17bd7b8e26737e9d7dfbba7468d0d3df382821e3b576c7d600",
+   "artifacts/day19/v2/V2-MOM-R001/10bps/fills.csv": "0d33583229dd0ab2f353ab9a14b14bf0573c3a41b4a0ad61adc0f7e630babd76",
+   "artifacts/day19/v2/V2-MOM-R001/10bps/metrics.json": "9394c70d9823f6d4c4aba487c18cc8e30eed72540872179abeed72164a80b9fa",
+   "artifacts/day19/v2/V2-MOM-R001/5bps/decisions.json": "8562033051b9fed9a664c2324988d915c8d5e75670b4d8a062ce4dacfda24e50",
+   "artifacts/day19/v2/V2-MOM-R001/5bps/episodes.json": "7fc496b6ed5ec01d836abdf8c526f17b2bc72826a6879f055807221988e14c6d",
+   "artifacts/day19/v2/V2-MOM-R001/5bps/equity.csv": "fb910fc873bed76ae1ebcfb11199bb20326d7c12bbe8a12f679623d84b578af0",
+   "artifacts/day19/v2/V2-MOM-R001/5bps/executions.json": "0b707936b67aa42e60bacc506d534dec5744f36bc60da55a28724cd07f88f472",
+   "artifacts/day19/v2/V2-MOM-R001/5bps/fills.csv": "8a199ee3f43766c99c6a8bb2d27660f2bfbeed1267e9787a28e961f12f604f3f",
+   "artifacts/day19/v2/V2-MOM-R001/5bps/metrics.json": "17dd34e0a3463ae34ad5187a29c473c36b3155f869bef6c1f9d50a0e9a60ff85",
+   "artifacts/day19/v2/V2-STR-R001/0bps/decisions.json": "a5868636ee8b44d1c1e3856db53a607d3cdeb140577d932370df09d65bcba7e9",
+   "artifacts/day19/v2/V2-STR-R001/0bps/episodes.json": "58b21dc4175faa48c95f035bf9c835b6ecddbc4fe2681bec42e663414321ee5e",
+   "artifacts/day19/v2/V2-STR-R001/0bps/equity.csv": "0b9d3d647c1215456c3354633454c476d44032c19cc3fedbf95dcbff1a073105",
+   "artifacts/day19/v2/V2-STR-R001/0bps/executions.json": "0f92803236c5b4999524d1b0274dda5a3353fa9a645b4810f43cf4fc089228b1",
+   "artifacts/day19/v2/V2-STR-R001/0bps/fills.csv": "3ce3ffcf532658ac0af3e8d45f93176160986eada792d983cf4b069e76b79b19",
+   "artifacts/day19/v2/V2-STR-R001/0bps/metrics.json": "ce7080ad0ec11ba893b35e650943b0dcc8a4107065474739469003d7f623a789",
+   "artifacts/day19/v2/V2-STR-R001/10bps/decisions.json": "a5868636ee8b44d1c1e3856db53a607d3cdeb140577d932370df09d65bcba7e9",
+   "artifacts/day19/v2/V2-STR-R001/10bps/episodes.json": "806fcf39f70cf7aaaf8effba8cbadc8a449199f4cfe3e76ece39ad51752374b4",
+   "artifacts/day19/v2/V2-STR-R001/10bps/equity.csv": "7b6144d96a5ac7e95e43613d366a18ffab6d88f1468f715d665d280d16352168",
+   "artifacts/day19/v2/V2-STR-R001/10bps/executions.json": "2d11a4cf18945fce5ebc7db14ecd246afadf5de723631f59e07cbf65f2d1a460",
+   "artifacts/day19/v2/V2-STR-R001/10bps/fills.csv": "4299f7bb35720da1a5227c1241df0e2aa2d628608a6ed359c0c1736749cf9e9d",
+   "artifacts/day19/v2/V2-STR-R001/10bps/metrics.json": "578666a77fc473d0f5c882789893a17cd48d5e854342ef28b56575ca4fed17df",
+   "artifacts/day19/v2/V2-STR-R001/5bps/decisions.json": "a5868636ee8b44d1c1e3856db53a607d3cdeb140577d932370df09d65bcba7e9",
+   "artifacts/day19/v2/V2-STR-R001/5bps/episodes.json": "59d7cc5716bf3067c0786e36519bf5194fb5ce743842bf7861974d4ed0659680",
+   "artifacts/day19/v2/V2-STR-R001/5bps/equity.csv": "829afe38d3eaa3a26b62bdda024cc2bc89a61e5782d43ee0327d6d6708595f09",
+   "artifacts/day19/v2/V2-STR-R001/5bps/executions.json": "8d7955f6b335b0913ef46a081a068cefd8e08daba10e25505f368adf34dd2dec",
+   "artifacts/day19/v2/V2-STR-R001/5bps/fills.csv": "db4431f8b6fe2858455ebfdfe8d2fbbfbe14796773a6609c3115127aa0b1c1f0",
+   "artifacts/day19/v2/V2-STR-R001/5bps/metrics.json": "680b48caf7bc93fb42adf14f793da9a083e0f1971148ea8e1cbffc6e617e3490",
+   "backtest/v2/__init__.py": "20902cb2834ec70eb552c542dd47cf0378ff9a36fda5344f2d86079227b463b0",
+   "backtest/v2/data.py": "e4c6d3cecb59ec3b61f23697a464354e6af6f18516fe6039d0b104ef7e878b53",
+   "backtest/v2/engine.py": "35b43d952400ffeb79e05a90cb75fa582aeca8bb97809dc4223d7578999fc59e",
+   "backtest/v2/metrics.py": "42c7e02153a2b3bcfa8ec9545367380dd1c1c3b9f156e81fe3764c52591ab6fa",
+   "backtest/v2/run.py": "a7d839f7f5ce3141c7692889911c5e364d479a8f9f1c53c828affc529ae1014a",
+   "backtest/v2/signals.py": "8838044b17a5ea2d9f0f1b61b6417d686315849ff2423640262963862155db55",
+   "tests/test_day19_v2_research.py": "547f02e78974e9f919156131b12c3855f4eeb3f3e5cf76442421e663c5ca07af"
+  }
+ },
+ "deviations": [
+  {
+   "id": "D1",
+   "rule": "\u00a717 dirty tree only for untracked run outputs",
+   "finding": "engine and test code untracked at run time",
+   "cure": "clean-tree reproduction from committed HEAD reproduces all results",
+   "blocking": false
+  },
+  {
+   "id": "D2",
+   "rule": "\u00a717 reproducibility block contents",
+   "finding": "full distribution list, asof/endpoint, per-file bars_all and dirty-file SHAs only transitively recorded",
+   "cure": "reproducibility_addendum (hash-verified)",
+   "blocking": false
+  },
+  {
+   "id": "D3",
+   "rule": "freeze procedure: clarifications are committed v2.0.x versions",
+   "finding": "LRV per-slot lambda recorded pre-run in an uncommitted file",
+   "cure": "disclosed; immaterial to every gate; recommend a committed v2.0.5 clarification before any reuse touching V2-LRV",
+   "blocking": false
+  },
+  {
+   "id": "D4",
+   "rule": "pre-run evidence",
+   "finding": "pre-run timing rests on mtime, recorded SHA and session log, not a pre-run commit",
+   "cure": "disclosed; recommend committing predeclarations before future runs",
+   "blocking": false
+  }
+ ],
+ "interpretation": {
+  "research_passed": "V2-MOM and V2-STR passed the predefined minimum historical research-viability gate (\u00a713)",
+  "not_validated_edge": "a pass is not validation; only FORWARD-PASSED is 'validated under v2' (\u00a714, \u00a715)",
+  "not_statistical_alpha": {
+   "holm_adjusted_p_5bps": {
+    "V2-MOM": 0.30290652274428,
+    "V2-STR": 0.6710367124830112,
+    "V2-LRV": 0.6710367124830112
+   },
+   "conclusion": "no family's active return vs B1 is statistically significant (diagnostic, not a gate)"
+  },
+  "robustness_observations": {
+   "mom_top2_concentration_5bps": 0.46526437666360115,
+   "mom_uneven_by_year": "excess concentrated in 2019-2020 and 2022; trails B1 in 2018 and 2021",
+   "str_cost_drag_5bps_10bps": [
+    0.05201188159740755,
+    0.1019375633225501
+   ],
+   "status": "observations only, not gates"
+  },
+  "limitations": "hindsight-selected surviving mega-cap universe (Q5); single strong-drift sample; cash at 0 % (Q7)"
+ },
+ "governance_conclusion": {
+  "eligible_for_historical_holdout": [
+   "V2-MOM",
+   "V2-STR"
+  ],
+  "move_together": true,
+  "winner_selected": false,
+  "v2_lrv": "RESEARCH-FAILED (economic); permanently rejected for this frozen branch; never run on the holdout (\u00a715.3)",
+  "holdout": {
+   "segment": "2023-01-03 -> 2026-06-02",
+   "sessions": 856,
+   "status": "not acquired; next step only"
+  },
+  "no_protocol_change": true,
+  "no_parameter_change": true
+ },
+ "pushed": false
+}
