@@ -1,0 +1,145 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-24 design of predeclared forward OOS duration amendment",
+ "title": "Design of Predeclared Forward OOS Duration Amendment",
+ "status": "PROPOSED AMENDMENT — NOT YET EFFECTIVE",
+ "design_date": "2026-10-08",
+ "governance_mandate": "protocol design task only; no strategy evaluation; no forward data acquired, inspected, or calculated; frozen protocol unchanged in this task",
+ "starting_head": "409b771467da3b95579d4a9e5965fcae36dc4707",
+ "target_strategy": {
+  "family": "V2-MOM",
+  "name": "Cross-sectional momentum 12-1, long-only",
+  "config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+  "status": "FROZEN FOR FORWARD OOS"
+ },
+ "executive_summary": {
+  "problem": "The frozen 252-session forward OOS window was sized in DAY-16 to accommodate 3 concurrent families, particularly V2-LRV's 126-session pairs trading period (2 x 126 = 252). With V2-LRV and V2-STR stopped, V2-MOM is the sole surviving strategy. 252 sessions imposes an 11-month idle delay without technical necessity or statistical justification.",
+  "recommended_duration": 63,
+  "unit": "XNYS sessions",
+  "architecture": "Single Blind Window",
+  "calendar_window": {
+   "start_date": "2026-10-08",
+   "end_date": "2027-01-07",
+   "calendar_months": "~3 months",
+   "financial_period": "Exactly 1 institutional financial quarter (252 / 4)"
+  },
+  "rebalance_count": 3,
+  "rationale": "Aligns with standard institutional financial review cycles; captures 3 distinct monthly rebalances across a corporate reporting season; eliminates 75% of waiting latency; preserves 100% of blindness and anti-snooping guarantees via ex-ante precommitment."
+ },
+ "candidate_windows_evaluation": [
+  {
+   "sessions": 20,
+   "calendar_duration": "~1 month",
+   "end_date": "2026-11-04",
+   "v2_mom_monthly_rebalances": 1,
+   "methodological_value": "Operational smoke test for live fills and corporate action handling",
+   "limitations": "Single return draw; high noise; vulnerable to 1-month shock",
+   "verdict": "REJECTED (insufficient rebalance depth)"
+  },
+  {
+   "sessions": 40,
+   "calendar_duration": "~2 months",
+   "end_date": "2026-12-03",
+   "v2_mom_monthly_rebalances": 2,
+   "methodological_value": "Tests transition between two consecutive monthly portfolios",
+   "limitations": "Arbitrary non-standard calendar boundary; high short-term noise",
+   "verdict": "REJECTED (sample too small; non-standard interval)"
+  },
+  {
+   "sessions": 60,
+   "calendar_duration": "~3 months",
+   "end_date": "2027-01-04",
+   "v2_mom_monthly_rebalances": 3,
+   "methodological_value": "Legacy baseline from protocol v1.0/v1.1",
+   "limitations": "Inherited from Yahoo Finance 60-day intraday API limitation; non-standard trading day count",
+   "verdict": "REJECTED (superseded by institutional 63-session quarter)"
+  },
+  {
+   "sessions": 63,
+   "calendar_duration": "Exactly 1 quarter (~3 months)",
+   "end_date": "2027-01-07",
+   "v2_mom_monthly_rebalances": 3,
+   "methodological_value": "Standard institutional quarterly review cycle; exact quarter division (252 / 4); spans 1 full earnings season; 3 monthly rebalances",
+   "limitations": "Cannot observe multi-year macroeconomic regime changes",
+   "verdict": "RECOMMENDED (optimal balance of institutional convention, depth, and latency reduction)"
+  },
+  {
+   "sessions": 84,
+   "calendar_duration": "~4 months",
+   "end_date": "2027-02-08",
+   "v2_mom_monthly_rebalances": 4,
+   "methodological_value": "Spans 1/3 of a trading year across two earnings seasons",
+   "limitations": "Non-standard calendar interval; awkward reporting period",
+   "verdict": "REJECTED (non-standard financial interval)"
+  },
+  {
+   "sessions": 126,
+   "calendar_duration": "Exactly 2 quarters (~6 months)",
+   "end_date": "2027-04-09",
+   "v2_mom_monthly_rebalances": 6,
+   "methodological_value": "Semi-annual institutional cycle; spans two full earnings cycles; native duration from protocol v2 (§5.3)",
+   "limitations": "Requires 6 months of latency",
+   "verdict": "STRONG RUNNER-UP (defensible conservative alternative)"
+  },
+  {
+   "sessions": 252,
+   "calendar_duration": "1 full year",
+   "end_date": "2027-10-08",
+   "v2_mom_monthly_rebalances": 12,
+   "methodological_value": "Full annual seasonal cycle; 12 monthly rebalances",
+   "limitations": "Imposes 11-month idle latency; still has low statistical power (§20 Q11)",
+   "verdict": "SUPERSEDED (obsolete multi-strategy legacy requirement)"
+  }
+ ],
+ "staged_vs_single_analysis": {
+  "architecture_A_single_blind_window": {
+   "description": "Exactly 63 XNYS sessions elapse with zero interim peeking; single data acquisition and evaluation at conclusion",
+   "blindness": "Absolute",
+   "anti_snooping": "Total (zero adaptive stopping risk)",
+   "governance_complexity": "Minimal (one acquisition, one evaluation)",
+   "decision_rule_complexity": "Zero new rules; retains protocol v2 §13 gate logic verbatim",
+   "verdict": "RECOMMENDED"
+  },
+  "architecture_B_staged_window": {
+   "description": "Predeclared stages (e.g. 20 + 40 or 30 + 33 sessions) with an intermediate decision rule",
+   "blindness": "Fragile; requires intermediate data exposure or partial blinding",
+   "anti_snooping": "Risk of psychological/governance leakage or adaptive behavior between stages",
+   "governance_complexity": "High (multiple acquisition snapshots and review cycles)",
+   "decision_rule_complexity": "High; an intermediate kill rule on 1 monthly rebalance creates massive false-positive risk",
+   "verdict": "REJECTED (uncalibrated kill rules for monthly momentum; unneeded complexity)"
+  }
+ },
+ "proposed_protocol_amendment": {
+  "target_version": "Protocol v2.0.5 (or v2.1)",
+  "specifications": {
+   "1_duration": "63 XNYS sessions (amended from 252 sessions)",
+   "2_session_count_definition": "Exactly 63 consecutive trading sessions of the New York Stock Exchange (XNYS), resolved by exchange_calendars 4.13.2",
+   "3_start_date_rule": "First XNYS session strictly after protocol freeze commit date: 2026-10-08",
+   "4_end_date_rule": "63rd XNYS session: 2027-01-07 inclusive; final liquidation at close of session 63",
+   "5_data_acquisition": "Stage F acquired strictly after 16:15 ET on 2027-01-07; Series A raw OHLC and Alpaca corporate actions from 2025-01-02 to 2027-01-07; single idempotent pass into data/oos_cache/protocol_v2/stage_f/",
+   "6_data_prohibition": "Zero forward market data dated after 2026-10-07 may be acquired, queried, or inspected prior to 16:15 ET on 2027-01-07; operational feeds must isolate ingestion and never calculate forward strategy performance",
+   "7_interim_evaluation": "Strictly prohibited; zero interim CAGR, Sharpe, Drawdown, PnL, or return tracking",
+   "8_final_evaluation_trigger": "Triggered once after session 63 completion and Stage F data validation pass",
+   "9_decision_rules": "Unchanged protocol v2 §13 gates at 5 bps: Gate 1 (net CAGR >= 0), Gate 2 (net CAGR >= B1 net CAGR over identical 63 sessions), Gate A (integrity), Gate C (completeness)",
+   "10_partial_calendar_years": "CAGR annualized as (E_T / E_0)^(252 / 63) - 1; subperiods for 2026 and 2027 explicitly labelled as partial",
+   "11_determinism": "Two independent runs must produce byte-identical fill logs, equity curves, and metrics",
+   "12_reproducibility": "Full §17 reproducibility block matching environment and configuration",
+   "13_operational_failures": "Unscheduled closures advance the session calendar until 63 sessions are reached; missingness > 2% halts for protocol-owner review without imputation",
+   "14_strategy_scope": "Applies exclusively to V2-MOM (V2-MOM-F001); V2-LRV and V2-STR remain permanently stopped",
+   "15_strategy_parameters": "Zero parameter changes; strategy config SHA-256 62827d70... is 100% invariant"
+  }
+ },
+ "safety_affirmations": {
+  "forward_data_acquired": false,
+  "forward_data_inspected": false,
+  "forward_returns_computed": false,
+  "forward_cagr_computed": false,
+  "forward_oos_simulated": false,
+  "v2_mom_modified": false,
+  "v2_str_resurrected": false,
+  "v2_lrv_resurrected": false,
+  "protocol_files_modified": false,
+  "amendment_effective_now": false
+ },
+ "next_task": "Protocol-owner review of the proposed forward-OOS duration amendment; if approved, apply the amendment in a separate commit before any forward data is acquired."
+}
