@@ -1,0 +1,1115 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-20",
+ "title": "Historical holdout (Stage H) data acquisition and validation",
+ "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; unchanged)",
+ "starting_head": "48ce878d07027a0d787b946d463defa7fd030970",
+ "commits_this_task": {
+  "decisions": "eb7abf7 (committed before any Stage H request)",
+  "implementation": "1cd321d (committed before acquisition; capture ran on a clean tree)",
+  "report": "this commit"
+ },
+ "head_at_acquisition": "1cd321dd9053466fe665937c570b1361cdc044a9",
+ "git_dirty_at_acquisition": false,
+ "decisions": {
+  "file": "artifacts/day20/day20-stage-h-acquisition-decisions.json",
+  "commit": "eb7abf7",
+  "ca_windows": {
+   "Q1": [
+    "2021-01-01",
+    "2026-06-02"
+   ],
+   "Q2": [
+    "2026-06-03",
+    "2026-08-31"
+   ]
+  },
+  "event_date_boundary": [
+   "2021-01-04",
+   "2026-06-02"
+  ],
+  "asof": "2026-10-07",
+  "assets_endpoint_called": false
+ },
+ "stage_r": {
+  "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+  "snapshot_id": "stage_r_20261007T093410Z",
+  "tree_sha256": "c5d786359adef89f86156c97aab6d579e2e54f5b22fe3161ed1d4ce76dc54590"
+ },
+ "stage_h": {
+  "path": "data/oos_cache/protocol_v2/stage_h/stage_h_20261008T100604Z",
+  "manifest_sha256": "eff959594658303c9aafeb81d18a159b742071821a4fe081e462691455be4a34",
+  "tree_sha256": "8a51463b335f0f4e2acf776bd4fdfb36ca07cf52eb2d5878f3f0251d328c5556",
+  "files": 63,
+  "bytes": 6787862,
+  "acquired_utc": [
+   "2026-10-08T10:06:04.699478+00:00",
+   "2026-10-08T10:07:40.771748+00:00"
+  ],
+  "requests": 56
+ },
+ "provider": {
+  "bars": "alpaca-market-data-v2 /v2/stocks/bars feed=sip timeframe=1Day",
+  "corporate_actions": "alpaca-market-data-v1 /v1/corporate-actions"
+ },
+ "sessions": {
+  "stage_h_range": [
+   "2021-01-04",
+   "2026-06-02"
+  ],
+  "stage_h_expected": 1359,
+  "holdout": {
+   "first": "2023-01-03",
+   "last": "2026-06-02",
+   "expected": 856,
+   "resolved": 856
+  },
+  "lookback_outside_evaluated_segment": {
+   "range": [
+    "2021-01-04",
+    "2022-12-30"
+   ],
+   "sessions": 503,
+   "purpose": "frozen \u00a73.9 >= 252-session lookback; never part of the evaluated holdout"
+  },
+  "actual_per_series": {
+   "AAPL/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "AAPL/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "ADBE/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "ADBE/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "AMAT/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "AMAT/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "AMD/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "AMD/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "AMZN/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "AMZN/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "AVGO/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "AVGO/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "COST/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "COST/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "CRM/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "CRM/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "CSCO/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "CSCO/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "GOOGL/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "GOOGL/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "INTC/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "INTC/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "JNJ/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "JNJ/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "JPM/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "JPM/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "KO/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "KO/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "META/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "META/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "MSFT/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "MSFT/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "MU/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "MU/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "NFLX/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "NFLX/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "NVDA/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "NVDA/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "ORCL/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "ORCL/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "PEP/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "PEP/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "QCOM/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "QCOM/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "SPY/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "SPY/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "TSLA/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "TSLA/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "WMT/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "WMT/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "XOM/all": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   },
+   "XOM/raw": {
+    "rows": 1359,
+    "sessions_present": 1359,
+    "missing_lookback": 0,
+    "missing_holdout": 0,
+    "first_bar": "2021-01-04",
+    "last_bar": "2026-06-02",
+    "status": "OK"
+   }
+  }
+ },
+ "symbols": [
+  "AAPL",
+  "ADBE",
+  "AMAT",
+  "AMD",
+  "AMZN",
+  "AVGO",
+  "COST",
+  "CRM",
+  "CSCO",
+  "GOOGL",
+  "INTC",
+  "JNJ",
+  "JPM",
+  "KO",
+  "META",
+  "MSFT",
+  "MU",
+  "NFLX",
+  "NVDA",
+  "ORCL",
+  "PEP",
+  "QCOM",
+  "SPY",
+  "TSLA",
+  "WMT",
+  "XOM"
+ ],
+ "ca_query_symbols": [
+  "AAPL",
+  "ADBE",
+  "AMAT",
+  "AMD",
+  "AMZN",
+  "AVGO",
+  "COST",
+  "CRM",
+  "CSCO",
+  "FB",
+  "GOOGL",
+  "INTC",
+  "JNJ",
+  "JPM",
+  "KO",
+  "META",
+  "MSFT",
+  "MU",
+  "NFLX",
+  "NVDA",
+  "ORCL",
+  "PEP",
+  "QCOM",
+  "SPY",
+  "TSLA",
+  "WMT",
+  "XOM"
+ ],
+ "row_counts": {
+  "raw": {
+   "AAPL": 1359,
+   "ADBE": 1359,
+   "AMAT": 1359,
+   "AMD": 1359,
+   "AMZN": 1359,
+   "AVGO": 1359,
+   "COST": 1359,
+   "CRM": 1359,
+   "CSCO": 1359,
+   "GOOGL": 1359,
+   "INTC": 1359,
+   "JNJ": 1359,
+   "JPM": 1359,
+   "KO": 1359,
+   "META": 1359,
+   "MSFT": 1359,
+   "MU": 1359,
+   "NFLX": 1359,
+   "NVDA": 1359,
+   "ORCL": 1359,
+   "PEP": 1359,
+   "QCOM": 1359,
+   "SPY": 1359,
+   "TSLA": 1359,
+   "WMT": 1359,
+   "XOM": 1359
+  },
+  "adjustment_all": {
+   "AAPL": 1359,
+   "ADBE": 1359,
+   "AMAT": 1359,
+   "AMD": 1359,
+   "AMZN": 1359,
+   "AVGO": 1359,
+   "COST": 1359,
+   "CRM": 1359,
+   "CSCO": 1359,
+   "GOOGL": 1359,
+   "INTC": 1359,
+   "JNJ": 1359,
+   "JPM": 1359,
+   "KO": 1359,
+   "META": 1359,
+   "MSFT": 1359,
+   "MU": 1359,
+   "NFLX": 1359,
+   "NVDA": 1359,
+   "ORCL": 1359,
+   "PEP": 1359,
+   "QCOM": 1359,
+   "SPY": 1359,
+   "TSLA": 1359,
+   "WMT": 1359,
+   "XOM": 1359
+  }
+ },
+ "corporate_actions": {
+  "retained_records": 433,
+  "counts_by_window": {
+   "Q1_all": {
+    "discarded_after_stage_h": 0,
+    "discarded_before_stage_h": 3,
+    "discarded_no_date": 0,
+    "kept": 429
+   },
+   "Q1_complete": {
+    "discarded_after_stage_h": 0,
+    "discarded_before_stage_h": 3,
+    "discarded_no_date": 0,
+    "kept": 429
+   },
+   "Q2_all": {
+    "discarded_after_stage_h": 17,
+    "discarded_before_stage_h": 0,
+    "discarded_no_date": 0,
+    "kept": 4
+   },
+   "Q2_complete": {
+    "discarded_after_stage_h": 17,
+    "discarded_before_stage_h": 0,
+    "discarded_no_date": 0,
+    "kept": 4
+   }
+  },
+  "complete_vs_all": {
+   "all_count": 433,
+   "blocking": false,
+   "complete_count": 433,
+   "only_in_all": 0,
+   "only_in_complete": 0,
+   "relevant_universe_ids_affected": 0,
+   "same_id_content_differs": 0
+  },
+  "events": {
+   "blocking": 0,
+   "dividends": 407,
+   "events": 415,
+   "review_items": 13,
+   "splits": 8
+  },
+  "splits": [
+   [
+    "AMZN",
+    "2022-06-06"
+   ],
+   [
+    "AVGO",
+    "2024-07-15"
+   ],
+   [
+    "GOOGL",
+    "2022-07-18"
+   ],
+   [
+    "NFLX",
+    "2025-11-17"
+   ],
+   [
+    "NVDA",
+    "2021-07-20"
+   ],
+   [
+    "NVDA",
+    "2024-06-10"
+   ],
+   [
+    "TSLA",
+    "2022-08-25"
+   ],
+   [
+    "WMT",
+    "2024-02-26"
+   ]
+  ],
+  "first_session_untestable": [
+   "CSCO cash_dividend 2021-01-04"
+  ]
+ },
+ "identity": {
+  "counts": {
+   "assigned": 428,
+   "assigned_by_cusip": 428,
+   "assigned_ticker_only": 0,
+   "conflicts": 0,
+   "foreign": 4,
+   "identity_unverified": 1,
+   "records": 433,
+   "unassigned": 0
+  },
+  "foreign_entity_records": [
+   {
+    "ca_type": "name_changes",
+    "entity": "META",
+    "event_date": "2022-01-31",
+    "reason": "ticker matches a Stage R entity but CUSIP is not in its CUSIP set"
+   },
+   {
+    "ca_type": "cash_dividends",
+    "entity": "META",
+    "event_date": "2025-09-24",
+    "reason": "ticker matches a Stage R entity but CUSIP is not in its CUSIP set"
+   },
+   {
+    "ca_type": "cash_dividends",
+    "entity": "META",
+    "event_date": "2026-03-25",
+    "reason": "ticker matches a Stage R entity but CUSIP is not in its CUSIP set"
+   },
+   {
+    "ca_type": "cash_dividends",
+    "entity": "META",
+    "event_date": "2025-12-24",
+    "reason": "ticker matches a Stage R entity but CUSIP is not in its CUSIP set"
+   }
+  ],
+  "foreign_note": "META->METV name change (as Stage R) and three cash dividends under the reused ticker FB with a CUSIP outside META's CUSIP set: correctly excluded (v2.0.1 C2 rule 4); all 9 Meta Platforms dividends are CUSIP-assigned and matched by the cross-check",
+  "identity_unverified": [
+   {
+    "ca_type": "stock_mergers",
+    "entity": "AMD",
+    "event_date": "2022-02-14",
+    "role": "acquirer"
+   }
+  ],
+  "conflicts": 0,
+  "unassigned": 0
+ },
+ "boundary_validation": {
+  "asof": "2026-10-07",
+  "asof_matches_decision": true,
+  "assets_endpoint_called": false,
+  "bar_request_ends": [
+   "2026-06-02T04:00:00Z"
+  ],
+  "bar_request_starts": [
+   "2021-01-04T05:00:00Z"
+  ],
+  "ca_discarded_counts_only": {
+   "Q1_all": {
+    "discarded_after_stage_h": 0,
+    "discarded_before_stage_h": 3,
+    "discarded_no_date": 0
+   },
+   "Q1_complete": {
+    "discarded_after_stage_h": 0,
+    "discarded_before_stage_h": 3,
+    "discarded_no_date": 0
+   },
+   "Q2_all": {
+    "discarded_after_stage_h": 17,
+    "discarded_before_stage_h": 0,
+    "discarded_no_date": 0
+   },
+   "Q2_complete": {
+    "discarded_after_stage_h": 17,
+    "discarded_before_stage_h": 0,
+    "discarded_no_date": 0
+   }
+  },
+  "ca_process_date_windows": [
+   [
+    "2021-01-01",
+    "2026-06-02"
+   ],
+   [
+    "2026-06-03",
+    "2026-08-31"
+   ]
+  ],
+  "ca_records_event_date_within_boundary": true,
+  "ca_windows_match_decision": true,
+  "forward_oos_requested": false,
+  "holdout_first": "2023-01-03",
+  "holdout_last": "2026-06-02",
+  "holdout_ok": true,
+  "holdout_sessions": 856,
+  "leakage_dates_checked_at_capture": 3032,
+  "lookback_sessions": 503,
+  "max_bar_session": "2026-06-02",
+  "min_bar_session": "2021-01-04",
+  "no_bar_after_2026_06_02": true,
+  "no_bar_before_2021_01_04": true,
+  "no_research_holdout_overlap_in_evaluated_segment": true,
+  "pass": true,
+  "research_last_session": "2022-12-30",
+  "sessions_expected": 1359,
+  "sessions_expected_ok": true
+ },
+ "overlap_cross_check": {
+  "range": [
+   "2021-01-04",
+   "2022-12-30"
+  ],
+  "raw_bars": "IDENTICAL",
+  "raw_bars_symbols_identical": 26,
+  "events": {
+   "content_differs": {},
+   "identical": 152,
+   "only_in_stage_h": [],
+   "only_in_stage_r": [],
+   "stage_h_records": 152,
+   "stage_r_records": 152,
+   "status": "IDENTICAL"
+  },
+  "adjustment_all_levels": "excluded (rebasing expected; frozen \u00a73.9)"
+ },
+ "implied_factor_cross_check_v2_0_4": {
+  "blocking_symbols": [
+   "NVDA"
+  ],
+  "NVDA": {
+   "detected_changes": 6,
+   "exact_evaluation_invalid_pairs": 0,
+   "expected_events": 23,
+   "first_session_untestable": 0,
+   "matched_events": 6,
+   "numerical_false_negatives": 0,
+   "numerical_false_positives": 0,
+   "precision_degenerate_pairs": 0,
+   "status": "BLOCKING",
+   "uncheckable_events": 0,
+   "unconfirmed_events": 17,
+   "unexplained_changes": 0
+  },
+  "numerical_false_positives_or_negatives": 0,
+  "exact_evaluation_invalid": 0
+ },
+ "frozen_review_classification": {
+  "status_counts": {
+   "BLOCKING": 18,
+   "FIRST_SESSION_UNTESTABLE": 1,
+   "HARD_FAIL": 0,
+   "MOOT": 0,
+   "NUMERICAL_FALSE_NEGATIVE": 0,
+   "NUMERICAL_FALSE_POSITIVE": 0,
+   "RESOLVED": 13,
+   "RESOLVED_EXCLUDED": 4
+  },
+  "review_records_dir": {
+   "applied": 0,
+   "dir": "artifacts/reviews/stage_h",
+   "files_found": 0,
+   "invalid": 0
+  },
+  "resolved_items": [
+   "cash_mergers JNJ<-ITCI",
+   "cash_mergers MSFT<-NUAN",
+   "stock_mergers AVGO<-VMW",
+   "stock_mergers AVGO<-VMW",
+   "stock_and_cash_mergers CRM<-WORK",
+   "cash_mergers JNJ<-SWAV",
+   "cash_mergers CSCO<-ACIA",
+   "stock_mergers XOM<-DEN",
+   "cash_mergers AMZN<-ONEM",
+   "stock_mergers XOM<-PXD",
+   "name_change FB->META",
+   "cash_mergers WMT<-VZIO",
+   "cash_mergers JNJ<-AMAM",
+   "foreign-entity name_changes META->METV",
+   "foreign-entity cash_dividends FB",
+   "foreign-entity cash_dividends FB",
+   "foreign-entity cash_dividends FB"
+  ],
+  "blocking_items": [
+   {
+    "category": "IDENTITY_UNVERIFIED",
+    "entity": "AMD",
+    "event_date": "2022-02-14",
+    "item": "identity-unverified stock_mergers AMD<-XLNX",
+    "reason": "v2.0.2 rule 4a / v2.0.3 item 5: no anchor and no applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2021-03-09",
+    "item": "unconfirmed-event NVDA cash_dividend 2021-03-09",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2021-06-09",
+    "item": "unconfirmed-event NVDA cash_dividend 2021-06-09",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2021-12-01",
+    "item": "unconfirmed-event NVDA cash_dividend 2021-12-01",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2022-03-02",
+    "item": "unconfirmed-event NVDA cash_dividend 2022-03-02",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2022-06-08",
+    "item": "unconfirmed-event NVDA cash_dividend 2022-06-08",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2022-09-07",
+    "item": "unconfirmed-event NVDA cash_dividend 2022-09-07",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2023-03-07",
+    "item": "unconfirmed-event NVDA cash_dividend 2023-03-07",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2023-06-07",
+    "item": "unconfirmed-event NVDA cash_dividend 2023-06-07",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2023-09-06",
+    "item": "unconfirmed-event NVDA cash_dividend 2023-09-06",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2023-12-05",
+    "item": "unconfirmed-event NVDA cash_dividend 2023-12-05",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2024-03-05",
+    "item": "unconfirmed-event NVDA cash_dividend 2024-03-05",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2024-09-12",
+    "item": "unconfirmed-event NVDA cash_dividend 2024-09-12",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2024-12-05",
+    "item": "unconfirmed-event NVDA cash_dividend 2024-12-05",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2025-03-12",
+    "item": "unconfirmed-event NVDA cash_dividend 2025-03-12",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2025-06-11",
+    "item": "unconfirmed-event NVDA cash_dividend 2025-06-11",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2025-09-11",
+    "item": "unconfirmed-event NVDA cash_dividend 2025-09-11",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   },
+   {
+    "category": "UNRESOLVED",
+    "entity": "NVDA",
+    "event_date": "2025-12-04",
+    "item": "unconfirmed-event NVDA cash_dividend 2025-12-04",
+    "reason": "v2.0.3 item 4: unconfirmed event without an applicable committed review record",
+    "status": "BLOCKING"
+   }
+  ]
+ },
+ "manifest_hash": {
+  "manifest_matches_files": true,
+  "entries": 62,
+  "writable_files": 0,
+  "validation_output": {
+   "path": "data/oos_cache/protocol_v2/stage_h/validation__stage_h_20261008T100604Z",
+   "validation_report_sha256": "84cfe89548f4bbf0336a640adb9f5ae9cf9ee1ee24631229a933d602fc02cbbc",
+   "manifest_sha256": "bb7d8b36ef0ad1d83d7c9f732fbc29d166aa52a997e1543cc6d220b345836da5"
+  }
+ },
+ "determinism_integrity": {
+  "recompute_matches_capture": {
+   "crosscheck": true,
+   "identity": true,
+   "normalised": true,
+   "quality": true,
+   "reviews": true,
+   "validation": true
+  },
+  "second_validation": "byte-identical validation_report.json (scratchpad re-run)",
+  "stage_r_and_prior_outputs": "unchanged (snapshot 64/64, v2.0.2/v2.0.3/DAY-18G/v2.0.4 outputs, 14 review records)"
+ },
+ "checks": {
+  "boundary": true,
+  "data_quality_complete_vs_all": true,
+  "frozen_review_items_resolved": false,
+  "identity_no_conflicts": true,
+  "manifest_verified": true,
+  "normalisation_no_blocking": true,
+  "overlap_events_identical": true,
+  "overlap_raw_bars_identical": true,
+  "recompute_matches_capture": true,
+  "structural": true
+ },
+ "no_strategy_evaluation": "no signal, TR index, ranking, z-score, pair formation, position, portfolio or gate was computed; no strategy or backtest module was imported by acquisition/v2/stage_h.py",
+ "no_performance_metric": "no return, CAGR, Sharpe, Sortino, drawdown, turnover, exposure, trade count or equity curve was computed or persisted; no price value is reported",
+ "forward_oos": "not accessed: bar requests end at 2026-06-02; CA process_date windows end 2026-08-31 (< freeze 2026-10-07); asof 2026-10-07; no assets call",
+ "brief_correction": "per frozen \u00a73.4, adjustment=all bars are audit-only (implied-factor cross-check); signals are built later from the PIT TR index of raw closes and events, not from adjusted prices",
+ "final_status": "BLOCKED",
+ "blocked_reason": "data acquisition and structural/boundary/overlap validation all PASS, but 18 frozen BLOCKING review items require committed protocol-owner review records bound to this Stage H manifest (v2.0.3 item 2): AMD<-XLNX IDENTITY_UNVERIFIED and 17 NVDA cash dividends UNCONFIRMED (6 in R\u2229H, 11 in the holdout); the agent creates no records"
+}
