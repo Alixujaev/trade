@@ -1,0 +1,381 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-20A",
+ "title": "Stage H protocol-owner review records",
+ "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 (frozen; unchanged; no v2.0.5)",
+ "starting_head": "73230fccf0fc3f0c02b80bacfb7b9792e9c6831b",
+ "records_commit": "06c60b4",
+ "stage_h": {
+  "snapshot": "data/oos_cache/protocol_v2/stage_h/stage_h_20261008T100604Z",
+  "manifest_sha256": "eff959594658303c9aafeb81d18a159b742071821a4fe081e462691455be4a34",
+  "tree_sha256": "8a51463b335f0f4e2acf776bd4fdfb36ca07cf52eb2d5878f3f0251d328c5556",
+  "unchanged": true
+ },
+ "stage_r": {
+  "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+  "snapshot_id": "stage_r_20261007T093410Z",
+  "tree_sha256": "c5d786359adef89f86156c97aab6d579e2e54f5b22fe3161ed1d4ce76dc54590",
+  "unchanged": true,
+  "review_records_unchanged": "14 records, last commit c36b673"
+ },
+ "decided_by": "Alixujaev (protocol owner), DAY-20A instruction; encoded by the agent (authorization field in every record); the agent made no decision",
+ "review_items": 18,
+ "records": [
+  {
+   "file": "artifacts/reviews/stage_h/amd-xlnx-stageh-20261008.json",
+   "sha256": "706a60522d994e10ec37a1b5e04f16b605c93a751b04f0dfbd420a46e0c09610",
+   "record_id": "amd-xlnx-stageh-20261008",
+   "item_type": "IDENTITY_UNVERIFIED",
+   "item_key": {
+    "entity": "AMD",
+    "event_date": "2022-02-14",
+    "ca_id": "15459aa5-b297-4e33-9624-c9d59b75ba46"
+   },
+   "decision": "SAME_ENTITY",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 3,
+   "prior_precedent": "Stage R record amd-xlnx-20261007 (bound to the Stage R manifest; cited as evidence only, does not resolve Stage H)"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20210309-stageh-20261008.json",
+   "sha256": "68f1b7038bfdfb9e93ebb83b2dc31f28cdf0fd74599c0210c22e40cd0b0cddee",
+   "record_id": "nvda-div-20210309-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2021-03-09",
+    "ca_id": "d80fa14c-6eb4-418f-b003-f5775322eba3"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "Stage R record nvda-div-20210309-20261007 (bound to the Stage R manifest; evidence only)"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20210609-stageh-20261008.json",
+   "sha256": "9efc5b23417f337cc3d3601c2f8e38047455efbf2c17d7c9d3be18649d232408",
+   "record_id": "nvda-div-20210609-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2021-06-09",
+    "ca_id": "d1a013e0-aea6-46ec-b844-d7a546ace337"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "Stage R record nvda-div-20210609-20261007 (bound to the Stage R manifest; evidence only)"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20211201-stageh-20261008.json",
+   "sha256": "cc38cdeedf7a6b305ff05c6fa2db822c985280e723495bfaecd1e391bda34c68",
+   "record_id": "nvda-div-20211201-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2021-12-01",
+    "ca_id": "ef9b148b-f031-4c05-8faf-4814f099b11d"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "Stage R record nvda-div-20211201-20261007 (bound to the Stage R manifest; evidence only)"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20220302-stageh-20261008.json",
+   "sha256": "1fd069e1924551898199a1c955b8ab54945fab5345cda44d4b99174cc911b76c",
+   "record_id": "nvda-div-20220302-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2022-03-02",
+    "ca_id": "13ca6ae3-efe8-461a-af9c-fa2490d56d9c"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "Stage R record nvda-div-20220302-20261007 (bound to the Stage R manifest; evidence only)"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20220608-stageh-20261008.json",
+   "sha256": "cb1ec0f08f0d4e82219b1be349593a361770d6593f8fb89b020b7c1bfe4d0c1d",
+   "record_id": "nvda-div-20220608-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2022-06-08",
+    "ca_id": "4ac972c2-d010-4c59-9bc5-3804d580e957"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "Stage R record nvda-div-20220608-20261007 (bound to the Stage R manifest; evidence only)"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20220907-stageh-20261008.json",
+   "sha256": "97e6ec7f7b7d684e781047483ef13f0c3ad9fa6f57fc203a11615fb64ba049f9",
+   "record_id": "nvda-div-20220907-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2022-09-07",
+    "ca_id": "90e63976-7fbe-41e6-a747-98da5ec27d03"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "Stage R record nvda-div-20220907-20261007 (bound to the Stage R manifest; evidence only)"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20230307-stageh-20261008.json",
+   "sha256": "c7362839fe5d3af299479aa2650a4e4232720b6b6590e0ba6d9379aea614c90a",
+   "record_id": "nvda-div-20230307-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2023-03-07",
+    "ca_id": "0a8c85e7-49e9-49e5-a832-8cadcfbc3348"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20230607-stageh-20261008.json",
+   "sha256": "72d1b6c92b3404ccb949ec9b06ef5a79938703c1c8e2265664d477d7d7ed1347",
+   "record_id": "nvda-div-20230607-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2023-06-07",
+    "ca_id": "4352e8c4-a689-4db5-a34c-8ab114b0dd98"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20230906-stageh-20261008.json",
+   "sha256": "11fa40583b8b72c9a74845543bf64269e19d2d3ced6f11cd2c6590a67460815a",
+   "record_id": "nvda-div-20230906-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2023-09-06",
+    "ca_id": "158b52c6-6280-4e57-967b-498fad7e915f"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20231205-stageh-20261008.json",
+   "sha256": "28d000fe57cae01a04984b18c2ab6f6dcac973241137a47b068d0fe5128e2021",
+   "record_id": "nvda-div-20231205-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2023-12-05",
+    "ca_id": "aa4f9cfa-e38f-459d-a060-7173b2a19476"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20240305-stageh-20261008.json",
+   "sha256": "8a0d6f17d7e97f36ff0f6dbd65c011f7fc3493fd3d553ffe115b49f1aa475ca2",
+   "record_id": "nvda-div-20240305-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2024-03-05",
+    "ca_id": "81ece9d6-8e02-4be3-a090-634d3e3f8f95"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20240912-stageh-20261008.json",
+   "sha256": "01c2100a4b5f0da1f8fc48c5f834600f236796424ef659bb9350bc1ad083096b",
+   "record_id": "nvda-div-20240912-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2024-09-12",
+    "ca_id": "9348eb05-9a41-43bc-9ba7-dbe497e98213"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20241205-stageh-20261008.json",
+   "sha256": "d5e7fac67a01792991518cb1d2824829f0203ebfa3e9abfc0224456b4ed04c6e",
+   "record_id": "nvda-div-20241205-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2024-12-05",
+    "ca_id": "74cd9151-b7cb-4264-847b-65e9f655a35e"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20250312-stageh-20261008.json",
+   "sha256": "343d245b3785641512ed32717492ec3a4e6b8b6aa7fae766183b81b2537f158e",
+   "record_id": "nvda-div-20250312-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2025-03-12",
+    "ca_id": "319ffd3d-16ab-45cc-8918-9a782d417482"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20250611-stageh-20261008.json",
+   "sha256": "65d8bd2dd17bba09c362feb1859e849c123211edf68401acc3c7b6e8fee2b262",
+   "record_id": "nvda-div-20250611-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2025-06-11",
+    "ca_id": "e1d7eebe-877b-4476-8774-a120c9af1562"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20250911-stageh-20261008.json",
+   "sha256": "0cb7f90adae9ba6bc19ad7fc1355a0352623b7517f288e4f2455c24fb48ce3af",
+   "record_id": "nvda-div-20250911-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2025-09-11",
+    "ca_id": "73e9164b-d300-4654-aab6-46228c859f8f"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  },
+  {
+   "file": "artifacts/reviews/stage_h/nvda-div-20251204-stageh-20261008.json",
+   "sha256": "4d2c5f5d95e6dc23bf1759dea43c6febf5dac85bce8f77fef09d55bb534e88f7",
+   "record_id": "nvda-div-20251204-stageh-20261008",
+   "item_type": "UNCONFIRMED_EVENT",
+   "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2025-12-04",
+    "ca_id": "351c65cc-3fec-450c-b371-4bfd4abe6109"
+   },
+   "decision": "EVENT_RETAINED",
+   "decided_utc": "2026-10-08T10:27:45Z",
+   "evidence_items": 4,
+   "prior_precedent": "no Stage R record (ex-date outside Stage R or confirmed there); DAY-18F EVENT_RETAINED reasoning applied"
+  }
+ ],
+ "amd_xlnx": {
+  "decision": "SAME_ENTITY",
+  "evidence_basis": "Stage H provider stock_mergers record 15459aa5-... (once and identical in both payloads; byte-identical to the Stage R record) + the previously accepted DAY-18F SEC 8-K (URL, retrieved 2026-10-07T11:42:44Z, SHA-256 492d6a6e...; local copy re-verified offline, quotes present); AMD Stage H cross-check clean -> acquirer-side merger RESOLVED"
+ },
+ "nvda": {
+  "decision": "EVENT_RETAINED",
+  "count": 17,
+  "ex_dates": [
+   "2021-03-09",
+   "2021-06-09",
+   "2021-12-01",
+   "2022-03-02",
+   "2022-06-08",
+   "2022-09-07",
+   "2023-03-07",
+   "2023-06-07",
+   "2023-09-06",
+   "2023-12-05",
+   "2024-03-05",
+   "2024-09-12",
+   "2024-12-05",
+   "2025-03-12",
+   "2025-06-11",
+   "2025-09-11",
+   "2025-12-04"
+  ],
+  "evidence_basis": "each Stage H provider dividend record once and identical in both payloads, CUSIP-assigned to NVDA (67066G104), not duplicated; exact v2.0.4 interval contains 1 at the ex-date session (no numerical FP/FN, no invalid value); DAY-18F EVENT_RETAINED reasoning applied unchanged; 6 overlap dividends cite their Stage R record as evidence only; 11 holdout dividends have no Stage R record"
+ },
+ "validator": {
+  "loader": "acquisition/v2/review_records.load (strict: committed at HEAD, worktree == blob, schema, record_id, manifest binding, protocol version, enums, item_key match, evidence hashes, mechanical checks, supersedes/conflicts)",
+  "result": {
+   "applied": 18,
+   "dir": "artifacts/reviews/stage_h",
+   "files_found": 18,
+   "invalid": 0
+  },
+  "invalid": 0,
+  "duplicate_active": 0,
+  "supersedes": "none"
+ },
+ "blockers_before": 18,
+ "blockers_after": 0,
+ "review_status_counts": {
+  "BLOCKING": 0,
+  "FIRST_SESSION_UNTESTABLE": 1,
+  "HARD_FAIL": 0,
+  "MOOT": 0,
+  "NUMERICAL_FALSE_NEGATIVE": 0,
+  "NUMERICAL_FALSE_POSITIVE": 0,
+  "RESOLVED": 31,
+  "RESOLVED_EXCLUDED": 4
+ },
+ "review_category_counts": {
+  "BLOCKING": 0,
+  "EXACT_EVALUATION_INVALID": 0,
+  "FIRST_SESSION_UNTESTABLE": 1,
+  "IDENTITY_UNVERIFIED": 0,
+  "MOOT": 0,
+  "NUMERICAL_FALSE_NEGATIVE": 0,
+  "NUMERICAL_FALSE_POSITIVE": 0,
+  "PASS": 35,
+  "UNRESOLVED": 0
+ },
+ "data_checks": {
+  "boundary": true,
+  "data_quality_complete_vs_all": true,
+  "frozen_review_items_resolved": true,
+  "identity_no_conflicts": true,
+  "manifest_verified": true,
+  "normalisation_no_blocking": true,
+  "overlap_events_identical": true,
+  "overlap_raw_bars_identical": true,
+  "recompute_matches_capture": true,
+  "structural": true
+ },
+ "validation_output": {
+  "path": "data/oos_cache/protocol_v2/stage_h/validation__stage_h_20261008T100604Z__day20a",
+  "validation_report_sha256": "c58a7d324c04216d586478465cc001b59be6ca324b9d67258a176e803b938750",
+  "manifest_sha256": "e2a7d5a72d5a12342554edff34efb3e398b10eb8db101716dbc806592f82530f",
+  "second_run": "byte-identical"
+ },
+ "no_strategy_evaluation": true,
+ "no_performance_metric": true,
+ "no_data_acquired": true,
+ "forward_oos_accessed": false,
+ "final_status": "READY_FOR_HISTORICAL_HOLDOUT_EVALUATION"
+}
