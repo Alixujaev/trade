@@ -135,6 +135,83 @@ def load_stage_r(stage_r_root: Path = STAGE_R_ROOT) -> tuple[MarketData, dict]:
     return MarketData(sessions, tickers, op, cl, q, d), info
 
 
+SNAPSHOT_ID_H = "stage_h_20261008T100604Z"
+SNAPSHOT_MANIFEST_SHA256_H = "eff959594658303c9aafeb81d18a159b742071821a4fe081e462691455be4a34"
+VALIDATION_H = f"validation__{SNAPSHOT_ID_H}__day20a"
+VALIDATION_H_MANIFEST_SHA256 = "e2a7d5a72d5a12342554edff34efb3e398b10eb8db101716dbc806592f82530f"
+LAST_ALLOWED_SESSION_H = date(2026, 6, 2)          # Stage H boundary; no excluded-period or forward data
+
+
+def load_stage_h() -> tuple[MarketData, dict]:
+    """Stage H (DAY-20/20A): validated READY snapshot; event set = snapshot events_normalised minus
+    FIRST_SESSION_UNTESTABLE ids (snapshot crosscheck) minus EVENT_REJECTED among committed Stage H records."""
+    from acquisition.v2.contract import REVIEW_RECORDS_DIR_H, STAGE_H_ROOT
+    from acquisition.v2.sessions import stage_h_sessions
+    snap = STAGE_H_ROOT / SNAPSHOT_ID_H
+    pre = verify_snapshot(snap, SNAPSHOT_MANIFEST_SHA256_H)
+    vdir = STAGE_H_ROOT / VALIDATION_H
+    if _sha(vdir / "manifest.json") != VALIDATION_H_MANIFEST_SHA256:
+        raise DataError("DAY-20A Stage H validation manifest does not match")
+    vman = json.loads((vdir / "manifest.json").read_text(encoding="utf-8"))
+    rep = json.loads((vdir / "validation_report.json").read_text(encoding="utf-8"))
+    if (vman["files_sha256"]["validation_report.json"] != _sha(vdir / "validation_report.json")
+            or rep["status"] != "READY_FOR_HISTORICAL_HOLDOUT_EVALUATION" or rep["snapshot_manifest_sha256"] != SNAPSHOT_MANIFEST_SHA256_H
+            or rep["review_records"]["applied"] != 18 or rep["review_records"]["invalid"] != 0):
+        raise DataError("Stage H is not READY_FOR_HISTORICAL_HOLDOUT_EVALUATION")
+    sessions = tuple(stage_h_sessions())
+    if sessions[-1] > LAST_ALLOWED_SESSION_H:
+        raise DataError("session index extends beyond the Stage H boundary")
+    tickers = tuple(sorted(FROZEN_DAY_UNIVERSE)) + (BENCHMARK_SYMBOL,)
+    pos = {s: i for i, s in enumerate(sessions)}
+    n, m = len(sessions), len(tickers)
+    op, cl = np.full((n, m), np.nan), np.full((n, m), np.nan)
+    for j, t in enumerate(tickers):
+        df = pd.read_parquet(snap / "bars_raw" / f"{t}.parquet", columns=["open", "close"])
+        for ts, o, c in zip(df.index, df["open"].to_numpy(np.float64), df["close"].to_numpy(np.float64)):
+            day, exact = session_of_label(ts)
+            if not exact or day not in pos:
+                raise DataError(f"{t}: bar label {ts} is not an XNYS Stage H session label")
+            op[pos[day], j], cl[pos[day], j] = o, c
+    events = json.loads((snap / "events_normalised.json").read_text(encoding="utf-8"))["events"]
+    cross = json.loads((snap / "crosscheck.json").read_text(encoding="utf-8"))["per_symbol"]
+    first_session = {e["id"] for v in cross.values() for e in v.get("first_session_untestable", [])}
+    rejected = set()
+    for f in sorted(REVIEW_RECORDS_DIR_H.glob("*.json")):
+        r = json.loads(f.read_text(encoding="utf-8"))
+        if r.get("decision") == "EVENT_REJECTED":
+            rejected.add(str(r["item_key"]["ca_id"]))
+    kept = [e for e in events if e["id"] not in first_session and e["id"] not in rejected]
+    q, d = np.ones((n, m)), np.zeros((n, m))
+    seen: set[tuple[str, str]] = set()
+    for e in kept:
+        if e["entity"] not in tickers:
+            raise DataError(f"event for non-universe entity {e['entity']}")
+        ex = date.fromisoformat(e["ex_date"])
+        if ex not in pos:
+            raise DataError(f"event {e['id']} ex-date {ex} is not a Stage H session")
+        key = (e["entity"], e["ex_date"])
+        if key in seen:
+            raise DataError(f"several events for {key} (same-ex-date case is a BLOCKING review, v2.0.1 C3)")
+        seen.add(key)
+        k, j = pos[ex], tickers.index(e["entity"])
+        if e["event"] == "cash_dividend":
+            d[k, j] = float(e["d"])
+        elif "split" in e["event"]:
+            q[k, j] = float(e["q"])
+        else:
+            raise DataError(f"unsupported event type {e['event']}")
+    info = {"snapshot_id": SNAPSHOT_ID_H, "manifest_sha256": pre["manifest_sha256"], "file_count": pre["file_count"],
+            "tree_sha256": pre["tree_sha256"],
+            "bars_raw_sha256": {f"bars_raw/{t}.parquet": pre["files"][f"bars_raw/{t}.parquet"] for t in tickers},
+            "events": {"source": f"data/oos_cache/protocol_v2/stage_h/{SNAPSHOT_ID_H}/events_normalised.json",
+                       "readiness": f"data/oos_cache/protocol_v2/stage_h/{VALIDATION_H} (manifest {VALIDATION_H_MANIFEST_SHA256})",
+                       "events_total": len(events), "excluded_first_session": sorted(first_session),
+                       "excluded_by_review": sorted(rejected), "events_used": len(kept)},
+            "sessions": n, "first_session": sessions[0].isoformat(), "last_session": sessions[-1].isoformat(),
+            "missing_bars": int(np.isnan(cl).sum()), "series_A_only": True, "series_C_loaded": False}
+    return MarketData(sessions, tickers, op, cl, q, d), info
+
+
 def tr_index(data: MarketData) -> np.ndarray:
     """Series B, frozen §3.4: chain-linked forward from each symbol's first close; NaN where the close is missing."""
     n, m = data.close.shape

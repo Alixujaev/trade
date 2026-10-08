@@ -1,6 +1,7 @@
-"""backtest/v2/run.py: DAY-19 frozen v2 research execution on the Stage R snapshot (Research segment only).
+"""backtest/v2/run.py: frozen v2 evaluation runner (DAY-19 Research on Stage R; DAY-21 Holdout on Stage H).
 
-    python -m backtest.v2.run --out artifacts/day19/v2
+    python -m backtest.v2.run --out artifacts/day19/v2                       (Research, default)
+    python -m backtest.v2.run --segment holdout --out artifacts/day21/v2     (Holdout: V2-MOM, V2-STR only, §15)
 
 Runs V2-MOM, V2-STR, V2-LRV and benchmarks B1, B2 at 0 / 5 / 10 bps per side on the Research segment
 (2017-02-01 .. 2022-12-30, 1490 sessions; warmup 2016-01-04 .. 2017-01-31 as inputs only), the §7 PIT tests,
@@ -30,7 +31,7 @@ from backtest.v2 import engine as en
 from backtest.v2 import metrics as mt
 from backtest.v2 import signals as sg
 from acquisition.v2.reevaluate import verify_snapshot
-from backtest.v2.data import MarketData, load_stage_r, tr_index
+from backtest.v2.data import MarketData, load_stage_h, load_stage_r, tr_index
 
 RESEARCH_FIRST, RESEARCH_LAST = date(2017, 2, 1), date(2022, 12, 30)
 EXPECTED_RESEARCH, EXPECTED_WARMUP = 1490, 272
@@ -42,6 +43,22 @@ PROTOCOL_FILES = ("artifacts/day16/research-protocol-v2.md", "artifacts/day16/re
                   "artifacts/day16/research-checklist.json")
 FREEZE_COMMIT = "ba3cefe54ccf2fe14c62f1c609f143d8a0904221"
 DEFINITIONS = "artifacts/day19/day19-predeclared-definitions.json"
+SEGMENTS = {
+    "research": {"id": "research", "first": RESEARCH_FIRST, "last": RESEARCH_LAST, "sessions": EXPECTED_RESEARCH,
+                 "inputs_before": EXPECTED_WARMUP, "families": FAMILIES, "experiment": EXPERIMENT,
+                 "status_prefix": "RESEARCH", "task": "DAY-19", "loader": load_stage_r},
+    # §15: one-shot holdout of every research-passed family (DAY-19 sign-off 48ce878); V2-LRV never run (§15.3)
+    "holdout": {"id": "holdout", "first": date(2023, 1, 3), "last": date(2026, 6, 2), "sessions": 856,
+                "inputs_before": 503, "families": ("V2-MOM", "V2-STR"),
+                "experiment": {"V2-MOM": "V2-MOM-H001", "V2-STR": "V2-STR-H001", "B1": "V2-B1-holdout",
+                               "B2": "V2-B2-holdout"},
+                "status_prefix": "HOLDOUT", "task": "DAY-21", "loader": load_stage_h},
+}
+RESEARCH_CONFIG_SHA256 = {   # §15.7: holdout/forward must use the identical frozen configuration
+    "V2-MOM": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+    "V2-STR": "0fc76b8a9ba8250c8fa1b399871ca6f511d5e0283f0ffe94f9085f0e38aa600e",
+    "V2-LRV": "0beffbe1ca5de4d52100fc34c6d42fe03b6bdce5a597d8d1fb17b38429105864",
+}
 ROBUSTNESS_ITEMS = {   # §16 completeness set (Gate C), per cost scenario
     "1_cost_sensitivity": ["cagr", "total_return"],
     "2_calendar_years": ["calendar_years"],
@@ -56,7 +73,7 @@ ROBUSTNESS_ITEMS = {   # §16 completeness set (Gate C), per cost scenario
 
 
 def _refuse(*_a, **_k):
-    raise RuntimeError("network access is forbidden during DAY-19 research execution")
+    raise RuntimeError("network access is forbidden during frozen v2 evaluation")
 
 
 def _sha_bytes(b: bytes) -> str:
@@ -89,13 +106,14 @@ def _csv(path: Path, header: list[str], rows: list[list]) -> str:
 
 
 class Setup:
-    def __init__(self, data: MarketData):
+    def __init__(self, data: MarketData, seg: dict | None = None):
         import exchange_calendars as xcals
+        self.seg = seg or SEGMENTS["research"]
         self.data = data
         self.tr = tr_index(data)
-        self.seg_first, self.seg_last = data.index_of(RESEARCH_FIRST), data.index_of(RESEARCH_LAST)
-        cal = xcals.get_calendar("XNYS", start="2015-12-01", end="2023-12-31")
-        self.next_session = cal.next_session(RESEARCH_LAST.isoformat()).date()   # calendar rule only, no market data
+        self.seg_first, self.seg_last = data.index_of(self.seg["first"]), data.index_of(self.seg["last"])
+        cal = xcals.get_calendar("XNYS", start="2015-12-01", end="2026-12-31")
+        self.next_session = cal.next_session(self.seg["last"].isoformat()).date()   # calendar rule only, no market data
         self.universe = [data.col(t) for t in data.universe]
         self.month = sg.decision_sessions(sg.month_end_flags(data.sessions, self.next_session), self.seg_first, self.seg_last)
         self.week = sg.decision_sessions(sg.iso_week_end_flags(data.sessions, self.next_session), self.seg_first, self.seg_last)
@@ -154,7 +172,7 @@ def pit_tests(st: Setup, full: dict[str, en.Result]) -> dict:
     idx_ok = all(np.array_equal(tr_index(data.truncate(k)), st.tr[:k + 1], equal_nan=True) for k in ks)
     out["index_test"] = {"pass": idx_ok, "sessions_checked": len(ks)}
     # 1./2. future-mutation and truncation tests on each family's decision log
-    for fam in FAMILIES:
+    for fam in st.seg["families"]:
         if fam == "V2-LRV":
             sched = list(range(st.seg_first - 1, st.seg_last))
         else:
@@ -188,13 +206,13 @@ def pit_tests(st: Setup, full: dict[str, en.Result]) -> dict:
             fill_ok &= f["price"] == data.open[k, j] and not math.isnan(f["price"])
             timing_ok &= data.sessions[k - 1].isoformat() in dec_closes or res.label == "V2-LRV" and \
                 (k - st.seg_first) % sg.LRV_PERIOD == 0
-            timing_ok &= RESEARCH_FIRST.isoformat() <= f["session"] <= RESEARCH_LAST.isoformat()
+            timing_ok &= st.seg["first"].isoformat() <= f["session"] <= st.seg["last"].isoformat()
     out["fill_source_test"] = {"pass": fill_ok, "fills_checked": n_fills, "series": "raw open (series A)"}
     out["execution_timing_test"] = {"pass": timing_ok, "rule": "every fill at the open after its decision close "
-                                    "(LRV period-end exits at the next cycle start); all fills inside Research"}
+                                    "(LRV period-end exits at the next cycle start); all fills inside the segment"}
     out["all_pass"] = idx_ok and fill_ok and timing_ok and all(
         v["truncation_test"] and v["future_mutation_test"] and v["future_deletion_test"] for f, v in out.items()
-        if f in FAMILIES)
+        if f in st.seg["families"])
     return out
 
 
@@ -221,17 +239,20 @@ def environment() -> dict:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
+    ap.add_argument("--segment", choices=sorted(SEGMENTS), default="research")
     a = ap.parse_args(argv)
+    seg = SEGMENTS[a.segment]
+    FAMILIES, EXPERIMENT = seg["families"], seg["experiment"]
     socket.socket.connect = _refuse
     started = datetime.now(timezone.utc).isoformat()
     out = Path(a.out)
     if not out.is_absolute():
         out = ROOT_DIR / out
-    data, data_info = load_stage_r()
-    st = Setup(data)
+    data, data_info = seg["loader"]()
+    st = Setup(data, seg)
     n_research = st.seg_last - st.seg_first + 1
-    if n_research != EXPECTED_RESEARCH or st.seg_first != EXPECTED_WARMUP:
-        raise SystemExit(f"session count mismatch: research {n_research}, warmup {st.seg_first}")
+    if n_research != seg["sessions"] or st.seg_first != seg["inputs_before"]:
+        raise SystemExit(f"session count mismatch: {seg['id']} {n_research}, inputs before {st.seg_first}")
     protocol = json.loads((ROOT_DIR / PROTOCOL_FILES[1]).read_text(encoding="utf-8"))
 
     results: dict[str, dict[str, en.Result]] = {c: {} for c in COSTS}
@@ -247,7 +268,8 @@ def main(argv=None) -> int:
             determinism[f"{fam}@{c}"] = (r1.fills == r2.fills and r1.equity == r2.equity
                                          and r1.decisions == r2.decisions and r1.executions == r2.executions)
     pit = pit_tests(st, results["5bps"])
-    post = verify_snapshot(ROOT_DIR / "data/oos_cache/protocol_v2/stage_r" / data_info["snapshot_id"],
+    stage_dir = "stage_r" if seg["id"] == "research" else "stage_h"
+    post = verify_snapshot(ROOT_DIR / "data/oos_cache/protocol_v2" / stage_dir / data_info["snapshot_id"],
                            data_info["manifest_sha256"])
     snapshot_unchanged = post["tree_sha256"] == data_info["tree_sha256"]
 
@@ -275,8 +297,9 @@ def main(argv=None) -> int:
         missing = {c: [it for it, keys in ROBUSTNESS_ITEMS.items() for k in keys if k not in metrics[c][f]] for c in COSTS}
         a_ok = all(gate_a.values())
         c_ok = not any(missing.values())
-        status = ("RESEARCH-FAILED (methodological)" if not a_ok else "RESEARCH-FAILED (economic)" if not (g1 and g2)
-                  else "RESEARCH-FAILED (incomplete)" if not c_ok else "RESEARCH-PASSED")
+        px = seg["status_prefix"]
+        status = (f"{px}-FAILED (methodological)" if not a_ok else f"{px}-FAILED (economic)" if not (g1 and g2)
+                  else f"{px}-FAILED (incomplete)" if not c_ok else f"{px}-PASSED")
         gates[f] = {"A_methodological": "PASS" if a_ok else "FAIL",
                     "B1_net_cagr_5bps_ge_0": g1, "B2_net_cagr_5bps_ge_B1": g2,
                     "net_cagr_5bps": m5["cagr"], "b1_net_cagr_5bps": metrics["5bps"]["B1"]["cagr"],
@@ -304,19 +327,22 @@ def main(argv=None) -> int:
         "protocol_files_sha256": {p: _sha_bytes((ROOT_DIR / p).read_bytes()) for p in PROTOCOL_FILES},
         "predeclared_definitions_sha256": _sha_bytes((ROOT_DIR / DEFINITIONS).read_bytes()),
         "git_commit": _git("rev-parse", "HEAD"),
-        "data": data_info | {"stage": "R", "corporate_action_endpoint": "/v1/corporate-actions (Stage R acquisition)"},
+        "data": data_info | ({"stage": "R", "corporate_action_endpoint": "/v1/corporate-actions (Stage R acquisition)"}
+                             if seg["id"] == "research" else
+                             {"stage": "H", "corporate_action_endpoint": "/v1/corporate-actions (Stage H acquisition, DAY-20)"}),
         "strategy_config_sha256": {f: strategy_config_sha(protocol, f) for f in FAMILIES},
         "random_seeds": None,
         "engine_sha256": {f"backtest/v2/{p.name}": _sha_bytes(p.read_bytes())
                           for p in sorted((ROOT_DIR / "backtest" / "v2").glob("*.py"))},
     }
     summary = {
-        "schema_version": "1.0", "task": "DAY-19", "segment": {"id": "research", "first": RESEARCH_FIRST.isoformat(),
-                   "last": RESEARCH_LAST.isoformat(), "sessions": n_research},
+        "schema_version": "1.0", "task": seg["task"], "segment": {"id": seg["id"], "first": seg["first"].isoformat(),
+                   "last": seg["last"].isoformat(), "sessions": n_research},
         "warmup": {"first": data.sessions[0].isoformat(), "last": data.sessions[st.seg_first - 1].isoformat(),
                    "sessions": st.seg_first},
-        "decision_counts": {"V2-MOM": len(st.month), "V2-STR": len(st.week),
-                            "V2-LRV_cycles": len(range(st.seg_first, st.seg_last + 1, sg.LRV_PERIOD))},
+        "decision_counts": {"V2-MOM": len(st.month), "V2-STR": len(st.week)}
+                           | ({"V2-LRV_cycles": len(range(st.seg_first, st.seg_last + 1, sg.LRV_PERIOD))}
+                              if "V2-LRV" in FAMILIES else {}),
         "holdout_or_forward_data_read": False, "last_session_loaded": data.sessions[-1].isoformat(),
         "gate_A_checks": gate_a, "determinism_in_process": determinism, "pit_tests": pit, "gates": gates,
         "headline": {c: {f: {"cagr": metrics[c][f]["cagr"], "total_return": metrics[c][f]["total_return"],
@@ -324,6 +350,12 @@ def main(argv=None) -> int:
                      for c in COSTS},
         "reproducibility": repro, "result_files_sha256": files,
     }
+    if seg["id"] != "research":
+        cfg = summary["reproducibility"]["strategy_config_sha256"]
+        summary["config_identical_to_research"] = {f: cfg[f] == RESEARCH_CONFIG_SHA256[f] for f in FAMILIES}
+        summary["families_not_run"] = {"V2-LRV": "RESEARCH-FAILED (economic); never run on the holdout (§15.3)"}
+        if not all(summary["config_identical_to_research"].values()):
+            raise SystemExit("strategy-config SHA-256 differs from the research configuration (§15.7)")
     files_sha = _dump(out / "run_summary.json", summary)
     _dump(out / "run_provenance.json", {"started_utc": started, "finished_utc": datetime.now(timezone.utc).isoformat(),
                                          "command": " ".join([sys.executable, "-m", "backtest.v2.run", *sys.argv[1:]]),
