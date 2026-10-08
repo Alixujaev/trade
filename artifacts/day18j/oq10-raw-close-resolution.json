@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0",
+  "applies_to_amendment": "2.0.4",
+  "amendment_file": "artifacts/day18j/protocol-v2.0.4-amendment.json",
+  "amendment_modified_by_this_task": false,
+  "open_question": "OQ10",
+  "status": "RESOLUTION PROPOSED - PENDING PROTOCOL-OWNER APPROVAL",
+  "drafted": "2026-10-08",
+  "human_readable": "artifacts/day18j/oq10-raw-close-resolution.md",
+  "head": "75c914f5226685f331cbb2e56a9c4db7c52b24b9",
+  "parent_amendment": "d26b36ef802cf0810952b2e5c4e8e19d908b4555",
+  "question": "how stored raw closes r(t) are converted to exact rationals for exact evaluation of f = r/a",
+  "evidence": {
+    "protocol": ["v2.0.2 item 1: r_k = stored raw close, treated as exact (no rounding term)",
+                 "v2.0.2 implementation note: snapshot stores closes as float64 parsed from the JSON numbers",
+                 "v2.0.2/v2.0.3: d_k from the shortest round-trip decimal representation",
+                 "v2.0.3: raw_close exact (unchanged)"],
+    "code_path": ["acquisition/v2/http.py resp.json() -> Python float (binary64)",
+                  "acquisition/v2/bars_client.py normalize_daily: pd.to_numeric(...).astype('float64')",
+                  "acquisition/v2/stage_r.py write_parquet_once: df.to_parquet",
+                  "acquisition/v2/crosscheck.py decimals_of: Decimal(repr(float(x)))"],
+    "provider_decimal_text_persisted": false,
+    "snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+    "serialization": {"bars_raw": {"files": 26, "column": "close", "arrow_type": "double", "parquet_physical_type": "DOUBLE"},
+                      "bars_all": {"files": 26, "column": "close", "arrow_type": "double", "parquet_physical_type": "DOUBLE"},
+                      "raw_and_adjusted_serialized_identically": true},
+    "profile": {
+      "bars_raw": {"values": 45812, "null_or_nonfinite": 0, "nonpositive": 0, "max_sig_digits_shortest": 7,
+                   "decimals_hist": {"0": 779, "1": 4527, "2": 40240, "3": 176, "4": 90},
+                   "roundtrip_fail": 0, "repr_vs_numpy_dragon4_mismatch": 0, "binary_exact_ne_shortest_decimal": 43498},
+      "bars_all": {"values": 45812, "null_or_nonfinite": 0, "nonpositive": 0, "max_sig_digits_shortest": 6,
+                   "decimals_hist": {"0": 484, "1": 4093, "2": 39978, "3": 1172, "4": 85},
+                   "roundtrip_fail": 0, "repr_vs_numpy_dragon4_mismatch": 0, "binary_exact_ne_shortest_decimal": 43996}
+    },
+    "tool_versions": {"python": "3.12.10", "numpy": "2.5.2", "pyarrow": "25.0.1"}
+  },
+  "proposed_patch": {
+    "exact_evaluation_rule": {
+      "value_source": "IEEE 754 binary64 values persisted in column close of bars_raw/<SYMBOL>.parquet (raw close r) and bars_all/<SYMBOL>.parquet (adjusted close a) of the immutable snapshot under evaluation",
+      "raw_close_conversion": "exact rational denoted by the shortest round-trip decimal representation of the persisted binary64 value",
+      "adjusted_close_conversion": "exact rational denoted by the shortest round-trip decimal representation of the persisted binary64 value (source made explicit; meaning unchanged)",
+      "shortest_round_trip_definition": "decimal string with the fewest significant digits that converts back to the identical binary64 under round-to-nearest-even; if several, the one numerically closest to the binary64 value",
+      "exact_binary64_value_used": false,
+      "raw_close_delta": "none (raw closes exact, unchanged from v2.0.2/v2.0.3)",
+      "adjusted_close_delta": "unchanged: 1 / (2 * 10^max(d_k, 2)), d_k from the same shortest representation",
+      "f_t": "R(t) / A(t), exact rational quotient"
+    },
+    "open_questions": {"OQ10": "RESOLVED by artifacts/day18j/oq10-raw-close-resolution.md (upon protocol-owner approval)"},
+    "implementation_impact": {"blocked_by": []}
+  },
+  "rejected_sources": {
+    "exact_binary64_value": "parse artefact of decimal JSON; asymmetric with adjusted rule; reintroduces binary representation noise",
+    "provider_json_text": "not persisted; not reproducible from the snapshot alone",
+    "economic_price": "not observable"
+  },
+  "amendment_change_required": "wording only (v2.0.4 §1, OQ10 status, implementation_impact.blocked_by); to be applied in DAY-18K after approval",
+  "other_semantics_changed": false,
+  "tolerance_introduced": false,
+  "symbol_date_provider_exception_introduced": false,
+  "research_safety_impact": {
+    "data_acquired": false, "network": false, "snapshot_accessed": "read-only (bars close columns and manifest)", "snapshot_modified": false,
+    "holdout_or_forward_accessed": false, "signals_returns_tr_backtests": false, "stage_r_reevaluated": false,
+    "review_records_created_or_modified": false, "production_code_modified": false
+  }
+}

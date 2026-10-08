@@ -1,0 +1,158 @@
+{
+  "schema_version": "1.0",
+  "amendment_version": "2.0.4",
+  "type": "protocol_change",
+  "status": "DRAFT - PENDING COMMIT",
+  "drafted": "2026-10-08",
+  "human_readable": "artifacts/day18j/protocol-v2.0.4-amendment.md",
+  "modified": true,
+  "recovery": {
+    "recovered": true,
+    "source": "authoritative DAY-18J handoff content (previous DAY-18J work, never committed, absent from the working tree)",
+    "recovered_in": "DAY-18J artifact recovery, 2026-10-08",
+    "new_protocol_owner_decision": false,
+    "new_semantics_introduced": false,
+    "committed": false
+  },
+  "parent_protocol_commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+  "parent_amendment": "d26b36ef802cf0810952b2e5c4e8e19d908b4555",
+  "parent_chain": {
+    "v2.0 R1": {"commit": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221", "files_sha256": {
+      "artifacts/day16/research-protocol-v2.md": "57cc368d80a0a3c89af78fe5fd1a6b95962859a3f494ae79a759fb7406a86fb1",
+      "artifacts/day16/research-protocol-v2.json": "ed21cfa508ac9aadcb6600b227014a084cbbfd6a9a5546433bd5327f5154e037",
+      "artifacts/day16/research-checklist.json": "7142f02ca243c08163385b5e5e1560024d3b71b87d3aaabf449d41f8ddf40eb3"}},
+    "v2.0.1": {"commit": "ed034b3e9500cc4d9b33625de7e1883f572cd5a4", "files_sha256": {
+      "artifacts/day17a/protocol-v2.0.1-amendment.md": "97ad311be549e8769838be99c6e559660408930015bdc35ac765ac5d7d304afe",
+      "artifacts/day17a/protocol-v2.0.1-amendment.json": "361b1909fddf5d6f00cf3eb098f625a75f2368c3e71898ed0fb3ea45e3e77c76",
+      "artifacts/day17/day17-data-blockers.md": "4c4187cb56507f783b22a1e80c9a27f2f383284c993bcec461228d6f7810079f",
+      "artifacts/day17/day17-data-blockers.json": "68ae17c4fdea0be1f1f3f7332439dafbd0746e53c22ad9e000c87b987a61159b"}},
+    "v2.0.2": {"commit": "0ebb6065f6e981e324220bae2abd2222800b2228", "files_sha256": {
+      "artifacts/day18a/protocol-v2.0.2-amendment.md": "0ce87282112c4407a56a868c462f8b39810597437d4e1ed240922ba4ce203e8e",
+      "artifacts/day18a/protocol-v2.0.2-amendment.json": "1b182ba1d582ffc921051db2dd278ffd16b097a6e8f7896c0ee8dfd2a97193d4"}},
+    "v2.0.3": {"commit": "d26b36ef802cf0810952b2e5c4e8e19d908b4555", "files_sha256": {
+      "artifacts/day18c/protocol-v2.0.3-amendment.md": "3492359a8376c4e6fb093a85a87dac31bb986ffdba38617ac15e8ac82dab5f3f",
+      "artifacts/day18c/protocol-v2.0.3-amendment.json": "9eefc2f3b59ab9a5dd8c7732b7190aea3db77acb47eb4017fd7c5e5fa6c23dd4"}}
+  },
+  "evidence_commit": "75c914f5226685f331cbb2e56a9c4db7c52b24b9",
+  "evidence_report": {
+    "commits": {
+      "artifacts/day18d/": "25d74f770760460c3427b37c63f7fd9b6fd5803e",
+      "artifacts/reviews/stage_r/": "c36b673609e1f238dd52e15fcc9b5503e108468f",
+      "artifacts/day18g/": "2ad9b272002ce514318ce7c3774b422f24a19f3c",
+      "artifacts/day18h/": "75c914f5226685f331cbb2e56a9c4db7c52b24b9"
+    },
+    "artifacts/day18d/day18d-stage-r-revaluation.md": "202a02e6cc25b973ba47c7ab30dd2fe42afb7d306e99a68116f74048d1bb1bf2",
+    "artifacts/day18d/day18d-stage-r-revaluation.json": "02a436fbb15e94051379655883f63d76121977b460c8e6fd7552733c92c7d486",
+    "artifacts/day18g/day18g-stage-r-revaluation.md": "5a44006feaa929e7e489920173460f90490c295b665069507cf71a5badda4861",
+    "artifacts/day18g/day18g-stage-r-revaluation.json": "a47e54f3f5d4e70871355b3fc8ee89d215db737593521eccbf41e6f5b5e709e0",
+    "artifacts/day18h/day18h-evidence-report.md": "6117ba369616f3a2a169278bd0a5e451e85e6b207d67c6b0069f8aaf7cc05f78",
+    "artifacts/day18h/day18h-evidence-report.json": "10e6408cb8cf0ddac95f0585c0b5a7cac318356f930b3b3086813e87a81ca48f",
+    "artifacts/day18h/amzn-evidence.json": "57d53f15e33ed308605a2544625a38f6b99e3a160826060c4f2a5ce37a669f99",
+    "artifacts/day18h/nflx-evidence.json": "95f5b5db593669f846ee41daf1264f7f0021ccc3fd4aad97760a9217868f9a15",
+    "hash_basis": "SHA-256 of the committed git blob at the cited commit (working-tree bytes may differ by CRLF conversion, v2.0.2 OQ5)",
+    "stage_r_snapshot_manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+    "snapshot_accessed_in_this_task": false
+  },
+  "decided_by": {"exact_evaluation_rule": "DAY-18J (recovered; not a new protocol-owner decision in this task)",
+                 "invalid_value_rule": "DAY-18J (recovered)", "float64_disagreement_rule": "DAY-18J (recovered)",
+                 "review_record_interaction": "DAY-18J (recovered)"},
+  "changed_sections": ["v2.0.3 item 1: evaluation semantics of the precision-interval rule (exact rational arithmetic authoritative; float64 diagnostic only)",
+                       "new status EXACT_EVALUATION_INVALID (BLOCKING)",
+                       "new diagnostic classifications NUMERICAL_FALSE_POSITIVE (NON-BLOCKING, recorded) and NUMERICAL_FALSE_NEGATIVE (exact detection authoritative)",
+                       "review-record interaction: v2.0.3 record whose item is no longer detected under exact evaluation -> MOOT"],
+  "unchanged_sections": ["v2.0.3 precision rule mathematics: d_k, delta_k, rho, rho_min, rho_max, detection condition",
+                         "closed interval [rho_min, rho_max]", "PRECISION_DEGENERATE -> BLOCKING",
+                         "v2.0.2 coincidence rules (no precision exemption)", "split-magnitude tolerance 0.1%", "v2.0.2 first-session rule",
+                         "v2.0.3 review-record mechanism, item types and decision enums", "existing DAY-18F review records (historically valid, unmodified)",
+                         "universe", "SPY benchmark-only role", "timeline", "strategy definitions and parameters", "execution model",
+                         "portfolio construction and accounting (§11)", "benchmarks B1/B2", "transaction costs", "Gate A", "Gate B", "Gate C",
+                         "raw OHLC execution/accounting role", "adjustment=all audit-only role", "v2.0.1 C1-C4 incl. v2.0.2 rule 4a",
+                         "round-to-nearest and exact-raw assumptions", "2% missing-session rule", "cross-check mismatch = BLOCKING data review"],
+  "old_rules": {
+    "evaluation_semantics": "unspecified; implemented in IEEE 754 float64",
+    "non_representable_values": "not defined",
+    "float_disagreement": "not defined",
+    "record_for_item_no_longer_detected": "not defined"
+  },
+  "new_rules": {
+    "evaluation_semantics": "see exact_evaluation_rule",
+    "non_representable_values": "see invalid_value_rule",
+    "float_disagreement": "see float64_disagreement_rule",
+    "record_for_item_no_longer_detected": "see review_record_interaction"
+  },
+  "rationale": {
+    "defect": "v2.0.3 defines the precision-interval rule mathematically but leaves numerical evaluation semantics unspecified; finite-precision float64 evaluation can create or hide detections at the closed endpoint.",
+    "history": "DAY-18H found that the two remaining v2.0.3 UNEXPLAINED_CHANGE items (AMZN 2016-02-22, NFLX 2018-11-29) have exact rho_max = 1 while float64 evaluates rho_max as 1 - 2.22e-16 (1 ULP) and 1 - 1.11e-16 (0.5 ULP), creating detections. These items are history only; the rule below is general and does not resolve them.",
+    "no_tolerance": "an epsilon or tolerance would change the mathematical rule; exact evaluation reproduces the v2.0.3 rule as written.",
+    "symmetry": "exact evaluation removes float artifacts in both directions (false detections and hidden detections)."
+  },
+  "exact_evaluation_rule": {
+    "status": "FROZEN",
+    "mathematical_rule": "unchanged from v2.0.3: detected iff NOT (rho_min <= 1 <= rho_max)",
+    "interval": "CLOSED",
+    "endpoint_equality": "counts as containment -> NO DETECTION",
+    "value_source": "IEEE 754 binary64 values persisted in column close of bars_raw/<SYMBOL>.parquet (raw close r) and bars_all/<SYMBOL>.parquet (adjusted close a) of the immutable snapshot under evaluation",
+    "raw_close_conversion": "exact rational denoted by the shortest round-trip decimal representation of the persisted binary64 value",
+    "adjusted_close_conversion": "each stored adjusted close is converted from its shortest round-trip decimal representation into an exact rational number (same representation rule as raw closes)",
+    "shortest_round_trip_definition": "decimal string with the fewest significant digits that converts back to the identical binary64 under round-to-nearest-even; if several, the one numerically closest to the binary64 value",
+    "exact_binary64_value_used": false,
+    "raw_close_delta": "none (raw closes exact, unchanged from v2.0.2/v2.0.3)",
+    "f_t": "f = R / A, exact rational quotient of the exact raw and adjusted values",
+    "d_k": "unchanged: number of displayed decimal places used by v2.0.3",
+    "delta_k": "1 / (2 * 10^max(d_k, 2)), represented exactly",
+    "arithmetic": "all v2.0.3 formulas evaluated using exact rational arithmetic",
+    "detection": "evaluated exactly: NOT (rho_min <= 1 <= rho_max)",
+    "authoritative_result": "exact",
+    "float64": "may be calculated only as diagnostic information",
+    "floating_point_tolerance": "none",
+    "epsilon": "none",
+    "provider_specific_tolerance": "none",
+    "symbol_specific_exception": "none",
+    "date_specific_exception": "none"
+  },
+  "invalid_value_rule": {
+    "precision_degenerate": "existing v2.0.3 degenerate check remains authoritative: a - delta <= 0 -> item remains BLOCKING per existing protocol",
+    "exact_evaluation_invalid": "a non-finite, non-positive, or non-convertible value that cannot be represented under exact evaluation -> EXACT_EVALUATION_INVALID",
+    "exact_evaluation_invalid_blocking": true,
+    "silent_coercion": "forbidden"
+  },
+  "float64_disagreement_rule": {
+    "NUMERICAL_FALSE_POSITIVE": {"exact": "NO DETECTION", "float64": "DETECTION", "real_factor_change": false, "blocking": false,
+                                 "recording": "must be recorded in the evaluation evidence"},
+    "NUMERICAL_FALSE_NEGATIVE": {"exact": "DETECTION", "float64": "NO DETECTION", "authoritative": "exact detection",
+                                 "consequence": "normal v2.0.3 coincidence/event rules apply"},
+    "symmetric": true
+  },
+  "review_record_interaction": {
+    "new_decision_type": "none",
+    "existing_v2_0_3_records": "remain historically valid",
+    "item_no_longer_detected_under_exact_v2_0_4": "record status MOOT (not INVALID); remains in history",
+    "existing_records_modified": false,
+    "new_records_created": false
+  },
+  "stage_r_status": "BLOCKED",
+  "stage_r_usable_by_this_amendment": false,
+  "blockers_cleared_by_this_amendment": [],
+  "open_questions": [
+    {"id": "OQ10", "question": "conversion of raw closes r_p, r_k to exact rationals: the recovered DAY-18J content specifies shortest round-trip conversion for stored adjusted closes only; v2.0.3 states raw closes are exact but not how they become rationals", "status": "RESOLVED (protocol-owner approved; artifacts/day18j/oq10-raw-close-resolution.md)"},
+    {"id": "OQ1", "question": "precision-based exemption for undetected genuine events", "status": "OPEN; not adopted (unchanged)"},
+    {"id": "OQ2", "question": "round-to-nearest and exact raw closes", "status": "NON-BLOCKING (fail-safe; unchanged)"},
+    {"id": "OQ5", "question": "CRLF drift of frozen artifacts", "status": "NON-BLOCKING (process)"},
+    {"id": "OQ7", "question": "remaining v2.0.3 UNEXPLAINED_CHANGE items (AMZN 2016-02-22, NFLX 2018-11-29)", "status": "BLOCKING; unresolved until mechanical v2.0.4 re-evaluation"}
+  ],
+  "implementation_impact": {
+    "code_changed_in_day18j": false,
+    "crosscheck.py": "exact rational evaluation of rho, rho_min, rho_max and detection; exact delta_k; float64 interval computed as diagnostic; EXACT_EVALUATION_INVALID status; NUMERICAL_FALSE_POSITIVE / NUMERICAL_FALSE_NEGATIVE recorded in evidence",
+    "reviews.py": "records whose item is no longer detected -> MOOT; no new decision type",
+    "reevaluate.py": "protocol chain incl. v2.0.4; new write-once output directory; v2.0.2 and v2.0.3 outputs untouched",
+    "tests": ["exact rho_max == 1 -> no detection", "interior interval -> no detection", "interval outside 1 -> detection",
+              "float/exact disagreement in both directions", "EXACT_EVALUATION_INVALID for non-finite/non-positive/non-convertible values",
+              "PRECISION_DEGENERATE unchanged", "MOOT record handling"],
+    "blocked_by": [],
+    "reacquisition_required": false
+  },
+  "research_safety_impact": {
+    "data_acquired": false, "network": false, "snapshot_accessed": false, "holdout_or_forward_accessed": false,
+    "signals_returns_tr_backtests": false, "rule_depends_on_outcomes": false, "makes_stage_r_usable": false
+  }
+}
