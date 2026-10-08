@@ -4,6 +4,10 @@ v2.0.3 (when a review-record inventory is supplied): UNEXPLAINED_CHANGE, UNCONFI
 items are resolved ONLY by records applied by review_records.load (committed, validated); otherwise BLOCKING.
 Report categories: PASS / BLOCKING / FIRST_SESSION_UNTESTABLE / IDENTITY_UNVERIFIED / UNRESOLVED.
 
+v2.0.4 (protocol="v2.0.4"): same record-driven outcomes, plus MOOT (a v2.0.3 record whose item no longer exists under
+exact evaluation; non-blocking), NUMERICAL_FALSE_POSITIVE (non-blocking audit item), NUMERICAL_FALSE_NEGATIVE (audit
+item; the exact detection itself goes through the normal coincidence rules) and EXACT_EVALUATION_INVALID (BLOCKING).
+
 v2.0.2: IDENTITY_UNVERIFIED records (rule 4a) -> BLOCKING; FIRST_SESSION_UNTESTABLE events (item 2) are listed
 and non-blocking; the cross-check clean-date condition uses the v2.0.2 unexplained-change dates.
 
@@ -25,6 +29,9 @@ from acquisition.v2.review_records import item_key_str
 
 MERGER_TYPES = ("cash_mergers", "stock_mergers", "stock_and_cash_mergers")
 CATEGORIES = ("PASS", "BLOCKING", "FIRST_SESSION_UNTESTABLE", "IDENTITY_UNVERIFIED", "UNRESOLVED")
+CATEGORIES_V204 = CATEGORIES + ("MOOT", "NUMERICAL_FALSE_POSITIVE", "NUMERICAL_FALSE_NEGATIVE", "EXACT_EVALUATION_INVALID")
+STATUSES = ("RESOLVED", "RESOLVED_EXCLUDED", "FIRST_SESSION_UNTESTABLE", "BLOCKING", "HARD_FAIL")
+STATUSES_V204 = STATUSES + ("MOOT", "NUMERICAL_FALSE_POSITIVE", "NUMERICAL_FALSE_NEGATIVE")
 
 
 def open_items(crosscheck: dict[str, Any], identity: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -59,13 +66,14 @@ def _category(item: dict[str, Any]) -> str:
 
 def classify(*, records: list[dict[str, Any]], identity: dict[str, Any], normalised: dict[str, Any],
              quality: dict[str, Any], crosscheck: dict[str, Any], validation: dict[str, Any],
-             ca_counts: dict[str, Any], review_inventory: dict[str, Any] | None = None) -> dict[str, Any]:
+             ca_counts: dict[str, Any], review_inventory: dict[str, Any] | None = None,
+             protocol: str = "v2.0.3") -> dict[str, Any]:
     """review_inventory None -> v2.0.2 classification (unchanged). A dict (from review_records.load, possibly with
     no records) -> v2.0.3 classification: record-driven outcomes, default BLOCKING."""
     if review_inventory is not None:
         return _classify_v203(records=records, identity=identity, normalised=normalised, quality=quality,
                               crosscheck=crosscheck, validation=validation, ca_counts=ca_counts,
-                              inventory=review_inventory)
+                              inventory=review_inventory, protocol=protocol)
     by_id = {str(r.get("id")): r for r in records}
     items: list[dict[str, Any]] = []
 
@@ -157,7 +165,8 @@ def classify(*, records: list[dict[str, Any]], identity: dict[str, Any], normali
             "usable_for_research": not blocking}
 
 
-def _classify_v203(*, records, identity, normalised, quality, crosscheck, validation, ca_counts, inventory):
+def _classify_v203(*, records, identity, normalised, quality, crosscheck, validation, ca_counts, inventory,
+                   protocol="v2.0.3"):
     """v2.0.3 items 2-5. Only records applied by review_records.load can resolve an item; default BLOCKING."""
     by_id = {str(r.get("id")): r for r in records}
     applied = inventory.get("applied", {})
@@ -295,20 +304,48 @@ def _classify_v203(*, records, identity, normalised, quality, crosscheck, valida
     if undated:
         items.append({"item": "corporate-action records without any date", "status": "BLOCKING",
                       "reason": f"{undated} records could not be placed relative to the Stage R boundary"})
+    if protocol == "v2.0.4":
+        for m in inventory.get("moot", []):
+            key = m["key"].split("|")
+            items.append({"item": f"moot review record {m['file']}", "entity": key[1].split("=", 1)[1],
+                          "event_date": key[2].split("=", 1)[1], "item_type": key[0], "status": "MOOT",
+                          "category": "MOOT", "review_record": {k: m.get(k) for k in ("record_id", "decision",
+                                                                                      "blob_sha256", "file")},
+                          "reason": "v2.0.4: " + m["reason"]})
+        for sym, v in sorted(crosscheck["per_symbol"].items()):
+            for pr in v.get("numerical_false_positives", []):
+                items.append({"item": f"numerical-false-positive {sym} {pr['k']}", "entity": sym,
+                              "event_date": pr["k"], "p": pr["p"], "status": "NUMERICAL_FALSE_POSITIVE",
+                              "category": "NUMERICAL_FALSE_POSITIVE",
+                              "reason": "v2.0.4: exact NO DETECTION, float64 DETECTION; not a factor change; non-blocking"})
+            for pr in v.get("numerical_false_negatives", []):
+                items.append({"item": f"numerical-false-negative {sym} {pr['k']}", "entity": sym,
+                              "event_date": pr["k"], "p": pr["p"], "status": "NUMERICAL_FALSE_NEGATIVE",
+                              "category": "NUMERICAL_FALSE_NEGATIVE",
+                              "reason": "v2.0.4: exact DETECTION, float64 NO DETECTION; exact detection stands and is "
+                                        "evaluated by the normal coincidence rules"})
+            for k in v.get("exact_evaluation_invalid_pairs", []):
+                items.append({"item": f"exact-evaluation-invalid {sym} {k}", "entity": sym, "event_date": k,
+                              "status": "BLOCKING", "category": "EXACT_EVALUATION_INVALID",
+                              "reason": "v2.0.4: a value of the pair has no exact representation"})
     for i in items:
         i["category"] = _category(i)
     blocking = [i for i in items if i["status"] in ("BLOCKING", "HARD_FAIL")]
     sym_blocking = sorted({i["entity"] for i in blocking if isinstance(i.get("entity"), str)
                            and i["entity"] in crosscheck["per_symbol"]
-                           and (i["item"].startswith(("unexplained-change", "unconfirmed-event", "raw/all cross-check")))})
-    return {"protocol": "v2.0.3", "items": items, "blocking_count": len(blocking),
-            "status_counts": {s: sum(1 for i in items if i["status"] == s)
-                              for s in ("RESOLVED", "RESOLVED_EXCLUDED", "FIRST_SESSION_UNTESTABLE", "BLOCKING",
-                                        "HARD_FAIL")},
-            "category_counts": {c: sum(1 for i in items if i["category"] == c) for c in CATEGORIES},
+                           and (i["item"].startswith(("unexplained-change", "unconfirmed-event", "raw/all cross-check",
+                                                      "exact-evaluation-invalid")))})
+    v204 = protocol == "v2.0.4"
+    out = {"protocol": protocol, "items": items, "blocking_count": len(blocking),
+            "status_counts": {s: sum(1 for i in items if i["status"] == s) for s in (STATUSES_V204 if v204 else STATUSES)},
+            "category_counts": {c: sum(1 for i in items if i["category"] == c)
+                                for c in (CATEGORIES_V204 if v204 else CATEGORIES)},
             "crosscheck_symbols_blocking": sym_blocking,
             "crosscheck_symbols_pass": sorted(set(crosscheck["per_symbol"]) - set(sym_blocking)),
             "events_excluded_by_review": excluded_events,
             "review_records": {"files_found": inventory.get("files_found", []), "applied": len(applied),
                                "invalid": len(inventory.get("invalid", []))},
             "usable_for_research": not blocking}
+    if v204:
+        out["review_records"]["moot"] = len(inventory.get("moot", []))
+    return out

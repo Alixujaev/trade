@@ -28,6 +28,13 @@ AMENDMENT_003_FILES = (
     "artifacts/day18c/protocol-v2.0.3-amendment.md",
     "artifacts/day18c/protocol-v2.0.3-amendment.json",
 )
+AMENDMENT_004_COMMIT = "71dbfa226e66c7c664079a98a84c45914fc4ece8"
+AMENDMENT_004_FILES = (
+    "artifacts/day18j/protocol-v2.0.4-amendment.md",
+    "artifacts/day18j/protocol-v2.0.4-amendment.json",
+)
+# v2.0.4: exact evaluation; existing v2.0.3 review records remain valid (PROTOCOL_VERSION stays the v2.0.3 chain)
+PROTOCOL_VERSION_004 = "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4"
 # v2.0.3 item 2: committed, human-decided review records (never created by code)
 REVIEW_RECORDS_DIR = ROOT_DIR / "artifacts" / "reviews" / "stage_r"
 PROTOCOL_FILES = (

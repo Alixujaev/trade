@@ -12,6 +12,10 @@ This module NEVER creates, edits or decides a record. A record is applied only i
 - mechanical evidence checks defined by v2.0.3 items 3-4 pass;
 - supersedes chains are honoured; two active records for one item are a conflict (both invalid).
 Anything else is INVALID, listed with reasons, and resolves nothing (the item stays BLOCKING).
+
+v2.0.4 (accepted_protocol_versions / moot_keys supplied by the caller): existing v2.0.3 records remain valid; a record
+whose only defect is that its item no longer exists under exact evaluation, while that item was open under the v2.0.3
+evaluation of the same snapshot (moot_keys), is MOOT - listed separately, not INVALID, resolving nothing.
 """
 
 from __future__ import annotations
@@ -137,9 +141,14 @@ def _mechanical(rec: dict[str, Any], item: dict[str, Any], ctx: dict[str, Any]) 
 
 def load(records_dir: Path, *, repo_root: Path, stage_r_root: Path, snapshot_id: str, snapshot_manifest_sha256: str,
          open_items: dict[str, dict[str, Any]], ca_payloads: dict[str, list[dict[str, Any]]],
-         identity: dict[str, Any], duplicate_ids: set[str] | None = None) -> dict[str, Any]:
+         identity: dict[str, Any], duplicate_ids: set[str] | None = None,
+         accepted_protocol_versions: tuple[str, ...] = (PROTOCOL_VERSION,),
+         moot_keys: set[str] | None = None) -> dict[str, Any]:
     """open_items: item_key_str -> item (with item_type, item_key and, for UNEXPLAINED_CHANGE, p/k)."""
     records_dir = Path(records_dir)
+    v204 = moot_keys is not None
+    moot_keys = moot_keys or set()
+    moot: list[dict[str, Any]] = []
     files = sorted(records_dir.glob("*.json")) if records_dir.is_dir() else []
     ctx = {"ca_payloads": ca_payloads, "aliases": identity.get("aliases", {}),
            "assignments": identity.get("assignments", []), "duplicate_ids": duplicate_ids or set(),
@@ -166,8 +175,8 @@ def load(records_dir: Path, *, repo_root: Path, stage_r_root: Path, snapshot_id:
             errs.append("record_id does not equal the file name")
         if rec.get("source_snapshot_manifest_sha256") != snapshot_manifest_sha256:
             errs.append("source_snapshot_manifest_sha256 does not match the evaluated snapshot")
-        if rec.get("protocol_version") != PROTOCOL_VERSION:
-            errs.append(f"protocol_version must be {PROTOCOL_VERSION!r}")
+        if rec.get("protocol_version") not in accepted_protocol_versions:
+            errs.append("protocol_version must be " + " or ".join(repr(v) for v in accepted_protocol_versions))
         it = rec.get("item_type")
         if it not in ITEM_TYPES:
             errs.append(f"invalid item_type {it!r}")
@@ -191,7 +200,12 @@ def load(records_dir: Path, *, repo_root: Path, stage_r_root: Path, snapshot_id:
                  "blob_sha256": hashlib.sha256(blob).hexdigest() if blob is not None else None,
                  "url_evidence_verified_offline": False if any(str(e.get("reference", "")).startswith("url:")
                                                                for e in rec.get("evidence") or [] if isinstance(e, dict)) else None}
-        if errs:
+        if (errs == ["item_key matches no open item of this type"]
+                and item_key_str(it, rec["item_key"]) in moot_keys):
+            moot.append({**entry, "key": item_key_str(it, rec["item_key"]), "decision": rec.get("decision"),
+                         "status": "MOOT", "reason": "item open under v2.0.3 evaluation no longer exists under exact "
+                                                     "v2.0.4 evaluation; record remains in history"})
+        elif errs:
             invalid.append({**entry, "reasons": errs})
         else:
             candidates.append({**entry, "record": rec, "key": item_key_str(it, rec["item_key"])})
@@ -222,6 +236,9 @@ def load(records_dir: Path, *, repo_root: Path, stage_r_root: Path, snapshot_id:
         c = cs[0]
         applied[key] = {"record_id": c["record_id"], "decision": c["record"]["decision"], "blob_sha256": c["blob_sha256"],
                         "reviewer": c["record"]["reviewer"], "file": c["file"]}
-    return {"records_dir": str(records_dir), "files_found": [f.name for f in files], "valid_active": len(applied),
-            "superseded": sorted(superseded), "invalid": invalid, "applied": applied,
-            "agent_created_records": 0}
+    out = {"records_dir": str(records_dir), "files_found": [f.name for f in files], "valid_active": len(applied),
+           "superseded": sorted(superseded), "invalid": invalid, "applied": applied,
+           "agent_created_records": 0}
+    if v204:
+        out["moot"] = moot
+    return out

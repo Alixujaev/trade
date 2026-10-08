@@ -1,6 +1,11 @@
-"""acquisition/v2/reevaluate.py: offline re-evaluation of an existing Stage R snapshot (DAY-18B v2.0.2, DAY-18D v2.0.3).
+"""acquisition/v2/reevaluate.py: offline re-evaluation of an existing Stage R snapshot (DAY-18B v2.0.2, DAY-18D v2.0.3,
+DAY-18K v2.0.4).
 
     python -m acquisition.v2.reevaluate --snapshot <snapshot_dir> --expect-manifest-sha256 <sha256> [--protocol v2.0.3]
+
+v2.0.4: exact rational evaluation of the cross-check (float64 diagnostic only); the same committed review records
+(v2.0.3 records stay valid); a record whose item disappears under exact evaluation but was open under the in-memory
+v2.0.3 evaluation of the same snapshot is MOOT; output <stage_r_root>/reviews/v2_0_4__<id>/.
 
 v2.0.3 (default): per-value precision (v2.0.3 item 1) and committed review records (items 2-5) loaded read-only
 from artifacts/reviews/stage_r/ by acquisition/v2/review_records.py; output <stage_r_root>/reviews/v2_0_3__<id>/.
@@ -40,12 +45,13 @@ from acquisition.v2 import review_records as rr
 from acquisition.v2 import reviews as rv
 from acquisition.v2 import validation as val
 from acquisition.v2.contract import (
-    AMENDMENT_002_COMMIT, AMENDMENT_002_FILES, AMENDMENT_003_COMMIT, AMENDMENT_003_FILES, AMENDMENT_COMMIT,
-    AMENDMENT_FILES, CA_QUERY_ALIASES, EVENT_DATE_MAX, FORBIDDEN_WRITE_ROOTS, FREEZE_COMMIT, PROTOCOL_FILES,
-    PROTOCOL_VERSION, REVIEW_RECORDS_DIR, REVIEW_SCHEMA_VERSION, STAGE_R_ROOT,
+    AMENDMENT_002_COMMIT, AMENDMENT_002_FILES, AMENDMENT_003_COMMIT, AMENDMENT_003_FILES, AMENDMENT_004_COMMIT,
+    AMENDMENT_004_FILES, AMENDMENT_COMMIT, AMENDMENT_FILES, CA_QUERY_ALIASES, EVENT_DATE_MAX, FORBIDDEN_WRITE_ROOTS,
+    FREEZE_COMMIT, PROTOCOL_FILES, PROTOCOL_VERSION, PROTOCOL_VERSION_004, REVIEW_RECORDS_DIR, REVIEW_SCHEMA_VERSION,
+    STAGE_R_ROOT,
 )
 
-PROTOCOLS = ("v2.0.3", "v2.0.2")
+PROTOCOLS = ("v2.0.4", "v2.0.3", "v2.0.2")
 from acquisition.v2.sessions import session_of_label, stage_r_sessions
 
 
@@ -135,10 +141,14 @@ def protocol_chain(protocol: str = "v2.0.3") -> dict[str, Any]:
     commits = {"v2.0 R1": FREEZE_COMMIT, "v2.0.1": AMENDMENT_COMMIT, "v2.0.2": AMENDMENT_002_COMMIT}
     pairs = ([(p, FREEZE_COMMIT) for p in PROTOCOL_FILES] + [(p, AMENDMENT_COMMIT) for p in AMENDMENT_FILES]
              + [(p, AMENDMENT_002_COMMIT) for p in AMENDMENT_002_FILES])
-    if protocol == "v2.0.3":
+    if protocol in ("v2.0.3", "v2.0.4"):
         commits["v2.0.3"] = AMENDMENT_003_COMMIT
         pairs += [(p, AMENDMENT_003_COMMIT) for p in AMENDMENT_003_FILES]
-    out: dict[str, Any] = {"version": PROTOCOL_VERSION if protocol == "v2.0.3" else "2.0 R1 + 2.0.1 + 2.0.2",
+    if protocol == "v2.0.4":
+        commits["v2.0.4"] = AMENDMENT_004_COMMIT
+        pairs += [(p, AMENDMENT_004_COMMIT) for p in AMENDMENT_004_FILES]
+    version = {"v2.0.4": PROTOCOL_VERSION_004, "v2.0.3": PROTOCOL_VERSION}.get(protocol, "2.0 R1 + 2.0.1 + 2.0.2")
+    out: dict[str, Any] = {"version": version,
                            "evaluated_under": protocol, "commits": commits, "files": {}}
     for path, commit in pairs:
         blob = subprocess.run(["git", "show", f"{commit}:{path}"], cwd=ROOT_DIR, capture_output=True, check=True).stdout
@@ -211,15 +221,29 @@ def reevaluate(snap: Path, *, expect_manifest_sha256: str, stage_r_root: Path = 
                                    precision_model=protocol)
     ca_counts = run.get("ca_counts", {})
     inventory = None
-    if protocol == "v2.0.3":
+    v203_reference = None
+    if protocol in ("v2.0.3", "v2.0.4"):
         dup_ids = {i for b in normalised["blocking"] if b.get("kind") == "duplicate_records" for i in b.get("ids", [])}
+        extra: dict[str, Any] = {}
+        if protocol == "v2.0.4":
+            # in-memory v2.0.3 evaluation of the same snapshot: defines which record items became MOOT
+            cc203 = cc.crosscheck_all(frames["raw"], frames["all"], normalised["events"], session_of_label,
+                                      precision_model="v2.0.3")
+            open_now = rv.open_items(crosscheck, identity)
+            open_203 = rv.open_items(cc203, identity)
+            moot_keys = set(open_203) - set(open_now)
+            extra = {"accepted_protocol_versions": (PROTOCOL_VERSION, PROTOCOL_VERSION_004), "moot_keys": moot_keys}
+            v203_reference = {"crosscheck_sha256": hashlib.sha256(json.dumps(cc203, indent=2, sort_keys=True,
+                                                                             default=str).encode("utf-8")).hexdigest(),
+                              "open_items_v2_0_3": sorted(open_203), "open_items_v2_0_4": sorted(open_now),
+                              "moot_keys": sorted(moot_keys)}
         inventory = rr.load(records_dir, repo_root=repo_root, stage_r_root=Path(stage_r_root), snapshot_id=snap.name,
                             snapshot_manifest_sha256=pre["manifest_sha256"],
                             open_items=rv.open_items(crosscheck, identity), ca_payloads=ca, identity=identity,
-                            duplicate_ids=dup_ids)
+                            duplicate_ids=dup_ids, **extra)
     reviews = rv.classify(records=ca["complete"], identity=identity, normalised=normalised, quality=quality,
                           crosscheck=crosscheck, validation=validation, ca_counts=ca_counts,
-                          review_inventory=inventory)
+                          review_inventory=inventory, protocol=protocol)
     leak = assert_no_leakage(identity, normalised, crosscheck, reviews, quality)
 
     files: dict[str, str] = {}
@@ -256,13 +280,32 @@ def reevaluate(snap: Path, *, expect_manifest_sha256: str, stage_r_root: Path = 
         "review_category_counts": reviews.get("category_counts"),
         "review_records": (None if inventory is None else
                            {"files_found": inventory["files_found"], "applied": len(inventory["applied"]),
-                            "invalid": len(inventory["invalid"]), "agent_created_records": 0}),
+                            "invalid": len(inventory["invalid"]), "agent_created_records": 0}
+                           | ({"moot": len(inventory["moot"])} if "moot" in inventory else {})),
         "blocking_items": [{k: i.get(k) for k in ("item", "entity", "event_date", "status", "category", "reason")}
                            for i in reviews["items"] if i["status"] in ("BLOCKING", "HARD_FAIL")],
         "spy": {"crosscheck": {k: crosscheck["per_symbol"].get("SPY", {}).get(k) for k in
                                ("status", "d", "detected_changes", "expected_events", "matched_events")},
                 "status": ("RESOLVED" if crosscheck["per_symbol"].get("SPY", {}).get("status") == "OK" else "BLOCKING")},
     }
+    if protocol == "v2.0.4":
+        per = crosscheck["per_symbol"]
+
+        def collect(field: str) -> dict[str, Any]:
+            return {s: v[field] for s, v in per.items() if v.get(field)}
+
+        summary["exact_evaluation"] = {
+            "numerical_false_positives": collect("numerical_false_positives"),
+            "numerical_false_negatives": collect("numerical_false_negatives"),
+            "float_degeneracy_disagreements": collect("float_degeneracy_disagreements"),
+            "exact_evaluation_invalid_pairs": collect("exact_evaluation_invalid_pairs"),
+            "split_checks_exact_disagreements": sorted(f"{s} {c['session']}" for s, v in per.items()
+                                                       for c in v.get("split_magnitude_checks", [])
+                                                       if c.get("exact_agrees") is False),
+            "moot_records": [{k: m.get(k) for k in ("file", "record_id", "key", "decision", "blob_sha256")}
+                             for m in (inventory or {}).get("moot", [])],
+            "v2_0_3_reference": v203_reference,
+        }
     evaluation = {
         "schema_version": REVIEW_SCHEMA_VERSION, "protocol_chain": protocol_chain(protocol),
         "source_snapshot": {"path": str(snap.relative_to(ROOT_DIR)).replace("\\", "/") if snap.resolve().is_relative_to(ROOT_DIR) else str(snap),

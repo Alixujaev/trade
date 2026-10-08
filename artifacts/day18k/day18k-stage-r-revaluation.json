@@ -1,0 +1,381 @@
+{
+  "schema_version": "1.0",
+  "task": "DAY-18K",
+  "starting_head": "75c914f5226685f331cbb2e56a9c4db7c52b24b9",
+  "head_at_evaluation": "71dbfa226e66c7c664079a98a84c45914fc4ece8",
+  "protocol": {
+    "version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4",
+    "commits": {
+      "v2.0 R1": "ba3cefe54ccf2fe14c62f1c609f143d8a0904221",
+      "v2.0.1": "ed034b3e9500cc4d9b33625de7e1883f572cd5a4",
+      "v2.0.2": "0ebb6065f6e981e324220bae2abd2222800b2228",
+      "v2.0.3": "d26b36ef802cf0810952b2e5c4e8e19d908b4555",
+      "v2.0.4": "71dbfa226e66c7c664079a98a84c45914fc4ece8"
+    },
+    "v2_0_4_commit": "71dbfa226e66c7c664079a98a84c45914fc4ece8",
+    "v2_0_4_files_verified_against_commit": true,
+    "oq10": "RESOLVED (protocol-owner approved): shortest round-trip decimal of the persisted parquet DOUBLE (raw: bars_raw/<SYMBOL>.parquet close; adjusted: bars_all/<SYMBOL>.parquet close), ties to the decimal nearest the binary64; raw closes no delta; f = R/A exact"
+  },
+  "implementation": {
+    "files": [
+      "acquisition/v2/contract.py",
+      "acquisition/v2/crosscheck.py",
+      "acquisition/v2/review_records.py",
+      "acquisition/v2/reviews.py",
+      "acquisition/v2/reevaluate.py",
+      "tests/test_day18k_v204.py"
+    ],
+    "acquisition_v2_sha256_at_evaluation": {
+      "acquisition/v2/__init__.py": "c074d71aa528ab08c1cb8d0386f53c9d897f12fdda385ce28d229305b1e6d0f5",
+      "acquisition/v2/bars_client.py": "6b085d135656701a1328091a72cf85238bca82358785bd6db370fe47038170c0",
+      "acquisition/v2/ca_client.py": "cc09bf2a20c3b296ca1603bea100c291b9ccd1c044a8885d53e2afb668cbc44d",
+      "acquisition/v2/contract.py": "f44438f9e01ccf9655a24463ee0ab862a76c2e80079a8fb88914dd08a165d7ec",
+      "acquisition/v2/crosscheck.py": "5b68e41e2991197d98116872b529d40f17c626b218d74a807d3a3923e8574b20",
+      "acquisition/v2/events.py": "8c59860bcdab2e73de8421b95711ebfa203bd96a88721f87cc5bec4931efd86b",
+      "acquisition/v2/http.py": "3db413452a2e6259f0e95e42d6f5d3d1c0b179854ce8dbdc3552d4cef0e23eae",
+      "acquisition/v2/identity.py": "7bc126ec2ccdf288571009ef2866d19ce765c732cd9874b4d213c4850113a0a1",
+      "acquisition/v2/reevaluate.py": "6980d1acd01fb13ca65b00bb8ca0b1c41a8143129445af80f45376f3d487ae6d",
+      "acquisition/v2/review_records.py": "c05ce5409f65a85ea67cd389969ea0d588aa34135ec112415299201ffb5bac78",
+      "acquisition/v2/reviews.py": "8e3807b3956286449f5d5c9725682ba5a45b34716510b2d0ee998fca5832edfd",
+      "acquisition/v2/sessions.py": "830176b7c0e533b07886c424188549313e23d32df09e64f1ff8e3e27b88efc17",
+      "acquisition/v2/stage_r.py": "8acfddc6430e42d570146b49da0f8e1b9dc9b80680b320ebc35eaece83c882af",
+      "acquisition/v2/validation.py": "655841259533014be711f31fc436c7d54d428ffb7ba6ae0ba256d2b8916814c5"
+    },
+    "summary": [
+      "crosscheck: precision_model v2.0.4 - shortest_decimal (repr, round-trip asserted), exact_value (Fraction of that decimal; non-finite/non-positive/non-convertible -> EXACT_EVALUATION_INVALID), exact_delta = 1/(2*10^max(d,2)), detect_changes_exact (authoritative); float64 detect_changes kept as diagnostic; numerical FP/FN, float-degeneracy disagreements and invalid pairs recorded (dates only); split 0.1 % check unchanged, exact agreement recorded as a diagnostic",
+      "review_records: accepted_protocol_versions (v2.0.3 records remain valid under v2.0.4); moot_keys -> a record whose only defect is that its item no longer exists, while open under the same-run v2.0.3 evaluation, is MOOT (not INVALID)",
+      "reviews: v2.0.4 categories MOOT, NUMERICAL_FALSE_POSITIVE, NUMERICAL_FALSE_NEGATIVE, EXACT_EVALUATION_INVALID (BLOCKING); v2.0.3 output unchanged",
+      "reevaluate: --protocol v2.0.4, protocol chain incl. 71dbfa2, output v2_0_4__<snapshot_id>, in-memory v2.0.3 reference for MOOT keys"
+    ],
+    "no_symbol_or_date_branch": true,
+    "decimal_from_float_used": false,
+    "binary64_value_used_for_protocol": false
+  },
+  "tests": {
+    "day18k_v204": "31 passed",
+    "focused": "97 passed (test_day18k_v204 31, test_day18d_v203 28, test_day18b_v202 15, test_day18_stage_r 23)",
+    "full_suite": "1280 passed, 0 failed (18 min 08 s; 28 third-party deprecation warnings)"
+  },
+  "source_snapshot": {
+    "file_count": 64,
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+    "path": "data/oos_cache/protocol_v2/stage_r/stage_r_20261007T093410Z",
+    "tree_sha256_after": "c5d786359adef89f86156c97aab6d579e2e54f5b22fe3161ed1d4ce76dc54590",
+    "tree_sha256_before": "c5d786359adef89f86156c97aab6d579e2e54f5b22fe3161ed1d4ce76dc54590",
+    "unchanged": true,
+    "manifest_entries_verified": 63,
+    "writable_files": 0
+  },
+  "review_output": {
+    "path": "data/oos_cache/protocol_v2/stage_r/reviews/v2_0_4__stage_r_20261007T093410Z",
+    "files_sha256": {
+      "crosscheck.json": "65afe6da9622617fc424bfd7bc9414462feccd5d6b781b87fed79463795516fa",
+      "data_quality_comparison.json": "b7af64540d8e6067490d222df2301d806362c1851fa0c42e5a24cf2a413fbd03",
+      "evaluation.json": "9c0e4d85afdaa344ea6533cddd14f29453909337cb0ad26031a9af325e62d33f",
+      "events_normalised.json": "e89b9c4361ba668df070d38d9139ddadcca968bf74cf3d582226dcb1341ef0e3",
+      "identity.json": "a775e3db846f88c6ce888d918114fc8c6c291f50d613ea4b5e94fe7981aa48c9",
+      "review_records.json": "285a34e85fc14565305f7ffeca677c178c101351bf912672e71f2cdc03726ac0",
+      "reviews.json": "8f7e5a990f86faae271bda062722366facdfe51a202ab05cf318a40835c74611",
+      "validation.json": "b17d175325391dbb6d38cc1582e35427eb2c15d63a070bab8c8642c2a571cb04"
+    },
+    "manifest_sha256": "755c905e0adae6c7cac924aa8146384defe7053784b526675e7b51d714f6d698",
+    "write_once": "second run refused with FileExistsError; files read-only"
+  },
+  "other_review_outputs_unchanged": {
+    "by_run": true,
+    "checked": [
+      "v2_0_2__stage_r_20261007T093410Z",
+      "v2_0_3__stage_r_20261007T093410Z",
+      "v2_0_3__stage_r_20261007T093410Z__day18g"
+    ],
+    "independent_check": "PASS (self-manifests v2.0.2 7/7, v2.0.3 8/8, day18g 8/8; DAY-18G recorded hashes 9/9; unchanged vs pre-run baseline)"
+  },
+  "review_records": {
+    "dir": "artifacts/reviews/stage_r",
+    "files_found": 14,
+    "applied": 12,
+    "moot": 2,
+    "invalid": 0,
+    "created": 0,
+    "modified": 0,
+    "git_diff_vs_head": "none"
+  },
+  "offline": true,
+  "network_calls": 0,
+  "leakage_dates_checked": 1515,
+  "final_status": "USABLE_FOR_RESEARCH",
+  "usable_for_research": true,
+  "blocking_count": {
+    "day18g_v2_0_3": 2,
+    "day18k_v2_0_4": 0
+  },
+  "status_counts": {
+    "day18g_v2_0_3": {
+      "BLOCKING": 2,
+      "FIRST_SESSION_UNTESTABLE": 3,
+      "HARD_FAIL": 0,
+      "RESOLVED": 16,
+      "RESOLVED_EXCLUDED": 1
+    },
+    "day18k_v2_0_4": {
+      "BLOCKING": 0,
+      "FIRST_SESSION_UNTESTABLE": 3,
+      "HARD_FAIL": 0,
+      "MOOT": 2,
+      "NUMERICAL_FALSE_NEGATIVE": 0,
+      "NUMERICAL_FALSE_POSITIVE": 2,
+      "RESOLVED": 16,
+      "RESOLVED_EXCLUDED": 1
+    }
+  },
+  "category_counts": {
+    "day18g_v2_0_3": {
+      "BLOCKING": 0,
+      "FIRST_SESSION_UNTESTABLE": 3,
+      "IDENTITY_UNVERIFIED": 0,
+      "PASS": 17,
+      "UNRESOLVED": 2
+    },
+    "day18k_v2_0_4": {
+      "BLOCKING": 0,
+      "EXACT_EVALUATION_INVALID": 0,
+      "FIRST_SESSION_UNTESTABLE": 3,
+      "IDENTITY_UNVERIFIED": 0,
+      "MOOT": 2,
+      "NUMERICAL_FALSE_NEGATIVE": 0,
+      "NUMERICAL_FALSE_POSITIVE": 2,
+      "PASS": 17,
+      "UNRESOLVED": 0
+    }
+  },
+  "remaining_blockers": [],
+  "moot_records": [
+    {
+      "blob_sha256": "dfd73ab0e5f365618021eeffaa0480929366d7ccd8e6404e1ddd3c8028c41b58",
+      "decision": "UNRESOLVED",
+      "file": "amzn-20160222-20261007.json",
+      "key": "UNEXPLAINED_CHANGE|entity=AMZN|session=2016-02-22",
+      "record_id": "amzn-20160222-20261007"
+    },
+    {
+      "blob_sha256": "454a3bb838e0f98ed3e44ac49bab3886de475f6b2726632f6f42d8f976374921",
+      "decision": "UNRESOLVED",
+      "file": "nflx-20181129-20261007.json",
+      "key": "UNEXPLAINED_CHANGE|entity=NFLX|session=2018-11-29",
+      "record_id": "nflx-20181129-20261007"
+    }
+  ],
+  "exact_evaluation": {
+    "numerical_false_positives": {
+      "AMZN": [
+        {
+          "k": "2016-02-22",
+          "p": "2016-02-19"
+        }
+      ],
+      "NFLX": [
+        {
+          "k": "2018-11-29",
+          "p": "2018-11-28"
+        }
+      ]
+    },
+    "numerical_false_negatives": {},
+    "float_degeneracy_disagreements": {},
+    "exact_evaluation_invalid_pairs": {},
+    "split_checks_exact_disagreements": []
+  },
+  "v2_0_3_reference": {
+    "crosscheck_sha256": "98f3efd0388bcf2f9226268e1e9f3fcd8b3ea0ef5051816e35d5e99a62c8ff59",
+    "equals_day18d_crosscheck_json": true,
+    "open_items_v2_0_3": 14,
+    "open_items_v2_0_4": 12,
+    "moot_keys": [
+      "UNEXPLAINED_CHANGE|entity=AMZN|session=2016-02-22",
+      "UNEXPLAINED_CHANGE|entity=NFLX|session=2018-11-29"
+    ]
+  },
+  "mechanical_layer_vs_day18d": {
+    "crosscheck.json": {
+      "sha256": "65afe6da9622617fc424bfd7bc9414462feccd5d6b781b87fed79463795516fa",
+      "identical_to_day18d": false
+    },
+    "data_quality_comparison.json": {
+      "sha256": "b7af64540d8e6067490d222df2301d806362c1851fa0c42e5a24cf2a413fbd03",
+      "identical_to_day18d": true
+    },
+    "events_normalised.json": {
+      "sha256": "e89b9c4361ba668df070d38d9139ddadcca968bf74cf3d582226dcb1341ef0e3",
+      "identical_to_day18d": true
+    },
+    "identity.json": {
+      "sha256": "a775e3db846f88c6ce888d918114fc8c6c291f50d613ea4b5e94fe7981aa48c9",
+      "identical_to_day18d": true
+    },
+    "validation.json": {
+      "sha256": "b17d175325391dbb6d38cc1582e35427eb2c15d63a070bab8c8642c2a571cb04",
+      "identical_to_day18d": true
+    }
+  },
+  "crosscheck_mechanical": {
+    "ok": [
+      "AAPL",
+      "ADBE",
+      "AMAT",
+      "AMD",
+      "AMZN",
+      "AVGO",
+      "COST",
+      "CRM",
+      "CSCO",
+      "GOOGL",
+      "INTC",
+      "JNJ",
+      "JPM",
+      "KO",
+      "META",
+      "MSFT",
+      "MU",
+      "NFLX",
+      "ORCL",
+      "PEP",
+      "QCOM",
+      "SPY",
+      "TSLA",
+      "WMT",
+      "XOM"
+    ],
+    "blocking": [
+      "NVDA"
+    ],
+    "NVDA_note": "10 unconfirmed dividends at the mechanical layer, each resolved by its committed DAY-18F EVENT_RETAINED record (as in DAY-18G)"
+  },
+  "key_evidence": {
+    "AMZN 2016-02-22": {
+      "p": "2016-02-19",
+      "k": "2016-02-22",
+      "source": {
+        "raw": "bars_raw/AMZN.parquet[close]",
+        "adjusted": "bars_all/AMZN.parquet[close]"
+      },
+      "persisted": {
+        "raw_p": {
+          "binary64_hex": "0x1.0b73333333333p+9",
+          "shortest_decimal": "534.9"
+        },
+        "raw_k": {
+          "binary64_hex": "0x1.17c0000000000p+9",
+          "shortest_decimal": "559.5"
+        },
+        "adjusted_p": {
+          "binary64_hex": "0x1.abd70a3d70a3dp+4",
+          "shortest_decimal": "26.74"
+        },
+        "adjusted_k": {
+          "binary64_hex": "0x1.bfae147ae147bp+4",
+          "shortest_decimal": "27.98"
+        }
+      },
+      "d": {
+        "p": 2,
+        "k": 2
+      },
+      "delta": {
+        "p": "1/200",
+        "k": "1/200"
+      },
+      "raw_delta": null,
+      "exact": {
+        "f_p": "26745/1337",
+        "f_k": "27975/1399",
+        "rho": "2493505/2494417",
+        "rho_min": "9972155/9979451",
+        "rho_max": "1",
+        "rho_decimal": "0.9996343835052439107013783180598913",
+        "rho_min_decimal": "0.9992688976577970070698277891238706",
+        "rho_max_decimal": "1",
+        "rho_max_equals_1": true,
+        "contains_1": true,
+        "detected": false
+      },
+      "float64": {
+        "rho": "0.9996343835052438",
+        "rho_min": "0.999268897657797",
+        "rho_max": "0.9999999999999998",
+        "detected": true,
+        "degenerate": false
+      },
+      "numerical_classification": "NUMERICAL_FALSE_POSITIVE",
+      "final_classification": "NUMERICAL_FALSE_POSITIVE (non-blocking); v2.0.3 UNEXPLAINED_CHANGE item no longer exists; DAY-18F record amzn-20160222-20261007 (UNRESOLVED) -> MOOT"
+    },
+    "NFLX 2018-11-29": {
+      "p": "2018-11-28",
+      "k": "2018-11-29",
+      "source": {
+        "raw": "bars_raw/NFLX.parquet[close]",
+        "adjusted": "bars_all/NFLX.parquet[close]"
+      },
+      "persisted": {
+        "raw_p": {
+          "binary64_hex": "0x1.1aa6666666666p+8",
+          "shortest_decimal": "282.65"
+        },
+        "raw_k": {
+          "binary64_hex": "0x1.20c0000000000p+8",
+          "shortest_decimal": "288.75"
+        },
+        "adjusted_p": {
+          "binary64_hex": "0x1.c428f5c28f5c3p+4",
+          "shortest_decimal": "28.26"
+        },
+        "adjusted_k": {
+          "binary64_hex": "0x1.ce147ae147ae1p+4",
+          "shortest_decimal": "28.88"
+        }
+      },
+      "d": {
+        "p": 2,
+        "k": 2
+      },
+      "delta": {
+        "p": "1/200",
+        "k": "1/200"
+      },
+      "raw_delta": null,
+      "exact": {
+        "f_p": "28265/2826",
+        "f_k": "28875/2888",
+        "rho": "8160075/8162932",
+        "rho_min": "32634525/32657381",
+        "rho_max": "1",
+        "rho_decimal": "0.9996500032096310492357402952762561",
+        "rho_min_decimal": "0.9993001275883084439624843155671301",
+        "rho_max_decimal": "1",
+        "rho_max_equals_1": true,
+        "contains_1": true,
+        "detected": false
+      },
+      "float64": {
+        "rho": "0.9996500032096312",
+        "rho_min": "0.9993001275883086",
+        "rho_max": "0.9999999999999999",
+        "detected": true,
+        "degenerate": false
+      },
+      "numerical_classification": "NUMERICAL_FALSE_POSITIVE",
+      "final_classification": "NUMERICAL_FALSE_POSITIVE (non-blocking); v2.0.3 UNEXPLAINED_CHANGE item no longer exists; DAY-18F record nflx-20181129-20261007 (UNRESOLVED) -> MOOT"
+    }
+  },
+  "determinism": {
+    "result": "PASS",
+    "method": "second offline run into a scratchpad directory; 7 output files byte-identical; evaluation.json and manifest.json identical after removing evaluated_utc/provenance/guard-list fields"
+  },
+  "not_done": [
+    "no acquisition or network",
+    "no holdout or forward-OOS access",
+    "no research/backtest/signal/return",
+    "no review record created or modified",
+    "no snapshot modification",
+    "no push"
+  ]
+}
