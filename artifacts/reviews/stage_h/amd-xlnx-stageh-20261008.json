@@ -1,0 +1,59 @@
+{
+  "record_id": "amd-xlnx-stageh-20261008",
+  "item_type": "IDENTITY_UNVERIFIED",
+  "item_key": {
+    "entity": "AMD",
+    "event_date": "2022-02-14",
+    "ca_id": "15459aa5-b297-4e33-9624-c9d59b75ba46"
+  },
+  "source_snapshot_manifest_sha256": "eff959594658303c9aafeb81d18a159b742071821a4fe081e462691455be4a34",
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4",
+  "evidence": [
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_h_20261008T100604Z/corporate_actions_complete.json#id=15459aa5-b297-4e33-9624-c9d59b75ba46",
+      "retrieved_utc": "2026-10-08T10:06:04.699478+00:00",
+      "sha256": "9e54583c2b3a579d368ca4cd0f8e61ef10bfd0e34d4da0a640618e38f89c35b8",
+      "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+      "content_scope": "the stock_mergers record id=15459aa5-b297-4e33-9624-c9d59b75ba46",
+      "relevance": "provider record (Stage H snapshot)",
+      "supports_check": "identity evidence (C2 rule 3 / v2.0.3 item 5)"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_h_20261008T100604Z/corporate_actions_all.json#id=15459aa5-b297-4e33-9624-c9d59b75ba46",
+      "retrieved_utc": "2026-10-08T10:06:04.699478+00:00",
+      "sha256": "9e54583c2b3a579d368ca4cd0f8e61ef10bfd0e34d4da0a640618e38f89c35b8",
+      "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+      "content_scope": "the same record in the data_quality=all payload",
+      "relevance": "payload consistency",
+      "supports_check": "identity evidence (C2 rule 3 / v2.0.3 item 5); identical in both payloads"
+    },
+    {
+      "type": "regulatory_filing",
+      "reference": "url:https://www.sec.gov/Archives/edgar/data/743988/000110465922021762/tm226258d1_8k.htm",
+      "retrieved_utc": "2026-10-07T11:42:44.202454+00:00",
+      "sha256": "492d6a6eab9f116c5be33c8f59113402471df53e38d2b17a71275d6937d518e7",
+      "hash_scope": "SHA-256 of the exact HTTP response body bytes (HTTP 200, text/html)",
+      "http_status": 200,
+      "bytes": 46642,
+      "local_copy": "data/oos_cache/protocol_v2/evidence/sec/492d6a6eab9f116c5be33c8f59113402471df53e38d2b17a71275d6937d518e7.htm (git-ignored, write-once; same SHA-256)",
+      "registrant_text_check": "XILINX, INC.",
+      "quoted_statements": [
+        "(the \"Company\") completed the previously announced combination with Advanced Micro Devices, Inc.",
+        "As a result of the consummation of the Merger on February 14, 2022, at the Effective Time a change in control of the Company occurred and the Company became a wholly owned subsidiary of AMD."
+      ],
+      "quote_note": "quoted from the retrieved document decoded as Windows-1252; only quotation-mark characters normalised to ASCII",
+      "relevance": "primary regulatory filing (SEC EDGAR) admissible for IDENTITY_UNVERIFIED decisions only (v2.0.3 item 5)",
+      "offline_reverification": "DAY-20A: the git-ignored write-once local copy was re-hashed offline and matches sha256; no re-download; both quoted statements present (quote characters normalised)",
+      "evidence_origin": "previously accepted DAY-18F evidence (Stage R record amd-xlnx-20261007), reused verbatim"
+    }
+  ],
+  "decision": "SAME_ENTITY",
+  "reasoning": "Stage H provider record 15459aa5-b297-4e33-9624-c9d59b75ba46 (stock_mergers, event date 2022-02-14) names acquirer AMD (CUSIP 007903107) and acquiree XLNX (CUSIP 983919101); it appears once and identically in both data_quality payloads of the Stage H snapshot and is byte-identical to the Stage R record of the same id. The previously accepted primary SEC filing (URL, retrieval time and SHA-256 in evidence; re-verified offline) states that Xilinx, Inc. completed the combination with Advanced Micro Devices, Inc. and became a wholly owned subsidiary of AMD on February 14, 2022, consistent with the provider record placing AMD as the acquiring issuer. Decision SAME_ENTITY: the record belongs to the universe entity AMD (as acquirer). Economic neutrality was not used as identity evidence. Under v2.0.3 item 5 it is processed as the entity's frozen §3.4 review item (acquirer-side merger); the Stage H v2.0.4 cross-check shows no unexplained change for AMD.",
+  "reviewer": "Alixujaev (protocol owner)",
+  "decided_utc": "2026-10-08T10:27:45Z",
+  "supersedes": null,
+  "prior_precedent": "Stage R record amd-xlnx-20261007 (bound to the Stage R manifest; cited as evidence only, does not resolve Stage H)",
+  "authorization": "Decision selected by the protocol owner (DAY-20A instruction: AMD<-XLNX SAME_ENTITY, NVDA dividends EVENT_RETAINED, subject to the frozen evidence supporting them) and encoded by the implementation agent; the agent made no decision."
+}

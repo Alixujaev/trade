@@ -1,0 +1,60 @@
+{
+  "record_id": "nvda-div-20220608-stageh-20261008",
+  "item_type": "UNCONFIRMED_EVENT",
+  "item_key": {
+    "entity": "NVDA",
+    "ex_date": "2022-06-08",
+    "ca_id": "4ac972c2-d010-4c59-9bc5-3804d580e957"
+  },
+  "source_snapshot_manifest_sha256": "eff959594658303c9aafeb81d18a159b742071821a4fe081e462691455be4a34",
+  "protocol_version": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4",
+  "evidence": [
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_h_20261008T100604Z/corporate_actions_complete.json#id=4ac972c2-d010-4c59-9bc5-3804d580e957",
+      "retrieved_utc": "2026-10-08T10:06:04.699478+00:00",
+      "sha256": "9e54583c2b3a579d368ca4cd0f8e61ef10bfd0e34d4da0a640618e38f89c35b8",
+      "hash_scope": "SHA-256 of the entire original file corporate_actions_complete.json (unmodified bytes)",
+      "content_scope": "the cash_dividends record id=4ac972c2-d010-4c59-9bc5-3804d580e957",
+      "relevance": "provider record (Stage H snapshot)",
+      "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4)"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_h_20261008T100604Z/corporate_actions_all.json#id=4ac972c2-d010-4c59-9bc5-3804d580e957",
+      "retrieved_utc": "2026-10-08T10:06:04.699478+00:00",
+      "sha256": "9e54583c2b3a579d368ca4cd0f8e61ef10bfd0e34d4da0a640618e38f89c35b8",
+      "hash_scope": "SHA-256 of the entire original file corporate_actions_all.json (unmodified bytes)",
+      "content_scope": "the same record in the data_quality=all payload",
+      "relevance": "payload consistency",
+      "supports_check": "EVENT_RETAINED preconditions (v2.0.3 item 4); identical in both payloads"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_h_20261008T100604Z/bars_raw/NVDA.parquet#session=2022-06-08",
+      "retrieved_utc": "2026-10-08T10:06:04.699478+00:00",
+      "sha256": "181727a411a9fd30a2ab8de2980bdeb7671d4646315ddb2eeb73f40c3c66a4b0",
+      "hash_scope": "SHA-256 of the entire original file bars_raw/NVDA.parquet (unmodified bytes)",
+      "content_scope": "the ex-date session 2022-06-08 and its previous session, column close",
+      "relevance": "raw closes",
+      "supports_check": "factor change detection (v2.0.3 item 1, exact evaluation v2.0.4)"
+    },
+    {
+      "type": "same_provider_record",
+      "reference": "snapshot:stage_h_20261008T100604Z/bars_all/NVDA.parquet#session=2022-06-08",
+      "retrieved_utc": "2026-10-08T10:06:04.699478+00:00",
+      "sha256": "6628e56bdead7c69f49889989db0e43b416eb07d1e43c9cf2f249774194ba196",
+      "hash_scope": "SHA-256 of the entire original file bars_all/NVDA.parquet (unmodified bytes)",
+      "content_scope": "the ex-date session 2022-06-08 and its previous session, column close",
+      "relevance": "adjusted closes and displayed precision",
+      "supports_check": "factor change detection (v2.0.3 item 1, exact evaluation v2.0.4)"
+    }
+  ],
+  "decision": "EVENT_RETAINED",
+  "reasoning": "(1) The Stage H provider corporate-action record 4ac972c2-d010-4c59-9bc5-3804d580e957 (cash dividend, ex-date 2022-06-08, rate 0.04, CUSIP 67066G104) exists, is identity-resolved to NVDA by CUSIP, appears exactly once and identically in both data_quality payloads, and is not duplicated. (2) At its ex-date session the exact v2.0.4 evaluation of the per-value rounding interval contains 1, so the cross-check detects no factor change; the event is not mechanically confirmed by the adjusted series, and no claim of a detectable adjusted-price change is made (no numerical false positive or negative, no invalid value). (3) The absence of a detectable change within the provider's rounding precision does not, by itself, invalidate the provider record. (4) The protocol owner's decision is EVENT_RETAINED: the provider record remains authoritative for the TR index and accounting (v2.0.1 C3; v2.0.3 item 4). This applies the reasoning of the DAY-18F Stage R records unchanged.",
+  "reviewer": "Alixujaev (protocol owner)",
+  "decided_utc": "2026-10-08T10:27:45Z",
+  "supersedes": null,
+  "prior_precedent": "Stage R record nvda-div-20220608-20261007 (bound to the Stage R manifest; evidence only)",
+  "authorization": "Decision selected by the protocol owner (DAY-20A instruction: AMD<-XLNX SAME_ENTITY, NVDA dividends EVENT_RETAINED, subject to the frozen evidence supporting them) and encoded by the implementation agent; the agent made no decision."
+}
