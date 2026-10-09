@@ -1,0 +1,128 @@
+{
+  "anchors_verified": {
+    "stage_h_snapshot": {
+      "manifest_sha256": "eff959594658303c9aafeb81d18a159b742071821a4fe081e462691455be4a34",
+      "path": "stage_h/stage_h_20261008T100604Z"
+    },
+    "stage_h_validation": {
+      "manifest_sha256": "e2a7d5a72d5a12342554edff34efb3e398b10eb8db101716dbc806592f82530f",
+      "path": "stage_h/validation__stage_h_20261008T100604Z__day20a"
+    },
+    "stage_r_review_output": {
+      "manifest_sha256": "755c905e0adae6c7cac924aa8146384defe7053784b526675e7b51d714f6d698",
+      "path": "stage_r/reviews/v2_0_4__stage_r_20261007T093410Z"
+    },
+    "stage_r_snapshot": {
+      "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+      "path": "stage_r/stage_r_20261007T093410Z"
+    }
+  },
+  "boundaries": {
+    "evidence": null,
+    "stage_h": {
+      "first_session": "2021-01-04",
+      "last_session": "2026-06-02"
+    },
+    "stage_r": {
+      "first_session": "2016-01-04",
+      "last_session": "2022-12-30"
+    }
+  },
+  "data_repo": {
+    "created_by_this_task": true,
+    "git_contents": [
+      "README.md"
+    ],
+    "owner": "Alixujaev",
+    "repo": "Alixujaev/trade-research-data",
+    "url": "https://github.com/Alixujaev/trade-research-data",
+    "visibility": "PRIVATE"
+  },
+  "date": "2026-10-09",
+  "forward_data_accessed": false,
+  "frozen_config_or_protocol_changed": false,
+  "kind": "infrastructure: permanent cross-device research-data vault (no strategy evaluation)",
+  "limitations": [
+    "GitHub 'immutable releases' setting not enabled on the data repo; integrity is enforced by the pinned manifest committed in the main repo (any changed asset fails restore).",
+    "This DAY-26 commit is local only; another device can restore only after the user pushes it (it contains the restore tooling and pinned manifest).",
+    "Headless/cloud agents need a fine-grained read-only GH_TOKEN for Alixujaev/trade-research-data.",
+    "gh was installed at C:\\Program Files\\GitHub CLI and is not on the Git-Bash PATH of this session; a new terminal picks it up.",
+    "Legacy protocol_v1.x caches, data/cache and day08-market-cache.tar.gz are intentionally not in the vault."
+  ],
+  "main_repo": {
+    "base_commit": "0cc349f22ec975767a261523cb8d042be2046028",
+    "branch": "feature/day-trading-research",
+    "pushed": false,
+    "repo": "Alixujaev/trade"
+  },
+  "market_data_provider_contacted": false,
+  "observed_dates": {
+    "stage_h": {
+      "bars_first": "2021-01-04",
+      "bars_last": "2026-06-02",
+      "events_last": "2026-05-26"
+    },
+    "stage_r": {
+      "bars_first": "2016-01-04",
+      "bars_last": "2022-12-30",
+      "events_last": "2022-12-30"
+    }
+  },
+  "original_snapshots_modified": false,
+  "release": {
+    "assets": {
+      "evidence-sec-protocol-v2-historical-v1.tar.gz": {
+        "component": "evidence",
+        "downloaded_matches_local": true,
+        "downloaded_sha256": "d74230e9b81140fb1295e946745d129d8f0cae6fb998a0163ca894ae41c4a1c1",
+        "files": 2,
+        "sha256": "d74230e9b81140fb1295e946745d129d8f0cae6fb998a0163ca894ae41c4a1c1",
+        "size": 13366
+      },
+      "stage_h-protocol-v2-historical-v1.tar.gz": {
+        "component": "stage_h",
+        "downloaded_matches_local": true,
+        "downloaded_sha256": "42fd47fbaf22cd960b6e41cbad04536344ac38c14d70253c0418ffd3fa078604",
+        "files": 67,
+        "sha256": "42fd47fbaf22cd960b6e41cbad04536344ac38c14d70253c0418ffd3fa078604",
+        "size": 3248886
+      },
+      "stage_r-protocol-v2-historical-v1.tar.gz": {
+        "component": "stage_r",
+        "downloaded_matches_local": true,
+        "downloaded_sha256": "1b4cb1067de929945f5582f979c1623df11dbcc035568929720fd93b553e1513",
+        "files": 99,
+        "sha256": "1b4cb1067de929945f5582f979c1623df11dbcc035568929720fd93b553e1513",
+        "size": 5495126
+      },
+      "vault-manifest.json": {
+        "downloaded_matches_local": true,
+        "downloaded_sha256": "505f2b3fe898a4c87caab734312a1bc0639e0f79aaa75d247dfbbf2907044968",
+        "sha256": "505f2b3fe898a4c87caab734312a1bc0639e0f79aaa75d247dfbbf2907044968",
+        "size": 41766
+      }
+    },
+    "draft": false,
+    "prerelease": false,
+    "tag": "protocol-v2-historical-v1",
+    "url": "https://github.com/Alixujaev/trade-research-data/releases/tag/protocol-v2-historical-v1"
+  },
+  "task": "DAY-26",
+  "tests": {
+    "day26_and_related": "70 passed (test_day26_research_data, test_day18_stage_r, test_day20_stage_h, test_day21_holdout, test_cache_immutability)",
+    "full_suite": "1361 passed, 0 failed, 28 warnings (59m18s, after upload)"
+  },
+  "trust_anchor": {
+    "path": "scripts/research_data/vaults/protocol-v2-historical-v1.json",
+    "sha256": "505f2b3fe898a4c87caab734312a1bc0639e0f79aaa75d247dfbbf2907044968"
+  },
+  "verification": {
+    "clean_room_restore_via_gh": "OK: 10 restored; byte-identical to originals (diff -rq)",
+    "downloaded_assets_match_local": true,
+    "pre_upload_staged_hashes_match": true,
+    "publish_roundtrip_restore": "OK (10 units restored into temp dir, all files/manifests/bindings/boundaries verified)",
+    "restore_over_real_tree": "OK: 10 already present, verified, skipped",
+    "second_restore": "OK: 10 already present, verified, skipped",
+    "source_tree_unchanged": "168 files, identical SHA-256 list before and after"
+  }
+}

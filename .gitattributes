@@ -1,0 +1,2 @@
+# DAY-26: pinned vault manifests are byte-exact trust anchors; never convert line endings.
+scripts/research_data/vaults/*.json binary
