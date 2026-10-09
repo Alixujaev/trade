@@ -1,0 +1,387 @@
+{
+ "authorizes_diagnostics": false,
+ "comparisons": [
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "V2-MOM",
+   "recomputed": 0.2921441610035611,
+   "reference": 0.2921441610035611,
+   "reference_file": "artifacts\\day19\\v2\\V2-MOM-R001\\0bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "V2-MOM",
+   "recomputed": 455143.3399808013,
+   "reference": 455143.3399808013,
+   "reference_file": "artifacts\\day19\\v2\\V2-MOM-R001\\0bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B1",
+   "recomputed": 0.1846029638879516,
+   "reference": 0.1846029638879516,
+   "reference_file": "artifacts\\day19\\v2\\V2-B1-research\\0bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B1",
+   "recomputed": 272278.8238699649,
+   "reference": 272278.8238699649,
+   "reference_file": "artifacts\\day19\\v2\\V2-B1-research\\0bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B2",
+   "recomputed": 0.1061402046162172,
+   "reference": 0.1061402046162172,
+   "reference_file": "artifacts\\day19\\v2\\V2-B2-research\\0bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B2",
+   "recomputed": 181566.7704540974,
+   "reference": 181566.7704540974,
+   "reference_file": "artifacts\\day19\\v2\\V2-B2-research\\0bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "V2-MOM",
+   "recomputed": 0.28816164633146335,
+   "reference": 0.28816164633146335,
+   "reference_file": "artifacts\\day19\\v2\\V2-MOM-R001\\5bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "V2-MOM",
+   "recomputed": 446911.57057257363,
+   "reference": 446911.57057257363,
+   "reference_file": "artifacts\\day19\\v2\\V2-MOM-R001\\5bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B1",
+   "recomputed": 0.1844074874473387,
+   "reference": 0.1844074874473387,
+   "reference_file": "artifacts\\day19\\v2\\V2-B1-research\\5bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B1",
+   "recomputed": 272013.27456468943,
+   "reference": 272013.27456468943,
+   "reference_file": "artifacts\\day19\\v2\\V2-B1-research\\5bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B2",
+   "recomputed": 0.10596036763366401,
+   "reference": 0.10596036763366401,
+   "reference_file": "artifacts\\day19\\v2\\V2-B2-research\\5bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B2",
+   "recomputed": 181392.30176811005,
+   "reference": 181392.30176811005,
+   "reference_file": "artifacts\\day19\\v2\\V2-B2-research\\5bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "V2-MOM",
+   "recomputed": 0.284193607440552,
+   "reference": 0.284193607440552,
+   "reference_file": "artifacts\\day19\\v2\\V2-MOM-R001\\10bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "V2-MOM",
+   "recomputed": 438833.12942247366,
+   "reference": 438833.12942247366,
+   "reference_file": "artifacts\\day19\\v2\\V2-MOM-R001\\10bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B1",
+   "recomputed": 0.18421204790480217,
+   "reference": 0.18421204790480217,
+   "reference_file": "artifacts\\day19\\v2\\V2-B1-research\\10bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B1",
+   "recomputed": 271747.99054343527,
+   "reference": 271747.99054343527,
+   "reference_file": "artifacts\\day19\\v2\\V2-B1-research\\10bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B2",
+   "recomputed": 0.10578056674813974,
+   "reference": 0.10578056674813974,
+   "reference_file": "artifacts\\day19\\v2\\V2-B2-research\\10bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B2",
+   "recomputed": 181218.00737651435,
+   "reference": 181218.00737651435,
+   "reference_file": "artifacts\\day19\\v2\\V2-B2-research\\10bps\\metrics.json",
+   "segment": "research"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "V2-MOM",
+   "recomputed": 0.7177913957601592,
+   "reference": 0.7177913957601592,
+   "reference_file": "artifacts\\day21\\v2\\V2-MOM-H001\\0bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "V2-MOM",
+   "recomputed": 628280.3841434743,
+   "reference": 628280.3841434743,
+   "reference_file": "artifacts\\day21\\v2\\V2-MOM-H001\\0bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B1",
+   "recomputed": 0.5328363188782443,
+   "reference": 0.5328363188782443,
+   "reference_file": "artifacts\\day21\\v2\\V2-B1-holdout\\0bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B1",
+   "recomputed": 426674.59336522804,
+   "reference": 426674.59336522804,
+   "reference_file": "artifacts\\day21\\v2\\V2-B1-holdout\\0bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B2",
+   "recomputed": 0.23271939951439635,
+   "reference": 0.23271939951439635,
+   "reference_file": "artifacts\\day21\\v2\\V2-B2-holdout\\0bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "0bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B2",
+   "recomputed": 203540.07310664203,
+   "reference": 203540.07310664203,
+   "reference_file": "artifacts\\day21\\v2\\V2-B2-holdout\\0bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "V2-MOM",
+   "recomputed": 0.7124610715568995,
+   "reference": 0.7124610715568995,
+   "reference_file": "artifacts\\day21\\v2\\V2-MOM-H001\\5bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "V2-MOM",
+   "recomputed": 621682.6585024017,
+   "reference": 621682.6585024017,
+   "reference_file": "artifacts\\day21\\v2\\V2-MOM-H001\\5bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B1",
+   "recomputed": 0.5323880517105726,
+   "reference": 0.5323880517105726,
+   "reference_file": "artifacts\\day21\\v2\\V2-B1-holdout\\5bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B1",
+   "recomputed": 426250.8928966526,
+   "reference": 426250.8928966526,
+   "reference_file": "artifacts\\day21\\v2\\V2-B1-holdout\\5bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B2",
+   "recomputed": 0.23236183330369142,
+   "reference": 0.23236183330369142,
+   "reference_file": "artifacts\\day21\\v2\\V2-B2-holdout\\5bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "5bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B2",
+   "recomputed": 203339.5961696026,
+   "reference": 203339.5961696026,
+   "reference_file": "artifacts\\day21\\v2\\V2-B2-holdout\\5bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "V2-MOM",
+   "recomputed": 0.7071510888097017,
+   "reference": 0.7071510888097017,
+   "reference_file": "artifacts\\day21\\v2\\V2-MOM-H001\\10bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "V2-MOM",
+   "recomputed": 615158.8701731006,
+   "reference": 615158.8701731006,
+   "reference_file": "artifacts\\day21\\v2\\V2-MOM-H001\\10bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B1",
+   "recomputed": 0.5319399183151041,
+   "reference": 0.5319399183151041,
+   "reference_file": "artifacts\\day21\\v2\\V2-B1-holdout\\10bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B1",
+   "recomputed": 425827.6157052686,
+   "reference": 425827.6157052686,
+   "reference_file": "artifacts\\day21\\v2\\V2-B1-holdout\\10bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "cagr",
+   "portfolio": "B2",
+   "recomputed": 0.2320043758388477,
+   "reference": 0.2320043758388477,
+   "reference_file": "artifacts\\day21\\v2\\V2-B2-holdout\\10bps\\metrics.json",
+   "segment": "holdout"
+  },
+  {
+   "cost": "10bps",
+   "equal": true,
+   "field": "ending_equity",
+   "portfolio": "B2",
+   "recomputed": 203139.31950922354,
+   "reference": 203139.31950922354,
+   "reference_file": "artifacts\\day21\\v2\\V2-B2-holdout\\10bps\\metrics.json",
+   "segment": "holdout"
+  }
+ ],
+ "comparisons_total": 36,
+ "environment": {
+  "distributions_count": 56,
+  "distributions_sha256": "7b47231b6bf706da340a4c8b940bb5cbd632c228c8f07dc57cde6c065c89379a",
+  "exchange_calendars": "4.13.2",
+  "numpy": "2.5.2",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python": "3.12.10"
+ },
+ "equality": "exact float64 (==); no tolerance, rounding or re-baselining",
+ "error": null,
+ "fingerprint_matches_reference": true,
+ "fingerprint_relaxes_equality": false,
+ "frozen_commit": "c794bdc58490517b451b81d125a6a41896eb09d9",
+ "mismatch_count": 0,
+ "mismatches": [],
+ "reference_environment_distributions_sha256": "7b47231b6bf706da340a4c8b940bb5cbd632c228c8f07dc57cde6c065c89379a",
+ "run_status": null,
+ "stage": "D6 integrity preflight",
+ "status": "PASSED",
+ "task": "DAY-25B",
+ "written_utc": "2026-10-09T13:53:25.649240+00:00"
+}
