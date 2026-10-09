@@ -39,6 +39,7 @@
     "visibility": "PRIVATE"
   },
   "date": "2026-10-09",
+  "defect_fixed": "First fresh-clone restore in a deep directory exceeded the Windows 260-char path limit while staging (raw FileNotFoundError, nothing written). Fixed in fe6a422: short staging names; OSError before the move phase becomes VaultError ('nothing was changed') with LongPathsEnabled guidance; test added.",
   "forward_data_accessed": false,
   "frozen_config_or_protocol_changed": false,
   "kind": "infrastructure: permanent cross-device research-data vault (no strategy evaluation)",
@@ -52,6 +53,10 @@
   "main_repo": {
     "base_commit": "0cc349f22ec975767a261523cb8d042be2046028",
     "branch": "feature/day-trading-research",
+    "commits": [
+      "8a21aeb feat: DAY-26 private research-data vault (publish, restore, verify)",
+      "fe6a422 fix: DAY-26 restore fails closed on filesystem errors (Windows long paths)"
+    ],
     "pushed": false,
     "repo": "Alixujaev/trade"
   },
@@ -109,8 +114,9 @@
   },
   "task": "DAY-26",
   "tests": {
-    "day26_and_related": "70 passed (test_day26_research_data, test_day18_stage_r, test_day20_stage_h, test_day21_holdout, test_cache_immutability)",
-    "full_suite": "1361 passed, 0 failed, 28 warnings (59m18s, after upload)"
+    "final_code_fe6a422_targeted": "71 passed (test_day26_research_data [29], test_day18_stage_r, test_day20_stage_h, test_day21_holdout, test_cache_immutability)",
+    "full_suite_8a21aeb": "1361 passed, 0 failed, 28 warnings (59m18s, after upload)",
+    "full_suite_fe6a422": "NOT COMPLETED: stopped by Claude Code because the system was low on memory (not a test failure); not restarted"
   },
   "trust_anchor": {
     "path": "scripts/research_data/vaults/protocol-v2-historical-v1.json",
@@ -119,6 +125,7 @@
   "verification": {
     "clean_room_restore_via_gh": "OK: 10 restored; byte-identical to originals (diff -rq)",
     "downloaded_assets_match_local": true,
+    "fresh_clone_restore": "OK: git clone (core.autocrlf=true) -> pinned manifest byte-exact; restore via gh restored 10 units, verify OK, byte-identical to originals; at two clone depths",
     "pre_upload_staged_hashes_match": true,
     "publish_roundtrip_restore": "OK (10 units restored into temp dir, all files/manifests/bindings/boundaries verified)",
     "restore_over_real_tree": "OK: 10 already present, verified, skipped",

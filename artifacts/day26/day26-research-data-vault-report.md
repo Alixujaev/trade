@@ -54,11 +54,22 @@ Every other unit was also verified against its own `manifest.json`: three earlie
    - `gh release view` lists exactly the four assets, with the expected sizes.
 4. A clean-room restore through `gh` restored all 10 units, and `diff -rq` showed them byte-identical to the originals. A second run gave 10 × "already present, verified, skipped".
 5. A restore over the real `data/oos_cache/protocol_v2` gave 10 × "already present, verified, skipped". The SHA-256 list of all 168 source files was identical before and after.
+6. Fresh-environment check: `git clone` with `core.autocrlf=true`, then `restore` and `verify` run through `gh` from the clone's own code. The pinned manifest stayed byte-exact (`.gitattributes` marks it binary). All 10 units were restored, and the result was byte-identical to the originals. This passed at two clone depths.
+
+## Defect found during the fresh-clone check, and the fix
+
+The first fresh-clone restore, in a deep directory, exceeded the Windows 260-character path limit inside the restore staging area. It raised a raw `FileNotFoundError` and wrote nothing (the destination stayed empty and the temp dir was removed). Commit `fe6a422` fixes this:
+- staging now uses short temp names;
+- any filesystem error before the move phase becomes a `VaultError` stating that nothing was changed, with guidance to enable `LongPathsEnabled` or use a shorter clone path;
+- the README carries the Windows note, and a new test covers the failure path.
+
+The same deep-path clone then restored and verified successfully. The published assets were not affected and were not changed.
 
 ## Tests
 
-- `tests/test_day26_research_data.py` plus the Stage R, Stage H, holdout and cache-immutability suites: **70 passed**.
-- Full suite after upload: **1361 passed, 0 failed** (28 warnings, 59m18s).
+- Full suite on commit `8a21aeb` (after upload): **1361 passed, 0 failed** (28 warnings, 59m18s).
+- On the final code `fe6a422` (long-path fix): `tests/test_day26_research_data.py` plus the Stage R, Stage H, holdout and cache-immutability suites gave **71 passed** (29 DAY-26 tests).
+- **Not completed:** a full-suite re-run on `fe6a422` was stopped by Claude Code because the system was low on memory. The run did not fail; it was not restarted. The fix touches only `scripts/research_data/vault.py`, which no other module imports, plus its test and README.
 
 ## Code added
 
