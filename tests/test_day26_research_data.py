@@ -99,7 +99,7 @@ def test_successful_restore_and_verify(built, tmp_path):
     for f in json.loads(raw)["components"]["stage_x"]["files"]:
         assert (dest / f["path"]).read_bytes() == (src / f["path"]).read_bytes()
     vault.verify_tree(dest, vault.parse_manifest(raw))
-    assert not list(tmp_path.glob(".vault-restore-*"))                 # temp area cleaned up
+    assert not list(tmp_path.glob(".vr-*"))                 # temp area cleaned up
 
 
 def test_build_is_deterministic(tmp_path):
@@ -160,6 +160,18 @@ def test_refuses_to_overwrite_existing_different_snapshot(built, tmp_path):
         vault.restore(raw, dest, vault.dir_fetch(stg))
     assert target.read_text(encoding="utf-8") == '{"tampered": true}'  # untouched
     assert not list((dest / "evidence").rglob("*.htm"))                # nothing moved after the refusal
+
+
+def test_filesystem_error_while_staging_fails_closed(built, tmp_path, monkeypatch):
+    """E.g. a Windows path over 260 characters: a clean VaultError, nothing written, temp area removed."""
+    _, stg, raw = built
+    def boom(*_a, **_k):
+        raise FileNotFoundError(2, "No such file or directory", "x" * 270)
+    monkeypatch.setattr(vault, "safe_extract", boom)
+    with pytest.raises(VaultError, match="nothing was changed.*LongPathsEnabled"):
+        vault.restore(raw, tmp_path / "dest", vault.dir_fetch(stg))
+    assert not any((tmp_path / "dest").iterdir())
+    assert not list(tmp_path.glob(".vr-*"))
 
 
 def test_archive_checksum_mismatch(built, tmp_path):

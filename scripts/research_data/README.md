@@ -33,6 +33,8 @@ gh auth login                                      # or set GH_TOKEN (see below)
 ```
 
 Restore is written to `data/oos_cache/protocol_v2/`, the paths `backtest/v2/data.py` reads.
+**Windows:** clone into a short path (for example `C:\src\trade`) or enable `LongPathsEnabled`. Restore staging paths can exceed 260 characters under a deep directory. Restore then fails with nothing changed.
+
 Options: `--components stage_r stage_h evidence` (downloads only those assets), `--dest DIR`,
 and `--from-dir DIR` (assets already on disk, e.g. copied from another PC).
 

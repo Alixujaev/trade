@@ -331,48 +331,59 @@ def restore(pinned: bytes, dest: Path, fetch: Fetch, components: Iterable[str] |
     names = select_components(manifest, components)
     dest = Path(dest)
     dest.mkdir(parents=True, exist_ok=True)
-    work = Path(tempfile.mkdtemp(prefix=".vault-restore-", dir=dest.parent))
+    work = Path(tempfile.mkdtemp(prefix=".vr-", dir=dest.parent))          # short names: Windows MAX_PATH headroom
     try:
-        dl, stage = work / "download", work / "stage"
-        dl.mkdir()
-        stage.mkdir()
-        if fetch(MANIFEST_ASSET, dl).read_bytes() != pinned:
-            raise VaultError("downloaded vault manifest differs from the pinned manifest committed in this repo")
-        archives = {}
-        for n in names:
-            comp = manifest["components"][n]
-            a = fetch(comp["asset"], dl)
-            if a.stat().st_size != comp["size"] or sha256_file(a) != comp["sha256"]:
-                raise VaultError(f"{comp['asset']}: archive SHA-256/size does not match the pinned manifest")
-            archives[n] = a
-        for n in names:
-            part = stage / n
-            part.mkdir()
-            safe_extract(archives[n], part, {f["path"]: f for f in manifest["components"][n]["files"]})
-            verify_tree(part, manifest, [n])
-        # decide everything before moving anything
-        actions: list[tuple[str, str, str]] = []
-        for n in names:
-            comp = manifest["components"][n]
-            for unit in comp["units"]:
-                target = dest.joinpath(*unit["path"].split("/"))
-                if target.exists() or target.is_symlink():
-                    try:
-                        verify_unit(dest, comp, unit)
-                    except VaultError as e:
-                        raise VaultError(f"{unit['path']} already exists and does not match the vault; "
-                                         f"refusing to overwrite ({e})") from None
-                    actions.append((n, unit["path"], "skipped"))
-                else:
-                    actions.append((n, unit["path"], "restore"))
+        try:
+            actions = _stage_and_plan(pinned, manifest, names, dest, fetch, work)
+        except OSError as e:                                               # nothing has been moved yet
+            raise VaultError(f"filesystem error while staging the restore; nothing was changed in {dest}: {e}. "
+                             "On Windows, paths over 260 characters need LongPathsEnabled or a shorter clone path"
+                             ) from None
         for n, upath, act in actions:
             if act == "restore":
                 target = dest.joinpath(*upath.split("/"))
                 target.parent.mkdir(parents=True, exist_ok=True)
-                os.replace(stage / n / upath, target)
+                os.replace(work / "s" / n / upath, target)
         report = verify_tree(dest, manifest, names)
     finally:
         _rmtree(work)
     return {"version": manifest["version"], "dest": str(dest), "components": report,
             "units": [{"component": n, "path": p, "action": "restored" if a == "restore" else "already present, verified, skipped"}
                       for n, p, a in actions]}
+
+
+def _stage_and_plan(pinned: bytes, manifest: dict, names: list[str], dest: Path, fetch: Fetch,
+                    work: Path) -> list[tuple[str, str, str]]:
+    """Download, check, extract and verify into `work`; decide every unit's action before anything is moved."""
+    dl, stage = work / "d", work / "s"
+    dl.mkdir()
+    stage.mkdir()
+    if fetch(MANIFEST_ASSET, dl).read_bytes() != pinned:
+        raise VaultError("downloaded vault manifest differs from the pinned manifest committed in this repo")
+    archives = {}
+    for n in names:
+        comp = manifest["components"][n]
+        a = fetch(comp["asset"], dl)
+        if a.stat().st_size != comp["size"] or sha256_file(a) != comp["sha256"]:
+            raise VaultError(f"{comp['asset']}: archive SHA-256/size does not match the pinned manifest")
+        archives[n] = a
+    for n in names:
+        part = stage / n
+        part.mkdir()
+        safe_extract(archives[n], part, {f["path"]: f for f in manifest["components"][n]["files"]})
+        verify_tree(part, manifest, [n])
+    actions: list[tuple[str, str, str]] = []
+    for n in names:
+        comp = manifest["components"][n]
+        for unit in comp["units"]:
+            target = dest.joinpath(*unit["path"].split("/"))
+            if target.exists() or target.is_symlink():
+                try:
+                    verify_unit(dest, comp, unit)
+                except VaultError as e:
+                    raise VaultError(f"{unit['path']} already exists and does not match the vault; "
+                                     f"refusing to overwrite ({e})") from None
+                actions.append((n, unit["path"], "skipped"))
+            else:
+                actions.append((n, unit["path"], "restore"))
+    return actions
