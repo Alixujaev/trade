@@ -1,0 +1,547 @@
+{
+ "descriptive_only": true,
+ "diagnostic": "D7",
+ "evidence_label": "robustness diagnostic on reused historical data \u2014 not independent or forward evidence",
+ "results": {
+  "holdout": {
+   "10bps": {
+    "candidates_ranked": 28,
+    "count_single_stocks_above_v2mom": 4,
+    "note": "hindsight comparator; supplemental; no decision role; never replaces B1 or B2",
+    "rows": [
+     {
+      "cagr": 0.3005242797105414,
+      "max_drawdown": 0.3308936235438381,
+      "ticker": "AAPL"
+     },
+     {
+      "cagr": -0.07440891601567867,
+      "max_drawdown": 0.6449839309345264,
+      "ticker": "ADBE"
+     },
+     {
+      "cagr": 0.6020322512987382,
+      "max_drawdown": 0.49363590362383714,
+      "ticker": "AMAT"
+     },
+     {
+      "cagr": 0.8366956507578596,
+      "max_drawdown": 0.6300028384899234,
+      "ticker": "AMD"
+     },
+     {
+      "cagr": 0.381258682211866,
+      "max_drawdown": 0.3087664215483764,
+      "ticker": "AMZN"
+     },
+     {
+      "cagr": 0.8862275556440073,
+      "max_drawdown": 0.4044815275065585,
+      "ticker": "AVGO"
+     },
+     {
+      "cagr": 0.2523547500590908,
+      "max_drawdown": 0.20241856411373782,
+      "ticker": "COST"
+     },
+     {
+      "cagr": 0.12899184137850606,
+      "max_drawdown": 0.5430026824179695,
+      "ticker": "CRM"
+     },
+     {
+      "cagr": 0.3520718936069285,
+      "max_drawdown": 0.1952542372881355,
+      "ticker": "CSCO"
+     },
+     {
+      "cagr": 0.5094239414963888,
+      "max_drawdown": 0.2970335298096435,
+      "ticker": "GOOGL"
+     },
+     {
+      "cagr": 0.5066271918654426,
+      "max_drawdown": 0.6263106796116504,
+      "ticker": "INTC"
+     },
+     {
+      "cagr": 0.09506703807659345,
+      "max_drawdown": 0.17276005547850204,
+      "ticker": "JNJ"
+     },
+     {
+      "cagr": 0.28567125171002505,
+      "max_drawdown": 0.23553562187338262,
+      "ticker": "JPM"
+     },
+     {
+      "cagr": 0.08781495515739657,
+      "max_drawdown": 0.16985793699814677,
+      "ticker": "KO"
+     },
+     {
+      "cagr": 0.5959770682181222,
+      "max_drawdown": 0.3404564961349452,
+      "ticker": "META"
+     },
+     {
+      "cagr": 0.19995979127465557,
+      "max_drawdown": 0.33333938920480366,
+      "ticker": "MSFT"
+     },
+     {
+      "cagr": 1.4516649342318257,
+      "max_drawdown": 0.5730887842882649,
+      "ticker": "MU"
+     },
+     {
+      "cagr": 0.35266381964293836,
+      "max_drawdown": 0.43351280308857254,
+      "ticker": "NFLX"
+     },
+     {
+      "cagr": 1.2185322892851107,
+      "max_drawdown": 0.36867808402461866,
+      "ticker": "NVDA"
+     },
+     {
+      "cagr": 0.38626495566043717,
+      "max_drawdown": 0.5733814030343998,
+      "ticker": "ORCL"
+     },
+     {
+      "cagr": -0.036755885751456274,
+      "max_drawdown": 0.2899072337405588,
+      "ticker": "PEP"
+     },
+     {
+      "cagr": 0.2707116297237262,
+      "max_drawdown": 0.43072146276251677,
+      "ticker": "QCOM"
+     },
+     {
+      "cagr": 0.4544136025928829,
+      "max_drawdown": 0.5376568165715,
+      "ticker": "TSLA"
+     },
+     {
+      "cagr": 0.3000239737696466,
+      "max_drawdown": 0.2159133533383345,
+      "ticker": "WMT"
+     },
+     {
+      "cagr": 0.12305602316356001,
+      "max_drawdown": 0.18262425770763857,
+      "ticker": "XOM"
+     }
+    ],
+    "v2mom_cagr": 0.7071510888097017,
+    "v2mom_rank_among_singles_b1_b2": 5
+   },
+   "5bps": {
+    "candidates_ranked": 28,
+    "count_single_stocks_above_v2mom": 4,
+    "note": "hindsight comparator; supplemental; no decision role; never replaces B1 or B2",
+    "rows": [
+     {
+      "cagr": 0.30090509483043504,
+      "max_drawdown": 0.33089362354383833,
+      "ticker": "AAPL"
+     },
+     {
+      "cagr": -0.07413638864884531,
+      "max_drawdown": 0.6449839309345264,
+      "ticker": "ADBE"
+     },
+     {
+      "cagr": 0.6025013206888927,
+      "max_drawdown": 0.49363590362383714,
+      "ticker": "AMAT"
+     },
+     {
+      "cagr": 0.8372364401388688,
+      "max_drawdown": 0.6300028384899234,
+      "ticker": "AMD"
+     },
+     {
+      "cagr": 0.38166537453863136,
+      "max_drawdown": 0.3087664215483765,
+      "ticker": "AMZN"
+     },
+     {
+      "cagr": 0.8867788625869972,
+      "max_drawdown": 0.4044815275065585,
+      "ticker": "AVGO"
+     },
+     {
+      "cagr": 0.25271762549164767,
+      "max_drawdown": 0.2024185641137377,
+      "ticker": "COST"
+     },
+     {
+      "cagr": 0.1293212425518775,
+      "max_drawdown": 0.5430026824179695,
+      "ticker": "CRM"
+     },
+     {
+      "cagr": 0.35246163543975406,
+      "max_drawdown": 0.19525423728813562,
+      "ticker": "CSCO"
+     },
+     {
+      "cagr": 0.5098673660540423,
+      "max_drawdown": 0.2970335298096435,
+      "ticker": "GOOGL"
+     },
+     {
+      "cagr": 0.507068525516517,
+      "max_drawdown": 0.6263106796116504,
+      "ticker": "INTC"
+     },
+     {
+      "cagr": 0.09537777907671185,
+      "max_drawdown": 0.17276005547850204,
+      "ticker": "JNJ"
+     },
+     {
+      "cagr": 0.2860395509290181,
+      "max_drawdown": 0.23553562187338273,
+      "ticker": "JPM"
+     },
+     {
+      "cagr": 0.0881232303189019,
+      "max_drawdown": 0.16985793699814689,
+      "ticker": "KO"
+     },
+     {
+      "cagr": 0.596445174069161,
+      "max_drawdown": 0.3404564961349451,
+      "ticker": "META"
+     },
+     {
+      "cagr": 0.20030876513798668,
+      "max_drawdown": 0.33333938920480355,
+      "ticker": "MSFT"
+     },
+     {
+      "cagr": 1.4523862736637683,
+      "max_drawdown": 0.5730887842882648,
+      "ticker": "MU"
+     },
+     {
+      "cagr": 0.35306209261180843,
+      "max_drawdown": 0.43351280308857254,
+      "ticker": "NFLX"
+     },
+     {
+      "cagr": 1.2191853583761745,
+      "max_drawdown": 0.36867808402461877,
+      "ticker": "NVDA"
+     },
+     {
+      "cagr": 0.3866682114726536,
+      "max_drawdown": 0.5733814030344,
+      "ticker": "ORCL"
+     },
+     {
+      "cagr": -0.03648771212108004,
+      "max_drawdown": 0.2899072337405587,
+      "ticker": "PEP"
+     },
+     {
+      "cagr": 0.2710776528825487,
+      "max_drawdown": 0.43072146276251677,
+      "ticker": "QCOM"
+     },
+     {
+      "cagr": 0.4548418343641907,
+      "max_drawdown": 0.5376568165714999,
+      "ticker": "TSLA"
+     },
+     {
+      "cagr": 0.300401752301229,
+      "max_drawdown": 0.2159133533383345,
+      "ticker": "WMT"
+     },
+     {
+      "cagr": 0.1233729069423335,
+      "max_drawdown": 0.18262425770763846,
+      "ticker": "XOM"
+     }
+    ],
+    "v2mom_cagr": 0.7124610715568995,
+    "v2mom_rank_among_singles_b1_b2": 5
+   }
+  },
+  "research": {
+   "10bps": {
+    "candidates_ranked": 28,
+    "count_single_stocks_above_v2mom": 3,
+    "note": "hindsight comparator; supplemental; no decision role; never replaces B1 or B2",
+    "rows": [
+     {
+      "cagr": 0.2761256395130798,
+      "max_drawdown": 0.3767644324232947,
+      "ticker": "AAPL"
+     },
+     {
+      "cagr": 0.2017359939343224,
+      "max_drawdown": 0.6002150006537182,
+      "ticker": "ADBE"
+     },
+     {
+      "cagr": 0.20057125920759922,
+      "max_drawdown": 0.5378353051423217,
+      "ticker": "AMAT"
+     },
+     {
+      "cagr": 0.351081489299947,
+      "max_drawdown": 0.6544994132542771,
+      "ticker": "AMD"
+     },
+     {
+      "cagr": 0.1264584129527242,
+      "max_drawdown": 0.5614526412267749,
+      "ticker": "AMZN"
+     },
+     {
+      "cagr": 0.2108941045335837,
+      "max_drawdown": 0.44987235019075766,
+      "ticker": "AVGO"
+     },
+     {
+      "cagr": 0.20281574238962974,
+      "max_drawdown": 0.29877494752013034,
+      "ticker": "COST"
+     },
+     {
+      "cagr": 0.09136706126006966,
+      "max_drawdown": 0.5861724093431411,
+      "ticker": "CRM"
+     },
+     {
+      "cagr": 0.10482637246056825,
+      "max_drawdown": 0.3944145026947574,
+      "ticker": "CSCO"
+     },
+     {
+      "cagr": 0.137127283612001,
+      "max_drawdown": 0.44320051255184734,
+      "ticker": "GOOGL"
+     },
+     {
+      "cagr": -0.013506113516254525,
+      "max_drawdown": 0.5592118695977677,
+      "ticker": "INTC"
+     },
+     {
+      "cagr": 0.10177210847980223,
+      "max_drawdown": 0.25455650060753343,
+      "ticker": "JNJ"
+     },
+     {
+      "cagr": 0.10267009088632761,
+      "max_drawdown": 0.41204608232837026,
+      "ticker": "JPM"
+     },
+     {
+      "cagr": 0.10063027825701432,
+      "max_drawdown": 0.3421337038752509,
+      "ticker": "KO"
+     },
+     {
+      "cagr": -0.016145317326346276,
+      "max_drawdown": 0.7673609294049925,
+      "ticker": "META"
+     },
+     {
+      "cagr": 0.2592102020738669,
+      "max_drawdown": 0.36007938758151414,
+      "ticker": "MSFT"
+     },
+     {
+      "cagr": 0.13053202341979508,
+      "max_drawdown": 0.5365697860108591,
+      "ticker": "MU"
+     },
+     {
+      "cagr": 0.13220813172621404,
+      "max_drawdown": 0.759473174398936,
+      "ticker": "NFLX"
+     },
+     {
+      "cagr": 0.32621654559958624,
+      "max_drawdown": 0.6616840311514373,
+      "ticker": "NVDA"
+     },
+     {
+      "cagr": 0.1399410304392501,
+      "max_drawdown": 0.38519204072188795,
+      "ticker": "ORCL"
+     },
+     {
+      "cagr": 0.12104886857487118,
+      "max_drawdown": 0.26726969769102593,
+      "ticker": "PEP"
+     },
+     {
+      "cagr": 0.1547852072049516,
+      "max_drawdown": 0.41145060812815193,
+      "ticker": "QCOM"
+     },
+     {
+      "cagr": 0.3992165918227677,
+      "max_drawdown": 0.7338829670463692,
+      "ticker": "TSLA"
+     },
+     {
+      "cagr": 0.15326240872713837,
+      "max_drawdown": 0.23984096357364193,
+      "ticker": "WMT"
+     },
+     {
+      "cagr": 0.07707608237944052,
+      "max_drawdown": 0.5436882665798328,
+      "ticker": "XOM"
+     }
+    ],
+    "v2mom_cagr": 0.284193607440552,
+    "v2mom_rank_among_singles_b1_b2": 4
+   },
+   "5bps": {
+    "candidates_ranked": 28,
+    "count_single_stocks_above_v2mom": 3,
+    "note": "hindsight comparator; supplemental; no decision role; never replaces B1 or B2",
+    "rows": [
+     {
+      "cagr": 0.276337741394046,
+      "max_drawdown": 0.3767644324232947,
+      "ticker": "AAPL"
+     },
+     {
+      "cagr": 0.20193925786564804,
+      "max_drawdown": 0.6002150006537181,
+      "ticker": "ADBE"
+     },
+     {
+      "cagr": 0.20076958707098402,
+      "max_drawdown": 0.5378353051423217,
+      "ticker": "AMAT"
+     },
+     {
+      "cagr": 0.35131001381485083,
+      "max_drawdown": 0.6544994132542771,
+      "ticker": "AMD"
+     },
+     {
+      "cagr": 0.12664894428959617,
+      "max_drawdown": 0.5614526412267749,
+      "ticker": "AMZN"
+     },
+     {
+      "cagr": 0.21108764256960666,
+      "max_drawdown": 0.44987235019075755,
+      "ticker": "AVGO"
+     },
+     {
+      "cagr": 0.20301232263504376,
+      "max_drawdown": 0.29877494752013023,
+      "ticker": "COST"
+     },
+     {
+      "cagr": 0.09155165717840008,
+      "max_drawdown": 0.5861724093431411,
+      "ticker": "CRM"
+     },
+     {
+      "cagr": 0.10499987722651083,
+      "max_drawdown": 0.3944145026947574,
+      "ticker": "CSCO"
+     },
+     {
+      "cagr": 0.13731961950212246,
+      "max_drawdown": 0.44320051255184745,
+      "ticker": "GOOGL"
+     },
+     {
+      "cagr": -0.013358118924021833,
+      "max_drawdown": 0.5592118695977677,
+      "ticker": "INTC"
+     },
+     {
+      "cagr": 0.10194761904046024,
+      "max_drawdown": 0.25455650060753343,
+      "ticker": "JNJ"
+     },
+     {
+      "cagr": 0.10284520121179885,
+      "max_drawdown": 0.41204608232837026,
+      "ticker": "JPM"
+     },
+     {
+      "cagr": 0.10080408463416823,
+      "max_drawdown": 0.3421337038752509,
+      "ticker": "KO"
+     },
+     {
+      "cagr": -0.015978906257972936,
+      "max_drawdown": 0.7673609294049923,
+      "ticker": "META"
+     },
+     {
+      "cagr": 0.2594180523374734,
+      "max_drawdown": 0.36007938758151403,
+      "ticker": "MSFT"
+     },
+     {
+      "cagr": 0.13072202371099007,
+      "max_drawdown": 0.5365697860108591,
+      "ticker": "MU"
+     },
+     {
+      "cagr": 0.1323996355815491,
+      "max_drawdown": 0.7594731743989359,
+      "ticker": "NFLX"
+     },
+     {
+      "cagr": 0.3264401502519805,
+      "max_drawdown": 0.6616840311514371,
+      "ticker": "NVDA"
+     },
+     {
+      "cagr": 0.1401275687940453,
+      "max_drawdown": 0.3851920407218882,
+      "ticker": "ORCL"
+     },
+     {
+      "cagr": 0.12122762051317815,
+      "max_drawdown": 0.26726969769102593,
+      "ticker": "PEP"
+     },
+     {
+      "cagr": 0.1549681650760637,
+      "max_drawdown": 0.41145060812815193,
+      "ticker": "QCOM"
+     },
+     {
+      "cagr": 0.39945325800125064,
+      "max_drawdown": 0.7338829670463693,
+      "ticker": "TSLA"
+     },
+     {
+      "cagr": 0.1534493626340483,
+      "max_drawdown": 0.23984096357364215,
+      "ticker": "WMT"
+     },
+     {
+      "cagr": 0.07724411718919133,
+      "max_drawdown": 0.5436882665798328,
+      "ticker": "XOM"
+     }
+    ],
+    "v2mom_cagr": 0.28816164633146335,
+    "v2mom_rank_among_singles_b1_b2": 4
+   }
+  }
+ }
+}

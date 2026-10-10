@@ -1,0 +1,79 @@
+{
+ "descriptive_only": true,
+ "diagnostic": "D2",
+ "evidence_label": "robustness diagnostic on reused historical data \u2014 not independent or forward evidence",
+ "results": {
+  "holdout": {
+   "note": "selection is outcome-dependent by construction; a stress test, not an estimate of expected performance",
+   "outcome_dependent": true,
+   "per_cost": {
+    "10bps": {
+     "active_vs_b1": 0.0009212383983747685,
+     "active_vs_b1_sub": 0.10273956431787146,
+     "b1_sub_cagr": 0.43012159239560743,
+     "cagr": 0.5328611567134789,
+     "max_drawdown": 0.2689939651322266,
+     "top2_concentration": 0.4229531653030167
+    },
+    "5bps": {
+     "active_vs_b1": 0.005632628043397814,
+     "active_vs_b1_sub": 0.10748167489533467,
+     "b1_sub_cagr": 0.4305390048586357,
+     "cagr": 0.5380206797539704,
+     "max_drawdown": 0.2688098297767907,
+     "top2_concentration": 0.42358336999750346
+    }
+   },
+   "ranking_cost": "5bps",
+   "removed": [
+    {
+     "share_of_abs_pnl": 0.2644663931118071,
+     "signed_contribution": 147245.66566033612,
+     "ticker": "MU"
+    },
+    {
+     "share_of_abs_pnl": 0.1680757403081694,
+     "signed_contribution": 93578.71135092551,
+     "ticker": "AMD"
+    }
+   ],
+   "same_symbols_at_all_costs": true
+  },
+  "research": {
+   "note": "selection is outcome-dependent by construction; a stress test, not an estimate of expected performance",
+   "outcome_dependent": true,
+   "per_cost": {
+    "10bps": {
+     "active_vs_b1": 0.004529722394967406,
+     "active_vs_b1_sub": 0.02865225804985516,
+     "b1_sub_cagr": 0.1600895122499144,
+     "cagr": 0.18874177029976957,
+     "max_drawdown": 0.33701787582053755,
+     "top2_concentration": 0.29705102601391353
+    },
+    "5bps": {
+     "active_vs_b1": 0.007960344786869022,
+     "active_vs_b1_sub": 0.032087885376126835,
+     "b1_sub_cagr": 0.1602799468580809,
+     "cagr": 0.19236783223420773,
+     "max_drawdown": 0.3366746625068593,
+     "top2_concentration": 0.2979842725903773
+    }
+   },
+   "ranking_cost": "5bps",
+   "removed": [
+    {
+     "share_of_abs_pnl": 0.3206213717852845,
+     "signed_contribution": 136127.86294826082,
+     "ticker": "TSLA"
+    },
+    {
+     "share_of_abs_pnl": 0.1446430048783167,
+     "signed_contribution": 61411.823656241446,
+     "ticker": "NVDA"
+    }
+   ],
+   "same_symbols_at_all_costs": true
+  }
+ }
+}

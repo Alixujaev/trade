@@ -412,6 +412,22 @@ def test_reuse_valid_record_completes_without_rerunning_preflight(reuse_env, mon
     assert reuse_env.record.read_bytes() == before
 
 
+def test_record_hash_is_line_ending_invariant(reuse_env):
+    """validate_preflight_record's SHA-256 check must be CRLF-invariant, like doc_sha256 (test above), since a
+    Windows checkout (core.autocrlf=true) rewrites the real record's line endings without changing its content."""
+    lf_bytes = reuse_env.record.read_bytes()
+    assert b"\r\n" not in lf_bytes                                        # the fixture record is written LF-only
+    crlf_path = reuse_env.root / "crlf" / "preflight_record.json"
+    crlf_path.parent.mkdir(parents=True)
+    crlf_path.write_bytes(lf_bytes.replace(b"\n", b"\r\n"))
+    out_lf = d25.validate_preflight_record(reuse_env.record, reuse_env.sha, reuse_env.spec,
+                                           expected_path=reuse_env.record, ref_root=reuse_env.root)
+    out_crlf = d25.validate_preflight_record(crlf_path, reuse_env.sha, reuse_env.spec,
+                                             expected_path=crlf_path, ref_root=reuse_env.root)
+    assert out_lf["sha256"] == out_crlf["sha256"] == reuse_env.sha
+    assert crlf_path.read_bytes() == lf_bytes.replace(b"\n", b"\r\n")     # the CRLF copy itself is never rewritten
+
+
 def _tamper(rec: dict, case: str) -> dict:
     c0 = rec["comparisons"][0]
     if case == "status":
@@ -489,14 +505,15 @@ def test_reuse_still_requires_authorization_before_reading_the_record(reuse_env,
 def test_cli_full_run_requires_the_exact_frozen_record_path(monkeypatch):
     _forbid(monkeypatch, "load_contexts", "verify_frozen_docs")
     other = d25.DEFAULT_PREFLIGHT_RECORD.parent / "other.json"
+    out_existed = d25.DEFAULT_OUT.exists()                                 # the real D1-D7 run may already exist
     assert d25.main(["--preflight-record", str(other), "--authorization", "test-authorization"]) == 2
-    assert not other.exists() and not d25.DEFAULT_OUT.exists()
+    assert not other.exists() and d25.DEFAULT_OUT.exists() == out_existed
 
 
 @pytest.mark.skipif(not d25.DEFAULT_PREFLIGHT_RECORD.exists(), reason="real preflight record not present")
 def test_real_preflight_record_validates_read_only():
     before = d25.DEFAULT_PREFLIGHT_RECORD.read_bytes()
-    assert hashlib.sha256(before).hexdigest() == d25.PREFLIGHT_RECORD_SHA256
+    assert hashlib.sha256(before.replace(b"\r\n", b"\n")).hexdigest() == d25.PREFLIGHT_RECORD_SHA256     # CRLF-invariant, as validate_preflight_record now checks
     out = d25.validate_preflight_record(d25.DEFAULT_PREFLIGHT_RECORD, d25.PREFLIGHT_RECORD_SHA256, d25.FROZEN_SPEC)
     assert out["sha256"] == d25.PREFLIGHT_RECORD_SHA256 and out["record"]["comparisons_total"] == 36
     assert d25.DEFAULT_PREFLIGHT_RECORD.read_bytes() == before

@@ -1,0 +1,131 @@
+{
+ "descriptive_only": true,
+ "diagnostic": "D6",
+ "evidence_label": "robustness diagnostic on reused historical data \u2014 not independent or forward evidence",
+ "results": {
+  "holdout": {
+   "0bps": {
+    "active_vs_b1": 0.18495507688191481,
+    "annual_turnover": 2.9948075506528187,
+    "b1_cagr": 0.5328363188782443,
+    "b2_cagr": 0.23271939951439635,
+    "cagr": 0.7177913957601592,
+    "cost_drag_vs_0bps": 0.0,
+    "mean_lambda": 0.9999999999999993,
+    "min_lambda": 0.9999999999999907,
+    "role": "frozen scenario (recomputed, verified by preflight)",
+    "total_costs": 0.0
+   },
+   "10bps": {
+    "active_vs_b1": 0.17521117049459756,
+    "annual_turnover": 2.9914791513505086,
+    "b1_cagr": 0.5319399183151041,
+    "b2_cagr": 0.2320043758388477,
+    "cagr": 0.7071510888097017,
+    "cost_drag_vs_0bps": 0.010640306950457479,
+    "mean_lambda": 0.9980295094699295,
+    "min_lambda": 0.9980019980019967,
+    "role": "frozen scenario (recomputed, verified by preflight)",
+    "total_costs": 4721.08174673755
+   },
+   "15bps": {
+    "active_vs_b1": 0.1703694375899789,
+    "annual_turnover": 2.989817764122942,
+    "b1_cagr": 0.5314919184300544,
+    "b2_cagr": 0.23164702691182204,
+    "cagr": 0.7018613560200333,
+    "cost_drag_vs_0bps": 0.015930039740125856,
+    "mean_lambda": 0.997045738404574,
+    "min_lambda": 0.9970044932601051,
+    "role": "diagnostic override",
+    "total_costs": 7032.779756872826
+   },
+   "20bps": {
+    "active_vs_b1": 0.16554773036294423,
+    "annual_turnover": 2.9881582481694213,
+    "b1_cagr": 0.5310440517939181,
+    "b2_cagr": 0.2312897863147978,
+    "cagr": 0.6965917821568623,
+    "cost_drag_vs_0bps": 0.021199613603296807,
+    "mean_lambda": 0.9960629482526604,
+    "min_lambda": 0.9960079840319307,
+    "role": "diagnostic override",
+    "total_costs": 9312.487958511674
+   },
+   "5bps": {
+    "active_vs_b1": 0.18007301984632695,
+    "annual_turnover": 2.9931424126070865,
+    "b1_cagr": 0.5323880517105726,
+    "b2_cagr": 0.23236183330369142,
+    "cagr": 0.7124610715568995,
+    "cost_drag_vs_0bps": 0.005330324203259629,
+    "mean_lambda": 0.9990142628628349,
+    "min_lambda": 0.9990004997501198,
+    "role": "frozen scenario (recomputed, verified by preflight)",
+    "total_costs": 2376.9663072638755
+   }
+  },
+  "research": {
+   "0bps": {
+    "active_vs_b1": 0.1075411971156095,
+    "annual_turnover": 3.0654274979066884,
+    "b1_cagr": 0.1846029638879516,
+    "b2_cagr": 0.1061402046162172,
+    "cagr": 0.2921441610035611,
+    "cost_drag_vs_0bps": 0.0,
+    "mean_lambda": 0.9999999999999992,
+    "min_lambda": 0.999999999999992,
+    "role": "frozen scenario (recomputed, verified by preflight)",
+    "total_costs": 0.0
+   },
+   "10bps": {
+    "active_vs_b1": 0.09998155953574983,
+    "annual_turnover": 3.062513435283993,
+    "b1_cagr": 0.18421204790480217,
+    "b2_cagr": 0.10578056674813974,
+    "cagr": 0.284193607440552,
+    "cost_drag_vs_0bps": 0.00795055356300911,
+    "mean_lambda": 0.9980192923728082,
+    "min_lambda": 0.998001998001992,
+    "role": "frozen scenario (recomputed, verified by preflight)",
+    "total_costs": 11374.365160424399
+   },
+   "15bps": {
+    "active_vs_b1": 0.09622333891104717,
+    "annual_turnover": 3.061062701517507,
+    "b1_cagr": 0.18401664515954685,
+    "b2_cagr": 0.10560080186809562,
+    "cagr": 0.28023998407059403,
+    "cost_drag_vs_0bps": 0.011904176932967081,
+    "mean_lambda": 0.9970304222617189,
+    "min_lambda": 0.9970044932601003,
+    "role": "diagnostic override",
+    "total_costs": 16864.275782175522
+   },
+   "20bps": {
+    "active_vs_b1": 0.09247943364233979,
+    "annual_turnover": 3.059613958138325,
+    "b1_cagr": 0.18382127911085422,
+    "b2_cagr": 0.10542107290205838,
+    "cagr": 0.276300712753194,
+    "cost_drag_vs_0bps": 0.015843448250367098,
+    "mean_lambda": 0.996042539323708,
+    "min_lambda": 0.9960079840319271,
+    "role": "diagnostic override",
+    "total_costs": 22226.34652733633
+   },
+   "5bps": {
+    "active_vs_b1": 0.10375415888412465,
+    "annual_turnover": 3.0639654515655157,
+    "b1_cagr": 0.1844074874473387,
+    "b2_cagr": 0.10596036763366401,
+    "cagr": 0.28816164633146335,
+    "cost_drag_vs_0bps": 0.003982514672097759,
+    "mean_lambda": 0.9990091511276797,
+    "min_lambda": 0.9990004997501156,
+    "role": "frozen scenario (recomputed, verified by preflight)",
+    "total_costs": 5753.872475510628
+   }
+  }
+ }
+}

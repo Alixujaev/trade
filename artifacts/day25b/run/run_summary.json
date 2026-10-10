@@ -1,0 +1,81 @@
+{
+ "authorization": "DAY25B-D1-D7-RUN",
+ "decision_rules": "none (F1-F5 withdrawn); no output changes V2-MOM status",
+ "descriptive_only": true,
+ "determinism_in_process": true,
+ "evidence_label": "robustness diagnostic on reused historical data \u2014 not independent or forward evidence",
+ "preflight_record": {
+  "path": "C:\\Users\\user\\Desktop\\Own\\trade\\artifacts\\day25b\\preflight\\preflight_record.json",
+  "reused": true,
+  "sha256": "c2e70c47cff4a1a6344b08f256b41c5d02c3c2188a300982d5abb87ff53a501b",
+  "validated": true
+ },
+ "reproducibility": {
+  "config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+  "data": {
+   "holdout": {
+    "first_session": "2021-01-04",
+    "last_session": "2026-06-02",
+    "manifest_sha256": "eff959594658303c9aafeb81d18a159b742071821a4fe081e462691455be4a34",
+    "snapshot_id": "stage_h_20261008T100604Z",
+    "tree_sha256": "8a51463b335f0f4e2acf776bd4fdfb36ca07cf52eb2d5878f3f0251d328c5556"
+   },
+   "research": {
+    "first_session": "2016-01-04",
+    "last_session": "2022-12-30",
+    "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+    "snapshot_id": "stage_r_20261007T093410Z",
+    "tree_sha256": "c5d786359adef89f86156c97aab6d579e2e54f5b22fe3161ed1d4ce76dc54590"
+   }
+  },
+  "engine_sha256": {
+   "backtest/v2/__init__.py": "361f97194f1ee124845fb8de614c127cb582a21b11992ed40e667cff3a4df9a4",
+   "backtest/v2/data.py": "9f67eeb7a625b7d9375135e4772692c4b8bf5d0f77ceb7000befd69172256a7d",
+   "backtest/v2/engine.py": "80c1100ba16ce18a44e0edf53d0be59a9e7a980a2ad70a94c68aabe750c3f4a8",
+   "backtest/v2/metrics.py": "15832cbe93efb380758e37c3f525cd04575b0a06b64bafa5fad2340319744f4f",
+   "backtest/v2/run.py": "fb934ec3a1507e31156a6590df0d33bbfabefbbbcfc18e457176d316b4ef52e1",
+   "backtest/v2/signals.py": "58090adbf0ba8358322e0f9670c9c67c4d118af82849b0c604d28ac611272a6b"
+  },
+  "environment": {
+   "distributions_count": 56,
+   "distributions_sha256": "7b47231b6bf706da340a4c8b940bb5cbd632c228c8f07dc57cde6c065c89379a",
+   "exchange_calendars": "4.13.2",
+   "numpy": "2.5.2",
+   "platform": "Windows-10-10.0.19045-SP0",
+   "python": "3.13.15"
+  },
+  "frozen_commit": "c794bdc58490517b451b81d125a6a41896eb09d9",
+  "frozen_doc_sha256": {
+   "artifacts/day25b/day25b-robustness-predeclaration.json": "c97d3d6804dc17a7da2e14bb1b24499cd44855a617213c004b53c13664ee33ff",
+   "artifacts/day25b/day25b-robustness-predeclaration.md": "f5b32aed2e31d95feb402a39121f312debb1ad9b8fa344fc9bb708df7b44bfbb"
+  },
+  "git_commit": "d32eee4cadb2a26cb48f97fad5fa35d9c2a79725",
+  "numpy": "2.5.2",
+  "seed": 20261008,
+  "subsets_sha256": "7e942c22c0fb57dddfb06a9cea31b70ecaf28dc34df1f36b81b809ce7b26705e"
+ },
+ "result_files_sha256": {
+  "d1.json": "9dfe44deb86c3d10164eda61f14b04c7d07f95a1c222bca461521c2b0b069670",
+  "d2.json": "541a9226c0ca1629767dfd1272b04d708e6163c73c24dfdf97df572fe2293bf5",
+  "d3.json": "82afc0914b45bbdc7f3c3c9a2e609c96b39464ee9bb5b0d71912861a8a563926",
+  "d4.json": "a08211e5d9c3fb9c63d4bf219e9a1eb9a95386b5728aa7d2a28111c33105933c",
+  "d5.json": "1738dd9eae9bb3e7d2af2e13c53a0b570ef3da11455708eca3d9f925ed43d864",
+  "d6.json": "949d6df85c6421cd964be755ed2ca8455e5b4252c53b4659650df6cc5b0f84fd",
+  "d7.json": "5d96008e2574c9e3a136795dc4507b10c4ef937a6c58e60e5c52730e19007301",
+  "subsets.json": "7e942c22c0fb57dddfb06a9cea31b70ecaf28dc34df1f36b81b809ce7b26705e"
+ },
+ "segments": {
+  "holdout": {
+   "first": "2023-01-03",
+   "last": "2026-06-02",
+   "sessions": 856
+  },
+  "research": {
+   "first": "2017-02-01",
+   "last": "2022-12-30",
+   "sessions": 1490
+  }
+ },
+ "status": "COMPLETED",
+ "task": "DAY-25B"
+}

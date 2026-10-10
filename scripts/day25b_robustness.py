@@ -300,7 +300,7 @@ def validate_preflight_record(record_path: Path, expected_sha256: str, spec: Spe
     if not record_path.is_file():
         raise Day25bError(f"preflight record missing: {record_path}")
     raw = record_path.read_bytes()
-    sha = hashlib.sha256(raw).hexdigest()
+    sha = hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest()         # CRLF normalised to LF, as doc_sha256() does
     if sha != expected_sha256:
         raise Day25bError(f"preflight record SHA-256 {sha} != expected {expected_sha256}")
     try:
@@ -553,8 +553,10 @@ def run(contexts: dict[str, Setup], spec: Spec, out_dir: Path, record_path: Path
             raise Day25bError(f"{seg_id}: data universe differs from the frozen universe order")
     if reuse_preflight_sha256 is None:
         frozen_runs = preflight(contexts, spec, record_path, ref_root)      # raises PreflightMismatch: no outputs
+        record_sha256 = hashlib.sha256(Path(record_path).read_bytes()).hexdigest()   # just written by _dump: LF, no CRLF
     else:
         validated = validate_preflight_record(record_path, reuse_preflight_sha256, spec, expected_record_path, ref_root)
+        record_sha256 = validated["sha256"]                                 # the canonical hash actually validated
         frozen_runs = preflight_runs_again(contexts, spec)
         recomputed = {(c["segment"], c["cost"], c["portfolio"], c["field"]): c["recomputed"]
                       for c in validated["record"]["comparisons"]}
@@ -588,7 +590,7 @@ def run(contexts: dict[str, Setup], spec: Spec, out_dir: Path, record_path: Path
             "decision_rules": "none (F1-F5 withdrawn); no output changes V2-MOM status",
             "authorization": authorization, "segments": {k: {"first": v.seg["first"].isoformat(), "last": v.seg["last"].isoformat(),
                                                              "sessions": v.seg_last - v.seg_first + 1} for k, v in contexts.items()},
-            "preflight_record": {"path": str(record_path), "sha256": hashlib.sha256(Path(record_path).read_bytes()).hexdigest(),
+            "preflight_record": {"path": str(record_path), "sha256": record_sha256,
                                  "reused": reuse_preflight_sha256 is not None, "validated": True},
             "determinism_in_process": True,
             "reproducibility": {"frozen_commit": FROZEN_COMMIT, "config_sha256": CONFIG_SHA256, "seed": spec.seed,
