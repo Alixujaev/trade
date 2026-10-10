@@ -1,0 +1,63 @@
+# Sealed real-time paper-trading runner V2-MOM-P001 (protocol 2.3, DAY-27). PREPARED, NOT ACTIVATED.
+# Activation needs owner approval + push + the secrets below + an existing branch `paper-state` in the private repo
+# Alixujaev/trade-research-data. This repository is PUBLIC: the job prints health only (never positions or P&L);
+# all state goes to the private repo. No broker / trading endpoint exists in the runner (internal virtual ledger).
+#
+# Secrets: ALPACA_API_KEY, ALPACA_SECRET_KEY (market data), PAPER_SEAL_KEY (64 hex chars; `python -m paper.runner
+# init-key`), PAPER_STATE_TOKEN (fine-grained token: contents read/write on Alixujaev/trade-research-data only).
+name: paper-trading-V2-MOM-P001
+
+on:
+  schedule:
+    - cron: "35 20 * * 1-5"      # 16:35 EDT / 15:35 EST  (the runner decides from the XNYS calendar what is complete)
+    - cron: "35 21 * * 1-5"      # 17:35 EDT / 16:35 EST  (second slot: DST coverage and retry; idempotent)
+  workflow_dispatch: {}
+
+concurrency:
+  group: paper-trading-V2-MOM-P001
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PAPER_STATE_DIR: ${{ github.workspace }}/state/V2-MOM-P001
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Checkout private state
+        uses: actions/checkout@v4
+        with:
+          repository: Alixujaev/trade-research-data
+          ref: paper-state
+          path: state
+          token: ${{ secrets.PAPER_STATE_TOKEN }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install pinned environment
+        run: pip install -r paper/requirements.txt
+      - name: Run (fail closed)
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          PAPER_SEAL_KEY: ${{ secrets.PAPER_SEAL_KEY }}
+        run: python -m paper.runner run
+      - name: Health check (missed sessions / failed run -> job fails -> e-mail alert)
+        if: always()
+        run: python -m paper.runner check-health
+      - name: Persist state to the private repo (backup = git history)
+        if: always()
+        working-directory: state
+        run: |
+          git config user.name "paper-runner"
+          git config user.email "paper-runner@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "paper V2-MOM-P001 state ${{ github.run_id }}"
+          git push origin HEAD:paper-state

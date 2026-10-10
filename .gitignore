@@ -20,3 +20,4 @@ scanner_state.json
 build/
 dist/
 *.egg-info/
+paper_state/

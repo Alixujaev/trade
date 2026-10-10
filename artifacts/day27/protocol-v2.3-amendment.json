@@ -1,0 +1,62 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-27",
+ "title": "Protocol v2.3 amendment: sealed real-time paper-trading runner V2-MOM-P001, parallel to fwd-gate2",
+ "companion_markdown": "artifacts/day27/protocol-v2.3-amendment.md",
+ "protocol_version": "2.3",
+ "protocol_version_full": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 + 2.1 + 2.2 + 2.3",
+ "status": "ADOPTED",
+ "adopted_utc": "2026-10-10T15:47:33Z",
+ "adoption_record": "artifacts/day27/protocol-v2.3-adoption.json",
+ "effective_from": "the commit that contains this amendment and its adoption record; not earlier",
+ "authorization": "explicit protocol-owner instruction 'DAY-27 — BUILD REAL-TIME PAPER TRADING' (2026-10-10); owner choices: parallel + sealed, internal virtual ledger, GitHub Actions",
+ "experiment": {
+  "id": "V2-MOM-P001",
+  "benchmarks": {
+   "B1": "V2-B1-P001",
+   "B2": "V2-B2-P001"
+  },
+  "first_session": "2026-10-12",
+  "initial_decision_close": "2026-10-09",
+  "history_start": "2025-01-02",
+  "cost_per_side": 0.0005,
+  "strategy_config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+  "seal_until": "2026-12-09T16:15:00-05:00 (America/New_York)"
+ },
+ "rules": {
+  "P1_separation": "own data path ($PAPER_STATE_DIR), state and ID; never used as fwd-gate2 evidence",
+  "P2_virtual_ledger": "frozen engine replay only; no broker; only https://data.alpaca.markets/ reachable",
+  "P3_seal": "performance-bearing outputs encrypted (HMAC-SHA256 CTR + HMAC tag, key PAPER_SEAL_KEY); reveal refused before seal time; plaintext = health only",
+  "P4_exception_E7": "DAY-22 §3.2.2 operational-feed clause: calculation allowed only inside the sealed runner; any disclosure before 2026-12-09 16:15 ET makes fwd-gate2 FORWARD42-INVALID (protocol-breach) and must be disclosed; time lock in code, key custody procedural",
+  "P5_fail_closed": [
+   "adoption chain not committed / pins",
+   "config SHA",
+   "quarantine",
+   "missing/stale/incomplete bars",
+   "off-calendar label",
+   "structural HARD_FAIL/BLOCKING",
+   "identity/normalisation conflicts",
+   "authentication error",
+   "inconsistent state",
+   "risk invariants (<=5 names, w<=0.2, sum<=1, exposure<=1, cash>=0, fills at raw open)"
+  ],
+  "P5_review_items": "corporate-action crosscheck/review items reported as review_pending in health, not blocking",
+  "P6_timing": "session processed only after official close + 15 min (early closes included); catch-up flagged late",
+  "P7_idempotency": "health record per session is the commit point; no reprocessing; orders are a pure function of the replay"
+ },
+ "implementation": [
+  "paper/config.py",
+  "paper/seal.py",
+  "paper/data.py",
+  "paper/ledger.py",
+  "paper/runner.py",
+  "tests/test_day27_paper.py",
+  ".github/workflows/paper-trading.yml (prepared, not activated)"
+ ],
+ "unchanged": [
+  "V2-MOM rules and config SHA",
+  "protocol 2.2 and fwd-gate2 calendar, guards, status PENDING",
+  "DAY-26C quarantine",
+  "frozen and historical artifacts"
+ ]
+}

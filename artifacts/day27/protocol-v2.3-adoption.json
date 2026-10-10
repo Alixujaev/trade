@@ -1,0 +1,30 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-27 protocol-owner adoption of protocol 2.3",
+ "final_status": "ADOPTED",
+ "protocol_version": "2.3",
+ "protocol_version_full": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 + 2.1 + 2.2 + 2.3",
+ "decided_by": "Alixujaev (protocol owner)",
+ "decided_utc": "2026-10-10T15:47:33Z",
+ "decision_provenance": "explicit protocol-owner instruction 'DAY-27 — BUILD REAL-TIME PAPER TRADING' (2026-10-10); owner choices: parallel + sealed, internal virtual ledger, GitHub Actions",
+ "effective_from": "the commit that contains this amendment and its adoption record; not earlier",
+ "adopted_files_sha256_lf": {
+  "artifacts/day27/protocol-v2.3-amendment.md": "0e3aeb2dc5b3aca321dbf3d9bf21b848e4110dc20f5c82169d3b4646341a01b2",
+  "artifacts/day27/protocol-v2.3-amendment.json": "566d59ae0a65b8a63668651d2625ff653e417f09957bfaaacbcf84f8a125645c"
+ },
+ "builds_on": {
+  "protocol_2_2_adoption": "artifacts/day26d/protocol-v2.2-adoption.json",
+  "protocol_2_2_decided_utc": "2026-10-10T14:56:30Z",
+  "protocol_2_2_adopted_files_sha256_lf": {
+   "artifacts/day26d/protocol-v2.2-amendment.md": "3e7204757b66f6d8ac8c38f2e77d29ac8d868e26a865f9aeebd6971152c91471",
+   "artifacts/day26d/protocol-v2.2-amendment.json": "06d47f3ae2affb33ac1ddb37854abc76edb2543ec93011043f11abe099fdbb80"
+  }
+ },
+ "segment_status_unchanged": {
+  "fwd-diag": "FWD-DIAG-INVALID (protocol-breach)",
+  "fwd-gate": "SUPERSEDED (protocol 2.2) — never acquired or evaluated",
+  "fwd-gate2": "PENDING — blind, not evaluated"
+ },
+ "experiment": "V2-MOM-P001",
+ "seal_until": "2026-12-09T16:15:00-05:00 (America/New_York)"
+}
