@@ -61,8 +61,8 @@ class DataValidationIssue(RuntimeError):
     """A Stage H data issue that must be reported and decided, never silently resolved."""
 
 
-def assert_no_leakage_h(*payloads: Any) -> int:
-    """No event_date / ex_date outside [2021-01-04, 2026-06-02] may reach a persisted payload."""
+def assert_no_leakage_h(*payloads: Any, lo: str = EVENT_DATE_MIN_H, hi: str = EVENT_DATE_MAX_H) -> int:
+    """No event_date / ex_date outside [lo, hi] (Stage H: [2021-01-04, 2026-06-02]) may reach a persisted payload."""
     seen = 0
 
     def walk(o: Any) -> None:
@@ -71,7 +71,7 @@ def assert_no_leakage_h(*payloads: Any) -> int:
             for k, v in o.items():
                 if k in ("event_date", "ex_date") and v:
                     seen += 1
-                    if not (EVENT_DATE_MIN_H <= str(v)[:10] <= EVENT_DATE_MAX_H):
+                    if not (lo <= str(v)[:10] <= hi):
                         raise sr.LeakageError(f"{k} outside the Stage H boundary reached a persisted payload")
                 walk(v)
         elif isinstance(o, (list, tuple)):
@@ -91,18 +91,20 @@ def unqueried_aliases(records: list[dict[str, Any]], queried: list[str]) -> list
 
 
 def derive(frames: dict[str, dict[str, pd.DataFrame]], ca: dict[str, list[dict[str, Any]]], q_syms: list[str],
-           ca_counts: dict[str, Any], inventory: dict[str, Any] | None = None) -> dict[str, Any]:
+           ca_counts: dict[str, Any], inventory: dict[str, Any] | None = None, *, sessions: list | None = None,
+           segment_first=HOLDOUT_FIRST_SESSION) -> dict[str, Any]:
     """Data-only derivations (identity C2, normalisation C3, complete/all C4, structural §3.8, v2.0.4 cross-check,
-    v2.0.4 review classification). No price, return or signal is produced."""
-    sessions = stage_h_sessions()
+    v2.0.4 review classification). No price, return or signal is produced. Defaults: Stage H (Stage F passes its
+    session set and evaluated-segment start)."""
+    sessions = stage_h_sessions() if sessions is None else sessions
     syms = stage_r_symbols()
     identity = idn.resolve(ca["complete"], syms, q_syms)
     normalised = ev.normalise(ca["complete"], identity)
     quality = ev.compare_quality(ca["complete"], ca["all"], {a["id"] for a in identity["assignments"]})
     per_series, raw_vs_all = {}, {}
     for s in syms:
-        r = val.check_series(frames["raw"][s], sessions, segment_first=HOLDOUT_FIRST_SESSION)
-        a = val.check_series(frames["all"][s], sessions, segment_first=HOLDOUT_FIRST_SESSION)
+        r = val.check_series(frames["raw"][s], sessions, segment_first=segment_first)
+        a = val.check_series(frames["all"][s], sessions, segment_first=segment_first)
         per_series[f"{s}/raw"], per_series[f"{s}/all"] = r, a
         raw_vs_all[s] = val.check_raw_all(r, a)
     validation = {"per_series": per_series, "raw_vs_all": raw_vs_all,
@@ -228,10 +230,11 @@ def _canon(o: Any) -> Any:
     return json.loads(json.dumps(o, sort_keys=True, default=str))
 
 
-def overlap_control(frames_h: dict, ca_h: dict, stage_r_dir: Path) -> dict[str, Any]:
-    """Frozen §3.9: raw bars and events on R∩H compared cell by cell -> IDENTICAL / DISCREPANCY.
-    adjustment=all levels are excluded (rebasing). Only counts, dates and field names are reported."""
-    lo, hi = OVERLAP
+def overlap_control(frames_h: dict, ca_h: dict, stage_r_dir: Path, rng: tuple[str, str] = OVERLAP) -> dict[str, Any]:
+    """Frozen §3.9: raw bars and events on an overlap range (default R∩H) compared cell by cell with an earlier
+    snapshot -> IDENTICAL / DISCREPANCY. adjustment=all levels are excluded (rebasing). Only counts, dates and field
+    names are reported."""
+    lo, hi = rng
     bars: dict[str, Any] = {}
     for s, h in sorted(frames_h["raw"].items()):
         r = pd.read_parquet(stage_r_dir / "bars_raw" / f"{s}.parquet").drop(columns=["session_date"])
@@ -258,7 +261,7 @@ def overlap_control(frames_h: dict, ca_h: dict, stage_r_dir: Path) -> dict[str, 
               "content_differs": {i: {"fields": f, "ca_type": H[i].get("ca_type"), "event_date": H[i].get("event_date")}
                                   for i, f in differs.items()}}
     events["status"] = "IDENTICAL" if not (events["only_in_stage_r"] or events["only_in_stage_h"] or differs) else "DISCREPANCY"
-    return {"range": list(OVERLAP), "raw_bars": bars,
+    return {"range": list(rng), "raw_bars": bars,
             "raw_bars_status": "IDENTICAL" if all(v["status"] == "IDENTICAL" for v in bars.values()) else "DISCREPANCY",
             "events": events, "adjustment_all_levels": "excluded (rebasing expected; frozen §3.9)"}
 

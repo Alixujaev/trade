@@ -51,6 +51,23 @@ def stage_h_sessions() -> list[date]:
     return out
 
 
+def stage_f_sessions(last: date) -> list[date]:
+    """Stage F XNYS sessions 2025-01-02 .. `last` (a protocol-2.1 forward segment's last session); calendar rule only."""
+    from acquisition.v2.contract import FORWARD_SEGMENTS, STAGE_F_EXPECTED_SESSIONS, STAGE_F_FIRST_SESSION
+    seg = next((k for k, v in FORWARD_SEGMENTS.items() if v[1] == last), None)
+    if seg is None:
+        raise SessionResolutionError(f"{last} is not the last session of a protocol-2.1 forward segment")
+    try:
+        import exchange_calendars as xcals
+    except ImportError as exc:
+        raise CalendarUnavailableError("exchange_calendars is not installed") from exc
+    cal = xcals.get_calendar(CALENDAR_NAME, start="2024-12-01", end="2027-12-31")
+    out = [d.date() for d in cal.sessions_in_range(pd.Timestamp(STAGE_F_FIRST_SESSION), pd.Timestamp(last))]
+    if len(out) != STAGE_F_EXPECTED_SESSIONS[seg] or out[0] != STAGE_F_FIRST_SESSION or out[-1] != last:
+        raise SessionResolutionError(f"Stage F ({seg}) resolved {len(out)} sessions; expected {STAGE_F_EXPECTED_SESSIONS[seg]}")
+    return out
+
+
 def label_for(session: date) -> pd.Timestamp:
     """UTC timestamp of the 1Day bar label: 00:00 America/New_York on the session date."""
     return pd.Timestamp(session.isoformat()).tz_localize(EXCHANGE_TZ).tz_convert("UTC")

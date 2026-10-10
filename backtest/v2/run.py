@@ -28,10 +28,12 @@ import numpy as np
 
 from acquisition.contract import ROOT_DIR
 from backtest.v2 import engine as en
+from backtest.v2 import forward as fw
 from backtest.v2 import metrics as mt
 from backtest.v2 import signals as sg
+from acquisition.v2.contract import PROTOCOL_VERSION_21, PROTOCOL_VERSION_22
 from acquisition.v2.reevaluate import verify_snapshot
-from backtest.v2.data import MarketData, load_stage_h, load_stage_r, tr_index
+from backtest.v2.data import MarketData, load_stage_f, load_stage_h, load_stage_r, tr_index
 
 RESEARCH_FIRST, RESEARCH_LAST = date(2017, 2, 1), date(2022, 12, 30)
 EXPECTED_RESEARCH, EXPECTED_WARMUP = 1490, 272
@@ -53,6 +55,24 @@ SEGMENTS = {
                 "experiment": {"V2-MOM": "V2-MOM-H001", "V2-STR": "V2-STR-H001", "B1": "V2-B1-holdout",
                                "B2": "V2-B2-holdout"},
                 "status_prefix": "HOLDOUT", "task": "DAY-21", "loader": load_stage_h},
+    # Protocol 2.1 (DAY-26B, artifacts/day26b/protocol-v2.1-amendment.md): one 63-session forward window split
+    # 21 + 42, never pooled. Only V2-MOM is eligible (V2-STR HOLDOUT-FAILED, V2-LRV RESEARCH-FAILED). Both segments are
+    # loaded by load_stage_f only after backtest.v2.forward.check_forward_access (adoption commit + earliest time).
+    "fwd-diag": {"id": "fwd-diag", "first": date(2026, 10, 8), "last": date(2026, 11, 5), "sessions": 21,
+                 "inputs_before": 442, "families": ("V2-MOM",),
+                 "experiment": {"V2-MOM": "V2-MOM-F002-DIAG", "B1": "V2-B1-fwd-diag", "B2": "V2-B2-fwd-diag"},
+                 "status_prefix": "FWD-DIAG", "kind": "diagnostic", "task": "DAY-26B", "loader": None},
+    "fwd-gate": {"id": "fwd-gate", "first": date(2026, 11, 6), "last": date(2027, 1, 7), "sessions": 42,
+                 "inputs_before": 463, "families": ("V2-MOM",),
+                 "experiment": {"V2-MOM": "V2-MOM-F002", "B1": "V2-B1-fwd-gate", "B2": "V2-B2-fwd-gate"},
+                 "status_prefix": "FORWARD42", "kind": "gate", "task": "DAY-26B", "loader": None},
+    # Protocol 2.2 (DAY-26D, artifacts/day26d/protocol-v2.2-amendment.md): fwd-diag invalid (DAY-26C), fwd-gate
+    # superseded; the clean 42-session gate below excludes the exposed sessions 2026-10-08/09 from its sample.
+    "fwd-gate2": {"id": "fwd-gate2", "first": date(2026, 10, 12), "last": date(2026, 12, 9), "sessions": 42,
+                  "inputs_before": 444, "families": ("V2-MOM",),
+                  "experiment": {"V2-MOM": "V2-MOM-F003", "B1": "V2-B1-fwd-gate2", "B2": "V2-B2-fwd-gate2"},
+                  "status_prefix": "FORWARD42", "kind": "gate", "task": "DAY-26D", "loader": None,
+                  "protocol_version": PROTOCOL_VERSION_22},
 }
 RESEARCH_CONFIG_SHA256 = {   # §15.7: holdout/forward must use the identical frozen configuration
     "V2-MOM": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
@@ -112,7 +132,7 @@ class Setup:
         self.data = data
         self.tr = tr_index(data)
         self.seg_first, self.seg_last = data.index_of(self.seg["first"]), data.index_of(self.seg["last"])
-        cal = xcals.get_calendar("XNYS", start="2015-12-01", end="2026-12-31")
+        cal = xcals.get_calendar("XNYS", start="2015-12-01", end="2027-12-31")   # covers the 2.1 forward window
         self.next_session = cal.next_session(self.seg["last"].isoformat()).date()   # calendar rule only, no market data
         self.universe = [data.col(t) for t in data.universe]
         self.month = sg.decision_sessions(sg.month_end_flags(data.sessions, self.next_session), self.seg_first, self.seg_last)
@@ -240,15 +260,34 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--segment", choices=sorted(SEGMENTS), default="research")
+    ap.add_argument("--snapshot", help="Stage F snapshot id (protocol-2.1 forward segments only)")
+    ap.add_argument("--expect-manifest-sha256", help="Stage F snapshot manifest SHA-256 (forward segments only)")
+    ap.add_argument("--authorization", default="", help="explicit run authorization reference (forward segments only)")
     a = ap.parse_args(argv)
     seg = SEGMENTS[a.segment]
     FAMILIES, EXPERIMENT = seg["families"], seg["experiment"]
+    forward = seg.get("kind") in ("diagnostic", "gate")
     socket.socket.connect = _refuse
     started = datetime.now(timezone.utc).isoformat()
     out = Path(a.out)
     if not out.is_absolute():
         out = ROOT_DIR / out
-    data, data_info = seg["loader"]()
+    access = None
+    if forward:                       # protocol 2.1: every precondition before any forward file is opened
+        if not a.authorization.strip():
+            print("REFUSED: --authorization is required for a forward segment; no data was loaded", file=sys.stderr)
+            return 2
+        try:
+            access = fw.check_forward_access(seg["id"])
+        except fw.ForwardAccessRefused as e:
+            print(f"REFUSED: {e}; no data was loaded", file=sys.stderr)
+            return 2
+        if out.exists():
+            print(f"REFUSED: output directory exists (write-once): {out}", file=sys.stderr)
+            return 2
+        data, data_info = load_stage_f(seg["id"], a.snapshot, a.expect_manifest_sha256)
+    else:
+        data, data_info = seg["loader"]()
     st = Setup(data, seg)
     n_research = st.seg_last - st.seg_first + 1
     if n_research != seg["sessions"] or st.seg_first != seg["inputs_before"]:
@@ -268,7 +307,7 @@ def main(argv=None) -> int:
             determinism[f"{fam}@{c}"] = (r1.fills == r2.fills and r1.equity == r2.equity
                                          and r1.decisions == r2.decisions and r1.executions == r2.executions)
     pit = pit_tests(st, results["5bps"])
-    stage_dir = "stage_r" if seg["id"] == "research" else "stage_h"
+    stage_dir = {"research": "stage_r", "holdout": "stage_h"}.get(seg["id"], "stage_f")
     post = verify_snapshot(ROOT_DIR / "data/oos_cache/protocol_v2" / stage_dir / data_info["snapshot_id"],
                            data_info["manifest_sha256"])
     snapshot_unchanged = post["tree_sha256"] == data_info["tree_sha256"]
@@ -284,13 +323,24 @@ def main(argv=None) -> int:
         for c in ("5bps", "10bps"):
             metrics[c][f]["cost_drag"] = metrics["0bps"][f]["cagr"] - metrics[c][f]["cagr"]
         metrics["0bps"][f]["cost_drag"] = 0.0
+    if forward:                       # every calendar year of a forward segment is partial (2.1 §8; P1 precedent)
+        for c in COSTS:
+            for f in FAMILIES + ("B1", "B2"):
+                res, m = results[c][f], metrics[c][f]
+                for y, row in m["calendar_years"].items():
+                    days = [s for s in res.sessions if s.startswith(y)]
+                    row["label"] = f"partial ({days[0]}..{days[-1]})"
+                m["worst_year"]["note"] = "every calendar year in a protocol-2.1 forward segment is partial"
+                if seg["kind"] == "diagnostic":
+                    m["cagr_label"] = fw.DIAG_CAGR_LABEL
 
     gate_a = {"look_ahead_tests_pass": pit["all_pass"], "data_integrity": snapshot_unchanged,
               "deterministic": all(determinism.values()),
               "reproducibility_block_complete": True, "execution_accounting_semantics": pit["fill_source_test"]["pass"]
               and pit["execution_timing_test"]["pass"], "complete_dataset": data_info["missing_bars"] == 0}
     gates = {}
-    for f in FAMILIES:
+    diagnostic = fw.diagnostic_report(metrics, gate_a, data_info) if seg.get("kind") == "diagnostic" else None
+    for f in (() if diagnostic else FAMILIES):                       # fwd-diag is never gated (2.1 §7)
         m5 = metrics["5bps"][f]
         g1 = m5["cagr"] >= 0.0
         g2 = m5["cagr"] >= metrics["5bps"]["B1"]["cagr"]
@@ -329,7 +379,9 @@ def main(argv=None) -> int:
         "git_commit": _git("rev-parse", "HEAD"),
         "data": data_info | ({"stage": "R", "corporate_action_endpoint": "/v1/corporate-actions (Stage R acquisition)"}
                              if seg["id"] == "research" else
-                             {"stage": "H", "corporate_action_endpoint": "/v1/corporate-actions (Stage H acquisition, DAY-20)"}),
+                             {"stage": "H", "corporate_action_endpoint": "/v1/corporate-actions (Stage H acquisition, DAY-20)"}
+                             if seg["id"] == "holdout" else
+                             {"stage": "F", "corporate_action_endpoint": "/v1/corporate-actions (Stage F acquisition, DAY-26B)"}),
         "strategy_config_sha256": {f: strategy_config_sha(protocol, f) for f in FAMILIES},
         "random_seeds": None,
         "engine_sha256": {f"backtest/v2/{p.name}": _sha_bytes(p.read_bytes())
@@ -350,10 +402,25 @@ def main(argv=None) -> int:
                      for c in COSTS},
         "reproducibility": repro, "result_files_sha256": files,
     }
+    if forward:
+        repro["protocol_version"] = seg.get("protocol_version", PROTOCOL_VERSION_21)
+        repro["forward_access"] = access
+        repro["authorization"] = a.authorization
+        summary["holdout_or_forward_data_read"] = True
+        summary["protocol_version"] = repro["protocol_version"]
+        summary["segments_pooled"] = False
+        summary["sample"] = (f"{seg['id']} sessions {seg['first'].isoformat()}..{seg['last'].isoformat()} only; "
+                             "earlier sessions are formation inputs, never part of the sample")
+        if diagnostic:
+            summary["diagnostic"] = diagnostic
+            summary["headline_cagr_label"] = fw.DIAG_CAGR_LABEL
     if seg["id"] != "research":
         cfg = summary["reproducibility"]["strategy_config_sha256"]
         summary["config_identical_to_research"] = {f: cfg[f] == RESEARCH_CONFIG_SHA256[f] for f in FAMILIES}
-        summary["families_not_run"] = {"V2-LRV": "RESEARCH-FAILED (economic); never run on the holdout (§15.3)"}
+        summary["families_not_run"] = (
+            {"V2-LRV": "RESEARCH-FAILED (economic); never run on the holdout (§15.3)"} if not forward else
+            {"V2-STR": "HOLDOUT-FAILED (economic); not eligible for the forward stage (§15.10)",
+             "V2-LRV": "RESEARCH-FAILED (economic); never run after research (§15.3)"})
         if not all(summary["config_identical_to_research"].values()):
             raise SystemExit("strategy-config SHA-256 differs from the research configuration (§15.7)")
     files_sha = _dump(out / "run_summary.json", summary)
@@ -362,7 +429,8 @@ def main(argv=None) -> int:
                                          "cwd": str(Path.cwd()), "environment": environment(),
                                          "git_status_porcelain": git_status, "git_dirty": bool(git_status),
                                          "run_summary_sha256": files_sha})
-    print(json.dumps({"out": str(out), "gates": {f: gates[f]["status"] for f in FAMILIES},
+    print(json.dumps({"out": str(out), "gates": {f: gates[f]["status"] for f in gates},
+                      "diagnostic_status": diagnostic["status"] if diagnostic else None,
                       "pit_all_pass": pit["all_pass"], "deterministic": all(determinism.values()),
                       "run_summary_sha256": files_sha}, indent=1))
     return 0

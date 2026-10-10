@@ -77,6 +77,23 @@ def _guarded_connect(self, address, *args, **kwargs):
     return _real_socket_connect(self, address, *args, **kwargs)
 
 
+def _install_session_market_data_guard() -> None:
+    """DAY-26C: session-wide hard guard, installed when this conftest is imported, i.e. before collection and before
+    any module- or session-scoped fixture runs. The function-scoped fixture below only starts with each test, so
+    module-scoped fixtures (tests/test_day08*..test_day12b*) previously ran unguarded, and on 2026-10-10 they
+    downloaded recent yfinance intraday data into data/cache/ (artifacts/day26c/day26c-forward-data-incident.md).
+    Tests that install their own fake download through monkeypatch still work; on teardown they restore this guard."""
+    yfp_module.yf.download = _network_disabled
+    yfp_module.yf.Ticker.history = _network_disabled
+    alpaca_module.AlpacaProvider._fetch_raw = _network_disabled
+    for cls in (yfp_module.YFinanceProvider, alpaca_module.AlpacaProvider):
+        cls._write_cache = _guard_write(cls.__dict__["_write_cache"].__func__)
+    socket.socket.connect = _guarded_connect
+
+
+_install_session_market_data_guard()
+
+
 @pytest.fixture(autouse=True)
 def _isolated_dedup_store_path(tmp_path, monkeypatch):
     monkeypatch.setattr(dedup_module, "DEFAULT_DEDUP_PATH", tmp_path / "signal_dedup.json")
@@ -89,12 +106,12 @@ def _frozen_market_data_guard(monkeypatch):
     monkeypatch.setattr(
         yfp_module.YFinanceProvider,
         "_write_cache",
-        _guard_write(yfp_module.YFinanceProvider._write_cache),
+        yfp_module.YFinanceProvider.__dict__["_write_cache"],        # already guarded at import (DAY-26C)
     )
     monkeypatch.setattr(
         alpaca_module.AlpacaProvider,
         "_write_cache",
-        _guard_write(alpaca_module.AlpacaProvider._write_cache),
+        alpaca_module.AlpacaProvider.__dict__["_write_cache"],
     )
     monkeypatch.setattr(socket.socket, "connect", _guarded_connect)
 

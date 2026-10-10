@@ -1,0 +1,47 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-26D protocol-owner adoption of protocol 2.2",
+ "title": "Adoption of Protocol v2.2: legacy-cache preflight dependency retired; clean 42-session gate fwd-gate2",
+ "final_status": "ADOPTED",
+ "protocol_version": "2.2",
+ "protocol_version_full": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 + 2.1 + 2.2",
+ "decided_by": "Alixujaev (protocol owner)",
+ "decided_utc": "2026-10-10T14:56:30Z",
+ "decision_provenance": "explicit protocol-owner instruction 'DAY-26D — RESOLVE BLOCKERS, COMMIT, START A CLEAN FORWARD GATE' (2026-10-10), authorising the amendment, the commit and the start of a new clean gate without further approval",
+ "effective_from": "the commit that contains this record and the pinned amendment; not earlier",
+ "adopted_files_sha256_lf": {
+  "artifacts/day26d/protocol-v2.2-amendment.md": "3e7204757b66f6d8ac8c38f2e77d29ac8d868e26a865f9aeebd6971152c91471",
+  "artifacts/day26d/protocol-v2.2-amendment.json": "06d47f3ae2affb33ac1ddb37854abc76edb2543ec93011043f11abe099fdbb80"
+ },
+ "builds_on": {
+  "protocol_2_1_adoption": "artifacts/day26b/protocol-v2.1-adoption.json",
+  "protocol_2_1_decided_utc": "2026-10-10T12:52:51Z",
+  "protocol_2_1_adopted_files_sha256_lf": {
+   "artifacts/day26b/protocol-v2.1-amendment.md": "43e4b83de3ebff00ca4f0ba99e0d41fadbab4d7a2a70e943f261cec7f1f46477",
+   "artifacts/day26b/protocol-v2.1-amendment.json": "ec32ab01ea9d9d690f87aec655c94dd5607542741882178c4c7e360afdbdd7db"
+  },
+  "incident_records_sha256_lf": {
+   "artifacts/day26c/day26c-forward-data-incident.md": "f023fde4f2611b17d3d664fa1391800f4b1b370f327dc877bffbc31ce8047171",
+   "artifacts/day26c/day26c-forward-data-incident.json": "68567a37a19b522aa331edf82a88d09a7f09b144fd23ff27a318aec7ce382449"
+  }
+ },
+ "segment_status": {
+  "fwd-diag": "FWD-DIAG-INVALID (protocol-breach)",
+  "fwd-gate": "SUPERSEDED (protocol 2.2) — never acquired or evaluated",
+  "fwd-gate2": "PENDING — blind, not evaluated"
+ },
+ "gate": {
+  "segment": "fwd-gate2",
+  "experiment": "V2-MOM-F003",
+  "sessions": 42,
+  "first_session": "2026-10-12",
+  "last_session": "2026-12-09",
+  "earliest_capture": "2026-12-09T16:15:00-05:00 (America/New_York) = 2026-12-09T21:15:00Z"
+ },
+ "integrity_at_adoption": {
+  "forward_data_accessed_since_day26c": false,
+  "quarantine_intact": true,
+  "stage_f_snapshot_exists": false,
+  "strategy_config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0"
+ }
+}

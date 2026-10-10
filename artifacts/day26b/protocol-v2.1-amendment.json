@@ -1,0 +1,803 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-26B",
+ "title": "Protocol v2.1 amendment: 63-session forward window with initial 21-session diagnostic and 42-session blind gate",
+ "companion_markdown": "artifacts/day26b/protocol-v2.1-amendment.md",
+ "status": "ADOPTED",
+ "effective": true,
+ "drafted": "2026-10-10",
+ "starting_head": "8ef01f4",
+ "protocol_version": "2.1",
+ "protocol_version_full": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 + 2.1",
+ "reserved_versions_not_used": [
+  "2.0.5 (DAY-24 proposal)"
+ ],
+ "amendment_statuses": {
+  "PROPOSED — NOT EFFECTIVE": "this draft; the 252-session rules of DAY-16 §3.6 / DAY-22 §3 remain binding",
+  "ADOPTED": "protocol-owner sign-off commit recording the LF-normalised SHA-256 of this .md and .json",
+  "LAPSED": "not adopted before the first Stage F acquisition or by 2027-01-07 16:15 America/New_York; the 252-session rules stay in force unchanged"
+ },
+ "lineage": [
+  {
+   "document": "artifacts/day16/research-protocol-v2.md",
+   "status": "frozen, effective",
+   "forward": "252 sessions from the first session after the freeze-commit date (§3.6)"
+  },
+  {
+   "document": "artifacts/day22/day22-protocol-owner-signoff-and-forward-oos-lockdown.md",
+   "status": "signed off, effective",
+   "forward": "2026-10-08 -> 2027-10-08, 252 sessions (§3.1); blind rules §3.2"
+  },
+  {
+   "document": "artifacts/day23/day23-forward-oos-252-session-audit.md",
+   "status": "audit, no rule change",
+   "forward": "PROTOCOL AMENDMENT MAY BE WARRANTED; §8.2 five conditions"
+  },
+  {
+   "document": "artifacts/day24/day24-forward-oos-duration-amendment-design.md",
+   "status": "PROPOSED — NOT YET EFFECTIVE",
+   "forward": "63 sessions, gated on all 63 (proposed v2.0.5)",
+   "on_adoption": "superseded by 2.1; file kept unedited as a historical record"
+  },
+  {
+   "document": "artifacts/day26a/day26a-forward-21-session-observation-amendment-draft.md",
+   "status": "PROPOSED — NOT EFFECTIVE (uncommitted draft)",
+   "forward": "21-session non-gating observation; OD-1..OD-5 open",
+   "on_adoption": "superseded by 2.1; file kept unedited as a historical record"
+  }
+ ],
+ "design": {
+  "total_sessions": 63,
+  "diagnostic_sessions": 21,
+  "gate_sessions": 42,
+  "additional_window_after_diagnostic": false,
+  "segments_pooled": false,
+  "diagnostic_role": "descriptive only; never gating; cannot change the strategy, thresholds, protocol or schedule",
+  "gate_role": "§13 gate applied once to sessions 22-63 only, after session 63",
+  "continuation": "unconditional; only the predeclared invalidation/abandonment rules can stop the schedule"
+ },
+ "calendar": {
+  "calendar": "exchange_calendars 4.13.2 XNYS",
+  "forward_start": "2026-10-08",
+  "total": {
+   "count": 63,
+   "first": "2026-10-08",
+   "last": "2027-01-07"
+  },
+  "fwd_diag": {
+   "session_numbers": [
+    1,
+    21
+   ],
+   "count": 21,
+   "first": "2026-10-08",
+   "last": "2026-11-05",
+   "sessions": [
+    "2026-10-08",
+    "2026-10-09",
+    "2026-10-12",
+    "2026-10-13",
+    "2026-10-14",
+    "2026-10-15",
+    "2026-10-16",
+    "2026-10-19",
+    "2026-10-20",
+    "2026-10-21",
+    "2026-10-22",
+    "2026-10-23",
+    "2026-10-26",
+    "2026-10-27",
+    "2026-10-28",
+    "2026-10-29",
+    "2026-10-30",
+    "2026-11-02",
+    "2026-11-03",
+    "2026-11-04",
+    "2026-11-05"
+   ],
+   "initial_decision_close": "2026-10-07",
+   "month_end_decision_closes": [
+    "2026-10-30"
+   ],
+   "rebalance_executions": [
+    "2026-11-02"
+   ],
+   "liquidation_close": "2026-11-05",
+   "inputs_before_from_stage_f_start": 442,
+   "stage_f_range": [
+    "2025-01-02",
+    "2026-11-05"
+   ],
+   "earliest_stage_f_capture": {
+    "local": "2026-11-05T16:15:00-05:00",
+    "utc": "2026-11-05T21:15:00+00:00",
+    "tz": "America/New_York",
+    "utc_offset": "-0500"
+   }
+  },
+  "fwd_gate": {
+   "session_numbers": [
+    22,
+    63
+   ],
+   "count": 42,
+   "first": "2026-11-06",
+   "last": "2027-01-07",
+   "sessions": [
+    "2026-11-06",
+    "2026-11-09",
+    "2026-11-10",
+    "2026-11-11",
+    "2026-11-12",
+    "2026-11-13",
+    "2026-11-16",
+    "2026-11-17",
+    "2026-11-18",
+    "2026-11-19",
+    "2026-11-20",
+    "2026-11-23",
+    "2026-11-24",
+    "2026-11-25",
+    "2026-11-27",
+    "2026-11-30",
+    "2026-12-01",
+    "2026-12-02",
+    "2026-12-03",
+    "2026-12-04",
+    "2026-12-07",
+    "2026-12-08",
+    "2026-12-09",
+    "2026-12-10",
+    "2026-12-11",
+    "2026-12-14",
+    "2026-12-15",
+    "2026-12-16",
+    "2026-12-17",
+    "2026-12-18",
+    "2026-12-21",
+    "2026-12-22",
+    "2026-12-23",
+    "2026-12-24",
+    "2026-12-28",
+    "2026-12-29",
+    "2026-12-30",
+    "2026-12-31",
+    "2027-01-04",
+    "2027-01-05",
+    "2027-01-06",
+    "2027-01-07"
+   ],
+   "initial_decision_close": "2026-11-05",
+   "month_end_decision_closes": [
+    "2026-11-30",
+    "2026-12-31"
+   ],
+   "rebalance_executions": [
+    "2026-12-01",
+    "2027-01-04"
+   ],
+   "liquidation_close": "2027-01-07",
+   "inputs_before_from_stage_f_start": 463,
+   "stage_f_range": [
+    "2025-01-02",
+    "2027-01-07"
+   ],
+   "earliest_stage_f_capture": {
+    "local": "2027-01-07T16:15:00-05:00",
+    "utc": "2027-01-07T21:15:00+00:00",
+    "tz": "America/New_York",
+    "utc_offset": "-0500"
+   }
+  },
+  "weekday_holidays_in_window": [
+   "2026-11-26",
+   "2026-12-25",
+   "2027-01-01"
+  ],
+  "early_closes_in_window": {
+   "2026-11-27": "13:00",
+   "2026-12-24": "13:00"
+  }
+ },
+ "ids": {
+  "segments": {
+   "fwd-diag": "sessions 1-21",
+   "fwd-gate": "sessions 22-63"
+  },
+  "experiments": {
+   "fwd-diag": {
+    "V2-MOM": "V2-MOM-F002-DIAG",
+    "B1": "V2-B1-fwd-diag",
+    "B2": "V2-B2-fwd-diag"
+   },
+   "fwd-gate": {
+    "V2-MOM": "V2-MOM-F002",
+    "B1": "V2-B1-fwd-gate",
+    "B2": "V2-B2-fwd-gate"
+   }
+  },
+  "unused_ids": [
+   "V2-MOM-F001 (252-session forward under 2.0.4; never run)"
+  ],
+  "section14_label": "V2-MOM-F002: DERIVED FROM PRIOR OBSERVATION (segment change only; strategy unchanged)",
+  "stage_f_snapshots": {
+   "F-D": "fwd-diag Stage F, 2025-01-02 -> 2026-11-05",
+   "F-G": "fwd-gate Stage F, 2025-01-02 -> 2027-01-07"
+  }
+ },
+ "invariants": {
+  "strategy": "V2-MOM, cross-sectional momentum 12-1, long-only, top 5, equal weight 20%",
+  "strategy_config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+  "universe": "FROZEN_DAY_UNIVERSE (25 US equities, DAY-22 §4)",
+  "benchmarks": {
+   "B1": "equal-weight 25-stock buy-and-hold (gate reference)",
+   "B2": "SPY buy-and-hold (reference, not gated)"
+  },
+  "initial_equity": 100000,
+  "segment_accounting": "each segment starts 100% cash and is liquidated at its last close (§11.6, §3.7)",
+  "execution": "market-on-open t+1 at raw Series A open; sells first; buy scaling lambda (§8, DAY-22 §4)",
+  "costs_bps": [
+   0,
+   5,
+   10
+  ],
+  "primary_cost_bps": 5,
+  "calendar": "exchange_calendars 4.13.2 XNYS, America/New_York",
+  "data_source": "frozen providers only (§3.2/§3.4): raw bars, all bars, corporate-action events for 25 symbols + SPY",
+  "gate_thresholds": "§13.B unchanged: net CAGR @5 bps >= 0 and >= B1 net CAGR @5 bps, margin 0, unrounded float64"
+ },
+ "permissions": [
+  {
+   "period": "now -> adoption",
+   "rule": "DAY-16/DAY-22 252-session rules unchanged: nothing forward may be acquired, computed or inspected"
+  },
+  {
+   "period": "adoption -> 2026-11-05 16:15 America/New_York",
+   "acquire": false,
+   "compute": false,
+   "inspect": false
+  },
+  {
+   "period": "after 2026-11-05 16:15 America/New_York (adopted, preflight passed, authorised)",
+   "scope": "data dated <= 2026-11-05 only",
+   "acquire": "once (Stage F-D)",
+   "compute": "fwd-diag run x2 (determinism)",
+   "inspect": true
+  },
+  {
+   "period": "2026-11-06 -> 2027-01-07 16:15 America/New_York",
+   "scope": "any data dated >= 2026-11-06",
+   "acquire": false,
+   "compute": false,
+   "inspect": false,
+   "monitor_or_visualize": false
+  },
+  {
+   "period": "after 2027-01-07 16:15 America/New_York (preflight passed, authorised)",
+   "scope": "data dated <= 2027-01-07",
+   "acquire": "once (Stage F-G)",
+   "compute": "fwd-gate run x2 (determinism)",
+   "inspect": true
+  },
+  {
+   "period": "always",
+   "rule": "operational feeds, if any, isolate raw ingestion and never compute or expose forward strategy performance (DAY-22 §3.2.2)"
+  }
+ ],
+ "diagnostic_report": {
+  "segment": "fwd-diag",
+  "headline_cost_bps": 5,
+  "supporting_cost_bps": [
+   0,
+   10
+  ],
+  "metrics": [
+   "total return, not annualised (V2-MOM, B1, B2)",
+   "active total return vs B1 and vs B2",
+   "max drawdown (close-marked equity)",
+   "turnover, executions, mean/min lambda",
+   "transaction-cost impact: total costs and cost drag (gross minus net total return)",
+   "concentration: top-2 share of sum |P&L contribution|, weight HHI, symbol breadth",
+   "exposure: mean/min/max of sum(positions)/equity",
+   "data completeness: missing sessions per symbol, §3.8 structural checks, corporate-action review outcome",
+   "protocol compliance: fill-source test, execution-timing test, determinism (two runs), config SHA, amendment SHA, §17 block"
+  ],
+  "excluded": "CAGR, Sharpe, Sortino, Calmar and statistical tests are not part of the diagnostic report; any engine file containing CAGR carries the label 'annualised from 21 sessions — not meaningful evidence'",
+  "thresholds": "none",
+  "consequences": "none: cannot change, extend, cancel or restart the fwd-gate schedule"
+ },
+ "gate": {
+  "segment": "fwd-gate",
+  "sessions": 42,
+  "A_methodological": "§13.A items 1-7 unchanged",
+  "B_economic": "§13.B unchanged on the 42 fwd-gate sessions: net CAGR @5 bps >= 0 and >= B1 net CAGR @5 bps; margin 0; unrounded float64; CAGR = (E_T/E_0)^(252/42) - 1",
+  "B_note": "with identical N and E_0 for V2-MOM and B1, the two inequalities give the same decision as comparing net total returns; no threshold depends on 252",
+  "C_completeness": "§16 items 1-7 at 0/5/10 bps, value or 'undefined (reason)'; calendar-year subperiods 2026 (partial, 2026-11-06 -> 2026-12-31, 38 sessions) and 2027 (partial, 2027-01-04 -> 2027-01-07, 4 sessions)",
+  "C_statistical_diagnostic": "HAC (Newey-West, lag 5) t-statistic of daily active return vs B1 on 42 returns; Holm adjustment with m = 1 (single family in the forward stage; DAY-21 P2 precedent of predeclaring m); diagnostic only",
+  "excluded_from_sample": "all fwd-diag sessions, returns and metrics; never pooled",
+  "evaluation": "once, after 2027-01-07 16:15 America/New_York, Stage F-G and §3.8 review",
+  "outcome_mapping": [
+   {
+    "condition": "any §13.A item fails",
+    "status": "FORWARD42-FAILED (methodological)"
+   },
+   {
+    "condition": "§13.A passes, §13.B fails",
+    "status": "FORWARD42-FAILED (economic)"
+   },
+   {
+    "condition": "§13.A and §13.B pass, a §16 item is missing",
+    "status": "FORWARD42-FAILED (incomplete)"
+   },
+   {
+    "condition": "§13.A, §13.B and §13.C pass",
+    "status": "FORWARD42-PASSED"
+   }
+  ]
+ },
+ "statuses": {
+  "fwd-diag": {
+   "FWD-DIAG-COMPLETE": "all checks passed, two identical runs, every report item present; says nothing about good or bad performance",
+   "FWD-DIAG-INVALID (methodological | data-incomplete | protocol-breach)": "diagnostic unusable; recorded with reason; never re-run to obtain a different result",
+   "FWD-DIAG-ABANDONED": "not executed; recorded with reason"
+  },
+  "fwd-gate": {
+   "FORWARD42-PASSED": "survived a 42-session blind forward gate under protocol 2.1 — not equivalent to the one-year test of §15.11; not 'validated under v2'",
+   "FORWARD42-FAILED (economic | methodological | incomplete)": "§13 vocabulary applied to the 42-session gate",
+   "FORWARD42-INVALID (protocol-breach)": "fwd-gate data, returns or metrics were acquired, computed or inspected before 2027-01-07 16:15 America/New_York, or a frozen item changed after adoption",
+   "FORWARD42-ABANDONED": "only for a predeclared abandonment reason (see invalidation_rules)"
+  },
+  "not_available_under_2_1": [
+   "FORWARD-PASSED",
+   "FORWARD-FAILED",
+   "validated under v2"
+  ]
+ },
+ "invalidation_rules": [
+  {
+   "event": "missing session for a symbol",
+   "rule": "listed, never imputed (§3.8); > 2% of a segment's sessions for any symbol (1 session = 4.8% of fwd-diag, 2.4% of fwd-gate) -> BLOCKING data review before the run, decided on data only"
+  },
+  {
+   "event": "§3.8 structural HARD FAIL or unresolved BLOCKING review",
+   "rule": "no run until resolved by a §3.9 write-once re-acquisition (originals kept); unresolved -> FWD-DIAG-INVALID (data-incomplete) / FORWARD42-FAILED (methodological) per §13.A.2 and A.7"
+  },
+  {
+   "event": "corporate-action mismatch or unsupported type",
+   "rule": "BLOCKING data review before the run (§3.4, §3.8)"
+  },
+  {
+   "event": "unscheduled market closure",
+   "rule": "the window runs to the 63rd completed XNYS session; the split stays 1-21 / 22-63 by session count; dates are re-derived and recorded before any acquisition; nothing else changes"
+  },
+  {
+   "event": "fill not at raw open, wrong timing, non-raw mark",
+   "rule": "§13.A.6 -> methodological"
+  },
+  {
+   "event": "two runs differ",
+   "rule": "§13.A.3 -> methodological"
+  },
+  {
+   "event": "technical crash with identical frozen configuration",
+   "rule": "technical re-run per §14; both runs kept and reported"
+  },
+  {
+   "event": "fwd-gate data/metrics seen before 2027-01-07 16:15 America/New_York",
+   "rule": "FORWARD42-INVALID (protocol-breach); recorded, never hidden"
+  },
+  {
+   "event": "fwd-diag data seen before adoption or before 2026-11-05 16:15 America/New_York",
+   "rule": "FWD-DIAG-INVALID (protocol-breach); if the exposure includes data dated >= 2026-11-06, also FORWARD42-INVALID (protocol-breach)"
+  },
+  {
+   "event": "fwd-diag invalid or abandoned for its own reasons",
+   "rule": "fwd-gate continues unchanged"
+  },
+  {
+   "event": "abandonment",
+   "rule": "fwd-gate may be abandoned only if (i) the amendment lapses, (ii) the protocol owner withdraws it before Stage F-D is acquired, or (iii) the frozen provider cannot supply the required data and the §3.8 review records this as unresolvable; never because of a diagnostic or market observation (DAY-22 §3.2.4, DAY-23 §8.1.1)"
+  }
+ ],
+ "conflicts": [
+  {
+   "id": "C1",
+   "clause": "DAY-16 §3.6 segment table",
+   "old": "Forward OOS = the 252 XNYS sessions starting at the first session strictly after the freeze-commit date",
+   "amended": "63 sessions from that first session (2026-10-08 -> 2027-01-07): fwd-diag 1-21, fwd-gate 22-63"
+  },
+  {
+   "id": "C2",
+   "clause": "DAY-16 §3.6 rationale 5 (length)",
+   "old": "its length is fixed now and is never extended or shortened after looking",
+   "amended": "shortened once, by this amendment, before any forward data exists (DAY-23 §8.2 condition 1); fixed thereafter"
+  },
+  {
+   "id": "C3",
+   "clause": "DAY-16 §3.6 rationale 5 (data)",
+   "old": "No data dated after the freeze commit may be acquired or inspected before the forward period has ended",
+   "amended": "data dated <= 2026-11-05: after 2026-11-05 16:15 America/New_York; data dated >= 2026-11-06: after 2027-01-07 16:15 America/New_York"
+  },
+  {
+   "id": "C4",
+   "clause": "DAY-16 §3.9 Stage F",
+   "old": "acquired only after the forward period has ended … 2025-01-02 -> last forward session. No interim forward data is acquired or inspected",
+   "amended": "two write-once snapshots, each acquired once: F-D (2025-01-02 -> 2026-11-05) and F-G (2025-01-02 -> 2027-01-07); overlap control H∩F-D, H∩F-G, F-D∩F-G cell by cell"
+  },
+  {
+   "id": "C5",
+   "clause": "DAY-16 §3.7 / §11.6",
+   "old": "each segment starts flat and is liquidated at its last close",
+   "amended": "unchanged; applied to fwd-diag and fwd-gate separately"
+  },
+  {
+   "id": "C6",
+   "clause": "DAY-16 §13 (gate re-applied on Forward)",
+   "old": "The same gate is re-applied, unchanged, on the Holdout and Forward segments",
+   "amended": "applied unchanged to fwd-gate only; fwd-diag is not gated"
+  },
+  {
+   "id": "C7",
+   "clause": "DAY-16 §13 outcome vocabulary / §15 diagram",
+   "old": "FORWARD-PASSED / FORWARD-FAILED",
+   "amended": "FORWARD42-PASSED / FORWARD42-FAILED (…) / FORWARD42-INVALID / FORWARD42-ABANDONED"
+  },
+  {
+   "id": "C8",
+   "clause": "DAY-16 §14 New experiment",
+   "old": "any change to a … segment … new ID and a new protocol version … DERIVED FROM PRIOR OBSERVATION if proposed after any v2 result",
+   "amended": "protocol 2.1; IDs V2-MOM-F002-DIAG / V2-MOM-F002; V2-MOM-F002 labelled DERIVED FROM PRIOR OBSERVATION (segment change only)"
+  },
+  {
+   "id": "C9",
+   "clause": "DAY-16 §14 / §16.7 Holm across the three families",
+   "old": "Holm-adjusted p-values across the three families, per segment",
+   "amended": "m = 1 in fwd-gate (only V2-MOM is in the forward stage); predeclared here (DAY-21 P2 precedent)"
+  },
+  {
+   "id": "C10",
+   "clause": "DAY-16 §15.6",
+   "old": "Forward data are acquired once, after the forward period ends; no interim forward performance is computed or inspected",
+   "amended": "once per segment, after that segment ends (C3, C4); no interim computation or inspection inside fwd-gate"
+  },
+  {
+   "id": "C11",
+   "clause": "DAY-16 §15.11 / §14 normative",
+   "old": "FORWARD-PASSED = survived one year of genuinely unseen data — the only status labelled 'validated under v2'",
+   "amended": "not available for this 42-session gate; FORWARD42-PASSED is defined in §8 and is never called 'validated'"
+  },
+  {
+   "id": "C12",
+   "clause": "DAY-16 §20 Q11",
+   "old": "forward OOS = 1 year (low power)",
+   "amended": "fwd-gate = 42 sessions: weaker long-term evidence than the original design (§12 disclaimer)"
+  },
+  {
+   "id": "C13",
+   "clause": "DAY-22 §3.1",
+   "old": "2026-10-08 -> 2027-10-08, exactly 252 XNYS sessions",
+   "amended": "2026-10-08 -> 2027-01-07, 63 sessions (21 + 42)"
+  },
+  {
+   "id": "C14",
+   "clause": "DAY-22 §3.2.1 configuration lockdown",
+   "old": "config SHA 62827d70… locked; zero changes",
+   "amended": "unchanged"
+  },
+  {
+   "id": "C15",
+   "clause": "DAY-22 §3.2.2 no interim peeking",
+   "old": "prohibited to compute/inspect/monitor/visualize interim forward performance",
+   "amended": "binding for all fwd-gate data until 2027-01-07 16:15 America/New_York; for fwd-diag data lifted only after adoption and 2026-11-05 16:15 America/New_York; operational-feed clause unchanged"
+  },
+  {
+   "id": "C16",
+   "clause": "DAY-22 §3.2.3 no forward data acquisition",
+   "old": "until the 252-session waiting period has concluded",
+   "amended": "per segment (C3)"
+  },
+  {
+   "id": "C17",
+   "clause": "DAY-22 §3.2.4 no forward-guided mutations",
+   "old": "observations during the blind period shall not be used to propose protocol changes",
+   "amended": "unchanged and extended: fwd-diag results can never change the strategy, thresholds, protocol or schedule"
+  },
+  {
+   "id": "C18",
+   "clause": "DAY-22 §6 exact next task",
+   "old": "wait for completion of the frozen 252-session forward OOS period",
+   "amended": "execution sequence S0-S12"
+  },
+  {
+   "id": "C19",
+   "clause": "DAY-23 §8.1.1 adaptive early stopping",
+   "old": "halting the evaluation prematurely because interim performance happens to be positive",
+   "amended": "fwd-gate continues unconditionally; abandonment only for predeclared reasons"
+  },
+  {
+   "id": "C20",
+   "clause": "DAY-23 §8.2 conditions 1-5",
+   "old": "before any forward data; fixed N*; frozen SHA; one-shot; no interim inspection",
+   "amended": "1 adoption before any Stage F; 2 N fixed (63 = 21 + 42); 3 SHA frozen; 4 one-shot per segment; 5 holds inside fwd-gate. Deviation: for the 63-session window as a whole, condition 5 is relaxed by the fwd-diag inspection; mitigated by excluding fwd-diag from the gate sample (approval A-8)"
+  },
+  {
+   "id": "C21",
+   "clause": "DAY-24 Specs 1-15 (63 sessions gated on all 63, v2.0.5, FORWARD-PASSED)",
+   "old": "proposed, not adopted",
+   "amended": "superseded on adoption: total length 63 kept; gate restricted to sessions 22-63; v2.0.5 and FORWARD-PASSED not used"
+  },
+  {
+   "id": "C22",
+   "clause": "DAY-26A draft (21-session observation, OD-1..OD-5)",
+   "old": "proposed, not adopted",
+   "amended": "superseded on adoption: OD-1 resolved as gate after the observation inside the same 63 sessions; OD-2 DAY-24 superseded; OD-3 IDs/version above; OD-4 adoption deadline (A-5); OD-5 start 2026-10-08 accepted (A-7)"
+  },
+  {
+   "id": "C23",
+   "clause": "implementation: backtest/v2/run.py (calendar end 2026-12-31; SEGMENTS research/holdout only); no Stage F loader/acquisition",
+   "old": "cannot run forward segments",
+   "amended": "implemented in DAY-26B (§18), with byte-identical research/holdout regression (DAY-21/DAY-22 §1.7 precedent); strategy config SHA unaffected (approval A-6)"
+  }
+ ],
+ "preflight": [
+  {
+   "id": "P1",
+   "check": "adoption commit exists; LF-normalised SHA-256 of this .md and .json match the values pinned in it"
+  },
+  {
+   "id": "P2",
+   "check": "strategy-config SHA-256 == 62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0"
+  },
+  {
+   "id": "P3",
+   "check": "DAY-16 protocol files and DAY-22 lockdown unchanged since adoption (git diff empty)"
+  },
+  {
+   "id": "P4",
+   "check": "forward-capable code reproduces DAY-19 research and DAY-21 holdout result files byte-identically"
+  },
+  {
+   "id": "P5",
+   "check": "python -m scripts.day26b_forward_calendar output equals the calendar block; exchange_calendars == 4.13.2"
+  },
+  {
+   "id": "P6",
+   "check": "environment fingerprint recorded (reference distributions SHA-256 7b47231b…); a different fingerprint is reported and never relaxes any check"
+  },
+  {
+   "id": "P7",
+   "check": "no Stage F snapshot for the segment exists yet; no forward bars in any project cache (directory listing only)"
+  },
+  {
+   "id": "P8",
+   "check": "current time >= the segment's earliest Stage F capture time (America/New_York)"
+  },
+  {
+   "id": "P9",
+   "check": "explicit authorisation reference for the step recorded in the run artifacts"
+  },
+  {
+   "id": "P10",
+   "check": "Stage F request bounded to the segment's last session; no bar or event dated later is persisted or displayed (v2.0.1 C1 precedent)"
+  },
+  {
+   "id": "P11",
+   "check": "simulation runs with network sockets refused; acquisition is the only networked step"
+  },
+  {
+   "id": "P12",
+   "check": "git tree clean except untracked run outputs (§17)"
+  },
+  {
+   "id": "P13",
+   "check": "fwd-gate only: fwd-diag artifacts and F-D snapshot exist write-once and unchanged; no fwd-gate artifact or interim output exists"
+  }
+ ],
+ "execution_sequence": [
+  {
+   "step": "S0",
+   "when": "now",
+   "action": "draft review; no forward access"
+  },
+  {
+   "step": "S1",
+   "when": "before any Stage F (to keep the diagnostic on time: before 2026-11-05 16:15 America/New_York)",
+   "action": "protocol-owner sign-off commit adopting 2.1; SHA-256 of .md/.json pinned; DAY-24 and DAY-26A recorded as superseded"
+  },
+  {
+   "step": "S2",
+   "when": "after S1, before 2026-11-05 16:15 America/New_York",
+   "action": "separately authorised implementation: fwd-diag/fwd-gate segments, Stage F loader and acquisition with bounded requests, calendar bound; regression P4; commit"
+  },
+  {
+   "step": "S3",
+   "when": "after 2026-11-05 16:15 America/New_York",
+   "action": "preflight P1-P12 for fwd-diag"
+  },
+  {
+   "step": "S4",
+   "when": "after S3, separately authorised",
+   "action": "Stage F-D acquisition once (2025-01-02 -> 2026-11-05), write-once; overlap control vs Stage H; §3.8 review"
+  },
+  {
+   "step": "S5",
+   "when": "after S4",
+   "action": "fwd-diag run (V2-MOM, B1, B2 at 0/5/10 bps) twice; diagnostic report; status FWD-DIAG-*; registry entry"
+  },
+  {
+   "step": "S6",
+   "when": "2026-11-06 -> 2027-01-07",
+   "action": "fwd-gate blind period: nothing acquired, computed, inspected, monitored or visualized; continues regardless of S5"
+  },
+  {
+   "step": "S7",
+   "when": "after 2027-01-07 16:15 America/New_York",
+   "action": "preflight P1-P13 for fwd-gate"
+  },
+  {
+   "step": "S8",
+   "when": "after S7, separately authorised",
+   "action": "Stage F-G acquisition once (2025-01-02 -> 2027-01-07), write-once; overlap control vs H and F-D; §3.8 review"
+  },
+  {
+   "step": "S9",
+   "when": "after S8",
+   "action": "fwd-gate run twice; §13 A/B/C on the 42 sessions only"
+  },
+  {
+   "step": "S10",
+   "when": "after S9",
+   "action": "status FORWARD42-*; registry entry; report"
+  },
+  {
+   "step": "S11",
+   "when": "after S10",
+   "action": "protocol-owner review and sign-off of the forward result"
+  },
+  {
+   "step": "S12",
+   "when": "after S11",
+   "action": "any decision about real-money trading is a separate, explicit decision outside this protocol"
+  }
+ ],
+ "timeline": {
+  "earliest_diagnostic_evaluation": "2026-11-05T16:15:00-05:00 (America/New_York, EST) = 2026-11-05T21:15:00Z",
+  "earliest_final_gate_evaluation": "2027-01-07T16:15:00-05:00 (America/New_York, EST) = 2027-01-07T21:15:00Z",
+  "early_2027_conclusion": "possible: the final evaluation can start on 2027-01-07 after 16:15 America/New_York; completion in January 2027 depends on no BLOCKING data review arising and on S2 being finished in time"
+ },
+ "disclaimers": [
+  "Shortening the forward window from 252 to 63 sessions, with only 42 gated, weakens the long-term evidence; a 42-session result does not provide evidence equivalent to a one-year test.",
+  "No outcome, including FORWARD42-PASSED, authorises real-money or live trading; that requires a separate explicit decision.",
+  "A 21-session diagnostic is descriptive; its CAGR is not meaningful evidence.",
+  "Even the 856-session historical holdout did not reach statistical significance vs B1 (HAC p = 0.166, DAY-22 §1.10)."
+ ],
+ "approvals_required": [
+  {
+   "id": "A-1",
+   "decision": "adopt protocol version 2.1 (2.0.5 stays reserved by DAY-24)"
+  },
+  {
+   "id": "A-2",
+   "decision": "gate labels FORWARD42-* and no 'validated' label (alternative needing explicit wording: a 2.1-specific 'validated' meaning)"
+  },
+  {
+   "id": "A-3",
+   "decision": "label V2-MOM-F002 DERIVED FROM PRIOR OBSERVATION under §14 (segment change only)"
+  },
+  {
+   "id": "A-4",
+   "decision": "Holm m = 1 for the fwd-gate statistical diagnostic"
+  },
+  {
+   "id": "A-5",
+   "decision": "adoption deadline: before any Stage F; to keep the diagnostic on time, before 2026-11-05 16:15 America/New_York; LAPSED rule"
+  },
+  {
+   "id": "A-6",
+   "decision": "authorise the separate implementation task S2 (forward segments, Stage F code, calendar bound) with regression proof"
+  },
+  {
+   "id": "A-7",
+   "decision": "accept that the window started on 2026-10-08, before adoption (no forward data accessed)"
+  },
+  {
+   "id": "A-8",
+   "decision": "accept the DAY-23 §8.2 condition-5 deviation for the window as a whole (fwd-diag inspected mid-window), mitigated by exclusion from the gate sample"
+  },
+  {
+   "id": "A-9",
+   "decision": "the closed list of abandonment reasons"
+  }
+ ],
+ "integrity": {
+  "forward_data_accessed": false,
+  "excluded_data_accessed": false,
+  "market_data_fetched": false,
+  "forward_metrics_computed": false,
+  "backtests_or_simulations_run": false,
+  "existing_files_modified": [],
+  "committed": false,
+  "evidence_of_prior_forward_access": "none found: data/oos_cache/protocol_v2 contains only stage_r, stage_h and evidence (vault-restored 2026-10-10); no stage_f"
+ },
+ "adoption": {
+  "adopted_utc": "2026-10-10T12:52:51Z",
+  "decided_by": "Alixujaev (protocol owner)",
+  "record": "artifacts/day26b/protocol-v2.1-adoption.json",
+  "effective_from": "the commit that contains the adoption record (never earlier)",
+  "before_adoption": "2026-10-08 until the adoption commit: the 252-session DAY-16 §3.6 / DAY-22 §3 rules governed; no forward data was acquired, computed or inspected",
+  "text_changes_since_draft": [
+   "status banner",
+   "adoption row",
+   "C23",
+   "§17 formal exceptions",
+   "§18 implementation"
+  ]
+ },
+ "formal_exceptions": [
+  {
+   "id": "E1",
+   "earlier": "DAY-16 §3.6 / DAY-22 §3.1: forward OOS = 252 sessions, 2026-10-08 -> 2027-10-08",
+   "basis": "replaced by 63 sessions (21 + 42), C1, C13; adopted 2026-10-10 before any forward data existed (DAY-23 §8.2 condition 1)"
+  },
+  {
+   "id": "E2",
+   "earlier": "DAY-16 §3.6 rationale 5: length never extended or shortened after looking",
+   "basis": "no forward data had been looked at; shortened once, C2"
+  },
+  {
+   "id": "E3",
+   "earlier": "DAY-16 §3.6 r5, §3.9, §15.6; DAY-22 §3.2.2-§3.2.3: one Stage F after the whole forward period, no interim inspection",
+   "basis": "two per-segment Stage F snapshots and permissions, C3, C4, C10, C15, C16; inside fwd-gate the original rules apply unchanged"
+  },
+  {
+   "id": "E4",
+   "earlier": "DAY-23 §8.2 condition 5 for the 63-session window as a whole",
+   "basis": "relaxed by the fwd-diag inspection after session 21 (A-8); mitigated by permanent exclusion of fwd-diag from the gate sample and the unconditional schedule (C19, C20)"
+  },
+  {
+   "id": "E5",
+   "earlier": "DAY-16 §15.11 / §14 normative: FORWARD-PASSED = one year, 'validated under v2'",
+   "basis": "not available; FORWARD42-* labels (A-2), C7, C11"
+  },
+  {
+   "id": "E6",
+   "earlier": "DAY-16 §14 / §16.7 Holm across three families",
+   "basis": "m = 1 (A-4), C9"
+  }
+ ],
+ "not_excepted": "strategy, configuration SHA-256 62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0, §13 thresholds, benchmarks and costs are unchanged; DAY-24 and DAY-26A superseded as historical records, files not edited",
+ "implementation": {
+  "backtest/v2/forward.py": "new: check_forward_access (time gate 16:15 America/New_York on the segment's last session + adoption gate: record ADOPTED, pinned SHA-256 match, files committed unchanged + 21/42/63 calendar split); diagnostic_report (§7)",
+  "backtest/v2/run.py": "calendar bound 2027-12-31; SEGMENTS fwd-diag / fwd-gate; forward segments require --authorization and pass check_forward_access before any load; write-once output; fwd-diag never gated; fwd-gate uses unchanged §13 code with prefix FORWARD42; partial calendar-year labels; research/holdout paths unchanged",
+  "backtest/v2/data.py": "load_stage_f (gated; validated READY snapshot; session index ends at the segment's last session)",
+  "acquisition/v2/stage_f.py": "new: Stage F capture and offline validation, gated before any client exists; acquired once per segment; request and persistence bounds per the adoption record",
+  "acquisition/v2/contract.py, acquisition/v2/sessions.py": "Stage F constants; stage_f_sessions",
+  "acquisition/v2/stage_h.py": "keyword parameters with unchanged defaults (derive, overlap_control, assert_no_leakage_h) reused by Stage F",
+  "tests/test_day26b_forward.py": "new: synthetic/offline tests of the split, time and adoption gates, refusal before loading, sample separation, diagnostic report"
+ },
+ "incident_disclosures": [
+  {
+   "appended_utc": "2026-10-10T14:30:00Z",
+   "incident": "DAY-26C",
+   "record": [
+    "artifacts/day26c/day26c-forward-data-incident.md",
+    "artifacts/day26c/day26c-forward-data-incident.json"
+   ],
+   "summary": "2026-10-10 12:56:23Z-12:59:51Z: a DAY-26B full-suite verification run downloaded recent yfinance intraday data (54 files, 5m/15m, 27 symbols) into data/cache and legacy tests consumed it, printing legacy trade counts; believed to cover Excluded-period sessions and forward sessions 1-2 (2026-10-08/09); no fwd-gate session existed; values not viewed; no V2-MOM forward metric computed",
+   "segment_status": {
+    "fwd-diag": "FWD-DIAG-INVALID (protocol-breach)",
+    "fwd-gate": "PENDING — blind, not evaluated"
+   },
+   "cancelled_steps": [
+    "S3",
+    "S4",
+    "S5"
+   ],
+   "unchanged": "adoption timestamp, all historical fields, fwd-gate dates, thresholds and calendar"
+  }
+ ],
+ "segment_status": {
+  "fwd-diag": "FWD-DIAG-INVALID (protocol-breach)",
+  "fwd-gate": "PENDING — blind, not evaluated"
+ }
+}

@@ -1,0 +1,243 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-26D",
+ "title": "Protocol v2.2 amendment: retire the unrecoverable DAY-15 legacy-cache preflight dependency; clean 42-session forward gate fwd-gate2",
+ "companion_markdown": "artifacts/day26d/protocol-v2.2-amendment.md",
+ "protocol_version": "2.2",
+ "protocol_version_full": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 + 2.1 + 2.2",
+ "status": "ADOPTED",
+ "adoption_record": "artifacts/day26d/protocol-v2.2-adoption.json",
+ "drafted_and_adopted_utc": "2026-10-10T14:56:30Z",
+ "effective_from": "the commit that contains this amendment and its adoption record; not earlier",
+ "authorization": "explicit protocol-owner instruction 'DAY-26D — RESOLVE BLOCKERS, COMMIT, START A CLEAN FORWARD GATE' (2026-10-10)",
+ "append_only": "protocol 2.1 files, its adoption record and the DAY-26C incident record are not modified; this amendment builds on them",
+ "lineage": {
+  "protocol_2_1_adoption": {
+   "file": "artifacts/day26b/protocol-v2.1-adoption.json",
+   "decided_utc": "2026-10-10T12:52:51Z",
+   "adopted_files_sha256_lf": {
+    "artifacts/day26b/protocol-v2.1-amendment.md": "43e4b83de3ebff00ca4f0ba99e0d41fadbab4d7a2a70e943f261cec7f1f46477",
+    "artifacts/day26b/protocol-v2.1-amendment.json": "ec32ab01ea9d9d690f87aec655c94dd5607542741882178c4c7e360afdbdd7db"
+   },
+   "incident_records_sha256_lf": {
+    "artifacts/day26c/day26c-forward-data-incident.md": "f023fde4f2611b17d3d664fa1391800f4b1b370f327dc877bffbc31ce8047171",
+    "artifacts/day26c/day26c-forward-data-incident.json": "68567a37a19b522aa331edf82a88d09a7f09b144fd23ff27a318aec7ce382449"
+   }
+  },
+  "protocol_2_1_amendment_sha256_lf": {
+   "artifacts/day26b/protocol-v2.1-amendment.md": "43e4b83de3ebff00ca4f0ba99e0d41fadbab4d7a2a70e943f261cec7f1f46477",
+   "artifacts/day26b/protocol-v2.1-amendment.json": "ec32ab01ea9d9d690f87aec655c94dd5607542741882178c4c7e360afdbdd7db"
+  },
+  "incident_record_sha256_lf": {
+   "artifacts/day26c/day26c-forward-data-incident.md": "f023fde4f2611b17d3d664fa1391800f4b1b370f327dc877bffbc31ce8047171",
+   "artifacts/day26c/day26c-forward-data-incident.json": "68567a37a19b522aa331edf82a88d09a7f09b144fd23ff27a318aec7ce382449"
+  }
+ },
+ "disclosures": {
+  "legacy_cache_unrecoverable": "the 305 frozen DAY-15 legacy files under data/cache (artifacts/day15/integrity-baseline.json) were searched for on 2026-10-10 in git history (all refs), the research-data vault (release protocol-v2-historical-v1: stage_r, stage_h, evidence, manifest only; DAY-26 report: data/cache intentionally not vaulted) and local disks (Desktop, Downloads, Documents, depth 6); the only candidate, trade/smc-scanner/data/cache, matched 0/305 SHA-256. They are unrecoverable. No replacement was downloaded or regenerated.",
+  "fwd_diag": "FWD-DIAG-INVALID (protocol-breach) (DAY-26C) — unchanged and final; never relabelled",
+  "old_fwd_gate": "SUPERSEDED (protocol 2.2) — never acquired or evaluated",
+  "quarantine": "the 54 DAY-26C incident files stay in the quarantine directory outside every active data path; their SHA-256 inventory (artifacts/day26c) is enforced by backtest/v2/forward.check_quarantine"
+ },
+ "decisions": [
+  {
+   "id": "D1",
+   "title": "Stage F preflight without the legacy cache",
+   "rule": "the Stage F capture preflight (acquisition/v2/stage_f.preflight) no longer requires DAY-15 data/cache; every other DAY-15 frozen directory (artifacts/day04 .. artifacts/day14) is still enforced: identical file set and each file equal to its baseline SHA-256 up to line endings only (raw, LF- or CRLF-normalised; DAY-25B precedent — the baseline itself mixes LF and CRLF files)",
+   "retained": [
+    "forward access (status, time, adoption chain, config SHA, calendar, quarantine)",
+    "clean git tree",
+    "frozen protocol identity (DAY-16 + v2.0.1-v2.0.3 at their commits)",
+    "v2.0.4 amendment unchanged",
+    "DAY-20 decisions committed"
+   ]
+  },
+  {
+   "id": "D2",
+   "title": "new clean gate fwd-gate2",
+   "segment": "fwd-gate2",
+   "experiment": "V2-MOM-F003",
+   "benchmarks": {
+    "B1": "V2-B1-fwd-gate2",
+    "B2": "V2-B2-fwd-gate2"
+   },
+   "sessions": 42,
+   "first_session": "2026-10-12",
+   "last_session": "2026-12-09",
+   "rule": "first XNYS session strictly after the DAY-26D commit day; 42 consecutive XNYS sessions; §13 gate (A/B/C) applied unchanged once after the final session",
+   "outcome_labels": [
+    "FORWARD42-PASSED",
+    "FORWARD42-FAILED (economic | methodological | incomplete)",
+    "FORWARD42-INVALID (protocol-breach)",
+    "FORWARD42-ABANDONED"
+   ],
+   "not_available": [
+    "FORWARD-PASSED",
+    "validated under v2"
+   ]
+  },
+  {
+   "id": "D3",
+   "title": "sample separation",
+   "rule": "2026-10-08 and 2026-10-09 (exposed in DAY-26C) and every earlier session are never part of the fwd-gate2 sample; they are formation history only, read mechanically by the frozen rules. The invalid fwd-diag is never part of fwd-gate2 metrics or benchmarks. Warm-up/lookback data come only from the single fresh Stage F acquisition below, never from quarantined files."
+  },
+  {
+   "id": "D4",
+   "title": "fresh immutable snapshot",
+   "rule": "one Stage F acquisition for fwd-gate2 (stage_f_fwd-gate2_<UTC>), 2025-01-02 -> 2026-12-09, Alpaca SIP raw + all bars and corporate actions, write-once and read-only, own manifest with per-file SHA-256; offline validation must give READY_FOR_FORWARD_EVALUATION; loader and validator refuse a mutable (writable) snapshot. Acquisition parameters as in the v2.1 adoption record (asof = last session; CA Q1 process_date [2025-01-01, 2026-12-09]; event_date boundary [2025-01-02, 2026-12-09]; no assets endpoint)."
+  },
+  {
+   "id": "D5",
+   "title": "invariants",
+   "strategy_config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+   "unchanged": [
+    "V2-MOM rules and parameters",
+    "FROZEN_DAY_UNIVERSE (25) + SPY",
+    "B1 equal-weight buy-and-hold, B2 SPY",
+    "market-on-open t+1 at raw open",
+    "costs 0/5/10 bps (5 primary)",
+    "§13 thresholds",
+    "§7 no-lookahead tests (index, truncation, future mutation/deletion, fill source, timing)",
+    "E_0 = 100,000, start flat, liquidate at last close"
+   ]
+  }
+ ],
+ "calendar": {
+  "calendar": "exchange_calendars 4.13.2 XNYS",
+  "segment": "fwd-gate2",
+  "commit_day": "2026-10-10",
+  "first_session": "2026-10-12",
+  "last_session": "2026-12-09",
+  "count": 42,
+  "sessions": [
+   "2026-10-12",
+   "2026-10-13",
+   "2026-10-14",
+   "2026-10-15",
+   "2026-10-16",
+   "2026-10-19",
+   "2026-10-20",
+   "2026-10-21",
+   "2026-10-22",
+   "2026-10-23",
+   "2026-10-26",
+   "2026-10-27",
+   "2026-10-28",
+   "2026-10-29",
+   "2026-10-30",
+   "2026-11-02",
+   "2026-11-03",
+   "2026-11-04",
+   "2026-11-05",
+   "2026-11-06",
+   "2026-11-09",
+   "2026-11-10",
+   "2026-11-11",
+   "2026-11-12",
+   "2026-11-13",
+   "2026-11-16",
+   "2026-11-17",
+   "2026-11-18",
+   "2026-11-19",
+   "2026-11-20",
+   "2026-11-23",
+   "2026-11-24",
+   "2026-11-25",
+   "2026-11-27",
+   "2026-11-30",
+   "2026-12-01",
+   "2026-12-02",
+   "2026-12-03",
+   "2026-12-04",
+   "2026-12-07",
+   "2026-12-08",
+   "2026-12-09"
+  ],
+  "exposed_sessions_excluded": [
+   "2026-10-08",
+   "2026-10-09"
+  ],
+  "exposed_in_sample": [],
+  "first_ranking_close": "2026-10-09",
+  "first_fill_open": "2026-10-12",
+  "decisions": [
+   {
+    "decision_close": "2026-10-09",
+    "fill_open": "2026-10-12",
+    "ranking_reads_close_t_minus_21": "2026-09-10",
+    "ranking_reads_close_t_minus_252": "2025-10-08",
+    "kind": "initial (§8.14)"
+   },
+   {
+    "decision_close": "2026-10-30",
+    "fill_open": "2026-11-02",
+    "ranking_reads_close_t_minus_21": "2026-10-01",
+    "ranking_reads_close_t_minus_252": "2025-10-29",
+    "kind": "month-end rebalance"
+   },
+   {
+    "decision_close": "2026-11-30",
+    "fill_open": "2026-12-01",
+    "ranking_reads_close_t_minus_21": "2026-10-29",
+    "ranking_reads_close_t_minus_252": "2025-11-26",
+    "kind": "month-end rebalance"
+   }
+  ],
+  "liquidation_close": "2026-12-09",
+  "stage_f_range": [
+   "2025-01-02",
+   "2026-12-09"
+  ],
+  "stage_f_sessions": 486,
+  "inputs_before": 444,
+  "weekday_holidays_in_sample": [
+   "2026-11-26"
+  ],
+  "early_closes_in_sample": {
+   "2026-11-27": "13:00"
+  },
+  "earliest_capture": {
+   "local": "2026-12-09T16:15:00-05:00",
+   "utc": "2026-12-09T21:15:00+00:00",
+   "tz": "America/New_York",
+   "utc_offset": "-0500"
+  },
+  "earliest_final_evaluation": "after a successful Stage F capture and READY_FOR_FORWARD_EVALUATION validation, not before 2026-12-09T16:15:00-05:00"
+ },
+ "acquisition_schedule": [
+  {
+   "step": "now",
+   "action": "commit; the gate's sessions begin on 2026-10-12; nothing is acquired, computed or inspected during the blind period"
+  },
+  {
+   "step": "S7",
+   "when": "2026-12-09T16:15:00-05:00 (2026-12-09T21:15:00+00:00)",
+   "command": "python -m acquisition.v2.stage_f --capture --segment fwd-gate2 --authorization <reference>"
+  },
+  {
+   "step": "S8",
+   "when": "after S7",
+   "command": "python -m acquisition.v2.stage_f --validate <stage_f_fwd-gate2_snapshot> --segment fwd-gate2 --expect-manifest-sha256 <sha>"
+  },
+  {
+   "step": "S9",
+   "when": "after READY_FOR_FORWARD_EVALUATION",
+   "command": "python -m backtest.v2.run --segment fwd-gate2 --out artifacts/day27/v2 --snapshot <id> --expect-manifest-sha256 <sha> --authorization <reference>"
+  }
+ ],
+ "segment_status": {
+  "fwd-diag": "FWD-DIAG-INVALID (protocol-breach)",
+  "fwd-gate": "SUPERSEDED (protocol 2.2) — never acquired or evaluated",
+  "fwd-gate2": "PENDING — blind, not evaluated"
+ },
+ "evidence_disclaimer": "a 42-session forward gate is weak long-term evidence and does not by itself authorise real-money trading",
+ "implementation": {
+  "acquisition/v2/contract.py": "fwd-gate2 window, expected Stage F sessions (486), EXPOSED_SESSIONS, PROTOCOL_VERSION_22",
+  "backtest/v2/forward.py": "effective segment status (2.1 overlaid by 2.2; only PENDING accessible), check_adoption_22, check_config_sha, check_segment_calendar, check_snapshot_immutable",
+  "acquisition/v2/stage_f.py": "preflight() (D1), frozen_baseline_check, eol_equivalent_sha; validate refuses a mutable snapshot",
+  "backtest/v2/data.py": "load_stage_f refuses a mutable snapshot",
+  "backtest/v2/run.py": "SEGMENTS fwd-gate2; protocol version per segment",
+  "scripts/day26d_gate_calendar.py": "deterministic declaration (this calendar block)",
+  "tests/test_day26d_gate2.py": "targeted network-free tests"
+ }
+}

@@ -1,0 +1,502 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-26C forward-data incident record",
+ "title": "Unauthorised recent yfinance intraday download into data/cache during DAY-26B test verification",
+ "recorded_utc": "2026-10-10T14:30:00Z",
+ "recorded_by": "Claude (implementation agent), for the protocol owner Alixujaev",
+ "severity": "protocol breach (DAY-22 §3.2.3; protocol 2.1 C3, C15, C16): forward-period market data acquired before permitted",
+ "status": "CONTAINED — files quarantined; root cause fixed in tests/conftest.py; fwd-diag invalidated",
+ "timeline_utc": [
+  {
+   "t": "2026-10-10T12:52:51Z",
+   "event": "protocol 2.1 adoption recorded (artifacts/day26b/protocol-v2.1-adoption.json decided_utc); integrity_at_adoption was true at that time"
+  },
+  {
+   "t": "2026-10-10T12:54:59Z..12:55:20Z",
+   "event": "full suite run 1: pytest -q -p no:cacheprovider -x --ignore=smc-scanner; 318 passed, stopped at tests/test_day07_backtest.py (its function-scoped guard blocked the download: total_trades=0). Nothing written to data/cache (verified: data/cache absent afterwards)"
+  },
+  {
+   "t": "2026-10-10T12:56:11Z (approx.)",
+   "event": "full suite run 2 started: same command plus a session plugin refusing Python socket connections (-p nonet_plugin), intended as network-blocked"
+  },
+  {
+   "t": "2026-10-10T12:56:23Z..12:59:51Z",
+   "event": "54 files written to data/cache/ by YFinanceProvider through module-scoped fixtures of tests/test_day08*..test_day12b*: yf.download(period=60d, interval=5m|15m) for 27 symbols; requests made through curl_cffi (libcurl), which the socket plugin could not intercept (plugin reported 0 blocked attempts)"
+  },
+  {
+   "t": "2026-10-10T12:56Z..13:37:02Z",
+   "event": "the same run consumed the cached files: legacy day-trading backtests (DAY-08..DAY-12B experiments, index regime; not V2-MOM) ran on them inside pytest; 27 tests failed and pytest printed short failure summaries, some containing legacy trade-count values (e.g. 'test_json_serialization - assert 5783 ==...'). 1406 passed, 2 skipped"
+  },
+  {
+   "t": "2026-10-10T13:4xZ",
+   "event": "breach discovered (data/cache listing by name, size and time only), reported to the protocol owner, work stopped"
+  },
+  {
+   "t": "2026-10-10T14:19:25.038251+00:00",
+   "event": "DAY-26C containment: inventory (metadata + SHA-256, no parsing) and move of all 54 files to quarantine; post-move SHA-256 verified; files read-only; empty data/cache removed"
+  }
+ ],
+ "correction_to_earlier_report": "the DAY-26B report said the files were written during the first full-suite run; the timestamps show they were written during the second (network-blocked) run. The first run wrote nothing.",
+ "root_cause": {
+  "summary": "tests/conftest.py guarded yf.download and real-cache writes only through function-scoped autouse fixtures; module-scoped fixtures (e.g. tests/test_day08_backtest.py:42 day08_run -> get_provider()) run before them, so the legacy provider downloaded and wrote the real cache unguarded",
+  "contributing": [
+   "the full pytest suite was run as a regression step although it contains legacy tests that depend on a market-data cache absent from this fresh clone",
+   "a socket-level block was assumed to stop all network access; yfinance uses curl_cffi (libcurl)"
+  ]
+ },
+ "exposure": {
+  "files_inspected_by_agent": false,
+  "market_values_parsed_or_viewed": false,
+  "believed_coverage": "not inspected; yfinance period=60d intraday requested on 2026-10-10 is believed to span roughly the last 60 calendar days to 2026-10-09: Excluded-period sessions (<= 2026-10-07) and forward sessions 1-2 (2026-10-08, 2026-10-09)",
+  "fwd_gate_sessions_exposed": "none possible: fwd-gate begins 2026-11-06, which did not exist at download time",
+  "v2_mom_forward_metrics_computed": false,
+  "consumption": "legacy day-trading strategy backtests (not V2-MOM) computed inside pytest; failure summaries with legacy trade counts were printed to the session output"
+ },
+ "inventory": {
+  "captured_utc": "2026-10-10T14:19:25.038251+00:00",
+  "source_dir": "data/cache",
+  "quarantine_dir": "C:\\Users\\user\\Desktop\\Own\\trade-quarantine\\day26c-forward-data-incident-20261010",
+  "count": 54,
+  "total_bytes": 6298075,
+  "post_move_sha256_verified": true,
+  "read_only": true,
+  "files": [
+   {
+    "file": "AAPL_15m.parquet",
+    "bytes": 64304,
+    "sha256": "c3d9864a3a4f44bb83cf7e346612eaa68633f2b3e0927af361617a098ad26dd6",
+    "mtime_utc": "2026-10-10T12:56:24.647757+00:00",
+    "ctime_utc": "2026-10-10T12:56:24.641499+00:00"
+   },
+   {
+    "file": "AAPL_5m.parquet",
+    "bytes": 169764,
+    "sha256": "e65a2017e57992fd46dc69671f1868ad8a331c507810bf51fe2b2352e8f6dddb",
+    "mtime_utc": "2026-10-10T12:56:23.994440+00:00",
+    "ctime_utc": "2026-10-10T12:56:23.980749+00:00"
+   },
+   {
+    "file": "ADBE_15m.parquet",
+    "bytes": 65986,
+    "sha256": "c3b62460223f21ef610a1779b94c7de4c854e599e377dabfbf08023cc9538b6c",
+    "mtime_utc": "2026-10-10T12:56:49.741089+00:00",
+    "ctime_utc": "2026-10-10T12:56:49.735143+00:00"
+   },
+   {
+    "file": "ADBE_5m.parquet",
+    "bytes": 175654,
+    "sha256": "2354196209e75aec6534696ce0d3d5685ab36d47a4e1760eb14fc7c365c149e3",
+    "mtime_utc": "2026-10-10T12:56:49.196925+00:00",
+    "ctime_utc": "2026-10-10T12:56:49.191639+00:00"
+   },
+   {
+    "file": "AMAT_15m.parquet",
+    "bytes": 68008,
+    "sha256": "5fec87fd2c49897d5070725fb0f9461731d9eeefc1273a65e8594414c16f4838",
+    "mtime_utc": "2026-10-10T12:56:48.297708+00:00",
+    "ctime_utc": "2026-10-10T12:56:48.294383+00:00"
+   },
+   {
+    "file": "AMAT_5m.parquet",
+    "bytes": 189663,
+    "sha256": "14a8ca9ccd5b1b50e71fdd4221acaeb56301bf37cfb49150362e2d8737d64a8b",
+    "mtime_utc": "2026-10-10T12:56:47.112011+00:00",
+    "ctime_utc": "2026-10-10T12:56:47.103045+00:00"
+   },
+   {
+    "file": "AMD_15m.parquet",
+    "bytes": 68106,
+    "sha256": "bd211f8a3a166c3ffb388de0aad1f74cc2a4dbe8900cb0c62b5b19b5cd73bcdb",
+    "mtime_utc": "2026-10-10T12:56:41.145186+00:00",
+    "ctime_utc": "2026-10-10T12:56:41.064419+00:00"
+   },
+   {
+    "file": "AMD_5m.parquet",
+    "bytes": 192115,
+    "sha256": "dc00e8b8130cfb2787813b2caed8af1cc1eaf05dd10fb7af38f71d102705c9f2",
+    "mtime_utc": "2026-10-10T12:56:40.444497+00:00",
+    "ctime_utc": "2026-10-10T12:56:40.439299+00:00"
+   },
+   {
+    "file": "AMZN_15m.parquet",
+    "bytes": 64202,
+    "sha256": "231010cfd1cc5bd046fffcc0df6b62537eecd0862a5be972649335b3cb891222",
+    "mtime_utc": "2026-10-10T12:56:31.424038+00:00",
+    "ctime_utc": "2026-10-10T12:56:31.420016+00:00"
+   },
+   {
+    "file": "AMZN_5m.parquet",
+    "bytes": 169712,
+    "sha256": "dfde5fc43f3a6e5bd5f7a859e4f5cf34307b08b59b77b9b7cd294b85224ec430",
+    "mtime_utc": "2026-10-10T12:56:30.499947+00:00",
+    "ctime_utc": "2026-10-10T12:56:30.493685+00:00"
+   },
+   {
+    "file": "AVGO_15m.parquet",
+    "bytes": 66066,
+    "sha256": "1bf6a9630249242165e28e97bd84c90d78a2de46733c9e32e4dabb56baeae099",
+    "mtime_utc": "2026-10-10T12:56:39.506386+00:00",
+    "ctime_utc": "2026-10-10T12:56:39.499739+00:00"
+   },
+   {
+    "file": "AVGO_5m.parquet",
+    "bytes": 178376,
+    "sha256": "fb79cc2c58a20c3e4c4423aa0402bab3775d7b6147343a4cef8679bab3958a25",
+    "mtime_utc": "2026-10-10T12:56:38.685860+00:00",
+    "ctime_utc": "2026-10-10T12:56:38.681813+00:00"
+   },
+   {
+    "file": "COST_15m.parquet",
+    "bytes": 65115,
+    "sha256": "895d31e2373d498473101ac32c93557afe3d163b016ac958733e4575c17f0276",
+    "mtime_utc": "2026-10-10T12:56:56.738354+00:00",
+    "ctime_utc": "2026-10-10T12:56:56.733987+00:00"
+   },
+   {
+    "file": "COST_5m.parquet",
+    "bytes": 175021,
+    "sha256": "880d6bdab6dfe617d6a2747cbcc5f1f716186b9d0aed7868bbb08fdf9a850f2c",
+    "mtime_utc": "2026-10-10T12:56:56.007995+00:00",
+    "ctime_utc": "2026-10-10T12:56:56.000295+00:00"
+   },
+   {
+    "file": "CRM_15m.parquet",
+    "bytes": 67050,
+    "sha256": "49693456c94d8ec8e046e9401c16539e8ae7a6bbd78ab7fc92bbcbf1aa8d4a67",
+    "mtime_utc": "2026-10-10T12:56:51.279967+00:00",
+    "ctime_utc": "2026-10-10T12:56:51.272941+00:00"
+   },
+   {
+    "file": "CRM_5m.parquet",
+    "bytes": 180913,
+    "sha256": "f57a6abb46b60ea35ad8a81864732ae15b355e8c60fd08019916bbbecb71da56",
+    "mtime_utc": "2026-10-10T12:56:50.729184+00:00",
+    "ctime_utc": "2026-10-10T12:56:50.721476+00:00"
+   },
+   {
+    "file": "CSCO_15m.parquet",
+    "bytes": 59639,
+    "sha256": "713bacd697852dcfcf708e6a06d60132fa8e4ba530ee899c60bad553e04903c9",
+    "mtime_utc": "2026-10-10T12:56:54.913177+00:00",
+    "ctime_utc": "2026-10-10T12:56:54.907518+00:00"
+   },
+   {
+    "file": "CSCO_5m.parquet",
+    "bytes": 147762,
+    "sha256": "e4748bbfe2113033121d9ef4c062e9e6504149cedaf69ba6b065ae6ad06e434b",
+    "mtime_utc": "2026-10-10T12:56:54.336594+00:00",
+    "ctime_utc": "2026-10-10T12:56:54.329206+00:00"
+   },
+   {
+    "file": "GOOGL_15m.parquet",
+    "bytes": 63165,
+    "sha256": "c7e073d5c716811e3cfcd8b4a5ec395f5c2146c7486cd0f5f77ec396ac6667fd",
+    "mtime_utc": "2026-10-10T12:56:35.273745+00:00",
+    "ctime_utc": "2026-10-10T12:56:35.269076+00:00"
+   },
+   {
+    "file": "GOOGL_5m.parquet",
+    "bytes": 165364,
+    "sha256": "19764e331cefd86ab1a4a1abac49f55ff75d1f281487a2e35e08865be7bdbc42",
+    "mtime_utc": "2026-10-10T12:56:34.662790+00:00",
+    "ctime_utc": "2026-10-10T12:56:34.653708+00:00"
+   },
+   {
+    "file": "INTC_15m.parquet",
+    "bytes": 66419,
+    "sha256": "5398d69dcfe076ddbf4e1c2ce1024576b461c79d2fb0803716c23eb15fecd956",
+    "mtime_utc": "2026-10-10T12:56:44.471925+00:00",
+    "ctime_utc": "2026-10-10T12:56:44.468781+00:00"
+   },
+   {
+    "file": "INTC_5m.parquet",
+    "bytes": 177386,
+    "sha256": "e62a56a7247ea894c468b9eb3715ce02bec805c4ded413aa252e3e723b8f9a58",
+    "mtime_utc": "2026-10-10T12:56:43.649562+00:00",
+    "ctime_utc": "2026-10-10T12:56:43.640832+00:00"
+   },
+   {
+    "file": "JNJ_15m.parquet",
+    "bytes": 61659,
+    "sha256": "edb104d2232c5716fe6e659ea10396aff7e568d3de29614a5b10a96c73a7f6a0",
+    "mtime_utc": "2026-10-10T12:57:06.000920+00:00",
+    "ctime_utc": "2026-10-10T12:57:05.996341+00:00"
+   },
+   {
+    "file": "JNJ_5m.parquet",
+    "bytes": 156993,
+    "sha256": "e818bbb81d0997fd8a6e4972dc0eafe9a49b7a20f71d7af3a8887e2367aa0398",
+    "mtime_utc": "2026-10-10T12:57:05.450983+00:00",
+    "ctime_utc": "2026-10-10T12:57:05.439465+00:00"
+   },
+   {
+    "file": "JPM_15m.parquet",
+    "bytes": 62660,
+    "sha256": "9b23810de4106a8f4d6199bb2a6881d438e4e7b14d87efb5c3990b1a73cc3067",
+    "mtime_utc": "2026-10-10T12:57:07.524477+00:00",
+    "ctime_utc": "2026-10-10T12:57:07.519622+00:00"
+   },
+   {
+    "file": "JPM_5m.parquet",
+    "bytes": 161810,
+    "sha256": "0720ff074dcf6ec9253a2b7b5792bf32ddc651581eea88a1807a4c3769a1b8b2",
+    "mtime_utc": "2026-10-10T12:57:06.933604+00:00",
+    "ctime_utc": "2026-10-10T12:57:06.927770+00:00"
+   },
+   {
+    "file": "KO_15m.parquet",
+    "bytes": 53861,
+    "sha256": "3add3bc619a483da95e8bc933a56c6b4cb40a800d9f9c5e5068a1d2c17e295c0",
+    "mtime_utc": "2026-10-10T12:57:00.236584+00:00",
+    "ctime_utc": "2026-10-10T12:57:00.230139+00:00"
+   },
+   {
+    "file": "KO_5m.parquet",
+    "bytes": 131548,
+    "sha256": "dde9f53d84a79456278ebe3b6ea084988510c3a9c2d7e14a800579cf971b690c",
+    "mtime_utc": "2026-10-10T12:56:59.641885+00:00",
+    "ctime_utc": "2026-10-10T12:56:59.631871+00:00"
+   },
+   {
+    "file": "META_15m.parquet",
+    "bytes": 67343,
+    "sha256": "af94eeed61d3d1fafb66fc3cc18f9db58f42c8f4b33dfedcf4b718babdd970d3",
+    "mtime_utc": "2026-10-10T12:56:33.718162+00:00",
+    "ctime_utc": "2026-10-10T12:56:33.714368+00:00"
+   },
+   {
+    "file": "META_5m.parquet",
+    "bytes": 189095,
+    "sha256": "f9f07e4d238606c16ec9f7cf35686a47bba90f588530015733c22cbb8e0ef3a9",
+    "mtime_utc": "2026-10-10T12:56:32.987633+00:00",
+    "ctime_utc": "2026-10-10T12:56:32.977920+00:00"
+   },
+   {
+    "file": "MSFT_15m.parquet",
+    "bytes": 65944,
+    "sha256": "7f9bcd4ac45168159f7e9b9e2e359d10f83227689310d3184f7b196430ace1d0",
+    "mtime_utc": "2026-10-10T12:56:26.046730+00:00",
+    "ctime_utc": "2026-10-10T12:56:26.043480+00:00"
+   },
+   {
+    "file": "MSFT_5m.parquet",
+    "bytes": 177509,
+    "sha256": "9d94e3e6ad75e2e03ad8673b79d94c827fc5d79a12824fa5987e3c91a1eff450",
+    "mtime_utc": "2026-10-10T12:56:25.370418+00:00",
+    "ctime_utc": "2026-10-10T12:56:25.364388+00:00"
+   },
+   {
+    "file": "MU_15m.parquet",
+    "bytes": 68371,
+    "sha256": "064bfd12e490aa3ea8a8ba6ff3297fd51bf37817999a735448824d026c8ac76b",
+    "mtime_utc": "2026-10-10T12:56:46.166952+00:00",
+    "ctime_utc": "2026-10-10T12:56:46.160415+00:00"
+   },
+   {
+    "file": "MU_5m.parquet",
+    "bytes": 195307,
+    "sha256": "387386c839ace59a23a8e8dda37446346129e5a64b518020c205a413148caeb9",
+    "mtime_utc": "2026-10-10T12:56:45.589828+00:00",
+    "ctime_utc": "2026-10-10T12:56:45.581088+00:00"
+   },
+   {
+    "file": "NFLX_15m.parquet",
+    "bytes": 62419,
+    "sha256": "914d1bef10c41ceecfefbdbd85e209727d2585bf5975acfe679bcaeb329803f6",
+    "mtime_utc": "2026-10-10T12:57:04.072483+00:00",
+    "ctime_utc": "2026-10-10T12:57:04.067147+00:00"
+   },
+   {
+    "file": "NFLX_5m.parquet",
+    "bytes": 157103,
+    "sha256": "fe7756b633693d492a3c88b4d04f25b11497777419f94b1220dc67f79b4154dd",
+    "mtime_utc": "2026-10-10T12:57:02.704377+00:00",
+    "ctime_utc": "2026-10-10T12:57:02.699267+00:00"
+   },
+   {
+    "file": "NVDA_15m.parquet",
+    "bytes": 65172,
+    "sha256": "362f9f9c7cad3f2da290834df0de19e18a5e674ffb33d011780262eb77f25a46",
+    "mtime_utc": "2026-10-10T12:56:27.652314+00:00",
+    "ctime_utc": "2026-10-10T12:56:27.650538+00:00"
+   },
+   {
+    "file": "NVDA_5m.parquet",
+    "bytes": 172873,
+    "sha256": "ab64c492d4f32c8f3bd8e776ba91627ea0028e5e7217178f6a3ce16b7d146c95",
+    "mtime_utc": "2026-10-10T12:56:27.016248+00:00",
+    "ctime_utc": "2026-10-10T12:56:27.008248+00:00"
+   },
+   {
+    "file": "ORCL_15m.parquet",
+    "bytes": 64172,
+    "sha256": "85c6765500ec488c90774415430019ada7f018b25865ad50070b5567d58fd3ad",
+    "mtime_utc": "2026-10-10T12:56:52.957731+00:00",
+    "ctime_utc": "2026-10-10T12:56:52.951709+00:00"
+   },
+   {
+    "file": "ORCL_5m.parquet",
+    "bytes": 167603,
+    "sha256": "9f53afdf3d2e71866f54da2acffabebff5e395d3a3c0a8a5e69fd07867892210",
+    "mtime_utc": "2026-10-10T12:56:52.412493+00:00",
+    "ctime_utc": "2026-10-10T12:56:52.406504+00:00"
+   },
+   {
+    "file": "PEP_15m.parquet",
+    "bytes": 59789,
+    "sha256": "2d4df177df7a5620a64e81a1a32407613d441b229b8d766e7977bafc7d3dd94e",
+    "mtime_utc": "2026-10-10T12:57:01.840652+00:00",
+    "ctime_utc": "2026-10-10T12:57:01.836426+00:00"
+   },
+   {
+    "file": "PEP_5m.parquet",
+    "bytes": 149450,
+    "sha256": "9a7545a76603247eec05b0e5a10771f585aaecc69156f2d190f6d07a9f7b14b7",
+    "mtime_utc": "2026-10-10T12:57:01.265387+00:00",
+    "ctime_utc": "2026-10-10T12:57:01.255384+00:00"
+   },
+   {
+    "file": "QCOM_15m.parquet",
+    "bytes": 65164,
+    "sha256": "8eec496ea4ea0c61d98a65152c6f500c492deafb65a504fdd41b91bc11457f51",
+    "mtime_utc": "2026-10-10T12:56:42.679139+00:00",
+    "ctime_utc": "2026-10-10T12:56:42.673283+00:00"
+   },
+   {
+    "file": "QCOM_5m.parquet",
+    "bytes": 171991,
+    "sha256": "d9ad86570c50616263d98ad73e2be80c1f0f08e1578585b2e3e89ff27ae8ce4c",
+    "mtime_utc": "2026-10-10T12:56:41.999767+00:00",
+    "ctime_utc": "2026-10-10T12:56:41.992676+00:00"
+   },
+   {
+    "file": "QQQ_15m.parquet",
+    "bytes": 64860,
+    "sha256": "b35fff11ab094dc7a27cb2915c058641005d1ff3fb7d974ea329f9444bc5117d",
+    "mtime_utc": "2026-10-10T12:59:51.379114+00:00",
+    "ctime_utc": "2026-10-10T12:59:51.375056+00:00"
+   },
+   {
+    "file": "QQQ_5m.parquet",
+    "bytes": 175146,
+    "sha256": "43a85e9f0307a4ef1d887276a9ea7c6e1a74f9d6b3129c306e3b2b56b5b7f5a1",
+    "mtime_utc": "2026-10-10T12:59:49.111857+00:00",
+    "ctime_utc": "2026-10-10T12:59:49.103819+00:00"
+   },
+   {
+    "file": "SPY_15m.parquet",
+    "bytes": 61569,
+    "sha256": "6861c99a682c84365c404f902066be9c5a04ee10a5fa6fc193fbfa8d78bfe777",
+    "mtime_utc": "2026-10-10T12:59:50.800129+00:00",
+    "ctime_utc": "2026-10-10T12:59:50.796120+00:00"
+   },
+   {
+    "file": "SPY_5m.parquet",
+    "bytes": 159241,
+    "sha256": "f7fd8bb191762a12887911b9e7202a5f43c152206d43a50af8d2fe6b63b9dfb8",
+    "mtime_utc": "2026-10-10T12:59:43.741894+00:00",
+    "ctime_utc": "2026-10-10T12:59:43.734946+00:00"
+   },
+   {
+    "file": "TSLA_15m.parquet",
+    "bytes": 66770,
+    "sha256": "64ac8f2a227c6d28be6e71f68850bf104e422bbedc98463891dc32a753129da0",
+    "mtime_utc": "2026-10-10T12:56:36.772888+00:00",
+    "ctime_utc": "2026-10-10T12:56:36.768167+00:00"
+   },
+   {
+    "file": "TSLA_5m.parquet",
+    "bytes": 182288,
+    "sha256": "7ece89ade05a87a528767c129058962117f4b558cdf81e1a827300d8f62c9897",
+    "mtime_utc": "2026-10-10T12:56:36.250084+00:00",
+    "ctime_utc": "2026-10-10T12:56:36.241768+00:00"
+   },
+   {
+    "file": "WMT_15m.parquet",
+    "bytes": 59999,
+    "sha256": "a764b642651f469919ddf311a8405f9a8f51275d2aa77bbf0bfb342087322fbc",
+    "mtime_utc": "2026-10-10T12:56:58.770554+00:00",
+    "ctime_utc": "2026-10-10T12:56:58.765560+00:00"
+   },
+   {
+    "file": "WMT_5m.parquet",
+    "bytes": 148750,
+    "sha256": "3282cf5e64f0db70e25d62a5dbd13684f6e8ec76ace8fab71865972aa09320e0",
+    "mtime_utc": "2026-10-10T12:56:58.212317+00:00",
+    "ctime_utc": "2026-10-10T12:56:58.201102+00:00"
+   },
+   {
+    "file": "XOM_15m.parquet",
+    "bytes": 60539,
+    "sha256": "957e5dbb601963345806728be9d325b627086434ebf60ef8e904c3c64b946759",
+    "mtime_utc": "2026-10-10T12:57:09.104954+00:00",
+    "ctime_utc": "2026-10-10T12:57:09.099272+00:00"
+   },
+   {
+    "file": "XOM_5m.parquet",
+    "bytes": 151287,
+    "sha256": "1f8d283bb1d80ece60774837455ff875896bc3f2988d13137ed287e790f3a83c",
+    "mtime_utc": "2026-10-10T12:57:08.496093+00:00",
+    "ctime_utc": "2026-10-10T12:57:08.489412+00:00"
+   }
+  ]
+ },
+ "quarantine": {
+  "path": "C:\\Users\\user\\Desktop\\Own\\trade-quarantine\\day26c-forward-data-incident-20261010",
+  "outside_repository": true,
+  "outside_cache_and_search_paths": true,
+  "files": 54,
+  "bytes": 6298075,
+  "read_only": true,
+  "deleted": false,
+  "note": "not deleted pending a protocol-owner decision; no code path or test references this directory"
+ },
+ "corrective_actions": [
+  "tests/conftest.py: session-wide hard guard installed at conftest import (before collection and any module/session fixture): yf.download, yf.Ticker.history, AlpacaProvider._fetch_raw, real-cache _write_cache and non-local socket connects refused",
+  "backtest/v2/forward.py: check_quarantine() refuses forward access if any inventoried SHA-256 exists under data/; fwd-diag permanently refused (FWD-DIAG-INVALID (protocol-breach)); diagnostic_report can only return that status",
+  "tests/test_day26c_incident.py: regression tests for the guard, the quarantine and the diagnostic status",
+  "agent memory: never run the full pytest suite in this repository"
+ ],
+ "status_decisions": {
+  "fwd-diag": "FWD-DIAG-INVALID (protocol-breach) — final; no fwd-diag acquisition, validation, load or evaluation (S3-S5 cancelled)",
+  "fwd-gate": "PENDING — blind, not evaluated; dates, thresholds and calendar unchanged"
+ },
+ "gate_assessment": {
+  "usable": true,
+  "reasons": [
+   "no fwd-gate-period data (>= 2026-11-06) existed or exists; the breach cannot reveal gate outcomes",
+   "strategy configuration SHA-256 62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0 frozen; no parameter, threshold or schedule changed after the breach",
+   "the gate's initial decision (close 2026-11-05) ranks on TR(t-21)/TR(t-252), i.e. the 2026-10-07 close and earlier; the exposed forward sessions 2026-10-08/09 enter later decisions only as formation history, used mechanically by the frozen rules",
+   "fwd-diag sessions are structurally excluded from the gate sample (tests/test_day26b_forward.py)"
+  ],
+  "caveat": "no V2-MOM forward result was seen; exposure is limited to raw legacy intraday caches and legacy trade counts"
+ },
+ "next_permitted_steps": [
+  {
+   "step": "S1",
+   "when": "now (protocol owner)",
+   "action": "commit artifacts/day26b/*, artifacts/day26c/*, the DAY-26B/26C code and tests; forward access stays refused until they are committed unchanged"
+  },
+  {
+   "step": "S7",
+   "when": "after 2027-01-07T16:15:00-05:00 (America/New_York) = 2027-01-07T21:15:00Z",
+   "action": "preflight for fwd-gate (P1-P13; P13 F-D items not applicable: fwd-diag invalid)"
+  },
+  {
+   "step": "S8",
+   "when": "after S7",
+   "command": "python -m acquisition.v2.stage_f --capture --segment fwd-gate --authorization <reference>"
+  },
+  {
+   "step": "S8b",
+   "when": "after S8",
+   "command": "python -m acquisition.v2.stage_f --validate <stage_f_fwd-gate_snapshot> --segment fwd-gate --expect-manifest-sha256 <sha>"
+  },
+  {
+   "step": "S9",
+   "when": "after READY_FOR_FORWARD_EVALUATION",
+   "command": "python -m backtest.v2.run --segment fwd-gate --out artifacts/day27/v2 --snapshot <id> --expect-manifest-sha256 <sha> --authorization <reference>"
+  }
+ ],
+ "known_blocker_before_S8": "acquisition/v2/stage_f.py capture runs stage_h.preflight -> stage_r.preflight -> acquisition.run integrity baseline (artifacts/day15/integrity-baseline.json), which requires data/cache to equal 305 frozen DAY-15 legacy cache files; they are absent from this clone (not in the research-data vault). A protocol-owner decision is required before 2027-01-07."
+}

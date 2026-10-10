@@ -7,7 +7,7 @@ artifacts/day17a/protocol-v2.0.1-amendment.md (v2.0.1, committed at ed034b3) C1-
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from datetime import date
+from datetime import date, time
 from typing import Any
 
 from acquisition.contract import ROOT_DIR
@@ -99,6 +99,23 @@ FORBIDDEN_WRITE_ROOTS = (
 )
 
 BAR_COLUMNS: tuple[str, ...] = ("open", "high", "low", "close", "volume", "trade_count", "provider_vwap")
+
+# Stage F (forward; protocol 2.1, DAY-26B: artifacts/day26b/protocol-v2.1-amendment.md and -adoption.json)
+PROTOCOL_VERSION_21 = "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 + 2.1"
+STAGE_F_ROOT = V2_ROOT / "stage_f"
+STAGE_F_FIRST_SESSION = date(2025, 1, 2)                  # frozen §3.9 Stage F range start
+REVIEW_RECORDS_DIR_F = ROOT_DIR / "artifacts" / "reviews" / "stage_f"
+FORWARD_WINDOW = (date(2026, 10, 8), date(2027, 1, 7), 63)
+FORWARD_SEGMENTS = {"fwd-diag": (date(2026, 10, 8), date(2026, 11, 5), 21),       # sessions 1-21, descriptive
+                    "fwd-gate": (date(2026, 11, 6), date(2027, 1, 7), 42)}        # sessions 22-63, blind §13 gate
+STAGE_F_EXPECTED_SESSIONS = {"fwd-diag": 442 + 21, "fwd-gate": 463 + 42}          # 2025-01-02 -> segment last
+CAPTURE_NOT_BEFORE = time(16, 15)                          # capture_policy, America/New_York
+# Protocol 2.2 (DAY-26D, artifacts/day26d/protocol-v2.2-amendment.md): fwd-diag invalid (DAY-26C breach), old fwd-gate
+# superseded; a new clean 42-session gate. 2026-10-08/09 (exposed in the DAY-26C incident) are never in its sample.
+PROTOCOL_VERSION_22 = "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 + 2.1 + 2.2"
+FORWARD_SEGMENTS["fwd-gate2"] = (date(2026, 10, 12), date(2026, 12, 9), 42)
+STAGE_F_EXPECTED_SESSIONS["fwd-gate2"] = 444 + 42
+EXPOSED_SESSIONS = (date(2026, 10, 8), date(2026, 10, 9))
 
 
 @dataclass(frozen=True)

@@ -1,0 +1,111 @@
+{
+  "task": "DAY-26A",
+  "title": "21-session forward observation amendment (draft)",
+  "status": "PROPOSED — NOT EFFECTIVE",
+  "effective": false,
+  "observation_started": false,
+  "drafted": "2026-10-10",
+  "starting_head": "8ef01f4",
+  "companion_markdown": "artifacts/day26a/day26a-forward-21-session-observation-amendment-draft.md",
+  "lineage": [
+    {"source": "artifacts/day16/research-protocol-v2.md", "sections": ["3.6", "3.9", "15"], "forward_sessions": 252, "status": "frozen, effective"},
+    {"source": "artifacts/day22/day22-protocol-owner-signoff-and-forward-oos-lockdown.md", "forward_sessions": 252, "window": ["2026-10-08", "2027-10-08"], "status": "signed off, effective"},
+    {"source": "artifacts/day23/day23-forward-oos-252-session-audit.md", "verdict": "PROTOCOL AMENDMENT MAY BE WARRANTED", "status": "audit, no rule change"},
+    {"source": "artifacts/day24/day24-forward-oos-duration-amendment-design.md", "forward_sessions": 63, "window": ["2026-10-08", "2027-01-07"], "status": "PROPOSED — NOT YET EFFECTIVE", "note": "rejects 20 sessions as a gating window: '1 rebalance cannot evaluate factor drift'"},
+    {"source": "this draft", "forward_sessions": 21, "window": ["2026-10-08", "2026-11-05"], "status": "PROPOSED — NOT EFFECTIVE", "role": "non-gating observation"}
+  ],
+  "day24_relationship": "separate alternative; DAY-24 not edited, withdrawn or superseded by this draft (see OD-2)",
+  "mode": "blind one-pass",
+  "gate_effect": "none",
+  "strategy": {
+    "family": "V2-MOM",
+    "config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+    "engine": "backtest/v2/* unchanged",
+    "protocol": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4",
+    "universe": "FROZEN_DAY_UNIVERSE (25 symbols, DAY-22 §4)",
+    "benchmarks": {"B1": "equal-weight 25 buy-and-hold (primary comparison)", "B2": "SPY buy-and-hold (reference)"},
+    "initial_equity": 100000,
+    "execution": "market-on-open t+1 at raw Series A open",
+    "costs_bps": [0, 5, 10],
+    "primary_cost_bps": 5
+  },
+  "calendar": {
+    "source": "exchange_calendars 4.13.2 XNYS (calendar facts, not market data)",
+    "formation_close": "2026-10-07",
+    "sessions": ["2026-10-08", "2026-10-09", "2026-10-12", "2026-10-13", "2026-10-14", "2026-10-15", "2026-10-16",
+                 "2026-10-19", "2026-10-20", "2026-10-21", "2026-10-22", "2026-10-23", "2026-10-26", "2026-10-27",
+                 "2026-10-28", "2026-10-29", "2026-10-30", "2026-11-02", "2026-11-03", "2026-11-04", "2026-11-05"],
+    "session_count": 21,
+    "first_session": "2026-10-08",
+    "last_session": "2026-11-05",
+    "month_end_decisions": ["2026-10-30"],
+    "rebalance_executions": ["2026-11-02"],
+    "allocations": 2,
+    "liquidation": "close of 2026-11-05",
+    "earliest_stage_f": "2026-11-05T16:15:00-05:00",
+    "holidays_or_early_closes_in_window": []
+  },
+  "stage_f": {"range": ["2025-01-02", "2026-11-05"], "symbols": "25 universe symbols + SPY", "acquisitions": 1, "write_once": true, "requires_separate_authorization": true},
+  "recording": ["decision log (scores, ranks, top 5, target weights) for 2026-10-07 and 2026-10-30",
+                "fill log", "daily close-marked equity for V2-MOM, B1, B2", "metrics", "outcome status",
+                "§17 reproducibility block with result-file SHA-256"],
+  "proposed_ids": {"experiment": "V2-MOM-F021-OBS", "benchmarks": ["V2-B1-forward21", "V2-B2-forward21"], "final": "OD-3"},
+  "metrics": {
+    "headline": ["total_return_5bps (not annualised)", "active_total_return_vs_B1_5bps", "active_total_return_vs_B2_5bps"],
+    "also_reported": ["same at 0 and 10 bps", "cost drag", "max drawdown", "turnover, executions, lambda", "concentration (top-2, HHI, breadth)",
+                      "exposure", "tracking error and information ratio vs B1 (21 daily returns)",
+                      "net CAGR (labelled 'annualised from 21 sessions — not interpretable')", "Sharpe, Sortino, Calmar, volatility (21 daily returns)",
+                      "calendar subperiods Oct/Nov 2026 labelled partial", "episode statistics or undefined (reason)"],
+    "not_computed": {"HAC_t_and_Holm_p": "undefined (n = 21 daily returns; HAC lag 5 not meaningful)"},
+    "thresholds": "none"
+  },
+  "failure_rules": {
+    "missing_bar": "listed, never imputed; >2% of window sessions for any symbol (1 session = 4.8%) -> BLOCKING data review before the run",
+    "structural_hard_fail": "no run; FORWARD-OBSERVATION-INVALID (data-incomplete) unless fixed by §3.9 re-acquisition before any simulation",
+    "unscheduled_closure": "window runs until 21 completed XNYS sessions; end date and earliest Stage F move accordingly",
+    "execution_violation": "FORWARD-OBSERVATION-INVALID (methodological)",
+    "non_determinism": "FORWARD-OBSERVATION-INVALID (methodological)",
+    "technical_crash": "technical re-run per §14; both runs kept",
+    "corporate_action_mismatch": "BLOCKING data review before the run",
+    "early_data_exposure": "FORWARD-OBSERVATION-INVALID (protocol-breach)",
+    "post_adoption_change": "FORWARD-OBSERVATION-INVALID (protocol-breach); change = new amendment",
+    "not_run": "FORWARD-OBSERVATION-ABANDONED"
+  },
+  "outcome_statuses": ["FORWARD-OBSERVED (complete)",
+                       "FORWARD-OBSERVATION-INVALID (methodological | data-incomplete | protocol-breach)",
+                       "FORWARD-OBSERVATION-ABANDONED"],
+  "outcome_is_gate_status": false,
+  "disclaimers": [
+    "A one-month result does not demonstrate a long-term edge (holdout HAC p = 0.166, DAY-22 §1.10).",
+    "No outcome authorises real-money or live trading; that requires a separate explicit decision.",
+    "No criterion is derived from DAY-25 / DAY-25B or other historical results.",
+    "Any later strategy change is a new DERIVED experiment that can never be confirmed on these 21 sessions (§14)."
+  ],
+  "anti_mutation": {
+    "adoption_deadline": "before 2026-11-05 16:15 ET and before any Stage F data exists",
+    "content_pinning": "adoption commit records LF-normalised SHA-256 of the adopted .md and .json; the run refuses on mismatch",
+    "immutability": "never edited after adoption; changes are new amendments, labelled DERIVED FROM PRIOR OBSERVATION if after any forward data",
+    "separate_authorizations": ["adoption", "Stage F acquisition", "observation run"],
+    "write_once_outputs": true
+  },
+  "open_decisions": [
+    {"id": "OD-1", "critical": true, "blocks_adoption": true,
+     "decision": "interaction with the gating forward window (63 or 252 sessions from 2026-10-08)",
+     "conflict": "Stage F after 2026-11-05 inspects forward data before the gating window ends (§15.6, DAY-22 §3.2)",
+     "options": ["(a) observation replaces the forward step; no FORWARD-PASSED possible under v2",
+                 "(b) gating window restarts after the observation with an amended start rule",
+                 "(c) observation result sealed until the gating window ends"]},
+    {"id": "OD-2", "blocks_adoption": true, "decision": "fate of DAY-24 63-session proposal", "options": ["withdrawn", "superseded", "kept as gating window under OD-1 (b) or (c)"]},
+    {"id": "OD-3", "blocks_adoption": true, "decision": "final experiment ID and protocol version number", "note": "DAY-24 reserved v2.0.5"},
+    {"id": "OD-4", "blocks_adoption": true, "decision": "adoption deadline", "constraint": "before 2026-11-05 16:15 ET"},
+    {"id": "OD-5", "blocks_adoption": true, "decision": "accept that the window started 2026-10-08 before adoption, or move the start to the first session after adoption"}
+  ],
+  "integrity": {
+    "forward_data_accessed": false,
+    "excluded_data_accessed": false,
+    "market_data_fetched": false,
+    "backtests_run": false,
+    "files_modified": [],
+    "committed": false
+  }
+}

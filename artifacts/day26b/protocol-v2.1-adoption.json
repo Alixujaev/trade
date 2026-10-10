@@ -1,0 +1,140 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-26B protocol-owner adoption of protocol 2.1",
+ "title": "Adoption of Protocol v2.1: 63-session forward window (21-session diagnostic + 42-session blind gate)",
+ "final_status": "ADOPTED",
+ "protocol_version": "2.1",
+ "protocol_version_full": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 + 2.1",
+ "decided_by": "Alixujaev (protocol owner)",
+ "decided_utc": "2026-10-10T12:52:51Z",
+ "decision_provenance": "explicit protocol-owner instruction 'DAY-26B — IMPLEMENT PROTOCOL v2.1' (2026-10-10): adopt artifacts/day26b/protocol-v2.1-amendment.md and .json as the operative protocol",
+ "effective_from": "the commit that contains this record together with the pinned amendment files; not earlier",
+ "starting_head": "8ef01f4",
+ "adopted_files_sha256_lf": {
+  "artifacts/day26b/protocol-v2.1-amendment.md": "43e4b83de3ebff00ca4f0ba99e0d41fadbab4d7a2a70e943f261cec7f1f46477",
+  "artifacts/day26b/protocol-v2.1-amendment.json": "ec32ab01ea9d9d690f87aec655c94dd5607542741882178c4c7e360afdbdd7db"
+ },
+ "sha256_method": "SHA-256 of the file bytes with CRLF normalised to LF (core.autocrlf checkouts; as DAY-25B)",
+ "approvals": {
+  "A-1": "ACCEPTED",
+  "A-2": "ACCEPTED",
+  "A-3": "ACCEPTED",
+  "A-4": "ACCEPTED",
+  "A-5": "ACCEPTED",
+  "A-6": "ACCEPTED",
+  "A-7": "ACCEPTED",
+  "A-8": "ACCEPTED",
+  "A-9": "ACCEPTED"
+ },
+ "formal_exceptions": "E1-E6, recorded in the adopted amendment §17 / formal_exceptions (DAY-16 §3.6, §3.9, §15.6, §15.11, §14/§16.7; DAY-22 §3.1, §3.2.2-§3.2.3; DAY-23 §8.2 condition 5)",
+ "superseded_records": {
+  "artifacts/day24/day24-forward-oos-duration-amendment-design.md": "superseded by 2.1 (63 sessions kept; gate restricted to sessions 22-63; v2.0.5 not used); file not edited",
+  "artifacts/day26a/day26a-forward-21-session-observation-amendment-draft.md": "superseded by 2.1 (OD-1..OD-5 resolved per C22); file not edited"
+ },
+ "forward_schedule": {
+  "window": [
+   "2026-10-08",
+   "2027-01-07",
+   63
+  ],
+  "fwd-diag": [
+   "2026-10-08",
+   "2026-11-05",
+   21
+  ],
+  "fwd-gate": [
+   "2026-11-06",
+   "2027-01-07",
+   42
+  ],
+  "earliest_fwd_diag_access": "2026-11-05T16:15:00-05:00 (America/New_York)",
+  "earliest_fwd_gate_access": "2027-01-07T16:15:00-05:00 (America/New_York)"
+ },
+ "stage_f_acquisition_parameters": {
+  "precedent": "DAY-20 Stage H acquisition decisions (eb7abf7)",
+  "range": {
+   "fwd-diag": [
+    "2025-01-02",
+    "2026-11-05"
+   ],
+   "fwd-gate": [
+    "2025-01-02",
+    "2027-01-07"
+   ]
+  },
+  "asof": "the segment's last session (fwd-diag 2026-11-05, fwd-gate 2027-01-07)",
+  "ca_process_date_windows": {
+   "fwd-diag": {
+    "Q1": [
+     "2025-01-01",
+     "2026-11-05"
+    ]
+   },
+   "fwd-gate": {
+    "Q1": [
+     "2025-01-01",
+     "2027-01-07"
+    ]
+   }
+  },
+  "ca_event_date_boundary": "[2025-01-02, segment last session]; records outside discarded in memory, counts only (v2.0.1 C1)",
+  "no_q2_window_rationale": "capture follows the segment's last close on the same evening, so later process dates are not yet observable; a corporate action processed later appears as an unexplained change in the v2.0.4 cross-check and is a BLOCKING review",
+  "assets_endpoint": "not called",
+  "snapshot_root": "data/oos_cache/protocol_v2/stage_f/ (snapshot ids stage_f_<segment>_<UTC timestamp>; one per segment)",
+  "review_records_dir": "artifacts/reviews/stage_f",
+  "validation_status_required": "READY_FOR_FORWARD_EVALUATION"
+ },
+ "unchanged": {
+  "strategy_config_sha256": "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0",
+  "gate_thresholds": "§13.B unchanged",
+  "benchmarks": "B1, B2 unchanged",
+  "costs_bps": [
+   0,
+   5,
+   10
+  ],
+  "frozen_files": "DAY-16 protocol files, DAY-22 lockdown, DAY-25B predeclaration and preflight record, historical artifacts"
+ },
+ "integrity_at_adoption": {
+  "forward_data_accessed": false,
+  "excluded_data_accessed": false,
+  "market_data_fetched": false,
+  "forward_metrics_computed": false,
+  "stage_f_snapshot_exists": false,
+  "committed": false
+ },
+ "next_task": "commit this record with the adopted amendment (S1), then S3 after 2026-11-05 16:15 America/New_York",
+ "adopted_files_sha256_lf_history": [
+  {
+   "pinned_utc": "2026-10-10T12:52:51Z",
+   "reason": "original adoption pins",
+   "adopted_files_sha256_lf": {
+    "artifacts/day26b/protocol-v2.1-amendment.md": "1a1b0b0bb1e8a4a4eb093e5789a4f9d8cd010fe368439d0d8c8e950053d34b78",
+    "artifacts/day26b/protocol-v2.1-amendment.json": "b4aa78cd8c6649a4bbfc67e73dc93597e22398e1debe8660fd2394da786fe20e"
+   }
+  }
+ ],
+ "adopted_files_repinned_utc": "2026-10-10T14:30:00Z",
+ "adopted_files_repin_reason": "append-only DAY-26C incident disclosure (amendment §19, incident_disclosures); no earlier text changed",
+ "incident_records_sha256_lf": {
+  "artifacts/day26c/day26c-forward-data-incident.md": "f023fde4f2611b17d3d664fa1391800f4b1b370f327dc877bffbc31ce8047171",
+  "artifacts/day26c/day26c-forward-data-incident.json": "68567a37a19b522aa331edf82a88d09a7f09b144fd23ff27a318aec7ce382449"
+ },
+ "incident_disclosures": [
+  {
+   "appended_utc": "2026-10-10T14:30:00Z",
+   "incident": "DAY-26C",
+   "record": [
+    "artifacts/day26c/day26c-forward-data-incident.md",
+    "artifacts/day26c/day26c-forward-data-incident.json"
+   ],
+   "summary": "2026-10-10 12:56:23Z-12:59:51Z, after decided_utc and before any commit: recent yfinance intraday data (54 files) downloaded into data/cache by a DAY-26B full-suite verification run and consumed by legacy tests; believed to include forward sessions 1-2; no fwd-gate session existed; no V2-MOM forward metric computed",
+   "effect_on_integrity_at_adoption": "the integrity_at_adoption values were true at decided_utc (12:52:51Z) and are kept unchanged as history; they no longer hold from 12:56:23Z on"
+  }
+ ],
+ "segment_status": {
+  "fwd-diag": "FWD-DIAG-INVALID (protocol-breach)",
+  "fwd-gate": "PENDING — blind, not evaluated"
+ },
+ "next_task_after_incident": "commit this record with the amendment, the DAY-26C incident record and the DAY-26B/26C code (S1); fwd-diag steps S3-S5 cancelled; next data acquisition: Stage F-G after 2027-01-07 16:15 America/New_York"
+}

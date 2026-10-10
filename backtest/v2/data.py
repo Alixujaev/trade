@@ -21,6 +21,7 @@ import pandas as pd
 from acquisition.v2.contract import STAGE_R_ROOT
 from acquisition.v2.reevaluate import verify_snapshot
 from acquisition.v2.sessions import session_of_label, stage_r_sessions
+from backtest.v2.forward import check_forward_access, check_snapshot_immutable
 from config.day_universe import FROZEN_DAY_UNIVERSE
 
 SNAPSHOT_ID = "stage_r_20261007T093410Z"
@@ -209,6 +210,85 @@ def load_stage_h() -> tuple[MarketData, dict]:
                        "excluded_by_review": sorted(rejected), "events_used": len(kept)},
             "sessions": n, "first_session": sessions[0].isoformat(), "last_session": sessions[-1].isoformat(),
             "missing_bars": int(np.isnan(cl).sum()), "series_A_only": True, "series_C_loaded": False}
+    return MarketData(sessions, tickers, op, cl, q, d), info
+
+
+def load_stage_f(seg_id: str, snapshot_id: str, manifest_sha256: str, root: Path | None = None,
+                 now=None) -> tuple[MarketData, dict]:
+    """Stage F (protocol 2.1, DAY-26B) for one forward segment: refused unless protocol 2.1 is adopted and committed
+    and the segment's earliest time has passed (checked before any file is opened); then a validated
+    READY_FOR_FORWARD_EVALUATION snapshot whose session index ends at the segment's last session, so no bar or event
+    after it can load. Event set = snapshot events_normalised minus FIRST_SESSION_UNTESTABLE ids minus EVENT_REJECTED
+    among committed Stage F review records (as Stage H)."""
+    from acquisition.v2.contract import FORWARD_SEGMENTS, REVIEW_RECORDS_DIR_F, STAGE_F_ROOT
+    from acquisition.v2.sessions import stage_f_sessions
+    access = check_forward_access(seg_id, now)
+    root = Path(root) if root is not None else STAGE_F_ROOT
+    seg_first, seg_last, _n = FORWARD_SEGMENTS[seg_id]
+    if not snapshot_id.startswith(f"stage_f_{seg_id}_"):
+        raise DataError(f"{snapshot_id} is not a {seg_id} Stage F snapshot")
+    snap = root / snapshot_id
+    pre = verify_snapshot(snap, manifest_sha256)
+    check_snapshot_immutable(snap)                                   # protocol 2.2 D4
+    vdir = root / f"validation__{snapshot_id}"
+    vman = json.loads((vdir / "manifest.json").read_text(encoding="utf-8"))
+    rep = json.loads((vdir / "validation_report.json").read_text(encoding="utf-8"))
+    if (vman["files_sha256"]["validation_report.json"] != _sha(vdir / "validation_report.json")
+            or rep["status"] != "READY_FOR_FORWARD_EVALUATION" or rep["segment"] != seg_id
+            or rep["snapshot_manifest_sha256"] != pre["manifest_sha256"]):
+        raise DataError(f"Stage F {snapshot_id} is not READY_FOR_FORWARD_EVALUATION for {seg_id}")
+    sessions = tuple(stage_f_sessions(seg_last))
+    tickers = tuple(sorted(FROZEN_DAY_UNIVERSE)) + (BENCHMARK_SYMBOL,)
+    pos = {s: i for i, s in enumerate(sessions)}
+    n, m = len(sessions), len(tickers)
+    op, cl = np.full((n, m), np.nan), np.full((n, m), np.nan)
+    for j, t in enumerate(tickers):
+        df = pd.read_parquet(snap / "bars_raw" / f"{t}.parquet", columns=["open", "close"])
+        for ts, o, c in zip(df.index, df["open"].to_numpy(np.float64), df["close"].to_numpy(np.float64)):
+            day, exact = session_of_label(ts)
+            if not exact or day not in pos:
+                raise DataError(f"{t}: bar label {ts} is not an XNYS Stage F session label of {seg_id}")
+            op[pos[day], j], cl[pos[day], j] = o, c
+    events = json.loads((snap / "events_normalised.json").read_text(encoding="utf-8"))["events"]
+    cross = json.loads((snap / "crosscheck.json").read_text(encoding="utf-8"))["per_symbol"]
+    first_session = {e["id"] for v in cross.values() for e in v.get("first_session_untestable", [])}
+    rejected = set()
+    for f in sorted(REVIEW_RECORDS_DIR_F.glob("*.json")) if REVIEW_RECORDS_DIR_F.is_dir() else []:
+        r = json.loads(f.read_text(encoding="utf-8"))
+        if r.get("decision") == "EVENT_REJECTED":
+            rejected.add(str(r["item_key"]["ca_id"]))
+    kept = [e for e in events if e["id"] not in first_session and e["id"] not in rejected]
+    q, d = np.ones((n, m)), np.zeros((n, m))
+    seen: set[tuple[str, str]] = set()
+    for e in kept:
+        if e["entity"] not in tickers:
+            raise DataError(f"event for non-universe entity {e['entity']}")
+        ex = date.fromisoformat(e["ex_date"])
+        if ex not in pos:
+            raise DataError(f"event {e['id']} ex-date {ex} is not a Stage F session of {seg_id}")
+        key = (e["entity"], e["ex_date"])
+        if key in seen:
+            raise DataError(f"several events for {key} (same-ex-date case is a BLOCKING review, v2.0.1 C3)")
+        seen.add(key)
+        k, j = pos[ex], tickers.index(e["entity"])
+        if e["event"] == "cash_dividend":
+            d[k, j] = float(e["d"])
+        elif "split" in e["event"]:
+            q[k, j] = float(e["q"])
+        else:
+            raise DataError(f"unsupported event type {e['event']}")
+    k0 = pos[seg_first]
+    info = {"snapshot_id": snapshot_id, "segment": seg_id, "manifest_sha256": pre["manifest_sha256"],
+            "file_count": pre["file_count"], "tree_sha256": pre["tree_sha256"],
+            "bars_raw_sha256": {f"bars_raw/{t}.parquet": pre["files"][f"bars_raw/{t}.parquet"] for t in tickers},
+            "events": {"source": f"data/oos_cache/protocol_v2/stage_f/{snapshot_id}/events_normalised.json",
+                       "events_total": len(events), "excluded_first_session": sorted(first_session),
+                       "excluded_by_review": sorted(rejected), "events_used": len(kept)},
+            "validation": f"data/oos_cache/protocol_v2/stage_f/validation__{snapshot_id}",
+            "forward_access": access, "sessions": n, "first_session": sessions[0].isoformat(),
+            "last_session": sessions[-1].isoformat(), "missing_bars": int(np.isnan(cl).sum()),
+            "missing_in_segment_by_symbol": {t: int(np.isnan(cl[k0:, j]).sum()) for j, t in enumerate(tickers)},
+            "series_A_only": True, "series_C_loaded": False}
     return MarketData(sessions, tickers, op, cl, q, d), info
 
 
