@@ -1,0 +1,498 @@
+{
+ "range": {
+  "start": "2026-07-02",
+  "end": "2026-09-25",
+  "sessions": 60,
+  "first_session": "2026-07-02",
+  "last_session": "2026-09-25"
+ },
+ "universe": {
+  "count": 25,
+  "symbols": [
+   "AAPL",
+   "ADBE",
+   "AMAT",
+   "AMD",
+   "AMZN",
+   "AVGO",
+   "COST",
+   "CRM",
+   "CSCO",
+   "GOOGL",
+   "INTC",
+   "JNJ",
+   "JPM",
+   "KO",
+   "META",
+   "MSFT",
+   "MU",
+   "NFLX",
+   "NVDA",
+   "ORCL",
+   "PEP",
+   "QCOM",
+   "TSLA",
+   "WMT",
+   "XOM"
+  ],
+  "symbols_with_trades": [
+   "AAPL",
+   "ADBE",
+   "AMAT",
+   "AMD",
+   "AMZN",
+   "AVGO",
+   "COST",
+   "CRM",
+   "GOOGL",
+   "INTC",
+   "JNJ",
+   "JPM",
+   "KO",
+   "META",
+   "MSFT",
+   "MU",
+   "NFLX",
+   "NVDA",
+   "ORCL",
+   "QCOM",
+   "TSLA",
+   "WMT",
+   "XOM"
+  ]
+ },
+ "rules": {
+  "initial_capital": 100000.0,
+  "risk_pct": 0.0025,
+  "target_r": 2.0,
+  "max_trades_per_day": 2,
+  "max_open_positions": 2,
+  "daily_loss_limit_r": -2.0,
+  "min_price": 5.0,
+  "slippage_bps": 5.0,
+  "commission_per_share": 0.005,
+  "force_exit": "15:55:00"
+ },
+ "trades": 95,
+ "win_rate": 0.4842105263157895,
+ "total_pnl": -1430.0965776289568,
+ "total_r": -5.763211822497445,
+ "avg_r": -0.060665387605236265,
+ "net_return": -0.014300965776289809,
+ "cagr": -0.05870404944940921,
+ "cagr_note": "annualised from 60 sessions - not meaningful evidence",
+ "max_drawdown": -0.020998601114025246,
+ "sharpe": -1.8701877057676881,
+ "sortino": -2.430951200080958,
+ "exits": {
+  "STOP": 13,
+  "TARGET": 0,
+  "FORCE_EXIT_1555": 82,
+  "SESSION_END": 0
+ },
+ "costs": {
+  "commission_total": 48.56,
+  "slippage_total": 1143.2411827314959,
+  "note": "both included in every trade's P&L (entry_fill/exit_fill and 2 x $0.005/share)"
+ },
+ "skips": {
+  "no_prior_close": 25,
+  "max_trades_per_day": 59,
+  "earnings_day": 24
+ },
+ "earnings_skipped_symbol_sessions": 24,
+ "benchmarks": {
+  "equal_weight_buy_and_hold": {
+   "status": "OK",
+   "method": "capital/25 per ticker, whole shares, buy first-session 09:30 open, sell last-session close; 5 bps slippage and $0.005/share commission on both legs; marked at closes",
+   "final_equity": 104676.64949871064,
+   "net_return": 0.0467664949871065,
+   "cagr": 0.21162776166720199,
+   "cagr_note": "annualised from 60 sessions - not meaningful evidence",
+   "max_drawdown": -0.046846647436657965,
+   "sharpe": 1.4635872271003116,
+   "sortino": 2.535857015877669,
+   "legs": [
+    {
+     "symbol": "AAPL",
+     "shares": 13,
+     "entry_open": 294.0849914550781,
+     "entry_fill": 294.23203395080566
+    },
+    {
+     "symbol": "ADBE",
+     "shares": 18,
+     "entry_open": 215.5500030517578,
+     "entry_fill": 215.6577780532837
+    },
+    {
+     "symbol": "AMAT",
+     "shares": 6,
+     "entry_open": 656.6950073242188,
+     "entry_fill": 657.0233548278808
+    },
+    {
+     "symbol": "AMD",
+     "shares": 7,
+     "entry_open": 538.219970703125,
+     "entry_fill": 538.4890806884765
+    },
+    {
+     "symbol": "AMZN",
+     "shares": 16,
+     "entry_open": 241.6024932861328,
+     "entry_fill": 241.72329453277587
+    },
+    {
+     "symbol": "AVGO",
+     "shares": 10,
+     "entry_open": 365.7250061035156,
+     "entry_fill": 365.9078686065674
+    },
+    {
+     "symbol": "COST",
+     "shares": 4,
+     "entry_open": 927.0,
+     "entry_fill": 927.4635
+    },
+    {
+     "symbol": "CRM",
+     "shares": 24,
+     "entry_open": 163.0,
+     "entry_fill": 163.08149999999998
+    },
+    {
+     "symbol": "CSCO",
+     "shares": 34,
+     "entry_open": 117.0250015258789,
+     "entry_fill": 117.08351402664184
+    },
+    {
+     "symbol": "GOOGL",
+     "shares": 11,
+     "entry_open": 359.4800109863281,
+     "entry_fill": 359.6597509918213
+    },
+    {
+     "symbol": "INTC",
+     "shares": 31,
+     "entry_open": 128.9149932861328,
+     "entry_fill": 128.97945078277587
+    },
+    {
+     "symbol": "JNJ",
+     "shares": 15,
+     "entry_open": 255.77999877929688,
+     "entry_fill": 255.9078887786865
+    },
+    {
+     "symbol": "JPM",
+     "shares": 11,
+     "entry_open": 338.0199890136719,
+     "entry_fill": 338.1889990081787
+    },
+    {
+     "symbol": "KO",
+     "shares": 48,
+     "entry_open": 81.62999725341797,
+     "entry_fill": 81.67081225204467
+    },
+    {
+     "symbol": "META",
+     "shares": 6,
+     "entry_open": 607.89501953125,
+     "entry_fill": 608.1989670410156
+    },
+    {
+     "symbol": "MSFT",
+     "shares": 10,
+     "entry_open": 384.4800109863281,
+     "entry_fill": 384.6722509918213
+    },
+    {
+     "symbol": "MU",
+     "shares": 3,
+     "entry_open": 1041.5,
+     "entry_fill": 1042.02075
+    },
+    {
+     "symbol": "NFLX",
+     "shares": 53,
+     "entry_open": 75.15799713134766,
+     "entry_fill": 75.19557612991332
+    },
+    {
+     "symbol": "NVDA",
+     "shares": 20,
+     "entry_open": 197.14999389648438,
+     "entry_fill": 197.2485688934326
+    },
+    {
+     "symbol": "ORCL",
+     "shares": 27,
+     "entry_open": 143.3000030517578,
+     "entry_fill": 143.3716530532837
+    },
+    {
+     "symbol": "PEP",
+     "shares": 27,
+     "entry_open": 143.0,
+     "entry_fill": 143.0715
+    },
+    {
+     "symbol": "QCOM",
+     "shares": 21,
+     "entry_open": 182.1699981689453,
+     "entry_fill": 182.26108316802978
+    },
+    {
+     "symbol": "TSLA",
+     "shares": 9,
+     "entry_open": 428.2300109863281,
+     "entry_fill": 428.44412599182124
+    },
+    {
+     "symbol": "WMT",
+     "shares": 36,
+     "entry_open": 109.33000183105469,
+     "entry_fill": 109.38466683197021
+    },
+    {
+     "symbol": "XOM",
+     "shares": 29,
+     "entry_open": 137.14999389648438,
+     "entry_fill": 137.2185688934326
+    }
+   ]
+  },
+  "capital_constrained_buy_and_hold": {
+   "status": "N/A",
+   "reason": "not defined comparably for an intraday strategy limited to 2 concurrent positions; not computed rather than approximated"
+  }
+ },
+ "inputs": {
+  "earnings_calendar": "config\\earnings_calendar.csv",
+  "cache_dir": "data/cache",
+  "data": {
+   "AAPL": {
+    "path": "data\\cache\\AAPL_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "ADBE": {
+    "path": "data\\cache\\ADBE_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "AMAT": {
+    "path": "data\\cache\\AMAT_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "AMD": {
+    "path": "data\\cache\\AMD_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "AMZN": {
+    "path": "data\\cache\\AMZN_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "AVGO": {
+    "path": "data\\cache\\AVGO_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "COST": {
+    "path": "data\\cache\\COST_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "CRM": {
+    "path": "data\\cache\\CRM_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "CSCO": {
+    "path": "data\\cache\\CSCO_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "GOOGL": {
+    "path": "data\\cache\\GOOGL_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "INTC": {
+    "path": "data\\cache\\INTC_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "JNJ": {
+    "path": "data\\cache\\JNJ_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "JPM": {
+    "path": "data\\cache\\JPM_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "KO": {
+    "path": "data\\cache\\KO_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "META": {
+    "path": "data\\cache\\META_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "MSFT": {
+    "path": "data\\cache\\MSFT_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "MU": {
+    "path": "data\\cache\\MU_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "NFLX": {
+    "path": "data\\cache\\NFLX_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "NVDA": {
+    "path": "data\\cache\\NVDA_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "ORCL": {
+    "path": "data\\cache\\ORCL_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "PEP": {
+    "path": "data\\cache\\PEP_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "QCOM": {
+    "path": "data\\cache\\QCOM_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "TSLA": {
+    "path": "data\\cache\\TSLA_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "WMT": {
+    "path": "data\\cache\\WMT_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "XOM": {
+    "path": "data\\cache\\XOM_5m.parquet",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   }
+  },
+  "network": "blocked (socket connect refused)"
+ },
+ "checks": [
+  {
+   "check": "trade sessions within backtest range",
+   "status": "PASS",
+   "detail": "0 outside"
+  },
+  {
+   "check": "no duplicate (symbol, session) trades",
+   "status": "PASS",
+   "detail": "0 duplicates"
+  },
+  {
+   "check": "entry is the bar after the signal; entry <= exit (no lookahead)",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "exit in the same session (no overnight)",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "signal bar opens in 09:45-11:00 ET",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "stop = OR low, target = entry + 2R",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "<= 2 trades per day",
+   "status": "PASS",
+   "detail": "max 2"
+  },
+  {
+   "check": "<= 2 concurrent positions",
+   "status": "PASS",
+   "detail": "max 2"
+  },
+  {
+   "check": "concurrent notional <= available capital",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "no trade on an earnings session",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "earnings skips == CSV sessions in range",
+   "status": "PASS",
+   "detail": "expected 24, skipped 24, missing [], extra []"
+  },
+  {
+   "check": "5 bps slippage applied on both legs",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "$0.005/share commission on both legs in P&L",
+   "status": "PASS",
+   "detail": "0 violations"
+  }
+ ],
+ "all_checks_passed": true
+}
