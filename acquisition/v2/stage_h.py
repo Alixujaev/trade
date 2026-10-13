@@ -42,7 +42,7 @@ from acquisition.v2.ca_client import CorporateActionsClient
 from acquisition.v2.contract import (
     AMENDMENT_004_COMMIT, AMENDMENT_004_FILES, BAR_COLUMNS, CA_DATA_QUALITY, CA_WINDOWS_H, DAY20_DECISIONS_COMMIT,
     EVENT_DATE_MAX_H, EVENT_DATE_MIN_H, HOLDOUT_EXPECTED_SESSIONS, HOLDOUT_FIRST_SESSION, PROTOCOL_VERSION,
-    PROTOCOL_VERSION_004, REVIEW_RECORDS_DIR_H, SCHEMA_VERSION, STAGE_H_ASOF, STAGE_H_EXPECTED_SESSIONS,
+    PINNED_ALIASES, PROTOCOL_VERSION_004, REVIEW_RECORDS_DIR_H, SCHEMA_VERSION, STAGE_H_ASOF, STAGE_H_EXPECTED_SESSIONS,
     STAGE_H_FIRST_SESSION, STAGE_H_LAST_SESSION, STAGE_H_ROOT, STAGE_R_ROOT, ca_query_symbols, stage_r_symbols,
     universe,
 )
@@ -98,7 +98,7 @@ def derive(frames: dict[str, dict[str, pd.DataFrame]], ca: dict[str, list[dict[s
     session set and evaluated-segment start)."""
     sessions = stage_h_sessions() if sessions is None else sessions
     syms = stage_r_symbols()
-    identity = idn.resolve(ca["complete"], syms, q_syms)
+    identity = idn.resolve(ca["complete"], syms, q_syms, PINNED_ALIASES)          # v2.4 A1
     normalised = ev.normalise(ca["complete"], identity)
     quality = ev.compare_quality(ca["complete"], ca["all"], {a["id"] for a in identity["assignments"]})
     per_series, raw_vs_all = {}, {}

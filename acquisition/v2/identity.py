@@ -79,7 +79,8 @@ def _closure(start: str, edges: list[tuple[str, str]]) -> set[str]:
     return seen
 
 
-def resolve(records: list[dict[str, Any]], entities: list[str], queried: list[str]) -> dict[str, Any]:
+def resolve(records: list[dict[str, Any]], entities: list[str], queried: list[str],
+            pinned_aliases: tuple[dict[str, str], ...] = ()) -> dict[str, Any]:
     """records: boundary-filtered CA records (each with 'ca_type', 'event_date', 'id').
     entities: Stage R symbols (25 + SPY). queried: symbols used as CA query keys."""
     ents = set(entities)
@@ -140,6 +141,25 @@ def resolve(records: list[dict[str, Any]], entities: list[str], queried: list[st
             if old_t not in queried:
                 conflicts.append({"kind": "missed_alias", "entity": new_t, "alias": old_t, "id": str(r.get("id"))})
 
+    # v2.4 A1: frozen historical aliases whose name-change record lies before the acquisition boundary.
+    # Applied only when no in-window record derives the alias and the pinned CUSIP is in the entity's CUSIP
+    # set computed from the acquired records. An unverifiable pin is not applied (records under the alias stay
+    # unassigned -> fail closed); a pin contradicted by an in-window name change is a conflict.
+    pinned_applied: list[dict[str, str]] = []
+    pinned_not_applied: list[dict[str, str]] = []
+    for p in pinned_aliases:
+        old_t, new_t, pc = p["old_symbol"], p["new_symbol"], p["cusip"]
+        if old_t in aliases:
+            if aliases[old_t] != new_t:
+                conflicts.append({"kind": "pinned_alias_mismatch", "alias": old_t, "pinned": new_t,
+                                  "observed": aliases[old_t], "source_id": p["source_id"]})
+            continue
+        if new_t not in ents or old_t not in queried or pc not in set(cusip_sets.get(new_t, [])):
+            pinned_not_applied.append({**p, "reason": "pinned CUSIP not in the entity's acquired CUSIP set"})
+            continue
+        aliases[old_t] = new_t
+        pinned_applied.append(dict(p))
+
     def to_entity(ticker: str) -> str | None:
         if ticker in ents:
             return ticker
@@ -197,6 +217,8 @@ def resolve(records: list[dict[str, Any]], entities: list[str], queried: list[st
             "assignments": assignments, "foreign_entity_records": foreign,
             "identity_unverified_records": unverified, "unassigned_records": unassigned,
             "conflicts": conflicts,
+            **({"pinned_aliases_applied": pinned_applied} if pinned_applied else {}),   # absent -> old snapshots byte-identical
+            **({"pinned_aliases_not_applied": pinned_not_applied} if pinned_not_applied else {}),
             "counts": {"records": len(records), "assigned": len(assignments),
                        "assigned_by_cusip": sum(1 for a in assignments if a["match"] == "cusip"),
                        "assigned_ticker_only": sum(1 for a in assignments if a["match"] == "ticker_only"),

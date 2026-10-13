@@ -33,6 +33,8 @@ AMENDMENT_FILES = ("artifacts/day26b/protocol-v2.1-amendment.md", "artifacts/day
 INCIDENT_FILES = ("artifacts/day26c/day26c-forward-data-incident.md", "artifacts/day26c/day26c-forward-data-incident.json")
 ADOPTION_JSON_22 = "artifacts/day26d/protocol-v2.2-adoption.json"
 AMENDMENT_FILES_22 = ("artifacts/day26d/protocol-v2.2-amendment.md", "artifacts/day26d/protocol-v2.2-amendment.json")
+ADOPTION_JSON_24 = "artifacts/day27a/protocol-v2.4-adoption.json"
+AMENDMENT_FILES_24 = ("artifacts/day27a/protocol-v2.4-amendment.md", "artifacts/day27a/protocol-v2.4-amendment.json")
 V2_MOM_CONFIG_SHA256 = "62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0"
 PROTOCOL_JSON = "artifacts/day16/research-protocol-v2.json"
 DIAG_CAGR_LABEL = "annualised from 21 sessions — not meaningful evidence"
@@ -141,6 +143,26 @@ def check_adoption_22(root: Path = ROOT_DIR, git_ok: Callable[..., bool] | None 
             "adopted_files_sha256_lf_22": pinned, **chain}
 
 
+def check_adoption_24(root: Path = ROOT_DIR, git_ok: Callable[..., bool] | None = None) -> dict:
+    """Protocol 2.4 (pinned identity alias, DAY-27A): ADOPTED, pins match, committed unchanged; plus the 2.2/2.1 chain."""
+    git_ok = git_ok or _git_ok
+    path = Path(root) / ADOPTION_JSON_24
+    if not path.is_file():
+        raise ForwardAccessRefused(f"protocol-2.4 adoption record missing: {ADOPTION_JSON_24}")
+    rec = json.loads(path.read_text(encoding="utf-8"))
+    if rec.get("final_status") != "ADOPTED" or rec.get("protocol_version") != "2.4":
+        raise ForwardAccessRefused("protocol 2.4 is not ADOPTED")
+    pinned = rec.get("adopted_files_sha256_lf") or {}
+    for p in AMENDMENT_FILES_24:
+        if not (Path(root) / p).is_file() or pinned.get(p) != lf_sha256(Path(root) / p):
+            raise ForwardAccessRefused(f"{p} is missing or differs from the adopted SHA-256")
+    for p in (ADOPTION_JSON_24, *AMENDMENT_FILES_24):
+        if not git_ok("ls-files", "--error-unmatch", p) or not git_ok("diff", "--quiet", "HEAD", "--", p):
+            raise ForwardAccessRefused(f"{p} is not committed unchanged; protocol 2.4 takes effect only from its commit")
+    return {"adoption_record_24": ADOPTION_JSON_24, "adopted_utc_24": rec.get("decided_utc"),
+            **check_adoption_22(root, git_ok)}
+
+
 def check_config_sha(root: Path = ROOT_DIR) -> str:
     """The frozen V2-MOM strategy-config SHA-256 (§17 canonical blob of the DAY-16 JSON) must be unchanged."""
     proto = json.loads((Path(root) / PROTOCOL_JSON).read_text(encoding="utf-8"))
@@ -204,7 +226,7 @@ def check_forward_access(seg_id: str, now: datetime | None = None) -> dict:
         raise ForwardAccessRefused(f"{seg_id} status is {status or 'unrecorded'}; only a PENDING segment may be accessed")
     now = now or datetime.now(timezone.utc)
     check_time(seg_id, now)
-    adoption = check_adoption_22() if seg_id == "fwd-gate2" else check_adoption()
+    adoption = check_adoption_24() if seg_id == "fwd-gate2" else check_adoption()
     check_config_sha()
     sessions = check_segment_calendar(seg_id)
     if seg_id != "fwd-gate2":

@@ -1,0 +1,26 @@
+{
+ "schema_version": "1.0",
+ "task": "DAY-27A protocol-owner adoption of protocol 2.4 (pinned historical identity alias FB -> META)",
+ "final_status": "ADOPTED",
+ "protocol_version": "2.4",
+ "protocol_version_full": "2.0 R1 + 2.0.1 + 2.0.2 + 2.0.3 + 2.0.4 + 2.1 + 2.2 + 2.3 + 2.4",
+ "decided_by": "Alixujaev (protocol owner)",
+ "decided_utc": "2026-10-13T07:05:10Z",
+ "decision_provenance": "explicit protocol-owner instruction 'Proceed with the revised DAY-27A v2.4 draft' (2026-10-13), after review of the draft, scratch-copy tests and the Stage F leakage fix (name_change_date)",
+ "effective_from": "the commit that contains this amendment and its adoption record; not earlier",
+ "adopted_files_sha256_lf": {
+  "artifacts/day27a/protocol-v2.4-amendment.md": "a4af6443e70218ebf8ce93084b41e72f1637db53c71d6b79c801e2889be1cf8b",
+  "artifacts/day27a/protocol-v2.4-amendment.json": "9be06589f345e9bd9abc87f91a58f026a13985da17699af4f5fa8c026f8a59c1"
+ },
+ "builds_on": {
+  "2.3": "artifacts/day27/protocol-v2.3-adoption.json",
+  "2.2": "artifacts/day26d/protocol-v2.2-adoption.json",
+  "2.1": "artifacts/day26b/protocol-v2.1-adoption.json"
+ },
+ "segment_status_unchanged": {
+  "fwd-diag": "FWD-DIAG-INVALID (protocol-breach)",
+  "fwd-gate": "SUPERSEDED (protocol 2.2) - never acquired or evaluated",
+  "fwd-gate2": "PENDING - blind, not evaluated"
+ },
+ "scope": "corporate-action entity identity only; no strategy, config, calendar, window, sample or validation-threshold change"
+}

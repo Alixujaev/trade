@@ -76,7 +76,7 @@ def check_adoption_23(root: Path = ROOT_DIR, git_ok: Callable[..., bool] | None 
     for f in (ADOPTION_JSON_23, *AMENDMENT_FILES_23):
         if not git_ok("ls-files", "--error-unmatch", f) or not git_ok("diff", "--quiet", "HEAD", "--", f):
             raise RunnerError(f"{f} is not committed unchanged; protocol 2.3 takes effect only from its commit")
-    fw.check_adoption_22(root, git_ok)
+    fw.check_adoption_24(root, git_ok)                                   # v2.4 (DAY-27A) -> 2.2 -> 2.1
     return {"adopted_utc_23": rec.get("decided_utc"),
             "pins": hashlib.sha256(json.dumps(rec.get("adopted_files_sha256_lf"), sort_keys=True).encode()).hexdigest()}
 

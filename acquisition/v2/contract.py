@@ -79,6 +79,10 @@ CA_TYPES = ("reverse_split", "forward_split", "unit_split", "cash_dividend", "st
 
 BENCHMARK_SYMBOL = "SPY"
 CA_QUERY_ALIASES = ("FB",)                 # v2.0.1 C2 rule 2 (Stage R alias)
+PINNED_ALIASES = (                         # protocol v2.4 A1: name change before the acquisition boundary
+    {"old_symbol": "FB", "new_symbol": "META", "cusip": "30303M102",
+     "source_id": "ed6f16b1-fc46-443e-8dba-898ed9007a7a", "name_change_date": "2022-06-09"},
+)
 
 # Frozen tolerances (protocol §3.4, §3.8) - never changed here.
 # FACTOR_CHANGE_REL_TOL is the retired v2.0 R1 value, kept as a historical record only: v2.0.2 item 1 replaced
