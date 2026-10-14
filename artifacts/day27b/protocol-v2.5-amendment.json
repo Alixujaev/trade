@@ -1,0 +1,72 @@
+{
+ "protocol_version": "2.5",
+ "status": "DRAFT_NOT_ADOPTED",
+ "title": "Review audit records in the V2-MOM-P001 health record",
+ "append_only_after": "2.4",
+ "scope": "paper runner V2-MOM-P001 only (observability)",
+ "not_in_scope": ["Stage R/H/F", "fwd-gate2 and backtest/v2/forward.py guards", "identity rules", "review classification",
+                  "strategy", "ledger", "seal"],
+ "amends": ["v2.3 P3 (permitted plaintext health content)", "v2.3 section 3 (health-record fields)"],
+ "rules": {
+  "R1_persisted_fields": {
+   "record_key": "review_pending_items",
+   "filter": "classifier status in [BLOCKING, HARD_FAIL] (unchanged)",
+   "item_keys": ["item", "entity", "event_date", "category", "status", "reason", "id"],
+   "unavailable_value": null,
+   "no_inference": true,
+   "order": "classifier order; never merged or de-duplicated",
+   "source": "acquisition/v2/reviews.py:classify output"
+  },
+  "R2_count_consistency": {
+   "review_pending_count": "len(review_pending_items), same list (single source of truth)",
+   "pre_commit_checks": ["count == number of BLOCKING/HARD_FAIL classifier items", "canonical JSON serialisation succeeds"],
+   "on_failure": "raise before runs/<D>.json is written; session stays unprocessed and is retried (v2.3 P5/P7)",
+   "empty_list_substitution": false
+  },
+  "R3_schema_marker": {
+   "new_records": {"health_schema": 2},
+   "check_health": "UNHEALTHY if a health_schema 2 record lacks review_pending_items or count != len",
+   "legacy_records": "records without health_schema (e.g. 2026-10-12) remain valid; never rewritten or backfilled"
+  },
+  "R4_plaintext_permission": {
+   "added": "non-performance review metadata (the seven R1 keys)",
+   "still_prohibited": ["positions", "weights", "holdings", "orders", "fills", "decisions", "pending orders", "equity",
+                        "cash", "P&L", "returns", "performance metrics", "seal keys", "credentials", "tokens",
+                        "encrypted or decrypted ledger content"],
+   "snapshot_unchanged": "raw corporate-action payloads and adjusted-price datasets are not added"
+  }
+ },
+ "invariants": ["frozen engine and strategy (config sha256 62827d70ccd17e21dd2e1d1f652357fa5b0de2c79454d1811677eac8e79388c0)",
+                "identity resolution v2.0.1 C2 + v2.4 A1, review classification and statuses",
+                "session order, catch-up, idempotency P7, locking, retries, late flags",
+                "sealed ledger format, ledger_sha256, seal key, reveal time lock, --now refusal",
+                "all v2.3 P5 / v2.4 fail-closed checks, check_quarantine, endpoint guard, check_config_sha",
+                "historical artifacts, existing session records and snapshots"],
+ "adoption_chain": ["2.5", "2.3", "2.4", "2.2", "2.1"],
+ "guards": {"paper_runner": "check_adoption_25 (paper/) -> check_adoption_23 -> fw.check_adoption_24 -> check_adoption_22 -> check_adoption",
+            "fwd-gate2": "unchanged; does not require v2.5"},
+ "required_tests": {
+  "file": "tests/test_day27b_review_audit.py",
+  "offline": true,
+  "cases": ["all BLOCKING/HARD_FAIL items persisted with exactly seven keys",
+            "review_pending_count == len(review_pending_items)",
+            "same entity/date items with different item label not collapsed",
+            "unavailable classifier keys stored as null",
+            "count mismatch or non-serialisable item raises before commit point; no runs/<D>.json",
+            "no performance/position keys and no seal-key value in the record",
+            "ledger_sha256 and classification identical for identical input",
+            "check-health: schema 2 without list or mismatched count UNHEALTHY; legacy record unaffected",
+            "v2.5 guard refuses missing/not-ADOPTED/mismatched/uncommitted; v2.4 and fwd-gate2 guards unchanged; existing suites pass"]
+ },
+ "files_to_change_after_approval": {
+  "modified": ["paper/data.py", "paper/runner.py", "paper/config.py"],
+  "new": ["tests/test_day27b_review_audit.py"],
+  "adoption_record": "artifacts/day27b/protocol-v2.5-adoption.json (rewritten as effective only at adoption)",
+  "unchanged": ["acquisition/", "backtest/", "strategy/config", "paper/seal.py", "paper/ledger.py", "existing artifacts and paper_state/"]
+ },
+ "evidence": {
+  "session_record": "paper_state/runs/2026-10-12.json (review_pending_count 9, no item details)",
+  "snapshot": "paper_state/data/2026-10-12-da42c150fe38/ (bars_raw, events.json, manifest.json only)",
+  "code": ["paper/data.py:153 projection (entity, event_date, category)", "paper/runner.py:221 count-only persistence"]
+ }
+}

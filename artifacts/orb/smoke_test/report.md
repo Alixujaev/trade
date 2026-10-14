@@ -3,7 +3,7 @@
 - Range: 2026-07-02 → 2026-09-25 (60 sessions)
 - Universe: 25 tickers; with trades: AAPL, ADBE, AMAT, AMD, AMZN, AVGO, COST, CRM, GOOGL, INTC, JNJ, JPM, KO, META, MSFT, MU, NFLX, NVDA, ORCL, QCOM, TSLA, WMT, XOM
 - Data: `data/cache` (network blocked (socket connect refused)); earnings: `config\earnings_calendar.csv`
-- Smoke test on 60 sessions of IEX 5m data: **not evidence of an edge**.
+- Smoke test on 60 sessions of yfinance 5m data (`data/cache`; documented provenance, not recorded per file - see `artifacts/orb/provenance_correction.md`): **not evidence of an edge**.
 
 | Metric | ORB | Equal-weight B&H |
 |---|---|---|

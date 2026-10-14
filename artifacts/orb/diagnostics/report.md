@@ -58,7 +58,7 @@ No P&L is computed for rejected signals (that would be outcome-driven selection)
 
 Each ranks only the signals competing for a slot at the same entry bar; time priority stays; symbol order remains only as the final deterministic tie-break.
 
-1. **Breakout-bar relative volume** (higher first): `volume_ratio` at the signal bar - the same series `is_volume_confirmed` already uses (rolling mean of bars <= signal). Lookahead risk: low; it must not use the entry bar's or the day's total volume. Caveat: IEX volume is not consolidated.
+1. **Breakout-bar relative volume** (higher first): `volume_ratio` at the signal bar - the same series `is_volume_confirmed` already uses (rolling mean of bars <= signal). Lookahead risk: low; it must not use the entry bar's or the day's total volume. Caveat: volume is from the yfinance cache, not SIP (aggregate within ~1-7% of Alpaca SIP on these sessions).
 2. **Prior-session liquidity** (higher first): previous session RTH dollar volume (sum close x volume). Uses only completed earlier sessions -> no intraday lookahead. Risk: it favours mega-caps (a structural, not alphabetical, preference) and needs >= 1 prior session (first session N/A).
 3. **Normalised breakout strength** (higher first): (signal close - OR high) / (OR high - OR low), from the OR bars and the signal bar only. Lookahead risk: low if computed at signal close; must not use the entry bar open or later bars.
 
@@ -75,4 +75,4 @@ Window = entry bar (entry at its open) through the exit bar. Exit bar: FORCE_EXI
 
 - N/A excursions: 0
 - TARGET group: no trade exited at target in the smoke test (N/A, not zero).
-- Descriptive only (60 IEX sessions); not used to choose any parameter.
+- Descriptive only (60 yfinance-cache sessions); not used to choose any parameter.

@@ -1,6 +1,6 @@
 # ORB diagnostics v2: entry features and conditional exit replay
 
-Inputs: `artifacts/orb/smoke_test/` (trades, metrics, daily equity), `artifacts/orb/diagnostics/trade_excursions.csv`, bars `data/cache/<T>_5m.parquet`. No backtest rerun, no network, no strategy/config change. n = 95 executed trades over 60 IEX sessions: **descriptive only, no parameter is selected here.**
+Inputs: `artifacts/orb/smoke_test/` (trades, metrics, daily equity), `artifacts/orb/diagnostics/trade_excursions.csv`, bars `data/cache/<T>_5m.parquet`. No backtest rerun, no network, no strategy/config change. n = 95 executed trades over 60 yfinance-cache sessions: **descriptive only, no parameter is selected here.**
 
 ## 1. Entry features vs outcomes
 
@@ -46,5 +46,5 @@ Replay calls the production `strategy.day.orb_rules.step_bar` and `close_trade` 
 - Exit rule: one target multiple (or no target) and the 15:55 forced exit - chosen and written down before the test, not re-picked afterwards from these numbers.
 - Same-bar signal ranking: one of the three point-in-time variants in `artifacts/orb/diagnostics/report.md` (or keep symbol order explicitly), with symbol order as the final tie-break.
 - Entry filters: either none beyond the current rules, or a single filter with a threshold fixed in advance (no threshold taken from these terciles).
-- Sample: a period that does not overlap 2026-07-02..2026-09-25, the data source (SIP preferred over IEX for volume), the 25-ticker universe, and a source-verified earnings calendar covering it.
+- Sample: a period that does not overlap 2026-07-02..2026-09-25, the data source (SIP preferred over the yfinance cache for volume), the 25-ticker universe, and a source-verified earnings calendar covering it.
 - Costs (5 bps/side, $0.005/share/side), risk (0.25% of initial capital), daily limits, metrics and pass/fail criteria (including comparison with equal-weight buy & hold) defined before seeing the out-of-sample results.
