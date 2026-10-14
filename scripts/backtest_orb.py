@@ -31,6 +31,7 @@ import pandas as pd  # noqa: E402
 
 from backtest.orb_engine import load_bars, run_orb_backtest  # noqa: E402
 from config.day_universe import FROZEN_DAY_UNIVERSE  # noqa: E402
+from config.settings import CACHE_DIR, DATA_PROVIDER  # noqa: E402
 from data.earnings import load_earnings_calendar  # noqa: E402
 from data.session import NY_TZ, get_session_dates, is_rth_series, to_eastern  # noqa: E402
 from strategy.day.orb_rules import OrbRules  # noqa: E402
@@ -71,6 +72,23 @@ def load_cache(cache_dir: Path, symbols: list[str]) -> tuple[dict[str, pd.DataFr
             raise SystemExit(f"ABORT: {p} lacks OHLCV columns")
         bars[s], paths[s] = df[list(OHLCV)].sort_index(), str(p)
     return bars, paths
+
+
+def data_source_label(cache_dir: str | None, provider_name: str | None) -> str:
+    """Report provenance yorlig'i. Faqat hujjatlangan manba nomlanadi, qolgani UNKNOWN/UNVERIFIED.
+
+    data/cache = yfinance: DAY-14 spec, DAY-15C audit (artifacts/orb/provenance_correction.md); fayl metadata yo'q.
+    """
+    if cache_dir is not None:
+        if Path(cache_dir).resolve() == CACHE_DIR.resolve():
+            return "yfinance (documented provenance; not recorded per file)"
+        return f"UNKNOWN/UNVERIFIED (no recorded provenance for {cache_dir})"
+    name = (provider_name or "").lower()
+    if name == "yfinance":
+        return "yfinance (provider run; provenance not recorded per file)"
+    if name == "alpaca":
+        return "Alpaca IEX (provider run; DataFeed.IEX hard-coded in data/alpaca_provider.py)"
+    return f"UNKNOWN/UNVERIFIED (provider {provider_name})"
 
 
 def rth_sessions(df: pd.DataFrame) -> pd.Series:
@@ -221,13 +239,15 @@ def main(argv: list[str] | None = None) -> int:
     if out is not None and out.exists() and any(out.iterdir()):
         raise SystemExit(f"ABORT: output directory is not empty: {out}")
 
+    provider_name = None
     if a.cache_dir:
         with no_network():
             bars, paths = load_cache(Path(a.cache_dir), symbols)
             res = run_orb_backtest(bars, rules, earnings, start, end)
     else:
         from data.factory import get_provider
-        bars, paths = load_bars(get_provider(), symbols), {s: "provider" for s in symbols}
+        provider_name = DATA_PROVIDER.lower()
+        bars, paths = load_bars(get_provider(provider_name), symbols), {s: "provider" for s in symbols}
         res = run_orb_backtest(bars, rules, earnings, start, end)
 
     trades, skips, sessions = res.trades, res.skips, res.sessions
@@ -274,7 +294,7 @@ def main(argv: list[str] | None = None) -> int:
                            "not defined comparably for an intraday strategy limited to 2 concurrent positions; "
                            "not computed rather than approximated"}},
         "inputs": {"earnings_calendar": str(Path(a.earnings)), "cache_dir": a.cache_dir,
-                   "data": data_cov, "network": "blocked (socket connect refused)" if a.cache_dir else "provider"},
+                   "data_source": data_source_label(a.cache_dir, provider_name), "data": data_cov, "network": "blocked (socket connect refused)" if a.cache_dir else "provider"},
     }
     checks = run_checks(trades, skips, earnings, symbols, start, end, sessions, rules)
     metrics["checks"] = checks
@@ -317,7 +337,8 @@ def render_report(m: dict) -> str:
         f"- Range: {m['range']['start']} → {m['range']['end']} ({m['range']['sessions']} sessions)",
         f"- Universe: {m['universe']['count']} tickers; with trades: {', '.join(m['universe']['symbols_with_trades']) or 'none'}",
         f"- Data: `{m['inputs']['cache_dir']}` (network {m['inputs']['network']}); earnings: `{m['inputs']['earnings_calendar']}`",
-        "- Smoke test on 60 sessions of IEX 5m data: **not evidence of an edge**.", "",
+        f"- Smoke test on {m['range']['sessions']} sessions of "
+        f"{m['inputs'].get('data_source', 'UNKNOWN/UNVERIFIED')} 5m data: **not evidence of an edge**.", "",
         "| Metric | ORB | Equal-weight B&H |", "|---|---|---|",
         f"| Trades | {m['trades']} | — |",
         f"| Win rate | {fmt(m['win_rate'], True)} | — |",
