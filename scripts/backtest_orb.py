@@ -38,6 +38,7 @@ from strategy.day.orb_rules import OrbRules  # noqa: E402
 
 OHLCV = ("open", "high", "low", "close", "volume")
 NA = "N/A"
+SIP_OUT_ROOT = Path(__file__).resolve().parent.parent / "artifacts" / "orb"   # --v11-sip-snapshot --out must be inside
 
 
 class NetworkBlocked(RuntimeError):
@@ -74,11 +75,15 @@ def load_cache(cache_dir: Path, symbols: list[str]) -> tuple[dict[str, pd.DataFr
     return bars, paths
 
 
-def data_source_label(cache_dir: str | None, provider_name: str | None) -> str:
+def data_source_label(cache_dir: str | None, provider_name: str | None, *, sip_snapshot_id: str | None = None) -> str:
     """Report provenance yorlig'i. Faqat hujjatlangan manba nomlanadi, qolgani UNKNOWN/UNVERIFIED.
 
     data/cache = yfinance: DAY-14 spec, DAY-15C audit (artifacts/orb/provenance_correction.md); fayl metadata yo'q.
+    sip_snapshot_id: --v11-sip-snapshot rejimi (artifacts/orb/sip_diagnostic_decision.md).
     """
+    if sip_snapshot_id is not None:
+        return (f"Alpaca SIP raw (v1.1 research snapshot {sip_snapshot_id}, hash-pinned; "
+                "research segment 2026-07-02..2026-09-25)")
     if cache_dir is not None:
         if Path(cache_dir).resolve() == CACHE_DIR.resolve():
             return "yfinance (documented provenance; not recorded per file)"
@@ -228,8 +233,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--earnings", required=True)
     ap.add_argument("--symbols", nargs="*")
     ap.add_argument("--cache-dir", help="read <dir>/<SYMBOL>_5m.parquet only; network blocked; no provider")
+    ap.add_argument("--v11-sip-snapshot", metavar="DIR",
+                    help="pinned Alpaca SIP v1.1 research snapshot dir (research segment only); network blocked; no provider")
     ap.add_argument("--out", help="artifact directory (must be empty or absent)")
     a = ap.parse_args(argv)
+    if a.cache_dir and a.v11_sip_snapshot:
+        ap.error("--cache-dir and --v11-sip-snapshot are mutually exclusive")
     start, end = date.fromisoformat(a.start), date.fromisoformat(a.end)
     symbols = sorted(a.symbols or FROZEN_DAY_UNIVERSE)
     rules = OrbRules(initial_capital=a.capital)
@@ -240,7 +249,23 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit(f"ABORT: output directory is not empty: {out}")
 
     provider_name = None
-    if a.cache_dir:
+    snap = None
+    if a.v11_sip_snapshot:
+        from backtest import orb_snapshot_input as osi            # lazy: default runs never import it
+        if (start, end) != (osi.RESEARCH_FIRST, osi.RESEARCH_LAST):
+            raise SystemExit(f"ABORT: --v11-sip-snapshot requires --start {osi.RESEARCH_FIRST} --end {osi.RESEARCH_LAST}")
+        root = SIP_OUT_ROOT.resolve()
+        if out is None or out.resolve() == root or not out.resolve().is_relative_to(root):
+            raise SystemExit(f"ABORT: --v11-sip-snapshot requires --out strictly inside {SIP_OUT_ROOT}")
+        with no_network():
+            try:
+                snap = osi.load_research_frames(Path(a.v11_sip_snapshot), symbols, pins=osi.PINNED)
+            except osi.SnapshotInputError as exc:
+                raise SystemExit(f"ABORT: {exc}") from None
+            bars = snap.bars
+            paths = {s: str(Path(a.v11_sip_snapshot) / f"{s}_5m.parquet") + " (research segment)" for s in symbols}
+            res = run_orb_backtest(bars, rules, earnings, start, end)
+    elif a.cache_dir:
         with no_network():
             bars, paths = load_cache(Path(a.cache_dir), symbols)
             res = run_orb_backtest(bars, rules, earnings, start, end)
@@ -294,8 +319,12 @@ def main(argv: list[str] | None = None) -> int:
                            "not defined comparably for an intraday strategy limited to 2 concurrent positions; "
                            "not computed rather than approximated"}},
         "inputs": {"earnings_calendar": str(Path(a.earnings)), "cache_dir": a.cache_dir,
-                   "data_source": data_source_label(a.cache_dir, provider_name), "data": data_cov, "network": "blocked (socket connect refused)" if a.cache_dir else "provider"},
+                   "data_source": data_source_label(a.cache_dir, provider_name,
+                                                    sip_snapshot_id=snap.provenance["snapshot_id"] if snap else None),
+                   "data": data_cov, "network": "blocked (socket connect refused)" if (a.cache_dir or snap) else "provider"},
     }
+    if snap is not None:
+        metrics["inputs"]["sip_snapshot"] = snap.provenance
     checks = run_checks(trades, skips, earnings, symbols, start, end, sessions, rules)
     metrics["checks"] = checks
     metrics["all_checks_passed"] = all(c["status"] == "PASS" for c in checks)
@@ -330,15 +359,41 @@ def fmt(v, pct=False):
     return f"{v * 100:.2f}%" if pct else (f"{v:.4f}" if isinstance(v, float) else str(v))
 
 
+def _report_head(m: dict) -> list[str]:
+    """Report sarlavhasi. sip_snapshot yo'q bo'lsa - default (o'zgarmagan); bor bo'lsa - ORB-SIP-D4/D5 disclosure."""
+    rng = f"- Range: {m['range']['start']} → {m['range']['end']} ({m['range']['sessions']} sessions)"
+    uni = f"- Universe: {m['universe']['count']} tickers; with trades: {', '.join(m['universe']['symbols_with_trades']) or 'none'}"
+    source = m['inputs'].get('data_source', 'UNKNOWN/UNVERIFIED')
+    snap = m["inputs"].get("sip_snapshot")
+    if snap is None:
+        return [
+            "# ORB smoke test (local cache only)", "", rng, uni,
+            f"- Data: `{m['inputs']['cache_dir']}` (network {m['inputs']['network']}); earnings: `{m['inputs']['earnings_calendar']}`",
+            f"- Smoke test on {m['range']['sessions']} sessions of {source} 5m data: **not evidence of an edge**.", "",
+        ]
+    first, last = snap["research_first"], snap["research_last"]
+    return [
+        "# ORB SIP snapshot diagnostic (descriptive; not independent evidence)", "", rng, uni,
+        f"- Data: Alpaca SIP snapshot `{snap['snapshot_id']}` (research segment {first} → {last}, RTH only, no warmup; "
+        f"network {m['inputs']['network']}); earnings: `{m['inputs']['earnings_calendar']}`",
+        f"- Source: {source}",
+        f"- **Descriptive diagnostic only:** a re-run on the same {snap['research_sessions']} sessions previously examined "
+        "with yfinance data. Not independent evidence and not strategy validation (ORB-SIP-D5).",
+        "- SIP results are reported on their own. Prior yfinance run: `artifacts/orb/smoke_test/report.md`, "
+        "referenced by path only; no deltas or numeric comparison.",
+        "- SIP volume differs from yfinance volume and can change the 20-bar volume-confirmation outcomes.",
+        f"- No warmup segment is supplied, so the first session ({first}) has no prior close for any symbol.",
+        f"- Corporate actions: prices are raw. Events for {first} → {last} are unknown (no event data was acquired) "
+        "and could affect the rolling 20-bar volume filter and the raw prior-close $5 minimum-price filter "
+        "(ORB-SIP-D4). Whether protocol v1.1 §18 governs ORB is not decided.",
+        "- Decision record: `artifacts/orb/sip_diagnostic_decision.md`.", "",
+    ]
+
+
 def render_report(m: dict) -> str:
     bh = m["benchmarks"]["equal_weight_buy_and_hold"]
     lines = [
-        "# ORB smoke test (local cache only)", "",
-        f"- Range: {m['range']['start']} → {m['range']['end']} ({m['range']['sessions']} sessions)",
-        f"- Universe: {m['universe']['count']} tickers; with trades: {', '.join(m['universe']['symbols_with_trades']) or 'none'}",
-        f"- Data: `{m['inputs']['cache_dir']}` (network {m['inputs']['network']}); earnings: `{m['inputs']['earnings_calendar']}`",
-        f"- Smoke test on {m['range']['sessions']} sessions of "
-        f"{m['inputs'].get('data_source', 'UNKNOWN/UNVERIFIED')} 5m data: **not evidence of an edge**.", "",
+        *_report_head(m),
         "| Metric | ORB | Equal-weight B&H |", "|---|---|---|",
         f"| Trades | {m['trades']} | — |",
         f"| Win rate | {fmt(m['win_rate'], True)} | — |",
