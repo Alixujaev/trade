@@ -1,0 +1,549 @@
+{
+ "range": {
+  "start": "2026-07-02",
+  "end": "2026-09-25",
+  "sessions": 60,
+  "first_session": "2026-07-02",
+  "last_session": "2026-09-25"
+ },
+ "universe": {
+  "count": 25,
+  "symbols": [
+   "AAPL",
+   "ADBE",
+   "AMAT",
+   "AMD",
+   "AMZN",
+   "AVGO",
+   "COST",
+   "CRM",
+   "CSCO",
+   "GOOGL",
+   "INTC",
+   "JNJ",
+   "JPM",
+   "KO",
+   "META",
+   "MSFT",
+   "MU",
+   "NFLX",
+   "NVDA",
+   "ORCL",
+   "PEP",
+   "QCOM",
+   "TSLA",
+   "WMT",
+   "XOM"
+  ],
+  "symbols_with_trades": [
+   "AAPL",
+   "ADBE",
+   "AMAT",
+   "AMD",
+   "AMZN",
+   "AVGO",
+   "COST",
+   "CRM",
+   "GOOGL",
+   "INTC",
+   "JNJ",
+   "KO",
+   "META",
+   "MSFT",
+   "MU",
+   "NFLX",
+   "NVDA",
+   "ORCL",
+   "QCOM",
+   "TSLA",
+   "WMT",
+   "XOM"
+  ]
+ },
+ "rules": {
+  "initial_capital": 100000.0,
+  "risk_pct": 0.0025,
+  "target_r": 2.0,
+  "max_trades_per_day": 2,
+  "max_open_positions": 2,
+  "daily_loss_limit_r": -2.0,
+  "min_price": 5.0,
+  "slippage_bps": 5.0,
+  "commission_per_share": 0.005,
+  "force_exit": "15:55:00"
+ },
+ "trades": 101,
+ "win_rate": 0.48514851485148514,
+ "total_pnl": -1541.106980499844,
+ "total_r": -6.219122382152892,
+ "avg_r": -0.06157546913022666,
+ "net_return": -0.015411069804998734,
+ "cagr": -0.06314843983087592,
+ "cagr_note": "annualised from 60 sessions - not meaningful evidence",
+ "max_drawdown": -0.026122891631781834,
+ "sharpe": -1.9619189499130916,
+ "sortino": -2.557537765991243,
+ "exits": {
+  "STOP": 13,
+  "TARGET": 0,
+  "FORCE_EXIT_1555": 88,
+  "SESSION_END": 0
+ },
+ "costs": {
+  "commission_total": 49.230000000000004,
+  "slippage_total": 1222.808180499857,
+  "note": "both included in every trade's P&L (entry_fill/exit_fill and 2 x $0.005/share)"
+ },
+ "skips": {
+  "no_prior_close": 25,
+  "max_trades_per_day": 81,
+  "earnings_day": 24
+ },
+ "earnings_skipped_symbol_sessions": 24,
+ "benchmarks": {
+  "equal_weight_buy_and_hold": {
+   "status": "OK",
+   "method": "capital/25 per ticker, whole shares, buy first-session 09:30 open, sell last-session close; 5 bps slippage and $0.005/share commission on both legs; marked at closes",
+   "final_equity": 104663.51428500001,
+   "net_return": 0.04663514285000003,
+   "cagr": 0.21098932379687851,
+   "cagr_note": "annualised from 60 sessions - not meaningful evidence",
+   "max_drawdown": -0.046504270765575347,
+   "sharpe": 1.4628240542103639,
+   "sortino": 2.5315641750402316,
+   "legs": [
+    {
+     "symbol": "AAPL",
+     "shares": 13,
+     "entry_open": 294.13,
+     "entry_fill": 294.277065
+    },
+    {
+     "symbol": "ADBE",
+     "shares": 18,
+     "entry_open": 215.51,
+     "entry_fill": 215.617755
+    },
+    {
+     "symbol": "AMAT",
+     "shares": 6,
+     "entry_open": 656.99,
+     "entry_fill": 657.318495
+    },
+    {
+     "symbol": "AMD",
+     "shares": 7,
+     "entry_open": 538.44,
+     "entry_fill": 538.7092200000001
+    },
+    {
+     "symbol": "AMZN",
+     "shares": 16,
+     "entry_open": 241.77,
+     "entry_fill": 241.890885
+    },
+    {
+     "symbol": "AVGO",
+     "shares": 10,
+     "entry_open": 365.73,
+     "entry_fill": 365.912865
+    },
+    {
+     "symbol": "COST",
+     "shares": 4,
+     "entry_open": 927.0,
+     "entry_fill": 927.4635
+    },
+    {
+     "symbol": "CRM",
+     "shares": 24,
+     "entry_open": 163.0,
+     "entry_fill": 163.08149999999998
+    },
+    {
+     "symbol": "CSCO",
+     "shares": 34,
+     "entry_open": 117.08,
+     "entry_fill": 117.13853999999999
+    },
+    {
+     "symbol": "GOOGL",
+     "shares": 11,
+     "entry_open": 359.59,
+     "entry_fill": 359.76979499999993
+    },
+    {
+     "symbol": "INTC",
+     "shares": 30,
+     "entry_open": 129.0,
+     "entry_fill": 129.06449999999998
+    },
+    {
+     "symbol": "JNJ",
+     "shares": 15,
+     "entry_open": 255.78,
+     "entry_fill": 255.90788999999998
+    },
+    {
+     "symbol": "JPM",
+     "shares": 11,
+     "entry_open": 338.02,
+     "entry_fill": 338.18900999999994
+    },
+    {
+     "symbol": "KO",
+     "shares": 48,
+     "entry_open": 81.63,
+     "entry_fill": 81.67081499999999
+    },
+    {
+     "symbol": "META",
+     "shares": 6,
+     "entry_open": 607.5,
+     "entry_fill": 607.8037499999999
+    },
+    {
+     "symbol": "MSFT",
+     "shares": 10,
+     "entry_open": 384.48,
+     "entry_fill": 384.67224
+    },
+    {
+     "symbol": "MU",
+     "shares": 3,
+     "entry_open": 1041.28,
+     "entry_fill": 1041.80064
+    },
+    {
+     "symbol": "NFLX",
+     "shares": 53,
+     "entry_open": 75.21,
+     "entry_fill": 75.247605
+    },
+    {
+     "symbol": "NVDA",
+     "shares": 20,
+     "entry_open": 197.16,
+     "entry_fill": 197.25858
+    },
+    {
+     "symbol": "ORCL",
+     "shares": 27,
+     "entry_open": 143.3,
+     "entry_fill": 143.37165000000002
+    },
+    {
+     "symbol": "PEP",
+     "shares": 27,
+     "entry_open": 143.31,
+     "entry_fill": 143.381655
+    },
+    {
+     "symbol": "QCOM",
+     "shares": 21,
+     "entry_open": 182.17,
+     "entry_fill": 182.26108499999998
+    },
+    {
+     "symbol": "TSLA",
+     "shares": 9,
+     "entry_open": 428.15,
+     "entry_fill": 428.36407499999996
+    },
+    {
+     "symbol": "WMT",
+     "shares": 36,
+     "entry_open": 109.33,
+     "entry_fill": 109.384665
+    },
+    {
+     "symbol": "XOM",
+     "shares": 29,
+     "entry_open": 137.15,
+     "entry_fill": 137.218575
+    }
+   ]
+  },
+  "capital_constrained_buy_and_hold": {
+   "status": "N/A",
+   "reason": "not defined comparably for an intraday strategy limited to 2 concurrent positions; not computed rather than approximated"
+  }
+ },
+ "inputs": {
+  "earnings_calendar": "config\\earnings_calendar.csv",
+  "cache_dir": null,
+  "data_source": "Alpaca SIP raw (v1.1 research snapshot research_20261006T095201Z, hash-pinned; research segment 2026-07-02..2026-09-25)",
+  "data": {
+   "AAPL": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\AAPL_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "ADBE": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\ADBE_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "AMAT": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\AMAT_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "AMD": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\AMD_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "AMZN": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\AMZN_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "AVGO": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\AVGO_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "COST": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\COST_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "CRM": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\CRM_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "CSCO": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\CSCO_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "GOOGL": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\GOOGL_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "INTC": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\INTC_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "JNJ": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\JNJ_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "JPM": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\JPM_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "KO": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\KO_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "META": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\META_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "MSFT": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\MSFT_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "MU": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\MU_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "NFLX": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\NFLX_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "NVDA": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\NVDA_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "ORCL": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\ORCL_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "PEP": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\PEP_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "QCOM": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\QCOM_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "TSLA": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\TSLA_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "WMT": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\WMT_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   },
+   "XOM": {
+    "path": "data\\oos_cache\\protocol_v1.1\\research\\snapshots\\research_20261006T095201Z\\XOM_5m.parquet (research segment)",
+    "sessions": 60,
+    "first": "2026-07-02",
+    "last": "2026-09-25"
+   }
+  },
+  "network": "blocked (socket connect refused)",
+  "sip_snapshot": {
+   "source": "Alpaca Market Data v2 SIP, adjustment=raw (v1.1 research snapshot)",
+   "snapshot_id": "research_20261006T095201Z",
+   "files_json_sha256": "b43b8996d1e45a58c61aba74bc8bc83b173809e554f4c0c125c0f4f5f6b95139",
+   "units_json_sha256": "6a0466192a87ce53cb27d8b5e55a4fb510f8e790d8cc75548b6e9987a3b76b74",
+   "run_json_sha256": "8b57b2dad2c22b69dee25845ef6d4d3520811088124c35b3b668e6fb510a4278",
+   "provider_config": {
+    "provider": "alpaca-market-data-v2",
+    "base_url": "https://data.alpaca.markets/v2/stocks",
+    "feed": "sip",
+    "adjustment": "raw",
+    "limit": 10000,
+    "sort": "asc",
+    "end_semantics": "inclusive"
+   },
+   "acquisition_commit": "57f4ecefc5861476d1b5ce43611cafe810843fb3",
+   "interval": "5m",
+   "segment": "research",
+   "research_first": "2026-07-02",
+   "research_last": "2026-09-25",
+   "research_sessions": 60,
+   "symbols": [
+    "AAPL",
+    "ADBE",
+    "AMAT",
+    "AMD",
+    "AMZN",
+    "AVGO",
+    "COST",
+    "CRM",
+    "CSCO",
+    "GOOGL",
+    "INTC",
+    "JNJ",
+    "JPM",
+    "KO",
+    "META",
+    "MSFT",
+    "MU",
+    "NFLX",
+    "NVDA",
+    "ORCL",
+    "PEP",
+    "QCOM",
+    "TSLA",
+    "WMT",
+    "XOM"
+   ],
+   "rth_only": true,
+   "warmup_supplied": false
+  }
+ },
+ "checks": [
+  {
+   "check": "trade sessions within backtest range",
+   "status": "PASS",
+   "detail": "0 outside"
+  },
+  {
+   "check": "no duplicate (symbol, session) trades",
+   "status": "PASS",
+   "detail": "0 duplicates"
+  },
+  {
+   "check": "entry is the bar after the signal; entry <= exit (no lookahead)",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "exit in the same session (no overnight)",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "signal bar opens in 09:45-11:00 ET",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "stop = OR low, target = entry + 2R",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "<= 2 trades per day",
+   "status": "PASS",
+   "detail": "max 2"
+  },
+  {
+   "check": "<= 2 concurrent positions",
+   "status": "PASS",
+   "detail": "max 2"
+  },
+  {
+   "check": "concurrent notional <= available capital",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "no trade on an earnings session",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "earnings skips == CSV sessions in range",
+   "status": "PASS",
+   "detail": "expected 24, skipped 24, missing [], extra []"
+  },
+  {
+   "check": "5 bps slippage applied on both legs",
+   "status": "PASS",
+   "detail": "0 violations"
+  },
+  {
+   "check": "$0.005/share commission on both legs in P&L",
+   "status": "PASS",
+   "detail": "0 violations"
+  }
+ ],
+ "all_checks_passed": true
+}
