@@ -151,10 +151,28 @@ def test_point_in_time_source_and_review_order(tmp_path):
     assert rec.source_date == rec.valid_from == rec.reviewed_on == date(2026, 1, 1)
 
 
+LATE_WINDOW = dict(valid_from="2026-03-01", source_date="2026-01-01", reviewed_on="2026-03-01")   # age 59 at start
+
+
+@pytest.mark.parametrize("status", ["COMPLIANT", "NON_COMPLIANT", "UNVERIFIED"])
+def test_record_may_not_outlive_its_maximum_source_age(tmp_path, status):
+    # valid_from age (59) and span (35) are fine, but on valid_until the screen would be 93 days old (> 92).
+    with pytest.raises(EligibilityError, match="outlives its source: .* 93 days"):
+        load_rows(tmp_path, row(status=status, valid_until="2026-04-04", **LATE_WINDOW), accepted=TEST_METHODS)
+
+
+def test_record_ending_exactly_at_maximum_source_age_is_valid_and_tradable(tmp_path):
+    reg = load_rows(tmp_path, row(status="COMPLIANT", valid_until="2026-04-03", **LATE_WINDOW), accepted=TEST_METHODS)
+    rec = reg.records["AAA"][0]
+    assert (rec.valid_until - rec.source_date).days == el.MAX_SOURCE_AGE_DAYS == 92
+    assert reg.decide("AAA", date(2026, 4, 3)).tradable
+    assert not reg.decide("AAA", date(2026, 4, 4)).tradable
+
+
 def test_compliant_requires_an_accepted_methodology(tmp_path):
-    assert el.ACCEPTED_METHODOLOGIES == frozenset()
+    assert el.ACCEPTED_METHODOLOGIES == frozenset({el.AKINDA_COMPLIANCE_METHODOLOGY})   # owner decision D13-A
     with pytest.raises(EligibilityError, match="not an accepted methodology"):
-        load_rows(tmp_path, row(status="COMPLIANT"))                              # default: empty accepted set
+        load_rows(tmp_path, row(status="COMPLIANT"))                              # default: TEST_METHOD not adopted
     with pytest.raises(EligibilityError, match="not an accepted methodology"):
         load_rows(tmp_path, row(status="COMPLIANT", methodology="OTHER"), accepted=TEST_METHODS)
     assert load_rows(tmp_path, row(status="COMPLIANT"), accepted=TEST_METHODS).records["AAA"][0].status \
@@ -173,13 +191,14 @@ def test_unverified_rows_need_no_provenance(tmp_path):
 
 
 def test_contradictory_records_fail_closed(tmp_path):
+    later = dict(source_date="2026-02-28", reviewed_on="2026-03-01")              # source young enough for April
     with pytest.raises(EligibilityError, match="overlapping records for AAA: lines 2, 3"):
-        load_rows(tmp_path, row(), row(status="UNVERIFIED", valid_from="2026-03-01", valid_until="2026-04-30"))
+        load_rows(tmp_path, row(), row(status="UNVERIFIED", valid_from="2026-03-01", valid_until="2026-04-30", **later))
     with pytest.raises(EligibilityError, match="overlapping records for AAA"):
         load_rows(tmp_path, row(), row())                                           # identical duplicates
     with pytest.raises(EligibilityError, match="overlapping records for AAA"):     # one shared day
-        load_rows(tmp_path, row(), row(valid_from="2026-03-31", valid_until="2026-04-30"))
-    ok = load_rows(tmp_path, row(), row(valid_from="2026-04-01", valid_until="2026-04-30"))
+        load_rows(tmp_path, row(), row(valid_from="2026-03-31", valid_until="2026-04-30", **later))
+    ok = load_rows(tmp_path, row(), row(valid_from="2026-04-01", valid_until="2026-04-30", **later))
     assert len(ok.records["AAA"]) == 2
 
 
@@ -205,7 +224,7 @@ def test_reverse_chronological_rows_sort_and_diagnose(tmp_path):
 
 # ------------------------------------------------------------------ source freshness (M1)
 
-FRESH_92 = dict(valid_from="2026-04-03", valid_until="2026-04-30", source_date="2026-01-01", reviewed_on="2026-04-03")
+FRESH_92 = dict(valid_from="2026-04-03", valid_until="2026-04-03", source_date="2026-01-01", reviewed_on="2026-04-03")
 
 
 def test_source_freshness_boundary(tmp_path):
@@ -224,9 +243,11 @@ def test_source_freshness_applies_to_every_status(tmp_path, status):
         == status
 
 
-def test_validity_window_and_source_freshness_are_independent(tmp_path):
-    rec = load_rows(tmp_path, row(**{**FRESH_92, "valid_until": "2026-07-03"})).records["AAA"][0]  # 92 + 92 days
-    assert (rec.valid_until - rec.valid_from).days + 1 == 92 and (rec.valid_from - rec.source_date).days == 92
+def test_full_window_on_a_92_day_old_source_is_rejected(tmp_path):
+    # Previously accepted (92-day window starting on a 92-day-old source: 183 days at valid_until). The source-age
+    # limit now also binds at valid_until, so this record outlives its source.
+    with pytest.raises(EligibilityError, match="outlives its source: .* 183 days"):
+        load_rows(tmp_path, row(**{**FRESH_92, "valid_until": "2026-07-03"}))
 
 
 def test_unverified_supplied_source_date_is_validated(tmp_path):
@@ -329,8 +350,8 @@ def test_decided_rows_may_still_have_an_empty_note(tmp_path, status):
     assert rec.status.value == status and rec.note == ""
 
 
-def test_module_allowlist_is_still_empty():
-    assert el.ACCEPTED_METHODOLOGIES == frozenset()
+def test_module_allowlist_is_exactly_the_owner_adopted_akinda_methodology():
+    assert el.ACCEPTED_METHODOLOGIES == frozenset({"AKINDA_COMPLIANCE_API_V1"})   # owner decision D13-A, 2026-10-17
 
 
 # ------------------------------------------------------------------ CSV parse errors and encodings (L2)

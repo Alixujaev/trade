@@ -22,7 +22,7 @@
 ## 0. Scope and effect
 
 - This draft has **no effect** on the code.
-  - `screening/eligibility.py` keeps `ACCEPTED_METHODOLOGIES = frozenset()`.
+  - `screening/eligibility.py` keeps `ACCEPTED_METHODOLOGIES = frozenset()`. (Superseded 2026-10-17: the set now holds only the vendor methodology `AKINDA_COMPLIANCE_API_V1`, by owner decision D13-A, `AKINDA_PROVIDER_DECISION.md`. This draft is still not adopted.)
   - `config/sharia_eligibility.csv` stays header-only, so no ticker is tradable.
 - Adopting this methodology needs three things, in this order:
   1. a qualified Shari'ah adviser's written review (section 11);

@@ -12,14 +12,17 @@ reviewer,reviewed_on,note
 - Dates are ISO YYYY-MM-DD calendar dates (America/New_York sessions); [valid_from, valid_until] is inclusive and
   spans at most MAX_VALIDITY_DAYS days.
 - COMPLIANT and NON_COMPLIANT rows need methodology, source, source_ref and source_date. COMPLIANT rows also need a
-  methodology in `accepted_methodologies`, which is empty by default, so no COMPLIANT row loads until the owner adopts
-  one. HLAL/SPUS ETF membership is not evidence of individual-stock compliance. A methodology whose name contains
-  "DRAFT" (e.g. AAOIFI_SS21_V1_DRAFT) can never be accepted; it may still label NON_COMPLIANT/UNVERIFIED rows.
+  methodology in `accepted_methodologies`. The default allowlist holds only owner-adopted methodologies: since the
+  owner's provider decision D13-A (2026-10-17, docs/shariah/AKINDA_PROVIDER_DECISION.md) that is the Akinda
+  /compliance verdict, AKINDA_COMPLIANCE_METHODOLOGY. HLAL/SPUS ETF membership is not evidence of individual-stock
+  compliance. A methodology whose name contains "DRAFT" (e.g. AAOIFI_SS21_V1_DRAFT) can never be accepted; it may
+  still label NON_COMPLIANT/UNVERIFIED rows.
 - UNVERIFIED rows need a non-empty note giving the reason (e.g. which input is missing or stale).
 - Point in time: source_date <= valid_from (a status starts only once its source was public), and
   reviewed_on >= source_date.
 - Freshness: valid_from - source_date <= MAX_SOURCE_AGE_DAYS calendar days, so an old screen cannot be chained into
-  new windows. This is separate from the validity-window limit. The point-in-time and freshness rules apply to every
+  new windows. This is separate from the validity-window limit. In addition valid_until - source_date <=
+  MAX_SOURCE_AGE_DAYS, so a record never stays valid past the day its source reaches the maximum age. The point-in-time and freshness rules apply to every
   row that supplies a source_date, UNVERIFIED rows included.
 - Overlapping records for one symbol are contradictory, whatever their statuses.
 
@@ -51,7 +54,10 @@ REQUIRED_COLUMNS: Final[tuple[str, ...]] = (
 )
 MAX_VALIDITY_DAYS: Final[int] = 92                 # inclusive calendar days covered by one record (quarterly re-screen)
 MAX_SOURCE_AGE_DAYS: Final[int] = 92               # max (valid_from - source_date).days; stale screens are rejected
-ACCEPTED_METHODOLOGIES: Final[frozenset[str]] = frozenset()   # owner-adopted; empty => no COMPLIANT row can load
+# Project label for Akinda B2B API v1 GET /compliance `halal_status` (Akinda publishes no methodology version field;
+# it describes the status as "AAOIFI-aligned"). Adopted by owner decision D13-A, 2026-10-17.
+AKINDA_COMPLIANCE_METHODOLOGY: Final[str] = "AKINDA_COMPLIANCE_API_V1"
+ACCEPTED_METHODOLOGIES: Final[frozenset[str]] = frozenset({AKINDA_COMPLIANCE_METHODOLOGY})   # owner-adopted only
 
 _PROVENANCE = ("methodology", "source", "source_ref", "source_date")
 _ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -206,6 +212,10 @@ def _record(row: dict[str, str], line: int, accepted: frozenset[str]) -> Eligibi
         if age > MAX_SOURCE_AGE_DAYS:
             raise EligibilityError(f"line {line}: stale source: source_date {source_date} is {age} days before "
                                    f"valid_from {valid_from} (max {MAX_SOURCE_AGE_DAYS})")
+        end_age = (valid_until - source_date).days
+        if end_age > MAX_SOURCE_AGE_DAYS:
+            raise EligibilityError(f"line {line}: record outlives its source: source_date {source_date} would be "
+                                   f"{end_age} days old on valid_until {valid_until} (max {MAX_SOURCE_AGE_DAYS})")
         if reviewed_on < source_date:
             raise EligibilityError(f"line {line}: reviewed_on {reviewed_on} before source_date {source_date}")
     if status is RecordStatus.COMPLIANT and v["methodology"] not in accepted:

@@ -22,3 +22,6 @@ dist/
 *.egg-info/
 paper_state/
 paper_orb_state/
+
+# Akinda screening evidence (raw vendor responses, usage ledger; vendor licence, public repo)
+screening_evidence/

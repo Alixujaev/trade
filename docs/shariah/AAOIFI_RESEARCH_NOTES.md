@@ -238,7 +238,7 @@ Every other clause in this file: PDF page and printed page **not provided**.
 
 ## 4. Implementation safeguards
 
-- `ACCEPTED_METHODOLOGIES` stays empty until these decisions are documented and reviewed.
+- `ACCEPTED_METHODOLOGIES` stays empty until these decisions are documented and reviewed. (Amended 2026-10-17: the owner adopted the Akinda vendor screen `AKINDA_COMPLIANCE_API_V1`, decision D13-A in `AKINDA_PROVIDER_DECISION.md`. These notes' in-house methodology is still not adopted.)
 - No ticker may be marked `COMPLIANT` or tradable on the basis of these notes alone.
 - **Purification implementation is blocked** until the exact period, the data definitions, the share count and adviser guidance are clarified. Do not implement purification as dividends multiplied by a ratio unless that interpretation is explicitly approved.
 - Every downstream document must keep reported source content separate from independently verified quotations and from implementation decisions.
