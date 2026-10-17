@@ -500,3 +500,16 @@ Sections 1–8 above are the original 2026-10-17 review and are not edited. Entr
   undecided.
 - OD-7 (clean tree before the `fwd-gate2` capture) still applies: this entry itself is an uncommitted change and must
   be committed, or otherwise resolved, before 2026-12-09 16:15 ET. OD-8 to OD-10 are unaffected.
+
+### 9.2 Candidate-selection status: `NO CANDIDATE SELECTED` (2026-10-17)
+
+| Field | Value |
+|---|---|
+| Decision | **`NO CANDIDATE SELECTED`** |
+| Decision date | 2026-10-17 |
+| Decision authority | Protocol owner (the user), explicit confirmation, 2026-10-17 |
+| Relationship to §9.1 | Confirms the outcome that §9.1 recorded only as an inference. From this entry on, it is an owner decision, not an inference. Consistent with OD-2 (§9.1) and with the §3 lapse rule and the §7 "if not accepted" branch. |
+| Rationale | Under OD-2 the TOM-SPY confirmatory forward experiment was rejected for insufficient statistical power (§9.1). The current evidence is not sufficient to select any new candidate. C1 (TOM-SPY) lapses; C2 and C3 (§3) were not selected and remain unselected. |
+| Interpretation | This does **not** show that every strategy, or every TOM hypothesis, is ineffective. It records only that no new candidate is selected on the current evidence. |
+| `fwd-gate2` / `V2-MOM-F003` | Unchanged. The gate, its schedule, configuration and sealed data are not touched. V2-MOM remains the only active candidate (§7). |
+| What this does not authorise | No new strategy, experiment, protocol, backtest, capture or acquisition is started or permitted by this entry. Any future candidate needs a new owner decision. |
