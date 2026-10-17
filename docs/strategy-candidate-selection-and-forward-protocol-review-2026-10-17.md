@@ -1,5 +1,8 @@
 # Independent strategy candidate selection and forward-test protocol review: 2026-10-17
 
+> **Owner decision recorded (2026-10-17):** OD-2 = **REJECT** the proposed TOM-SPY confirmatory forward experiment.
+> See §9. The §4 protocol draft below is kept unchanged as history and is **not to be created or run**.
+
 This is a read-only planning document. No experiment, backtest, simulation, parameter search, data download, external
 API call or test suite was run. No existing file was modified. No sealed forward-test data, paper-runner ledger,
 paper-runner market-data snapshot or Stage F data was opened. Nothing here changes any protocol, gate, seal, schedule,
@@ -446,3 +449,54 @@ the underpowered forward window).
 - No parquet or market-data file opened. Vault contents were checked by directory listing only.
 - No existing file modified. No commit, push, deployment or trading. Exactly one new file: this report.
 - Candidate C1 was not motivated by any blind-period market observation (DAY-22 §3.2.4).
+
+---
+
+## 9. Owner decision log (append-only)
+
+Sections 1–8 above are the original 2026-10-17 review and are not edited. Entries below are appended only.
+
+### 9.1 OD-2: TOM-SPY confirmatory forward experiment (2026-10-17)
+
+| Field | Value |
+|---|---|
+| Decision ID | **OD-2** (§6.1) |
+| Decided by | Protocol owner, explicit instruction, 2026-10-17 |
+| Decision | **REJECT** the proposed TOM-SPY confirmatory forward experiment (§4, `TOM-SPY-F001`) as impractical under the evaluated power assumptions. Neither option offered in §6.1 (24-month window accepted as mainly a falsification test, or a 60-month window) is accepted. |
+| Rationale | The proposed 24- and 60-month forward windows are insufficiently powered for plausible modest TOM effects (details below). |
+| Consequence | `artifacts/day28/tom-spy-protocol-v1.md` (and its JSON twin and adoption record, §4.11) is **not** created. No TOM-SPY confirmatory forward test is scheduled or run under this rejected design. The §7 "if accepted" branch does not apply. |
+| Scope limitation | This rejects the **proposed confirmatory forward design only**. It does not establish that the TOM hypothesis is false, or that every TOM strategy is ineffective, and it does not rule out a different future exploratory or re-scoped study (which would need its own owner decision). |
+| Sharia / instrument | **Unresolved.** SPY was considered as a research-only instrument (§4.3, OD-3). It is not labelled Sharia-compliant, and this decision does not change that. |
+| `fwd-gate2` / `V2-MOM-F003` | Unaffected. No gate, seal, schedule, configuration, protocol or capture file is changed by this decision. |
+
+**Evidence provenance.**
+- **FACT:** the power analysis behind this decision was delivered as a terminal report in a Claude Code session on
+  2026-10-17. **No report file exists in the repository**; none is cited here by filename.
+- **FACT:** §4.9 of this document is the earlier, simpler in-repo version of the same arithmetic (i.i.d., σ ≈ 1.1%) and
+  gives the same headline MDEs.
+- **Method (as reported):** session counts from the `exchange_calendars` 4.13.2 XNYS calendar only (24 months:
+  96 TOM / 406 other sessions; 60 months: 240 / 1,015); analytic power for a one-sided test at α = 0.05; and a Monte
+  Carlo on **synthetic** returns only. No SPY prices, vault data, sealed data or external sources were used.
+- **Stated assumptions (not estimated from data):** per-session σ ≈ 1.1% (sensitivity 0.8–2.0%); drift ≈ 0.04% per
+  session; literature effect sizes of roughly 0.1–0.15% per session, cited from memory and **unverified**; 5 bps per
+  side costs.
+
+**Reported findings (conditional on those assumptions, not universal facts).**
+- The 24-month design reaches about 80% power only for an effect of about **0.31% per session**.
+- The 60-month design reaches about 80% power only for an effect of about **0.20% per session**.
+- Plausible effects of **0.05–0.15% per session** would need substantially longer observation (roughly 9 years or more
+  at 0.15%, and decades at 0.05%, under the base-case σ).
+- The proposed "net total return @5 bps > 0" condition does not by itself establish a TOM effect: with general market
+  drift it is met in roughly half of synthetic runs even with no TOM effect at all.
+- The report also noted two count corrections to §4.9 (Validation 166/690 rather than 164/692; 60 months
+  1,255 sessions rather than ≈ 1,260) and definitional issues with the §4.5 permutation null. These are not edited in
+  §4 because the design is rejected.
+
+**Effect on the other §6 items.**
+- **INF:** under the §3 rule ("the selection lapses to `NO CANDIDATE SELECTED` if the owner does not accept … OD-2"),
+  the conditional selection of C1 lapses. The owner has not separately confirmed this label; it is recorded as an
+  inference, not a decision.
+- OD-1, OD-3 (as it applies to TOM-SPY), OD-4, OD-5 and OD-6 concern only the rejected design and are left
+  undecided.
+- OD-7 (clean tree before the `fwd-gate2` capture) still applies: this entry itself is an uncommitted change and must
+  be committed, or otherwise resolved, before 2026-12-09 16:15 ET. OD-8 to OD-10 are unaffected.
