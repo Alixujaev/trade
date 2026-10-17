@@ -252,6 +252,19 @@ def test_combined_notional_never_exceeds_available_capital(earnings):
 
 # ------------------------------------------------------------------ backtest <-> paper parity
 
+def _eligible_aaa_bbb(tmp_path):
+    """Test-only registry: synthetic AAA/BBB COMPLIANT for March 2026 under TEST_ONLY_METHOD (paper runner gate)."""
+    from screening.eligibility import REQUIRED_COLUMNS, load_registry
+    vals = dict(status="COMPLIANT", valid_from="2026-03-01", valid_until="2026-03-31", methodology="TEST_ONLY_METHOD",
+                source="Synthetic test screen", source_ref="doc-1", source_date="2026-02-27", reviewer="tester",
+                reviewed_on="2026-02-28", note="synthetic fixture")
+    p = tmp_path / "registry" / "reg.csv"
+    p.parent.mkdir()
+    p.write_text("\n".join([",".join(REQUIRED_COLUMNS)] + [",".join({**vals, "symbol": s}[c] for c in REQUIRED_COLUMNS)
+                                                           for s in ("AAA", "BBB")]) + "\n", encoding="utf-8")
+    return load_registry(p, accepted_methodologies=frozenset({"TEST_ONLY_METHOD"}))
+
+
 def _three_days():
     tp = ov((time(10, 30), dict(high=104.2)))
     st = ov((time(10, 0), dict(low=99.0)))
@@ -260,13 +273,13 @@ def _three_days():
 
 
 def test_backtest_and_paper_produce_identical_ledgers(tmp_path, earnings):
-    bars, cal = _three_days(), earnings(symbols=("AAA", "BBB"))
+    bars, cal, reg = _three_days(), earnings(symbols=("AAA", "BBB")), _eligible_aaa_bbb(tmp_path)
     bt = run_orb_backtest(bars, RULES, cal, D1, D3)
     paper_trades = []
     for d in (D1, D2, D3):
         visible = {s: df.loc[df.index < pd.Timestamp(datetime.combine(d + timedelta(days=1), time(0), NY_TZ))]
                    for s, df in bars.items()}                                    # paper sees data up to d only
-        assert po.process_session(d, visible, RULES, cal, tmp_path)["status"] == "OK"
+        assert po.process_session(d, visible, RULES, cal, tmp_path, eligibility=reg)["status"] == "OK"
         paper_trades += json.loads((tmp_path / "sessions" / f"{d}.json").read_text(encoding="utf-8"))["trades"]
     assert len(bt.trades) == 5
     assert json.dumps(paper_trades, sort_keys=True) == json.dumps(bt.trades, sort_keys=True)
@@ -274,15 +287,15 @@ def test_backtest_and_paper_produce_identical_ledgers(tmp_path, earnings):
 
 
 def test_paper_is_idempotent_ordered_and_rule_locked(tmp_path, earnings):
-    bars, cal = _three_days(), earnings(symbols=("AAA", "BBB"))
-    assert po.process_session(D2, bars, RULES, cal, tmp_path)["status"] == "OK"
+    bars, cal, reg = _three_days(), earnings(symbols=("AAA", "BBB")), _eligible_aaa_bbb(tmp_path)
+    assert po.process_session(D2, bars, RULES, cal, tmp_path, eligibility=reg)["status"] == "OK"
     before = (tmp_path / "sessions" / f"{D2}.json").read_bytes()
-    assert po.process_session(D2, bars, RULES, cal, tmp_path)["status"] == "NOOP"
+    assert po.process_session(D2, bars, RULES, cal, tmp_path, eligibility=reg)["status"] == "NOOP"
     assert (tmp_path / "sessions" / f"{D2}.json").read_bytes() == before
     with pytest.raises(ValueError, match="not after"):
-        po.process_session(D1, bars, RULES, cal, tmp_path)
+        po.process_session(D1, bars, RULES, cal, tmp_path, eligibility=reg)
     with pytest.raises(po.PaperOrbError, match="rules"):
-        po.process_session(D3, bars, OrbRules(initial_capital=50_000.0), cal, tmp_path)
+        po.process_session(D3, bars, OrbRules(initial_capital=50_000.0), cal, tmp_path, eligibility=reg)
 
 
 def test_paper_orb_has_no_order_or_broker_code():
