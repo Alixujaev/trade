@@ -1,0 +1,31 @@
+{
+ "descriptive_only": true,
+ "diagnostic": "K1",
+ "evidence_label": "robustness diagnostic on reused historical data \u2014 not independent or forward evidence",
+ "results": {
+  "citations": [
+   {
+    "day25b_run_summary_pin": "9dfe44deb86c3d10164eda61f14b04c7d07f95a1c222bca461521c2b0b069670",
+    "frozen_document_sha256": "9dfe44deb86c3d10164eda61f14b04c7d07f95a1c222bca461521c2b0b069670",
+    "matches": true,
+    "observed_raw_sha256": "9dfe44deb86c3d10164eda61f14b04c7d07f95a1c222bca461521c2b0b069670",
+    "path": "artifacts/day25b/run/d1.json"
+   },
+   {
+    "day25b_run_summary_pin": "541a9226c0ca1629767dfd1272b04d708e6163c73c24dfdf97df572fe2293bf5",
+    "frozen_document_sha256": "541a9226c0ca1629767dfd1272b04d708e6163c73c24dfdf97df572fe2293bf5",
+    "matches": true,
+    "observed_raw_sha256": "541a9226c0ca1629767dfd1272b04d708e6163c73c24dfdf97df572fe2293bf5",
+    "path": "artifacts/day25b/run/d2.json"
+   },
+   {
+    "day25b_run_summary_pin": "1738dd9eae9bb3e7d2af2e13c53a0b570ef3da11455708eca3d9f925ed43d864",
+    "frozen_document_sha256": "1738dd9eae9bb3e7d2af2e13c53a0b570ef3da11455708eca3d9f925ed43d864",
+    "matches": true,
+    "observed_raw_sha256": "1738dd9eae9bb3e7d2af2e13c53a0b570ef3da11455708eca3d9f925ed43d864",
+    "path": "artifacts/day25b/run/d5.json"
+   }
+  ],
+  "note": "reference only; DAY-25B values are not recomputed, restated or reinterpreted"
+ }
+}

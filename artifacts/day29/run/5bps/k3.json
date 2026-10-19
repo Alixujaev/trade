@@ -1,0 +1,3682 @@
+{
+ "cost": "5bps",
+ "cost_label": "primary analysis (5 bps)",
+ "descriptive_only": true,
+ "diagnostic": "K3",
+ "evidence_label": "robustness diagnostic on reused historical data \u2014 not independent or forward evidence",
+ "family_scope": "V2-MOM only",
+ "results": {
+  "holdout": {
+   "compared_sessions": 856,
+   "mismatch_count": 0,
+   "mismatches": [],
+   "reporting_sessions": [
+    {
+     "H_current": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "H_prior": [],
+     "T_current": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "T_prior": [],
+     "prior_close": "pre-segment close",
+     "session": "2023-01-03"
+    },
+    {
+     "H_current": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "H_prior": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "T_current": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "T_prior": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "prior_close": "2023-01-31",
+     "session": "2023-02-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "ORCL",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "H_prior": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "T_current": [
+      "AVGO",
+      "ORCL",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "T_prior": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "prior_close": "2023-02-28",
+     "session": "2023-03-01"
+    },
+    {
+     "H_current": [
+      "JPM",
+      "KO",
+      "ORCL",
+      "PEP",
+      "XOM"
+     ],
+     "H_prior": [
+      "AVGO",
+      "ORCL",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "T_current": [
+      "JPM",
+      "KO",
+      "ORCL",
+      "PEP",
+      "XOM"
+     ],
+     "T_prior": [
+      "AVGO",
+      "ORCL",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "prior_close": "2023-03-31",
+     "session": "2023-04-03"
+    },
+    {
+     "H_current": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "XOM"
+     ],
+     "H_prior": [
+      "JPM",
+      "KO",
+      "ORCL",
+      "PEP",
+      "XOM"
+     ],
+     "T_current": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "XOM"
+     ],
+     "T_prior": [
+      "JPM",
+      "KO",
+      "ORCL",
+      "PEP",
+      "XOM"
+     ],
+     "prior_close": "2023-04-28",
+     "session": "2023-05-01"
+    },
+    {
+     "H_current": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "XOM"
+     ],
+     "H_prior": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "XOM"
+     ],
+     "T_current": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "XOM"
+     ],
+     "T_prior": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "XOM"
+     ],
+     "prior_close": "2023-05-31",
+     "session": "2023-06-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "H_prior": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "XOM"
+     ],
+     "T_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_prior": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "XOM"
+     ],
+     "prior_close": "2023-06-30",
+     "session": "2023-07-03"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "H_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "prior_close": "2023-07-31",
+     "session": "2023-08-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "H_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "prior_close": "2023-08-31",
+     "session": "2023-09-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AVGO",
+      "META",
+      "NVDA",
+      "ORCL"
+     ],
+     "H_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_current": [
+      "ADBE",
+      "AVGO",
+      "META",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "prior_close": "2023-09-29",
+     "session": "2023-10-02"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "META",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AVGO",
+      "META",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "META",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AVGO",
+      "META",
+      "NVDA",
+      "ORCL"
+     ],
+     "prior_close": "2023-10-31",
+     "session": "2023-11-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "META",
+      "NVDA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "META",
+      "NVDA"
+     ],
+     "prior_close": "2023-11-30",
+     "session": "2023-12-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMD",
+      "META",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMD",
+      "META",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2023-12-29",
+     "session": "2024-01-02"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AVGO",
+      "INTC",
+      "META",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMD",
+      "META",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMD",
+      "AVGO",
+      "INTC",
+      "META",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMD",
+      "META",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2024-01-31",
+     "session": "2024-02-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "META",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMD",
+      "AVGO",
+      "INTC",
+      "META",
+      "NVDA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "META",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMD",
+      "AVGO",
+      "INTC",
+      "META",
+      "NVDA"
+     ],
+     "prior_close": "2024-02-29",
+     "session": "2024-03-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "META",
+      "NVDA"
+     ],
+     "T_current": [
+      "AMD",
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "META",
+      "NVDA"
+     ],
+     "prior_close": "2024-03-28",
+     "session": "2024-04-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMD",
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "AMD",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMD",
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2024-04-30",
+     "session": "2024-05-01"
+    },
+    {
+     "H_current": [
+      "AMZN",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMD",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "T_current": [
+      "AMZN",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMD",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "prior_close": "2024-05-31",
+     "session": "2024-06-03"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA",
+      "QCOM"
+     ],
+     "H_prior": [
+      "AMZN",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "T_current": [
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA",
+      "QCOM"
+     ],
+     "T_prior": [
+      "AMZN",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "prior_close": "2024-06-28",
+     "session": "2024-07-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA",
+      "QCOM"
+     ],
+     "T_current": [
+      "AMAT",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA",
+      "QCOM"
+     ],
+     "prior_close": "2024-07-31",
+     "session": "2024-08-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "COST",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "T_current": [
+      "AVGO",
+      "COST",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AVGO",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "prior_close": "2024-08-30",
+     "session": "2024-09-03"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "COST",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AVGO",
+      "COST",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "T_current": [
+      "AVGO",
+      "COST",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AVGO",
+      "COST",
+      "META",
+      "MU",
+      "NVDA"
+     ],
+     "prior_close": "2024-09-30",
+     "session": "2024-10-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "H_prior": [
+      "AVGO",
+      "COST",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_prior": [
+      "AVGO",
+      "COST",
+      "META",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2024-10-31",
+     "session": "2024-11-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "WMT"
+     ],
+     "H_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "WMT"
+     ],
+     "T_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "prior_close": "2024-11-29",
+     "session": "2024-12-02"
+    },
+    {
+     "H_current": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "WMT"
+     ],
+     "H_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "WMT"
+     ],
+     "T_current": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "WMT"
+     ],
+     "T_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "NVDA",
+      "WMT"
+     ],
+     "prior_close": "2024-12-31",
+     "session": "2025-01-02"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "NFLX",
+      "NVDA",
+      "TSLA",
+      "WMT"
+     ],
+     "H_prior": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "WMT"
+     ],
+     "T_current": [
+      "AVGO",
+      "NFLX",
+      "NVDA",
+      "TSLA",
+      "WMT"
+     ],
+     "T_prior": [
+      "META",
+      "NFLX",
+      "NVDA",
+      "ORCL",
+      "WMT"
+     ],
+     "prior_close": "2025-01-31",
+     "session": "2025-02-03"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "NFLX",
+      "NVDA",
+      "TSLA",
+      "WMT"
+     ],
+     "H_prior": [
+      "AVGO",
+      "NFLX",
+      "NVDA",
+      "TSLA",
+      "WMT"
+     ],
+     "T_current": [
+      "AVGO",
+      "NFLX",
+      "NVDA",
+      "TSLA",
+      "WMT"
+     ],
+     "T_prior": [
+      "AVGO",
+      "NFLX",
+      "NVDA",
+      "TSLA",
+      "WMT"
+     ],
+     "prior_close": "2025-02-28",
+     "session": "2025-03-03"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "COST",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "H_prior": [
+      "AVGO",
+      "NFLX",
+      "NVDA",
+      "TSLA",
+      "WMT"
+     ],
+     "T_current": [
+      "AVGO",
+      "COST",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "T_prior": [
+      "AVGO",
+      "NFLX",
+      "NVDA",
+      "TSLA",
+      "WMT"
+     ],
+     "prior_close": "2025-03-31",
+     "session": "2025-04-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "H_prior": [
+      "AVGO",
+      "COST",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "T_current": [
+      "AAPL",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "T_prior": [
+      "AVGO",
+      "COST",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "prior_close": "2025-04-30",
+     "session": "2025-05-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "H_prior": [
+      "AAPL",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "T_current": [
+      "AVGO",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "T_prior": [
+      "AAPL",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "prior_close": "2025-05-30",
+     "session": "2025-06-02"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "H_prior": [
+      "AVGO",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "T_current": [
+      "AVGO",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "T_prior": [
+      "AVGO",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "prior_close": "2025-06-30",
+     "session": "2025-07-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "CSCO",
+      "META",
+      "NFLX",
+      "ORCL"
+     ],
+     "H_prior": [
+      "AVGO",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "T_current": [
+      "AVGO",
+      "CSCO",
+      "META",
+      "NFLX",
+      "ORCL"
+     ],
+     "T_prior": [
+      "AVGO",
+      "CSCO",
+      "NFLX",
+      "TSLA",
+      "WMT"
+     ],
+     "prior_close": "2025-07-31",
+     "session": "2025-08-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "ORCL",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AVGO",
+      "CSCO",
+      "META",
+      "NFLX",
+      "ORCL"
+     ],
+     "T_current": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "ORCL",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AVGO",
+      "CSCO",
+      "META",
+      "NFLX",
+      "ORCL"
+     ],
+     "prior_close": "2025-08-29",
+     "session": "2025-09-02"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "JPM",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "H_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "ORCL",
+      "TSLA"
+     ],
+     "T_current": [
+      "AVGO",
+      "JPM",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_prior": [
+      "AVGO",
+      "META",
+      "NFLX",
+      "ORCL",
+      "TSLA"
+     ],
+     "prior_close": "2025-09-30",
+     "session": "2025-10-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "INTC",
+      "MU",
+      "ORCL",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AVGO",
+      "JPM",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "T_current": [
+      "AVGO",
+      "INTC",
+      "MU",
+      "ORCL",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AVGO",
+      "JPM",
+      "NFLX",
+      "NVDA",
+      "ORCL"
+     ],
+     "prior_close": "2025-10-31",
+     "session": "2025-11-03"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "H_prior": [
+      "AVGO",
+      "INTC",
+      "MU",
+      "ORCL",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_prior": [
+      "AVGO",
+      "INTC",
+      "MU",
+      "ORCL",
+      "TSLA"
+     ],
+     "prior_close": "2025-11-28",
+     "session": "2025-12-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "H_prior": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_current": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_prior": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "prior_close": "2025-12-31",
+     "session": "2026-01-02"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "H_prior": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_current": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_prior": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "prior_close": "2026-01-30",
+     "session": "2026-02-02"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "H_prior": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_prior": [
+      "AMD",
+      "AVGO",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "prior_close": "2026-02-27",
+     "session": "2026-03-02"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "prior_close": "2026-03-31",
+     "session": "2026-04-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "prior_close": "2026-04-30",
+     "session": "2026-05-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "prior_close": "2026-05-29",
+     "session": "2026-06-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "INTC",
+      "MU"
+     ],
+     "prior_close": "2026-06-01",
+     "session": "2026-06-02"
+    }
+   ],
+   "status": "COMPLETED"
+  },
+  "research": {
+   "compared_sessions": 1490,
+   "mismatch_count": 0,
+   "mismatches": [],
+   "reporting_sessions": [
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "H_prior": [],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "T_prior": [],
+     "prior_close": "pre-segment close",
+     "session": "2017-02-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "prior_close": "2017-02-28",
+     "session": "2017-03-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "prior_close": "2017-03-31",
+     "session": "2017-04-03"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "JPM",
+      "MU",
+      "NVDA"
+     ],
+     "prior_close": "2017-04-28",
+     "session": "2017-05-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2017-05-31",
+     "session": "2017-06-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2017-06-30",
+     "session": "2017-07-03"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2017-07-31",
+     "session": "2017-08-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2017-08-31",
+     "session": "2017-09-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2017-09-29",
+     "session": "2017-10-02"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AMD",
+      "MU",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2017-10-31",
+     "session": "2017-11-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMAT",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMAT",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2017-11-30",
+     "session": "2017-12-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMAT",
+      "AVGO",
+      "MU",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMAT",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMAT",
+      "AVGO",
+      "MU",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMAT",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2017-12-29",
+     "session": "2018-01-02"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMAT",
+      "MU",
+      "NVDA",
+      "WMT"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMAT",
+      "AVGO",
+      "MU",
+      "NVDA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMAT",
+      "MU",
+      "NVDA",
+      "WMT"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMAT",
+      "AVGO",
+      "MU",
+      "NVDA"
+     ],
+     "prior_close": "2018-01-31",
+     "session": "2018-02-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMAT",
+      "MU",
+      "NVDA",
+      "WMT"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMAT",
+      "MU",
+      "NVDA",
+      "WMT"
+     ],
+     "prior_close": "2018-02-28",
+     "session": "2018-03-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2018-03-29",
+     "session": "2018-04-02"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2018-04-30",
+     "session": "2018-05-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2018-05-31",
+     "session": "2018-06-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "INTC",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "ADBE",
+      "INTC",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2018-06-29",
+     "session": "2018-07-02"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMZN",
+      "CRM",
+      "MU",
+      "NFLX"
+     ],
+     "H_prior": [
+      "ADBE",
+      "INTC",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMZN",
+      "CRM",
+      "MU",
+      "NFLX"
+     ],
+     "T_prior": [
+      "ADBE",
+      "INTC",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2018-07-31",
+     "session": "2018-08-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMZN",
+      "CRM",
+      "MU",
+      "NFLX"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMZN",
+      "CRM",
+      "MU",
+      "NFLX"
+     ],
+     "prior_close": "2018-08-31",
+     "session": "2018-09-04"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMZN",
+      "MU",
+      "NFLX",
+      "NVDA"
+     ],
+     "prior_close": "2018-09-28",
+     "session": "2018-10-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "prior_close": "2018-10-31",
+     "session": "2018-11-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "prior_close": "2018-11-30",
+     "session": "2018-12-03"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "prior_close": "2018-12-31",
+     "session": "2019-01-02"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "CRM",
+      "MSFT"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "CRM",
+      "MSFT"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMD",
+      "AMZN",
+      "CRM",
+      "NFLX"
+     ],
+     "prior_close": "2019-01-31",
+     "session": "2019-02-01"
+    },
+    {
+     "H_current": [
+      "ADBE",
+      "AMD",
+      "CRM",
+      "KO",
+      "NFLX"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "CRM",
+      "MSFT"
+     ],
+     "T_current": [
+      "ADBE",
+      "AMD",
+      "CRM",
+      "KO",
+      "NFLX"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMD",
+      "AVGO",
+      "CRM",
+      "MSFT"
+     ],
+     "prior_close": "2019-02-28",
+     "session": "2019-03-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "CRM",
+      "CSCO",
+      "MSFT",
+      "NFLX"
+     ],
+     "H_prior": [
+      "ADBE",
+      "AMD",
+      "CRM",
+      "KO",
+      "NFLX"
+     ],
+     "T_current": [
+      "AMD",
+      "CRM",
+      "CSCO",
+      "MSFT",
+      "NFLX"
+     ],
+     "T_prior": [
+      "ADBE",
+      "AMD",
+      "CRM",
+      "KO",
+      "NFLX"
+     ],
+     "prior_close": "2019-03-29",
+     "session": "2019-04-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AVGO",
+      "CRM",
+      "MSFT",
+      "PEP"
+     ],
+     "H_prior": [
+      "AMD",
+      "CRM",
+      "CSCO",
+      "MSFT",
+      "NFLX"
+     ],
+     "T_current": [
+      "AMD",
+      "AVGO",
+      "CRM",
+      "MSFT",
+      "PEP"
+     ],
+     "T_prior": [
+      "AMD",
+      "CRM",
+      "CSCO",
+      "MSFT",
+      "NFLX"
+     ],
+     "prior_close": "2019-04-30",
+     "session": "2019-05-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AVGO",
+      "CSCO",
+      "MSFT",
+      "QCOM"
+     ],
+     "H_prior": [
+      "AMD",
+      "AVGO",
+      "CRM",
+      "MSFT",
+      "PEP"
+     ],
+     "T_current": [
+      "AMD",
+      "AVGO",
+      "CSCO",
+      "MSFT",
+      "QCOM"
+     ],
+     "T_prior": [
+      "AMD",
+      "AVGO",
+      "CRM",
+      "MSFT",
+      "PEP"
+     ],
+     "prior_close": "2019-05-31",
+     "session": "2019-06-03"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "CSCO",
+      "MSFT",
+      "PEP",
+      "QCOM"
+     ],
+     "H_prior": [
+      "AMD",
+      "AVGO",
+      "CSCO",
+      "MSFT",
+      "QCOM"
+     ],
+     "T_current": [
+      "AMD",
+      "CSCO",
+      "MSFT",
+      "PEP",
+      "QCOM"
+     ],
+     "T_prior": [
+      "AMD",
+      "AVGO",
+      "CSCO",
+      "MSFT",
+      "QCOM"
+     ],
+     "prior_close": "2019-06-28",
+     "session": "2019-07-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AVGO",
+      "CSCO",
+      "MSFT",
+      "QCOM"
+     ],
+     "H_prior": [
+      "AMD",
+      "CSCO",
+      "MSFT",
+      "PEP",
+      "QCOM"
+     ],
+     "T_current": [
+      "AMD",
+      "AVGO",
+      "CSCO",
+      "MSFT",
+      "QCOM"
+     ],
+     "T_prior": [
+      "AMD",
+      "CSCO",
+      "MSFT",
+      "PEP",
+      "QCOM"
+     ],
+     "prior_close": "2019-07-31",
+     "session": "2019-08-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "COST",
+      "CSCO",
+      "KO",
+      "MSFT"
+     ],
+     "H_prior": [
+      "AMD",
+      "AVGO",
+      "CSCO",
+      "MSFT",
+      "QCOM"
+     ],
+     "T_current": [
+      "AVGO",
+      "COST",
+      "CSCO",
+      "KO",
+      "MSFT"
+     ],
+     "T_prior": [
+      "AMD",
+      "AVGO",
+      "CSCO",
+      "MSFT",
+      "QCOM"
+     ],
+     "prior_close": "2019-08-30",
+     "session": "2019-09-03"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "COST",
+      "MSFT",
+      "PEP",
+      "WMT"
+     ],
+     "H_prior": [
+      "AVGO",
+      "COST",
+      "CSCO",
+      "KO",
+      "MSFT"
+     ],
+     "T_current": [
+      "AMAT",
+      "COST",
+      "MSFT",
+      "PEP",
+      "WMT"
+     ],
+     "T_prior": [
+      "AVGO",
+      "COST",
+      "CSCO",
+      "KO",
+      "MSFT"
+     ],
+     "prior_close": "2019-09-30",
+     "session": "2019-10-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "AVGO",
+      "COST",
+      "MSFT"
+     ],
+     "H_prior": [
+      "AMAT",
+      "COST",
+      "MSFT",
+      "PEP",
+      "WMT"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "AVGO",
+      "COST",
+      "MSFT"
+     ],
+     "T_prior": [
+      "AMAT",
+      "COST",
+      "MSFT",
+      "PEP",
+      "WMT"
+     ],
+     "prior_close": "2019-10-31",
+     "session": "2019-11-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "META",
+      "QCOM"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "AVGO",
+      "COST",
+      "MSFT"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "META",
+      "QCOM"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "AVGO",
+      "COST",
+      "MSFT"
+     ],
+     "prior_close": "2019-11-29",
+     "session": "2019-12-02"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "META",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "META",
+      "QCOM"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "META",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "META",
+      "QCOM"
+     ],
+     "prior_close": "2019-12-31",
+     "session": "2020-01-02"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "NVDA",
+      "QCOM"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "META",
+      "NVDA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "NVDA",
+      "QCOM"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "META",
+      "NVDA"
+     ],
+     "prior_close": "2020-01-31",
+     "session": "2020-02-03"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "NVDA",
+      "QCOM"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "NVDA",
+      "QCOM"
+     ],
+     "prior_close": "2020-02-28",
+     "session": "2020-03-02"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "prior_close": "2020-03-31",
+     "session": "2020-04-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "MSFT",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "MSFT",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMAT",
+      "AMD",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2020-04-30",
+     "session": "2020-05-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "MSFT",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "MSFT",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2020-05-29",
+     "session": "2020-06-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "MSFT",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "MSFT",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2020-06-30",
+     "session": "2020-07-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "MSFT",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "MSFT",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2020-07-31",
+     "session": "2020-08-03"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2020-08-31",
+     "session": "2020-09-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2020-09-30",
+     "session": "2020-10-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2020-10-30",
+     "session": "2020-11-02"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "NFLX",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2020-11-30",
+     "session": "2020-12-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2020-12-31",
+     "session": "2021-01-04"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "prior_close": "2021-01-29",
+     "session": "2021-02-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AMD",
+      "AMZN",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "prior_close": "2021-02-26",
+     "session": "2021-03-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AVGO",
+      "MU",
+      "QCOM",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMAT",
+      "AVGO",
+      "MU",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "prior_close": "2021-03-31",
+     "session": "2021-04-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AVGO",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AVGO",
+      "MU",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMAT",
+      "AVGO",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AVGO",
+      "MU",
+      "QCOM",
+      "TSLA"
+     ],
+     "prior_close": "2021-04-30",
+     "session": "2021-05-03"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "MU",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AVGO",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMAT",
+      "MU",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AVGO",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2021-05-28",
+     "session": "2021-06-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "MU",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "MU",
+      "NVDA",
+      "QCOM",
+      "TSLA"
+     ],
+     "prior_close": "2021-06-30",
+     "session": "2021-07-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "JPM",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMAT",
+      "JPM",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2021-07-30",
+     "session": "2021-08-02"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "MU",
+      "ORCL"
+     ],
+     "H_prior": [
+      "AMAT",
+      "JPM",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "MU",
+      "ORCL"
+     ],
+     "T_prior": [
+      "AMAT",
+      "JPM",
+      "MU",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2021-08-31",
+     "session": "2021-09-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "TSLA",
+      "XOM"
+     ],
+     "H_prior": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "MU",
+      "ORCL"
+     ],
+     "T_current": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "TSLA",
+      "XOM"
+     ],
+     "T_prior": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "MU",
+      "ORCL"
+     ],
+     "prior_close": "2021-09-30",
+     "session": "2021-10-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "TSLA",
+      "XOM"
+     ],
+     "H_prior": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "TSLA",
+      "XOM"
+     ],
+     "T_current": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "TSLA",
+      "XOM"
+     ],
+     "T_prior": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "TSLA",
+      "XOM"
+     ],
+     "prior_close": "2021-10-29",
+     "session": "2021-11-01"
+    },
+    {
+     "H_current": [
+      "GOOGL",
+      "NVDA",
+      "ORCL",
+      "TSLA",
+      "XOM"
+     ],
+     "H_prior": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "TSLA",
+      "XOM"
+     ],
+     "T_current": [
+      "GOOGL",
+      "NVDA",
+      "ORCL",
+      "TSLA",
+      "XOM"
+     ],
+     "T_prior": [
+      "AMAT",
+      "GOOGL",
+      "JPM",
+      "TSLA",
+      "XOM"
+     ],
+     "prior_close": "2021-11-30",
+     "session": "2021-12-01"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "NVDA",
+      "TSLA"
+     ],
+     "H_prior": [
+      "GOOGL",
+      "NVDA",
+      "ORCL",
+      "TSLA",
+      "XOM"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_prior": [
+      "GOOGL",
+      "NVDA",
+      "ORCL",
+      "TSLA",
+      "XOM"
+     ],
+     "prior_close": "2021-12-31",
+     "session": "2022-01-03"
+    },
+    {
+     "H_current": [
+      "AMAT",
+      "AMD",
+      "COST",
+      "GOOGL",
+      "NVDA"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "NVDA",
+      "TSLA"
+     ],
+     "T_current": [
+      "AMAT",
+      "AMD",
+      "COST",
+      "GOOGL",
+      "NVDA"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "GOOGL",
+      "NVDA",
+      "TSLA"
+     ],
+     "prior_close": "2022-01-31",
+     "session": "2022-02-01"
+    },
+    {
+     "H_current": [
+      "COST",
+      "MSFT",
+      "NVDA",
+      "PEP",
+      "XOM"
+     ],
+     "H_prior": [
+      "AMAT",
+      "AMD",
+      "COST",
+      "GOOGL",
+      "NVDA"
+     ],
+     "T_current": [
+      "COST",
+      "MSFT",
+      "NVDA",
+      "PEP",
+      "XOM"
+     ],
+     "T_prior": [
+      "AMAT",
+      "AMD",
+      "COST",
+      "GOOGL",
+      "NVDA"
+     ],
+     "prior_close": "2022-02-28",
+     "session": "2022-03-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AMD",
+      "COST",
+      "NVDA",
+      "XOM"
+     ],
+     "H_prior": [
+      "COST",
+      "MSFT",
+      "NVDA",
+      "PEP",
+      "XOM"
+     ],
+     "T_current": [
+      "AAPL",
+      "AMD",
+      "COST",
+      "NVDA",
+      "XOM"
+     ],
+     "T_prior": [
+      "COST",
+      "MSFT",
+      "NVDA",
+      "PEP",
+      "XOM"
+     ],
+     "prior_close": "2022-03-31",
+     "session": "2022-04-01"
+    },
+    {
+     "H_current": [
+      "AMD",
+      "COST",
+      "NVDA",
+      "TSLA",
+      "XOM"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AMD",
+      "COST",
+      "NVDA",
+      "XOM"
+     ],
+     "T_current": [
+      "AMD",
+      "COST",
+      "NVDA",
+      "TSLA",
+      "XOM"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AMD",
+      "COST",
+      "NVDA",
+      "XOM"
+     ],
+     "prior_close": "2022-04-29",
+     "session": "2022-05-02"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "AVGO",
+      "COST",
+      "TSLA",
+      "XOM"
+     ],
+     "H_prior": [
+      "AMD",
+      "COST",
+      "NVDA",
+      "TSLA",
+      "XOM"
+     ],
+     "T_current": [
+      "AAPL",
+      "AVGO",
+      "COST",
+      "TSLA",
+      "XOM"
+     ],
+     "T_prior": [
+      "AMD",
+      "COST",
+      "NVDA",
+      "TSLA",
+      "XOM"
+     ],
+     "prior_close": "2022-05-31",
+     "session": "2022-06-01"
+    },
+    {
+     "H_current": [
+      "AVGO",
+      "COST",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "H_prior": [
+      "AAPL",
+      "AVGO",
+      "COST",
+      "TSLA",
+      "XOM"
+     ],
+     "T_current": [
+      "AVGO",
+      "COST",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "T_prior": [
+      "AAPL",
+      "AVGO",
+      "COST",
+      "TSLA",
+      "XOM"
+     ],
+     "prior_close": "2022-06-30",
+     "session": "2022-07-01"
+    },
+    {
+     "H_current": [
+      "COST",
+      "JNJ",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "H_prior": [
+      "AVGO",
+      "COST",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "T_current": [
+      "COST",
+      "JNJ",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "T_prior": [
+      "AVGO",
+      "COST",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "prior_close": "2022-07-29",
+     "session": "2022-08-01"
+    },
+    {
+     "H_current": [
+      "COST",
+      "KO",
+      "PEP",
+      "TSLA",
+      "XOM"
+     ],
+     "H_prior": [
+      "COST",
+      "JNJ",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "T_current": [
+      "COST",
+      "KO",
+      "PEP",
+      "TSLA",
+      "XOM"
+     ],
+     "T_prior": [
+      "COST",
+      "JNJ",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "prior_close": "2022-08-31",
+     "session": "2022-09-01"
+    },
+    {
+     "H_current": [
+      "AAPL",
+      "COST",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "H_prior": [
+      "COST",
+      "KO",
+      "PEP",
+      "TSLA",
+      "XOM"
+     ],
+     "T_current": [
+      "AAPL",
+      "COST",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "T_prior": [
+      "COST",
+      "KO",
+      "PEP",
+      "TSLA",
+      "XOM"
+     ],
+     "prior_close": "2022-09-30",
+     "session": "2022-10-03"
+    },
+    {
+     "H_current": [
+      "COST",
+      "JNJ",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "H_prior": [
+      "AAPL",
+      "COST",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "T_current": [
+      "COST",
+      "JNJ",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "T_prior": [
+      "AAPL",
+      "COST",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "prior_close": "2022-10-31",
+     "session": "2022-11-01"
+    },
+    {
+     "H_current": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "H_prior": [
+      "COST",
+      "JNJ",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "T_current": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "T_prior": [
+      "COST",
+      "JNJ",
+      "KO",
+      "PEP",
+      "XOM"
+     ],
+     "prior_close": "2022-11-30",
+     "session": "2022-12-01"
+    },
+    {
+     "H_current": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "H_prior": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "T_current": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "T_prior": [
+      "JNJ",
+      "KO",
+      "PEP",
+      "WMT",
+      "XOM"
+     ],
+     "prior_close": "2022-12-29",
+     "session": "2022-12-30"
+    }
+   ],
+   "status": "COMPLETED"
+  }
+ }
+}

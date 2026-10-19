@@ -1,0 +1,34 @@
+{
+ "authorizes_diagnostics": false,
+ "checks": {
+  "S1": {
+   "files_verified_raw": 48
+  },
+  "S10": "byte-identical in-process outputs",
+  "S2": {
+   "run_summaries_verified_raw": 2
+  },
+  "S3": "segments equal the frozen definitions",
+  "S4": "passed",
+  "S5": "passed",
+  "S6": {
+   "exchange_calendars": "4.13.2"
+  },
+  "S7": "passed",
+  "S8": "passed",
+  "S9": {
+   "allow_listed_paths": 56
+  }
+ },
+ "environment": {
+  "exchange_calendars": "4.13.2",
+  "executable": "C:\\Users\\Admin\\Desktop\\own\\trade\\.venv\\Scripts\\python.exe",
+  "numpy": "2.5.2",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.12.10"
+ },
+ "frozen_commit": "06fc45f90b4059a1bcba65514c7a6e4598c8d3e7",
+ "stage": "shared integrity and session alignment (frozen \u00a74)",
+ "status": "PASSED",
+ "task": "DAY-29"
+}

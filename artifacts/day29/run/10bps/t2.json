@@ -1,0 +1,384 @@
+{
+ "cost": "10bps",
+ "cost_label": "secondary cost sensitivity (10 bps) \u2014 not primary evidence",
+ "descriptive_only": true,
+ "diagnostic": "T2",
+ "evidence_label": "robustness diagnostic on reused historical data \u2014 not independent or forward evidence",
+ "family_scope": "V2-MOM vs B1",
+ "results": {
+  "holdout": {
+   "annualisation": "G^(252/(N-k)) - 1 (DAY-25B D4c)",
+   "by_k": {
+    "10": {
+     "best_removed": {
+      "active_cagr": -0.028055479547604456,
+      "active_total_return": -0.20726903596982593,
+      "cagr_excl": {
+       "B1": 0.41140294162205904,
+       "V2-MOM": 0.3833474620744546
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 2.1798003072881054,
+       "V2-MOM": 1.9725312713182794
+      },
+      "sessions_remaining": 846,
+      "sessions_removed": [
+       "2024-07-31",
+       "2025-09-10",
+       "2026-01-21",
+       "2026-04-01",
+       "2026-04-08",
+       "2026-04-24",
+       "2026-04-29",
+       "2026-05-05",
+       "2026-05-08",
+       "2026-05-26"
+      ]
+     },
+     "worst_removed": {
+      "active_cagr": 0.37545408431895755,
+      "active_total_return": 4.968613035122156,
+      "cagr_excl": {
+       "B1": 0.5972870801139198,
+       "V2-MOM": 0.9727411644328774
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 3.8171005825760984,
+       "V2-MOM": 8.785713617698255
+      },
+      "sessions_remaining": 846,
+      "sessions_removed": [
+       "2023-01-23",
+       "2023-02-02",
+       "2024-04-19",
+       "2024-07-17",
+       "2025-12-04",
+       "2025-12-12",
+       "2026-01-23",
+       "2026-02-04",
+       "2026-03-03",
+       "2026-03-26"
+      ]
+     }
+    },
+    "20": {
+     "best_removed": {
+      "active_cagr": -0.14030036513305588,
+      "active_total_return": -0.8075055216938702,
+      "cagr_excl": {
+       "B1": 0.33768391670593356,
+       "V2-MOM": 0.19738355157287768
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 1.625262532421794,
+       "V2-MOM": 0.8177570107279237
+      },
+      "sessions_remaining": 836,
+      "sessions_removed": [
+       "2024-02-02",
+       "2024-02-22",
+       "2024-07-31",
+       "2024-12-13",
+       "2025-09-05",
+       "2025-09-10",
+       "2025-11-24",
+       "2026-01-02",
+       "2026-01-21",
+       "2026-01-28",
+       "2026-04-01",
+       "2026-04-08",
+       "2026-04-24",
+       "2026-04-29",
+       "2026-04-30",
+       "2026-05-05",
+       "2026-05-06",
+       "2026-05-08",
+       "2026-05-20",
+       "2026-05-26"
+      ]
+     },
+     "worst_removed": {
+      "active_cagr": 0.5576725156496845,
+      "active_total_return": 8.684495065612673,
+      "cagr_excl": {
+       "B1": 0.6612609140069639,
+       "V2-MOM": 1.2189334296566483
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 4.386340578354527,
+       "V2-MOM": 13.0708356439672
+      },
+      "sessions_remaining": 836,
+      "sessions_removed": [
+       "2023-01-09",
+       "2023-01-23",
+       "2023-02-01",
+       "2023-02-02",
+       "2023-03-16",
+       "2023-09-12",
+       "2024-04-19",
+       "2024-07-17",
+       "2024-07-30",
+       "2025-03-10",
+       "2025-11-04",
+       "2025-11-20",
+       "2025-12-04",
+       "2025-12-12",
+       "2026-01-23",
+       "2026-02-04",
+       "2026-03-03",
+       "2026-03-06",
+       "2026-03-26",
+       "2026-03-30"
+      ]
+     }
+    },
+    "5": {
+     "best_removed": {
+      "active_cagr": 0.0519807030546755,
+      "active_total_return": 0.4498413559120267,
+      "cagr_excl": {
+       "B1": 0.4596206446584816,
+       "V2-MOM": 0.5116013477131571
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 2.586211212026551,
+       "V2-MOM": 3.0360525679385777
+      },
+      "sessions_remaining": 851,
+      "sessions_removed": [
+       "2024-07-31",
+       "2025-09-10",
+       "2026-04-24",
+       "2026-05-05",
+       "2026-05-08"
+      ]
+     },
+     "worst_removed": {
+      "active_cagr": 0.2811865462714511,
+      "active_total_return": 3.417596991804082,
+      "cagr_excl": {
+       "B1": 0.5706879998803795,
+       "V2-MOM": 0.8518745461518307
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 3.594016668629454,
+       "V2-MOM": 7.011613660433536
+      },
+      "sessions_remaining": 851,
+      "sessions_removed": [
+       "2023-02-02",
+       "2024-04-19",
+       "2024-07-17",
+       "2026-01-23",
+       "2026-02-04"
+      ]
+     }
+    }
+   },
+   "disclosures": [
+    "the return path is spliced; this is not a re-simulation and not a tradable strategy",
+    "removal is outcome-dependent by construction",
+    "if the last session is in the removed set, its liquidation cost is removed with it",
+    "a change after tail removal is not, by itself, evidence of failure or of robustness"
+   ],
+   "unremoved_t0_cagr_copied": {
+    "B1": 0.5319399183151041,
+    "V2-MOM": 0.7071510888097017
+   }
+  },
+  "research": {
+   "annualisation": "G^(252/(N-k)) - 1 (DAY-25B D4c)",
+   "by_k": {
+    "10": {
+     "best_removed": {
+      "active_cagr": 0.031633877338841154,
+      "active_total_return": 0.4095003312467296,
+      "cagr_excl": {
+       "B1": 0.1601261460190324,
+       "V2-MOM": 0.19176002335787357
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 1.392435013846356,
+       "V2-MOM": 1.8019353450930855
+      },
+      "sessions_remaining": 1480,
+      "sessions_removed": [
+       "2017-05-10",
+       "2017-07-05",
+       "2018-11-07",
+       "2019-01-30",
+       "2020-03-19",
+       "2020-03-24",
+       "2020-08-31",
+       "2022-02-02",
+       "2022-10-07",
+       "2022-12-27"
+      ]
+     },
+     "worst_removed": {
+      "active_cagr": 0.18771921127800262,
+      "active_total_return": 3.8659044036255636,
+      "cagr_excl": {
+       "B1": 0.19540002618318342,
+       "V2-MOM": 0.38311923746118604
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 1.8525719822367224,
+       "V2-MOM": 5.718476385862286
+      },
+      "sessions_remaining": 1480,
+      "sessions_removed": [
+       "2017-05-02",
+       "2017-05-17",
+       "2017-06-09",
+       "2017-10-25",
+       "2017-11-29",
+       "2018-11-19",
+       "2020-03-18",
+       "2021-11-19",
+       "2022-11-10",
+       "2022-11-30"
+      ]
+     }
+    },
+    "20": {
+     "best_removed": {
+      "active_cagr": -0.019277905404780027,
+      "active_total_return": -0.19856712638832996,
+      "cagr_excl": {
+       "B1": 0.13442193808252223,
+       "V2-MOM": 0.1151440326777422
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 1.0869814867556977,
+       "V2-MOM": 0.8884143603673678
+      },
+      "sessions_remaining": 1470,
+      "sessions_removed": [
+       "2017-02-01",
+       "2017-02-27",
+       "2017-05-10",
+       "2017-06-21",
+       "2017-07-05",
+       "2018-11-07",
+       "2018-11-28",
+       "2019-01-04",
+       "2019-01-07",
+       "2019-01-30",
+       "2020-02-28",
+       "2020-03-19",
+       "2020-03-24",
+       "2020-04-13",
+       "2020-04-22",
+       "2020-08-31",
+       "2022-02-02",
+       "2022-10-07",
+       "2022-12-22",
+       "2022-12-27"
+      ]
+     },
+     "worst_removed": {
+      "active_cagr": 0.258867093354467,
+      "active_total_return": 6.487843395457219,
+      "cagr_excl": {
+       "B1": 0.21470759711106902,
+       "V2-MOM": 0.473574690465536
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 2.109938934910961,
+       "V2-MOM": 8.59778233036818
+      },
+      "sessions_remaining": 1470,
+      "sessions_removed": [
+       "2017-05-02",
+       "2017-05-17",
+       "2017-06-09",
+       "2017-10-25",
+       "2017-11-29",
+       "2018-09-05",
+       "2018-10-10",
+       "2018-10-19",
+       "2018-10-26",
+       "2018-11-19",
+       "2020-03-16",
+       "2020-03-18",
+       "2021-11-19",
+       "2022-03-09",
+       "2022-07-05",
+       "2022-07-21",
+       "2022-07-27",
+       "2022-11-10",
+       "2022-11-11",
+       "2022-11-30"
+      ]
+     }
+    },
+    "5": {
+     "best_removed": {
+      "active_cagr": 0.06146855059764822,
+      "active_total_return": 0.8807504617277688,
+      "cagr_excl": {
+       "B1": 0.16788057716412141,
+       "V2-MOM": 0.22934912776176963
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 1.4955676883269038,
+       "V2-MOM": 2.3763181500546726
+      },
+      "sessions_remaining": 1485,
+      "sessions_removed": [
+       "2017-05-10",
+       "2019-01-30",
+       "2020-03-24",
+       "2020-08-31",
+       "2022-10-07"
+      ]
+     },
+     "worst_removed": {
+      "active_cagr": 0.14925668386476265,
+      "active_total_return": 2.8482052713295842,
+      "cagr_excl": {
+       "B1": 0.19397703044282366,
+       "V2-MOM": 0.3432337143075863
+      },
+      "last_session_removed": false,
+      "remaining_total_return": {
+       "B1": 1.8426688036825536,
+       "V2-MOM": 4.690874075012138
+      },
+      "sessions_remaining": 1485,
+      "sessions_removed": [
+       "2017-05-02",
+       "2017-05-17",
+       "2018-11-19",
+       "2020-03-18",
+       "2022-11-10"
+      ]
+     }
+    }
+   },
+   "disclosures": [
+    "the return path is spliced; this is not a re-simulation and not a tradable strategy",
+    "removal is outcome-dependent by construction",
+    "if the last session is in the removed set, its liquidation cost is removed with it",
+    "a change after tail removal is not, by itself, evidence of failure or of robustness"
+   ],
+   "unremoved_t0_cagr_copied": {
+    "B1": 0.18421204790480217,
+    "V2-MOM": 0.284193607440552
+   }
+  }
+ }
+}

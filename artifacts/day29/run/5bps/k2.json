@@ -1,0 +1,376 @@
+{
+ "cost": "5bps",
+ "cost_label": "primary analysis (5 bps)",
+ "descriptive_only": true,
+ "diagnostic": "K2",
+ "evidence_label": "robustness diagnostic on reused historical data \u2014 not independent or forward evidence",
+ "family_scope": "V2-MOM only",
+ "results": {
+  "holdout": {
+   "note": "no P&L of any kind (frozen \u00a711)",
+   "rows": [
+    {
+     "ep": 1,
+     "h": 21,
+     "h_share": 0.02453271028037383,
+     "sel": 1,
+     "ticker": "AAPL"
+    },
+    {
+     "ep": 2,
+     "h": 104,
+     "h_share": 0.12149532710280374,
+     "sel": 5,
+     "ticker": "ADBE"
+    },
+    {
+     "ep": 2,
+     "h": 87,
+     "h_share": 0.10163551401869159,
+     "sel": 5,
+     "ticker": "AMAT"
+    },
+    {
+     "ep": 3,
+     "h": 252,
+     "h_share": 0.29439252336448596,
+     "sel": 13,
+     "ticker": "AMD"
+    },
+    {
+     "ep": 1,
+     "h": 19,
+     "h_share": 0.02219626168224299,
+     "sel": 1,
+     "ticker": "AMZN"
+    },
+    {
+     "ep": 5,
+     "h": 628,
+     "h_share": 0.7336448598130841,
+     "sel": 30,
+     "ticker": "AVGO"
+    },
+    {
+     "ep": 2,
+     "h": 64,
+     "h_share": 0.07476635514018691,
+     "sel": 3,
+     "ticker": "COST"
+    },
+    {
+     "ep": 1,
+     "h": 84,
+     "h_share": 0.09813084112149532,
+     "sel": 4,
+     "ticker": "CSCO"
+    },
+    {
+     "ep": 1,
+     "h": 126,
+     "h_share": 0.14719626168224298,
+     "sel": 7,
+     "ticker": "GOOGL"
+    },
+    {
+     "ep": 2,
+     "h": 165,
+     "h_share": 0.1927570093457944,
+     "sel": 9,
+     "ticker": "INTC"
+    },
+    {
+     "ep": 1,
+     "h": 39,
+     "h_share": 0.0455607476635514,
+     "sel": 2,
+     "ticker": "JNJ"
+    },
+    {
+     "ep": 2,
+     "h": 42,
+     "h_share": 0.04906542056074766,
+     "sel": 2,
+     "ticker": "JPM"
+    },
+    {
+     "ep": 2,
+     "h": 58,
+     "h_share": 0.06775700934579439,
+     "sel": 3,
+     "ticker": "KO"
+    },
+    {
+     "ep": 2,
+     "h": 483,
+     "h_share": 0.5642523364485982,
+     "sel": 23,
+     "ticker": "META"
+    },
+    {
+     "ep": 2,
+     "h": 250,
+     "h_share": 0.29205607476635514,
+     "sel": 13,
+     "ticker": "MU"
+    },
+    {
+     "ep": 4,
+     "h": 421,
+     "h_share": 0.49182242990654207,
+     "sel": 20,
+     "ticker": "NFLX"
+    },
+    {
+     "ep": 2,
+     "h": 504,
+     "h_share": 0.5887850467289719,
+     "sel": 24,
+     "ticker": "NVDA"
+    },
+    {
+     "ep": 4,
+     "h": 294,
+     "h_share": 0.34345794392523366,
+     "sel": 14,
+     "ticker": "ORCL"
+    },
+    {
+     "ep": 1,
+     "h": 81,
+     "h_share": 0.09462616822429906,
+     "sel": 4,
+     "ticker": "PEP"
+    },
+    {
+     "ep": 1,
+     "h": 22,
+     "h_share": 0.02570093457943925,
+     "sel": 1,
+     "ticker": "QCOM"
+    },
+    {
+     "ep": 4,
+     "h": 185,
+     "h_share": 0.2161214953271028,
+     "sel": 9,
+     "ticker": "TSLA"
+    },
+    {
+     "ep": 2,
+     "h": 227,
+     "h_share": 0.2651869158878505,
+     "sel": 11,
+     "ticker": "WMT"
+    },
+    {
+     "ep": 1,
+     "h": 124,
+     "h_share": 0.14485981308411214,
+     "sel": 6,
+     "ticker": "XOM"
+    }
+   ],
+   "status": "COMPLETED",
+   "totals": {
+    "N": 856,
+    "decision_records": 42,
+    "discarded_records": 0,
+    "distinct_held": 23,
+    "distinct_selected": 23,
+    "episodes": 48,
+    "held_ticker_sessions": 4280
+   }
+  },
+  "research": {
+   "note": "no P&L of any kind (frozen \u00a711)",
+   "rows": [
+    {
+     "ep": 5,
+     "h": 359,
+     "h_share": 0.24093959731543624,
+     "sel": 17,
+     "ticker": "AAPL"
+    },
+    {
+     "ep": 1,
+     "h": 332,
+     "h_share": 0.22281879194630871,
+     "sel": 16,
+     "ticker": "ADBE"
+    },
+    {
+     "ep": 6,
+     "h": 562,
+     "h_share": 0.37718120805369126,
+     "sel": 27,
+     "ticker": "AMAT"
+    },
+    {
+     "ep": 5,
+     "h": 877,
+     "h_share": 0.5885906040268456,
+     "sel": 42,
+     "ticker": "AMD"
+    },
+    {
+     "ep": 4,
+     "h": 335,
+     "h_share": 0.22483221476510068,
+     "sel": 16,
+     "ticker": "AMZN"
+    },
+    {
+     "ep": 7,
+     "h": 226,
+     "h_share": 0.15167785234899328,
+     "sel": 11,
+     "ticker": "AVGO"
+    },
+    {
+     "ep": 2,
+     "h": 273,
+     "h_share": 0.18322147651006712,
+     "sel": 13,
+     "ticker": "COST"
+    },
+    {
+     "ep": 2,
+     "h": 190,
+     "h_share": 0.12751677852348994,
+     "sel": 9,
+     "ticker": "CRM"
+    },
+    {
+     "ep": 2,
+     "h": 105,
+     "h_share": 0.07046979865771812,
+     "sel": 5,
+     "ticker": "CSCO"
+    },
+    {
+     "ep": 2,
+     "h": 145,
+     "h_share": 0.09731543624161074,
+     "sel": 7,
+     "ticker": "GOOGL"
+    },
+    {
+     "ep": 1,
+     "h": 21,
+     "h_share": 0.014093959731543624,
+     "sel": 1,
+     "ticker": "INTC"
+    },
+    {
+     "ep": 2,
+     "h": 65,
+     "h_share": 0.0436241610738255,
+     "sel": 3,
+     "ticker": "JNJ"
+    },
+    {
+     "ep": 2,
+     "h": 167,
+     "h_share": 0.11208053691275167,
+     "sel": 8,
+     "ticker": "JPM"
+    },
+    {
+     "ep": 3,
+     "h": 168,
+     "h_share": 0.11275167785234899,
+     "sel": 8,
+     "ticker": "KO"
+    },
+    {
+     "ep": 1,
+     "h": 42,
+     "h_share": 0.028187919463087248,
+     "sel": 2,
+     "ticker": "META"
+    },
+    {
+     "ep": 5,
+     "h": 254,
+     "h_share": 0.1704697986577181,
+     "sel": 12,
+     "ticker": "MSFT"
+    },
+    {
+     "ep": 4,
+     "h": 547,
+     "h_share": 0.36711409395973155,
+     "sel": 26,
+     "ticker": "MU"
+    },
+    {
+     "ep": 4,
+     "h": 423,
+     "h_share": 0.28389261744966443,
+     "sel": 20,
+     "ticker": "NFLX"
+    },
+    {
+     "ep": 5,
+     "h": 920,
+     "h_share": 0.6174496644295302,
+     "sel": 44,
+     "ticker": "NVDA"
+    },
+    {
+     "ep": 2,
+     "h": 43,
+     "h_share": 0.028859060402684565,
+     "sel": 2,
+     "ticker": "ORCL"
+    },
+    {
+     "ep": 5,
+     "h": 217,
+     "h_share": 0.14563758389261744,
+     "sel": 10,
+     "ticker": "PEP"
+    },
+    {
+     "ep": 5,
+     "h": 230,
+     "h_share": 0.15436241610738255,
+     "sel": 11,
+     "ticker": "QCOM"
+    },
+    {
+     "ep": 5,
+     "h": 610,
+     "h_share": 0.40939597315436244,
+     "sel": 29,
+     "ticker": "TSLA"
+    },
+    {
+     "ep": 3,
+     "h": 63,
+     "h_share": 0.042281879194630875,
+     "sel": 3,
+     "ticker": "WMT"
+    },
+    {
+     "ep": 2,
+     "h": 276,
+     "h_share": 0.18523489932885906,
+     "sel": 13,
+     "ticker": "XOM"
+    }
+   ],
+   "status": "COMPLETED",
+   "totals": {
+    "N": 1490,
+    "decision_records": 71,
+    "discarded_records": 0,
+    "distinct_held": 25,
+    "distinct_selected": 25,
+    "episodes": 85,
+    "held_ticker_sessions": 7450
+   }
+  }
+ }
+}
