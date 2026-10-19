@@ -1,0 +1,649 @@
+{
+ "conditional_label": "G7/G8 reconciliation is conditional on unproven premises A1 (IEEE-754 platform arithmetic) and A4 (bit-identical reconstructed share/price state); see \u00a76A",
+ "cost": "10bps",
+ "cost_label": "secondary cost sensitivity (10 bps) \u2014 not primary evidence",
+ "decision_rule": "none; no outcome triggers any action, status change or gate (frozen \u00a71)",
+ "descriptive_only": true,
+ "evidence_label": "descriptive attribution on reused historical data \u2014 outcome-dependent day and ticker sets \u2014 survivor-universe \u2014 not independent or forward evidence",
+ "outcome_dependence_label": "outcome-dependent sets: day sets selected by realised l_d, ticker sets selected by realised P&L",
+ "output": "O1",
+ "results": {
+  "holdout": {
+   "10": {
+    "best": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": 0.34235110880051384,
+        "sum": 0.16132410351599136
+       },
+       "engine_residual": {
+        "share_of_total": 1.453314419983055e-15,
+        "sum": 6.848368236693657e-16
+       },
+       "other_tickers": {
+        "share_of_total": 0.6312347690530787,
+        "sum": 0.2974530550883933
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 0.2254894309389622,
+        "sum": 0.106256060995426
+       },
+       "engine_residual": {
+        "share_of_total": 2.7374593721126316e-16,
+        "sum": 1.2899569119691312e-16
+       },
+       "other_tickers": {
+        "share_of_total": -0.19907530879255655,
+        "sum": -0.09380908925825023
+       }
+      }
+     },
+     "d2_tickers": [
+      "MU",
+      "AMD"
+     ],
+     "day_set_sessions": [
+      "2024-07-31",
+      "2025-09-10",
+      "2026-01-21",
+      "2026-04-01",
+      "2026-04-08",
+      "2026-04-24",
+      "2026-04-29",
+      "2026-05-05",
+      "2026-05-08",
+      "2026-05-26"
+     ],
+     "total": 0.4712241303415613,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    },
+    "worst": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": -0.22157186083259126,
+        "sum": -0.10441000742899925
+       },
+       "engine_residual": {
+        "share_of_total": 1.748564076892569e-15,
+        "sum": 8.239655864801957e-16
+       },
+       "other_tickers": {
+        "share_of_total": -0.4811424547427298,
+        "sum": -0.22672593480654687
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 0.7894124005720673,
+        "sum": 0.3719901719404166
+       },
+       "engine_residual": {
+        "share_of_total": -2.1503719698250825e-17,
+        "sum": -1.0133071613916944e-17
+       },
+       "other_tickers": {
+        "share_of_total": 0.9133019150032521,
+        "sum": 0.43036990063668995
+       }
+      }
+     },
+     "d2_tickers": [
+      "MU",
+      "AMD"
+     ],
+     "day_set_sessions": [
+      "2023-01-23",
+      "2023-02-02",
+      "2024-04-19",
+      "2024-07-17",
+      "2025-12-04",
+      "2025-12-12",
+      "2026-01-23",
+      "2026-02-04",
+      "2026-03-03",
+      "2026-03-26"
+     ],
+     "total": 0.4712241303415613,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    }
+   },
+   "20": {
+    "best": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": 0.5688666784098165,
+        "sum": 0.2680637058139584
+       },
+       "engine_residual": {
+        "share_of_total": -7.505280687514892e-16,
+        "sum": -3.5366693649435203e-16
+       },
+       "other_tickers": {
+        "share_of_total": 1.0639637625329845,
+        "sum": 0.5013653987145411
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": -0.0010261386703404591,
+        "sum": -0.00048354130254102894
+       },
+       "engine_residual": {
+        "share_of_total": 2.4775884259458075e-15,
+        "sum": 1.1674994513606307e-15
+       },
+       "other_tickers": {
+        "share_of_total": -0.6318043022724623,
+        "sum": -0.297721432884398
+       }
+      }
+     },
+     "d2_tickers": [
+      "MU",
+      "AMD"
+     ],
+     "day_set_sessions": [
+      "2024-02-02",
+      "2024-02-22",
+      "2024-07-31",
+      "2024-12-13",
+      "2025-09-05",
+      "2025-09-10",
+      "2025-11-24",
+      "2026-01-02",
+      "2026-01-21",
+      "2026-01-28",
+      "2026-04-01",
+      "2026-04-08",
+      "2026-04-24",
+      "2026-04-29",
+      "2026-04-30",
+      "2026-05-05",
+      "2026-05-06",
+      "2026-05-08",
+      "2026-05-20",
+      "2026-05-26"
+     ],
+     "total": 0.4712241303415613,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    },
+    "worst": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": -0.3583023615576507,
+        "sum": -0.1688407187243316
+       },
+       "engine_residual": {
+        "share_of_total": -3.721512799652128e-17,
+        "sum": -1.753666632571063e-17
+       },
+       "other_tickers": {
+        "share_of_total": -0.8656530243396073,
+        "sum": -0.40791659357197385
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 0.9261429012971267,
+        "sum": 0.43642088323574896
+       },
+       "engine_residual": {
+        "share_of_total": 1.7642754851908394e-15,
+        "sum": 8.313691811919894e-16
+       },
+       "other_tickers": {
+        "share_of_total": 1.2978124846001295,
+        "sum": 0.611560559402117
+       }
+      }
+     },
+     "d2_tickers": [
+      "MU",
+      "AMD"
+     ],
+     "day_set_sessions": [
+      "2023-01-09",
+      "2023-01-23",
+      "2023-02-01",
+      "2023-02-02",
+      "2023-03-16",
+      "2023-09-12",
+      "2024-04-19",
+      "2024-07-17",
+      "2024-07-30",
+      "2025-03-10",
+      "2025-11-04",
+      "2025-11-20",
+      "2025-12-04",
+      "2025-12-12",
+      "2026-01-23",
+      "2026-02-04",
+      "2026-03-03",
+      "2026-03-06",
+      "2026-03-26",
+      "2026-03-30"
+     ],
+     "total": 0.4712241303415613,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    }
+   },
+   "5": {
+    "best": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": 0.16139750031324865,
+        "sum": 0.07605439672441246
+       },
+       "engine_residual": {
+        "share_of_total": -1.4463814252928757e-17,
+        "sum": -6.815698292758231e-18
+       },
+       "other_tickers": {
+        "share_of_total": 0.4011006567694308,
+        "sum": 0.1890083081656041
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 0.4064430394262274,
+        "sum": 0.19152576778700492
+       },
+       "engine_residual": {
+        "share_of_total": 1.741524171447247e-15,
+        "sum": 8.20648213159037e-16
+       },
+       "other_tickers": {
+        "share_of_total": 0.031058803491091413,
+        "sum": 0.014635657664538998
+       }
+      }
+     },
+     "d2_tickers": [
+      "MU",
+      "AMD"
+     ],
+     "day_set_sessions": [
+      "2024-07-31",
+      "2025-09-10",
+      "2026-04-24",
+      "2026-05-05",
+      "2026-05-08"
+     ],
+     "total": 0.4712241303415613,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    },
+    "worst": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": -0.08995680694970587,
+        "sum": -0.042389818123178866
+       },
+       "engine_residual": {
+        "share_of_total": 7.777732287266935e-16,
+        "sum": 3.665055133096844e-16
+       },
+       "other_tickers": {
+        "share_of_total": -0.29712469196647073,
+        "sum": -0.14001232457490445
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 0.6577973466891819,
+        "sum": 0.30996998263459624
+       },
+       "engine_residual": {
+        "share_of_total": 9.492871284676247e-16,
+        "sum": 4.473270015565944e-16
+       },
+       "other_tickers": {
+        "share_of_total": 0.7292841522269929,
+        "sum": 0.3436562904050475
+       }
+      }
+     },
+     "d2_tickers": [
+      "MU",
+      "AMD"
+     ],
+     "day_set_sessions": [
+      "2023-02-02",
+      "2024-04-19",
+      "2024-07-17",
+      "2026-01-23",
+      "2026-02-04"
+     ],
+     "total": 0.4712241303415613,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    }
+   }
+  },
+  "research": {
+   "10": {
+    "best": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": 0.27205941766996594,
+        "sum": 0.16585811401341843
+       },
+       "engine_residual": {
+        "share_of_total": 1.2311426867803942e-15,
+        "sum": 7.50552970595993e-16
+       },
+       "other_tickers": {
+        "share_of_total": 0.27131022372543656,
+        "sum": 0.16540137593857387
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 0.6266821318609599,
+        "sum": 0.38205005864732366
+       },
+       "engine_residual": {
+        "share_of_total": 2.4009605096357377e-15,
+        "sum": 1.4637198938356798e-15
+       },
+       "other_tickers": {
+        "share_of_total": -0.17005177325636608,
+        "sum": -0.1036702446785101
+       }
+      }
+     },
+     "d2_tickers": [
+      "TSLA",
+      "NVDA"
+     ],
+     "day_set_sessions": [
+      "2017-05-10",
+      "2017-07-05",
+      "2018-11-07",
+      "2019-01-30",
+      "2020-03-19",
+      "2020-03-24",
+      "2020-08-31",
+      "2022-02-02",
+      "2022-10-07",
+      "2022-12-27"
+     ],
+     "total": 0.6096393039208081,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    },
+    "worst": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": -0.18491918237464647,
+        "sum": -0.11273400162448444
+       },
+       "engine_residual": {
+        "share_of_total": -1.5937835608832104e-15,
+        "sum": -9.716331006572673e-16
+       },
+       "other_tickers": {
+        "share_of_total": -0.4209055938432434,
+        "sum": -0.25660059324696927
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 1.0836607319055724,
+        "sum": 0.6606421742852265
+       },
+       "engine_residual": {
+        "share_of_total": 5.2258867572993426e-15,
+        "sum": 3.18590596508894e-15
+       },
+       "other_tickers": {
+        "share_of_total": 0.5221640443123139,
+        "sum": 0.31833172450703306
+       }
+      }
+     },
+     "d2_tickers": [
+      "TSLA",
+      "NVDA"
+     ],
+     "day_set_sessions": [
+      "2017-05-02",
+      "2017-05-17",
+      "2017-06-09",
+      "2017-10-25",
+      "2017-11-29",
+      "2018-11-19",
+      "2020-03-18",
+      "2021-11-19",
+      "2022-11-10",
+      "2022-11-30"
+     ],
+     "total": 0.6096393039208081,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    }
+   },
+   "20": {
+    "best": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": 0.39877062476479175,
+        "sum": 0.2431062461056734
+       },
+       "engine_residual": {
+        "share_of_total": 1.19078161332938e-15,
+        "sum": 7.2594727387182e-16
+       },
+       "other_tickers": {
+        "share_of_total": 0.5791507070236955,
+        "sum": 0.3530730338951696
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 0.4999709247661341,
+        "sum": 0.3048019265550687
+       },
+       "engine_residual": {
+        "share_of_total": 2.441321583086752e-15,
+        "sum": 1.4883255905598529e-15
+       },
+       "other_tickers": {
+        "share_of_total": -0.47789225655462503,
+        "sum": -0.29134190263510584
+       }
+      }
+     },
+     "d2_tickers": [
+      "TSLA",
+      "NVDA"
+     ],
+     "day_set_sessions": [
+      "2017-02-01",
+      "2017-02-27",
+      "2017-05-10",
+      "2017-06-21",
+      "2017-07-05",
+      "2018-11-07",
+      "2018-11-28",
+      "2019-01-04",
+      "2019-01-07",
+      "2019-01-30",
+      "2020-02-28",
+      "2020-03-19",
+      "2020-03-24",
+      "2020-04-13",
+      "2020-04-22",
+      "2020-08-31",
+      "2022-02-02",
+      "2022-10-07",
+      "2022-12-22",
+      "2022-12-27"
+     ],
+     "total": 0.6096393039208081,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    },
+    "worst": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": -0.33674694094737384,
+        "sum": -0.20529417067661845
+       },
+       "engine_residual": {
+        "share_of_total": -3.4474875706572434e-15,
+        "sum": -2.1017239228511195e-15
+       },
+       "other_tickers": {
+        "share_of_total": -0.70303810174894,
+        "sum": -0.42859965898003005
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 1.2354884904782997,
+        "sum": 0.7532023433373606
+       },
+       "engine_residual": {
+        "share_of_total": 7.079590767073375e-15,
+        "sum": 4.315996787282792e-15
+       },
+       "other_tickers": {
+        "share_of_total": 0.8042965522180106,
+        "sum": 0.4903307902400938
+       }
+      }
+     },
+     "d2_tickers": [
+      "TSLA",
+      "NVDA"
+     ],
+     "day_set_sessions": [
+      "2017-05-02",
+      "2017-05-17",
+      "2017-06-09",
+      "2017-10-25",
+      "2017-11-29",
+      "2018-09-05",
+      "2018-10-10",
+      "2018-10-19",
+      "2018-10-26",
+      "2018-11-19",
+      "2020-03-16",
+      "2020-03-18",
+      "2021-11-19",
+      "2022-03-09",
+      "2022-07-05",
+      "2022-07-21",
+      "2022-07-27",
+      "2022-11-10",
+      "2022-11-11",
+      "2022-11-30"
+     ],
+     "total": 0.6096393039208081,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    }
+   },
+   "5": {
+    "best": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": 0.17695129977127985,
+        "sum": 0.1078764672204453
+       },
+       "engine_residual": {
+        "share_of_total": 3.709076146993498e-16,
+        "sum": 2.261198600442389e-16
+       },
+       "other_tickers": {
+        "share_of_total": 0.12432699234249249,
+        "sum": 0.07579462107024476
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 0.721790249759646,
+        "sum": 0.4400317054402968
+       },
+       "engine_residual": {
+        "share_of_total": 3.2611955817167824e-15,
+        "sum": 1.9881530043874338e-15
+       },
+       "other_tickers": {
+        "share_of_total": -0.023068541873421985,
+        "sum": -0.014063489810180994
+       }
+      }
+     },
+     "d2_tickers": [
+      "TSLA",
+      "NVDA"
+     ],
+     "day_set_sessions": [
+      "2017-05-10",
+      "2019-01-30",
+      "2020-03-24",
+      "2020-08-31",
+      "2022-10-07"
+     ],
+     "total": 0.6096393039208081,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    },
+    "worst": {
+     "cells": {
+      "day_set": {
+       "d2_top_two": {
+        "share_of_total": -0.09807105474311953,
+        "sum": -0.059787969548374856
+       },
+       "engine_residual": {
+        "share_of_total": -2.1362224983701418e-15,
+        "sum": -1.3023251969263428e-15
+       },
+       "other_tickers": {
+        "share_of_total": -0.24550541131903747,
+        "sum": -0.14966974806532968
+       }
+      },
+      "other_days": {
+       "d2_top_two": {
+        "share_of_total": 0.9968126042740454,
+        "sum": 0.6076961422091169
+       },
+       "engine_residual": {
+        "share_of_total": 5.7683256947862735e-15,
+        "sum": 3.5165980613580157e-15
+       },
+       "other_tickers": {
+        "share_of_total": 0.346763861788108,
+        "sum": 0.21140087932539345
+       }
+      }
+     },
+     "d2_tickers": [
+      "TSLA",
+      "NVDA"
+     ],
+     "day_set_sessions": [
+      "2017-05-02",
+      "2017-05-17",
+      "2018-11-19",
+      "2020-03-18",
+      "2022-11-10"
+     ],
+     "total": 0.6096393039208081,
+     "total_definition": "\u03a3 over segment sessions of the exact daily simple active return r_MOM \u2212 r_B1 (denominator for the shares only)"
+    }
+   }
+  }
+ },
+ "survivor_universe_label": "survivor-universe: the frozen 25-symbol universe was chosen with present knowledge"
+}

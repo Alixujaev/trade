@@ -1,0 +1,91 @@
+{
+ "conditional_label": "G7/G8 reconciliation is conditional on unproven premises A1 (IEEE-754 platform arithmetic) and A4 (bit-identical reconstructed share/price state); see \u00a76A",
+ "environment": {
+  "exchange_calendars": "4.13.2",
+  "executable": "C:\\Users\\Admin\\Desktop\\own\\trade\\.venv\\Scripts\\python.exe",
+  "numpy": "2.5.2",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.12.10"
+ },
+ "frozen_commit": "2f94f7d8f760a31107ce609be14232f4b654c0cc",
+ "frozen_doc_lf_sha256": "09f8b4e6be9355ef3f962905fbcbddb0fdf45533dadca6b2282f8a1229fec72e",
+ "gates": {
+  "G1": {
+   "files_verified_raw": 32,
+   "run_summaries_verified_raw": 2
+  },
+  "G2": {
+   "exchange_calendars": "4.13.2",
+   "snapshots": {
+    "holdout": {
+     "manifest_sha256": "eff959594658303c9aafeb81d18a159b742071821a4fe081e462691455be4a34",
+     "missing_bars": 0,
+     "snapshot_id": "stage_h_20261008T100604Z",
+     "tree_sha256": "8a51463b335f0f4e2acf776bd4fdfb36ca07cf52eb2d5878f3f0251d328c5556"
+    },
+    "research": {
+     "manifest_sha256": "aefef19d48b80f842bae3c61cc439b9a2a44082189e28733d5ab25a1735006bd",
+     "missing_bars": 0,
+     "snapshot_id": "stage_r_20261007T093410Z",
+     "tree_sha256": "c5d786359adef89f86156c97aab6d579e2e54f5b22fe3161ed1d4ce76dc54590"
+    }
+   }
+  },
+  "G3": {
+   "d2_sets": {
+    "holdout": [
+     "MU",
+     "AMD"
+    ],
+    "research": [
+     "TSLA",
+     "NVDA"
+    ]
+   },
+   "day29_t1_files": 2,
+   "day_sets": 24
+  },
+  "G4": {
+   "fills_checked": 1476,
+   "rule": "price == open, in segment, universe ticker, \u22641 fill per ticker-session, no NaN open where held or traded"
+  },
+  "G5": {
+   "checkpoints": [
+    "G5a",
+    "G5b",
+    "G5c",
+    "G5d"
+   ],
+   "note": "integrity checks only; not proof of bit-identical state at every step (\u00a76A.6)",
+   "sessions_checked": 9384
+  },
+  "G6": {
+   "determinism_in_process": "byte-identical outputs in two executions",
+   "network": "refused in main",
+   "reads": "I1-I4 via the allow-list and I2 via the verifying loaders"
+  },
+  "G7": {
+   "conditional": "G7/G8 reconciliation is conditional on unproven premises A1 (IEEE-754 platform arithmetic) and A4 (bit-identical reconstructed share/price state); see \u00a76A",
+   "series_sessions_checked": {
+    "holdout/10bps/B1": 856,
+    "holdout/10bps/V2-MOM": 856,
+    "holdout/5bps/B1": 856,
+    "holdout/5bps/V2-MOM": 856,
+    "research/10bps/B1": 1490,
+    "research/10bps/V2-MOM": 1490,
+    "research/5bps/B1": 1490,
+    "research/5bps/V2-MOM": 1490
+   },
+   "status": "passed"
+  },
+  "G8": {
+   "conditional": "G7/G8 reconciliation is conditional on unproven premises A1 (IEEE-754 platform arithmetic) and A4 (bit-identical reconstructed share/price state); see \u00a76A",
+   "series_checked": 8,
+   "status": "passed",
+   "tickers_per_series": 25
+  }
+ },
+ "stage": "integrity gates G1-G8 (frozen \u00a76, \u00a76A)",
+ "status": "PASSED",
+ "task": "DAY-30"
+}

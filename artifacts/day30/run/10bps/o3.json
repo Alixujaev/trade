@@ -1,0 +1,682 @@
+{
+ "conditional_label": "G7/G8 reconciliation is conditional on unproven premises A1 (IEEE-754 platform arithmetic) and A4 (bit-identical reconstructed share/price state); see \u00a76A",
+ "cost": "10bps",
+ "cost_label": "secondary cost sensitivity (10 bps) \u2014 not primary evidence",
+ "decision_rule": "none; no outcome triggers any action, status change or gate (frozen \u00a71)",
+ "descriptive_only": true,
+ "evidence_label": "descriptive attribution on reused historical data \u2014 outcome-dependent day and ticker sets \u2014 survivor-universe \u2014 not independent or forward evidence",
+ "note": "G7/G8 passed under the conditional bounds of \u00a76A; a pass is consistency evidence under premises A1 and A4, not proof of exact reconstruction",
+ "outcome_dependence_label": "outcome-dependent sets: day sets selected by realised l_d, ticker sets selected by realised P&L",
+ "output": "O3",
+ "results": {
+  "holdout": {
+   "B1": {
+    "g7": {
+     "passed": 856,
+     "sessions": 856
+    },
+    "g8": [
+     {
+      "difference": -6.607415650691752e-13,
+      "passed": true,
+      "tau_j": 1.1948576171971543e-11,
+      "ticker": "AAPL"
+     },
+     {
+      "difference": 3.79362013981672e-13,
+      "passed": true,
+      "tau_j": 2.902132839016123e-12,
+      "ticker": "ADBE"
+     },
+     {
+      "difference": -8.581784203020799e-13,
+      "passed": true,
+      "tau_j": 1.6470854410061458e-11,
+      "ticker": "AMAT"
+     },
+     {
+      "difference": -5.842645381269307e-13,
+      "passed": true,
+      "tau_j": 1.5340302351817084e-11,
+      "ticker": "AMD"
+     },
+     {
+      "difference": -7.520586242547837e-13,
+      "passed": true,
+      "tau_j": 6.652263919182485e-12,
+      "ticker": "AMZN"
+     },
+     {
+      "difference": 5.002023039256541e-12,
+      "passed": true,
+      "tau_j": 2.5366532238185178e-11,
+      "ticker": "AVGO"
+     },
+     {
+      "difference": 1.3214860211347292e-12,
+      "passed": true,
+      "tau_j": 1.2020724691571366e-11,
+      "ticker": "COST"
+     },
+     {
+      "difference": 5.034268266893838e-13,
+      "passed": true,
+      "tau_j": 8.045691814294655e-12,
+      "ticker": "CRM"
+     },
+     {
+      "difference": 3.724278107490989e-13,
+      "passed": true,
+      "tau_j": 1.2777270711788744e-11,
+      "ticker": "CSCO"
+     },
+     {
+      "difference": -7.316062486369224e-13,
+      "passed": true,
+      "tau_j": 1.2096735455406565e-11,
+      "ticker": "GOOGL"
+     },
+     {
+      "difference": -1.118365092364137e-12,
+      "passed": true,
+      "tau_j": 1.1635957759396968e-11,
+      "ticker": "INTC"
+     },
+     {
+      "difference": -9.489266010092495e-13,
+      "passed": true,
+      "tau_j": 1.019945252287204e-11,
+      "ticker": "JNJ"
+     },
+     {
+      "difference": -1.1614394424914774e-12,
+      "passed": true,
+      "tau_j": 1.1994765210281735e-11,
+      "ticker": "JPM"
+     },
+     {
+      "difference": -9.755924150400692e-13,
+      "passed": true,
+      "tau_j": 9.682534007959046e-12,
+      "ticker": "KO"
+     },
+     {
+      "difference": -2.3628137465975592e-12,
+      "passed": true,
+      "tau_j": 1.4070087444191336e-11,
+      "ticker": "META"
+     },
+     {
+      "difference": 4.428487045384605e-13,
+      "passed": true,
+      "tau_j": 1.0950894472915717e-11,
+      "ticker": "MSFT"
+     },
+     {
+      "difference": 7.421819385171571e-13,
+      "passed": true,
+      "tau_j": 4.453409010559704e-11,
+      "ticker": "MU"
+     },
+     {
+      "difference": -1.8081128057492696e-13,
+      "passed": true,
+      "tau_j": 9.598061466211352e-12,
+      "ticker": "NFLX"
+     },
+     {
+      "difference": 2.920537221855391e-12,
+      "passed": true,
+      "tau_j": 4.09486792509527e-11,
+      "ticker": "NVDA"
+     },
+     {
+      "difference": -1.0917607166058196e-12,
+      "passed": true,
+      "tau_j": 1.3098525060029966e-11,
+      "ticker": "ORCL"
+     },
+     {
+      "difference": -2.7284322863730624e-13,
+      "passed": true,
+      "tau_j": 8.978006200679335e-12,
+      "ticker": "PEP"
+     },
+     {
+      "difference": 1.5116958419033233e-12,
+      "passed": true,
+      "tau_j": 1.132168415630913e-11,
+      "ticker": "QCOM"
+     },
+     {
+      "difference": 1.1764744877294403e-12,
+      "passed": true,
+      "tau_j": 7.671862869578684e-12,
+      "ticker": "TSLA"
+     },
+     {
+      "difference": 1.4793286975106884e-12,
+      "passed": true,
+      "tau_j": 1.3116601234736584e-11,
+      "ticker": "WMT"
+     },
+     {
+      "difference": 6.850176931601282e-13,
+      "passed": true,
+      "tau_j": 1.0475453305258085e-11,
+      "ticker": "XOM"
+     }
+    ],
+    "max_abs_eps": {
+     "session": "2026-05-15",
+     "value": 2.0874925409153896e-10
+    },
+    "max_abs_eps_over_tau": {
+     "session": "2024-08-07",
+     "value": 0.10487061407889771
+    }
+   },
+   "V2-MOM": {
+    "g7": {
+     "passed": 856,
+     "sessions": 856
+    },
+    "g8": [
+     {
+      "difference": -5.3034624833624364e-12,
+      "passed": true,
+      "tau_j": 4.574679735997506e-11,
+      "ticker": "AAPL"
+     },
+     {
+      "difference": 2.2871040006614615e-12,
+      "passed": true,
+      "tau_j": 9.978176642135189e-11,
+      "ticker": "ADBE"
+     },
+     {
+      "difference": 3.756361867759116e-11,
+      "passed": true,
+      "tau_j": 2.881385362990388e-10,
+      "ticker": "AMAT"
+     },
+     {
+      "difference": 1.09626848900065e-11,
+      "passed": true,
+      "tau_j": 5.129794966943622e-10,
+      "ticker": "AMD"
+     },
+     {
+      "difference": -2.4867399513419644e-12,
+      "passed": true,
+      "tau_j": 3.55945571265304e-11,
+      "ticker": "AMZN"
+     },
+     {
+      "difference": 2.6641605260453058e-11,
+      "passed": true,
+      "tau_j": 1.6707553288263174e-09,
+      "ticker": "AVGO"
+     },
+     {
+      "difference": 1.6546521762180948e-12,
+      "passed": true,
+      "tau_j": 1.1758892954226957e-10,
+      "ticker": "COST"
+     },
+     {
+      "difference": 0.0,
+      "passed": true,
+      "tau_j": 0.0,
+      "ticker": "CRM"
+     },
+     {
+      "difference": 4.3824903109760575e-12,
+      "passed": true,
+      "tau_j": 8.910524922226893e-11,
+      "ticker": "CSCO"
+     },
+     {
+      "difference": 6.131691680421699e-12,
+      "passed": true,
+      "tau_j": 2.283785213457942e-10,
+      "ticker": "GOOGL"
+     },
+     {
+      "difference": -3.903108350528389e-12,
+      "passed": true,
+      "tau_j": 3.388488529980173e-10,
+      "ticker": "INTC"
+     },
+     {
+      "difference": -2.7587779390267647e-12,
+      "passed": true,
+      "tau_j": 2.6685258281349316e-11,
+      "ticker": "JNJ"
+     },
+     {
+      "difference": -2.6306303085620014e-12,
+      "passed": true,
+      "tau_j": 9.639952176232015e-11,
+      "ticker": "JPM"
+     },
+     {
+      "difference": 3.2466556248434538e-12,
+      "passed": true,
+      "tau_j": 5.525678917420203e-11,
+      "ticker": "KO"
+     },
+     {
+      "difference": 6.562024475262216e-12,
+      "passed": true,
+      "tau_j": 3.8851912131822473e-10,
+      "ticker": "META"
+     },
+     {
+      "difference": 0.0,
+      "passed": true,
+      "tau_j": 0.0,
+      "ticker": "MSFT"
+     },
+     {
+      "difference": 2.1796639118575834e-11,
+      "passed": true,
+      "tau_j": 4.937980750939268e-10,
+      "ticker": "MU"
+     },
+     {
+      "difference": 1.5215666954498998e-11,
+      "passed": true,
+      "tau_j": 7.53212025415995e-10,
+      "ticker": "NFLX"
+     },
+     {
+      "difference": 1.1189666516504995e-11,
+      "passed": true,
+      "tau_j": 4.3447705935930247e-10,
+      "ticker": "NVDA"
+     },
+     {
+      "difference": -1.3309302910792571e-11,
+      "passed": true,
+      "tau_j": 5.676208411269647e-10,
+      "ticker": "ORCL"
+     },
+     {
+      "difference": -4.5445987161648e-12,
+      "passed": true,
+      "tau_j": 3.91904543171417e-11,
+      "ticker": "PEP"
+     },
+     {
+      "difference": -5.8656132974560504e-12,
+      "passed": true,
+      "tau_j": 3.564440382347213e-11,
+      "ticker": "QCOM"
+     },
+     {
+      "difference": 2.6001295300909833e-11,
+      "passed": true,
+      "tau_j": 4.9774747787657e-10,
+      "ticker": "TSLA"
+     },
+     {
+      "difference": 1.2308799814708067e-11,
+      "passed": true,
+      "tau_j": 2.727259574314193e-10,
+      "ticker": "WMT"
+     },
+     {
+      "difference": 1.7247770044193273e-12,
+      "passed": true,
+      "tau_j": 6.191707358407369e-11,
+      "ticker": "XOM"
+     }
+    ],
+    "max_abs_eps": {
+     "session": "2025-11-03",
+     "value": 1.3719241007724314e-10
+    },
+    "max_abs_eps_over_tau": {
+     "session": "2025-09-30",
+     "value": 0.28901129793307617
+    }
+   }
+  },
+  "research": {
+   "B1": {
+    "g7": {
+     "passed": 1490,
+     "sessions": 1490
+    },
+    "g8": [
+     {
+      "difference": 2.152867190595434e-12,
+      "passed": true,
+      "tau_j": 2.361043810985043e-11,
+      "ticker": "AAPL"
+     },
+     {
+      "difference": -1.0051696292959878e-13,
+      "passed": true,
+      "tau_j": 6.59616453531937e-12,
+      "ticker": "ADBE"
+     },
+     {
+      "difference": -2.4953133215458516e-14,
+      "passed": true,
+      "tau_j": 1.776314565454607e-11,
+      "ticker": "AMAT"
+     },
+     {
+      "difference": -6.1026384999266e-14,
+      "passed": true,
+      "tau_j": 1.1855662000131751e-11,
+      "ticker": "AMD"
+     },
+     {
+      "difference": 2.126398891829042e-12,
+      "passed": true,
+      "tau_j": 7.54108645639493e-12,
+      "ticker": "AMZN"
+     },
+     {
+      "difference": 6.502820681809559e-13,
+      "passed": true,
+      "tau_j": 1.870810565973619e-11,
+      "ticker": "AVGO"
+     },
+     {
+      "difference": 5.056528651833016e-13,
+      "passed": true,
+      "tau_j": 1.921794841655479e-11,
+      "ticker": "COST"
+     },
+     {
+      "difference": 1.4048773685362186e-13,
+      "passed": true,
+      "tau_j": 4.309729870060855e-12,
+      "ticker": "CRM"
+     },
+     {
+      "difference": 9.824193871682844e-13,
+      "passed": true,
+      "tau_j": 1.583134345489799e-11,
+      "ticker": "CSCO"
+     },
+     {
+      "difference": 2.0606869864274927e-13,
+      "passed": true,
+      "tau_j": 7.536557458358892e-12,
+      "ticker": "GOOGL"
+     },
+     {
+      "difference": 2.390549384100596e-13,
+      "passed": true,
+      "tau_j": 1.4607715794478946e-11,
+      "ticker": "INTC"
+     },
+     {
+      "difference": -3.7282850264674585e-13,
+      "passed": true,
+      "tau_j": 1.6038106314996483e-11,
+      "ticker": "JNJ"
+     },
+     {
+      "difference": -1.4218047903699871e-12,
+      "passed": true,
+      "tau_j": 1.5550575839179924e-11,
+      "ticker": "JPM"
+     },
+     {
+      "difference": 8.151015170909128e-13,
+      "passed": true,
+      "tau_j": 1.6172569492228623e-11,
+      "ticker": "KO"
+     },
+     {
+      "difference": 4.516794596725728e-13,
+      "passed": true,
+      "tau_j": 3.0257984705031407e-12,
+      "ticker": "META"
+     },
+     {
+      "difference": -1.1754808405627703e-12,
+      "passed": true,
+      "tau_j": 1.9712141327688747e-11,
+      "ticker": "MSFT"
+     },
+     {
+      "difference": -6.061865811504461e-13,
+      "passed": true,
+      "tau_j": 7.681032628757177e-12,
+      "ticker": "MU"
+     },
+     {
+      "difference": 6.324298224246674e-13,
+      "passed": true,
+      "tau_j": 5.032455684363196e-12,
+      "ticker": "NFLX"
+     },
+     {
+      "difference": 3.639716535961525e-12,
+      "passed": true,
+      "tau_j": 2.7599466790910664e-11,
+      "ticker": "NVDA"
+     },
+     {
+      "difference": -2.8396391791444446e-13,
+      "passed": true,
+      "tau_j": 1.594254013045618e-11,
+      "ticker": "ORCL"
+     },
+     {
+      "difference": 4.3710332941810486e-13,
+      "passed": true,
+      "tau_j": 1.6449907373316485e-11,
+      "ticker": "PEP"
+     },
+     {
+      "difference": 9.480950775852974e-13,
+      "passed": true,
+      "tau_j": 1.7959136688198993e-11,
+      "ticker": "QCOM"
+     },
+     {
+      "difference": 3.746217291048639e-12,
+      "passed": true,
+      "tau_j": 3.766398867985455e-11,
+      "ticker": "TSLA"
+     },
+     {
+      "difference": 9.716842444845802e-13,
+      "passed": true,
+      "tau_j": 1.6998444242369464e-11,
+      "ticker": "WMT"
+     },
+     {
+      "difference": 5.862844219778984e-13,
+      "passed": true,
+      "tau_j": 1.5831041978179905e-11,
+      "ticker": "XOM"
+     }
+    ],
+    "max_abs_eps": {
+     "session": "2022-08-03",
+     "value": 2.1960150315501821e-10
+    },
+    "max_abs_eps_over_tau": {
+     "session": "2018-06-06",
+     "value": 0.12461783404531532
+    }
+   },
+   "V2-MOM": {
+    "g7": {
+     "passed": 1490,
+     "sessions": 1490
+    },
+    "g8": [
+     {
+      "difference": -4.101434399248351e-12,
+      "passed": true,
+      "tau_j": 1.1998889202773431e-09,
+      "ticker": "AAPL"
+     },
+     {
+      "difference": 6.4344376582611425e-12,
+      "passed": true,
+      "tau_j": 1.7048983678743415e-10,
+      "ticker": "ADBE"
+     },
+     {
+      "difference": -1.564195387609901e-11,
+      "passed": true,
+      "tau_j": 1.914292907183856e-09,
+      "ticker": "AMAT"
+     },
+     {
+      "difference": -2.8832353414830677e-11,
+      "passed": true,
+      "tau_j": 2.103648109902119e-09,
+      "ticker": "AMD"
+     },
+     {
+      "difference": -2.556451107996344e-11,
+      "passed": true,
+      "tau_j": 8.190531985308356e-10,
+      "ticker": "AMZN"
+     },
+     {
+      "difference": -1.9937595393046376e-11,
+      "passed": true,
+      "tau_j": 1.290459962703323e-09,
+      "ticker": "AVGO"
+     },
+     {
+      "difference": -8.212118621973101e-12,
+      "passed": true,
+      "tau_j": 6.350090589034997e-10,
+      "ticker": "COST"
+     },
+     {
+      "difference": -4.432946535695266e-12,
+      "passed": true,
+      "tau_j": 2.507318200559626e-10,
+      "ticker": "CRM"
+     },
+     {
+      "difference": 1.0567784526406587e-11,
+      "passed": true,
+      "tau_j": 1.759817745180418e-10,
+      "ticker": "CSCO"
+     },
+     {
+      "difference": -3.5482356197219355e-11,
+      "passed": true,
+      "tau_j": 5.867948557281152e-10,
+      "ticker": "GOOGL"
+     },
+     {
+      "difference": 2.7795252835888607e-12,
+      "passed": true,
+      "tau_j": 2.99690989438635e-11,
+      "ticker": "INTC"
+     },
+     {
+      "difference": -2.4772802801960335e-11,
+      "passed": true,
+      "tau_j": 2.8359104452375537e-10,
+      "ticker": "JNJ"
+     },
+     {
+      "difference": -2.448408877834809e-12,
+      "passed": true,
+      "tau_j": 3.2594192648024054e-10,
+      "ticker": "JPM"
+     },
+     {
+      "difference": -1.0598084685600264e-11,
+      "passed": true,
+      "tau_j": 5.247935339337933e-10,
+      "ticker": "KO"
+     },
+     {
+      "difference": 2.4549484284844834e-12,
+      "passed": true,
+      "tau_j": 5.186372193987896e-11,
+      "ticker": "META"
+     },
+     {
+      "difference": -5.338435771082705e-12,
+      "passed": true,
+      "tau_j": 6.85395200888177e-10,
+      "ticker": "MSFT"
+     },
+     {
+      "difference": -8.14040583781671e-12,
+      "passed": true,
+      "tau_j": 9.790233883754123e-10,
+      "ticker": "MU"
+     },
+     {
+      "difference": -7.819010311339854e-12,
+      "passed": true,
+      "tau_j": 5.575882278384112e-10,
+      "ticker": "NFLX"
+     },
+     {
+      "difference": -1.3976686087206325e-11,
+      "passed": true,
+      "tau_j": 2.9193941900034515e-09,
+      "ticker": "NVDA"
+     },
+     {
+      "difference": 6.311113352008815e-13,
+      "passed": true,
+      "tau_j": 2.5215169108841364e-10,
+      "ticker": "ORCL"
+     },
+     {
+      "difference": -3.35158310289459e-11,
+      "passed": true,
+      "tau_j": 1.11672278241457e-09,
+      "ticker": "PEP"
+     },
+     {
+      "difference": -2.5438784294840646e-11,
+      "passed": true,
+      "tau_j": 1.0250259075855374e-09,
+      "ticker": "QCOM"
+     },
+     {
+      "difference": 5.474370921244473e-12,
+      "passed": true,
+      "tau_j": 1.9614841978606353e-09,
+      "ticker": "TSLA"
+     },
+     {
+      "difference": -2.020149791500449e-12,
+      "passed": true,
+      "tau_j": 1.9667078014782164e-10,
+      "ticker": "WMT"
+     },
+     {
+      "difference": 1.6340367013478418e-12,
+      "passed": true,
+      "tau_j": 9.820054136774509e-10,
+      "ticker": "XOM"
+     }
+    ],
+    "max_abs_eps": {
+     "session": "2021-12-09",
+     "value": 1.5034474790198527e-10
+    },
+    "max_abs_eps_over_tau": {
+     "session": "2018-08-14",
+     "value": 0.3377702289810505
+    }
+   }
+  }
+ },
+ "survivor_universe_label": "survivor-universe: the frozen 25-symbol universe was chosen with present knowledge"
+}
